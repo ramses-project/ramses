@@ -21,7 +21,7 @@
 
 package fr.tpt.aadl.ramses.control.workflow;
 
-import java.util.List;
+import java.util.List ;
 
 /**
  * This interface specifies the methods that must be implemented by a workflow 
@@ -94,6 +94,8 @@ public interface WorkflowPilot {
 	 */
 	public String getInputModelId();
 	
+	public void setLoopModelIdSuffix(String suffix);
+	
 	/**
 	 * This method retrieves the identifier of the output model for the 
 	 * current action in the workflow being processed.
@@ -109,4 +111,7 @@ public interface WorkflowPilot {
   public AbstractLoop getLoop();
   
   public String getTransformationName();
+
+  public Workflow getWokflowRoot() ;
+
 }

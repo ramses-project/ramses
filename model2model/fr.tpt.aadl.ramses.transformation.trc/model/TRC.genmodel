@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/fr.tpt.aadl.ramses.transformation.trc/src" modelPluginID="fr.tpt.aadl.ramses.transformation.trc"
+    modelName="TRC" testsDirectory="" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="6.0" copyrightFields="false">
+  <foreignModel>TRC.ecore</foreignModel>
+  <genPackages prefix="Trc" basePackage="fr.tpt.aadl.ramses.transformation" disposableProviderFactory="true"
+      ecorePackage="TRC.ecore#/">
+    <genClasses ecoreClass="TRC.ecore#//TrcSpecification">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TrcSpecification/transformationList"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TrcSpecification/dependencyList"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TrcSpecification/moduleList"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//TransformationImpact">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//TransformationImpact/impactValue"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//TransformationImpact/qualityAttributeName"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//Module">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//Module/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//Module/path"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TRC.ecore#//Module/rules"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//Transformation">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//Transformation/impacts"/>
+      <genFeatures createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TRC.ecore#//Transformation/modules"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//Transformation/ruleName"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//Transformation/name"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//TransformationDependency">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//TransformationDependency/variableId"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TRC.ecore#//TransformationDependency/appliedTransformation"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TransformationDependency/requiredTransformations"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EReference TRC.ecore#//TransformationDependency/appliedRule"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="TRC.ecore#//AbstractRuleDependency"/>
+    <genClasses ecoreClass="TRC.ecore#//RuleDependencyConjunction"/>
+    <genClasses ecoreClass="TRC.ecore#//RuleDependencyDisjunction"/>
+    <genClasses ecoreClass="TRC.ecore#//RuleDependency">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//RuleDependency/variableId"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//RuleDependency/fieldNames"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TRC.ecore#//RuleDependency/requiredTransformation"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//RuleDependency/requiredRule"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//RuleDependency/isExclusion"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="TRC.ecore#//RuleDependencyComposite">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//RuleDependencyComposite/requiredTransformations"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="TRC.ecore#//TransformationElement"/>
+    <genClasses ecoreClass="TRC.ecore#//ModuleList">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//ModuleList/modules"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="TRC.ecore#//SpecificationElement"/>
+    <genClasses ecoreClass="TRC.ecore#//TransformationList">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TransformationList/transformations"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//TransformationDependencyList">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TransformationDependencyList/transformationDependencies"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//TrcRule">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//TrcRule/name"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TRC.ecore#//TrcRule/superRule"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//TrcRule/isAbstract"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

@@ -33,24 +33,27 @@ import org.eclipse.emf.ecore.EClass;
  *
  * @generated
  */
-public class DisjunctionImpl extends AnalysisSequenceImpl implements Disjunction {
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected DisjunctionImpl() {
-		super();
-	}
+public class DisjunctionImpl extends AnalysisSequenceImpl implements Disjunction
+{
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  protected DisjunctionImpl()
+  {
+    super();
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return WorkflowPackage.Literals.DISJUNCTION;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  protected EClass eStaticClass()
+  {
+    return WorkflowPackage.Literals.DISJUNCTION;
+  }
 
 } //DisjunctionImpl

@@ -39,21 +39,22 @@ import org.eclipse.emf.ecore.EObject;
  * @model
  * @generated
  */
-public interface List extends EObject {
-	/**
-	 * Returns the value of the '<em><b>File</b></em>' containment reference list.
-	 * The list contents are of type {@link fr.tpt.aadl.ramses.control.workflow.File}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>File</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>File</em>' containment reference list.
-	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getList_File()
-	 * @model containment="true" required="true"
-	 * @generated
-	 */
-	EList<File> getFile();
+public interface List extends EObject
+{
+  /**
+   * Returns the value of the '<em><b>File</b></em>' containment reference list.
+   * The list contents are of type {@link fr.tpt.aadl.ramses.control.workflow.File}.
+   * <!-- begin-user-doc -->
+   * <p>
+   * If the meaning of the '<em>File</em>' containment reference list isn't clear,
+   * there really should be more of a description here...
+   * </p>
+   * <!-- end-user-doc -->
+   * @return the value of the '<em>File</em>' containment reference list.
+   * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getList_File()
+   * @model containment="true" required="true"
+   * @generated
+   */
+  EList<File> getFile();
 
 } // List

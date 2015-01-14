@@ -21,7 +21,7 @@
 
 package test_events
 public
-  with POK, Data_Model, ARINC653;
+  with POK, Data_Model, ARINC653, common_pkg;
 
   system root
   end root;
@@ -29,7 +29,10 @@ public
   system implementation root.impl
   subcomponents
     the_cpu: processor common_pkg::cpu.single_partition  {	ARINC653::Module_Major_Frame => 1000 ms;
-    														ARINC653::Partition_Slots => (1000 ms);};
+    														ARINC653::Module_Schedule => (
+       															[Partition => reference(the_part); Duration => 1000ms; Periodic_Processing_Start => true;]
+    														);
+                                                         };
     the_proc: process proc.impl;
     the_mem: memory common_pkg::mem.impl;
   properties

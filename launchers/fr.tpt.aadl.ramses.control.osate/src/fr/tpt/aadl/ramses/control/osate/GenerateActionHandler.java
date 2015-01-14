@@ -23,6 +23,8 @@ package fr.tpt.aadl.ramses.control.osate;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.HashMap ;
+import java.util.Map ;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -36,6 +38,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.emf.common.util.TreeIterator ;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
@@ -55,6 +60,8 @@ import fr.tpt.aadl.ramses.control.support.generator.TransformationException;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
+import fr.tpt.aadl.ramses.control.workflow.Analysis ;
 import fr.tpt.aadl.ramses.control.workflow.EcoreWorkflowPilot;
 
 public class GenerateActionHandler extends RamsesActionHandler {
@@ -63,8 +70,6 @@ public class GenerateActionHandler extends RamsesActionHandler {
 
   private static final String _OUTLINE_COMMAND_ID = 
                          "fr.tpt.aadl.ramses.control.osate.outline.generation" ;
-//  private static final String MENU_OR_BUTTON_COMMAND_ID = 
-//                        "fr.tpt.aadl.ramses.control.osate.instance.generation" ;
   
 
   // Call init method to setup these attributes.
@@ -77,43 +82,86 @@ public class GenerateActionHandler extends RamsesActionHandler {
     try
     {
       _JOB_NAME = "RAMSES code generation";
+      
       init(event, _OUTLINE_COMMAND_ID) ;
       
-      // Fetch RAMSES configuration.
-      try
+      Resource r = _sysInst.eResource();
+      String workflowFile = getConfigFile(r, "workflow");
+
+      boolean foundGenerationPhase = false;
+
+      if(workflowFile!=null)
       {
-        RamsesPropertyPage.fetchProperties(_currentProject, _config) ;
-      }
-      catch (ConfigurationException ee)
-      {
-        if(RamsesPropertyPage.openPropertyDialog(_currentProject))
+        URI uri = URI.createFileURI(workflowFile);
+        Resource workflow = r.getResourceSet().getResource(uri, true);
+        TreeIterator<EObject> iter = workflow.getAllContents();
+        while(iter.hasNext())
         {
-          // Reload configuration.
+          EObject eObj = iter.next();
+          if(eObj instanceof fr.tpt.aadl.ramses.control.workflow.Generation)
+            foundGenerationPhase = true;
+        }
+      }
+      else
+        foundGenerationPhase = true;
+
+      if(foundGenerationPhase)
+      {
+        // Fetch RAMSES configuration.
+        try
+        {
           RamsesPropertyPage.fetchProperties(_currentProject, _config) ;
         }
-        else // User has canceled.
+        catch (ConfigurationException ee)
         {
-          return null ;
+          if(RamsesPropertyPage.openPropertyDialog(_currentProject))
+          {
+            // Reload configuration.
+            RamsesPropertyPage.fetchProperties(_currentProject, _config) ;
+          }
+          else // User has canceled.
+          {
+            return null ;
+          }
+        }
+        finally
+        {
+          // Only call once because it creates a log file.
+          LoggingConfigPage.fetchLoggingProperties(_currentProject);
+          _config.log() ;
         }
       }
-      finally
+      else if(workflowFile!=null)
       {
-        // Only call once because it creates a log file.
-        LoggingConfigPage.fetchLoggingProperties(_currentProject);
-        _config.log() ;
+    	  _config.setGenerationTargetId("workflow_only");
+    	  _config.setRamsesOutputDir(RamsesPropertyPage.
+    			  fetchPropertiesValue(_currentProject, RamsesPropertyPage.OUTPUT_DIR)) ;
+    	  // Only call once because it creates a log file.
+    	  LoggingConfigPage.fetchLoggingProperties(_currentProject);
+          _config.log() ;
       }
-      
-      Resource r;
-      if(_sysImpl!=null)
-    	  r = _sysImpl.eResource();
-      else
-    	  r = _sysInst.eResource();
-      if(getWorkflow(r)!=null)
+      if(workflowFile!=null)
       {
-    	  try
+        try
+        {
+          URI uri = URI.createFileURI(workflowFile);
+          Resource workflow = r.getResourceSet().getResource(uri, true);
+          TreeIterator<EObject> iter = workflow.getAllContents();
+          boolean foundAI=false;
+          while(iter.hasNext()
+              && !foundAI)
           {
-    		  AadlInspectorPropertyPage.fetchProperties(_currentProject, _config) ;
+            EObject eObj = iter.next();
+            if(eObj instanceof Analysis)
+            {
+              Analysis a = (Analysis) eObj;
+              if(a.getMethod().equals(Names.TIMING_ANALYSIS_PLUGIN_NAME))
+                foundAI = true;
+            }
           }
+          if(foundAI)
+            AadlInspectorPropertyPage.fetchProperties(_currentProject, _config) ;
+        }
     	  catch (ConfigurationException ee)
           {
             if(AadlInspectorPropertyPage.openPropertyDialog(_currentProject))
@@ -145,7 +193,7 @@ public class GenerateActionHandler extends RamsesActionHandler {
   @Override
   protected void jobCore(IProgressMonitor monitor) throws Exception
   {
-    monitor.beginTask("Code generation", IProgressMonitor.UNKNOWN);
+    monitor.beginTask("RAMSES execution", IProgressMonitor.UNKNOWN);
     
     if(monitor.isCanceled())
     {
@@ -159,13 +207,6 @@ public class GenerateActionHandler extends RamsesActionHandler {
     
     instantiator.setProgressMonitor(monitor);
     
-    // For the executed command from outline menu,the system implementation 
-    // root has to be instantiated prior to the code generation.
-    if(_isOutline)
-    {
-      // Fetch instantiate the model.
-      _sysInst = instantiator.instantiate(_sysImpl) ;
-    }
     // For executed command from the button or the RAMSES menu,system
     // implementation has already been instantiated.
     
@@ -202,10 +243,10 @@ public class GenerateActionHandler extends RamsesActionHandler {
     registry = ServiceProvider.getServiceRegistry() ;
     Generator generator = registry.getGenerator(config.getTargetId()) ;
     
-    SystemImplementation sysImpl = sinst.getSystemImplementation() ;
+    SystemImplementation sysImpl = (SystemImplementation) sinst.
+                                                  getComponentImplementation() ;
     
-    
-    String workflow = getWorkflow(sysImpl.eResource());
+    String workflow = getConfigFile(sysImpl.eResource(), "workflow");
     
     AnalysisErrorReporterManager errReporter = 
                                  ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER ;
@@ -216,6 +257,11 @@ public class GenerateActionHandler extends RamsesActionHandler {
     File[] includeDirs = new File[tmp.size()] ;
     tmp.toArray(includeDirs) ;
     
+    String properties = getConfigFile(sysImpl.eResource(), "properties");
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put(Names.RAMSES_PROPERTIES, properties);
+    config.setParameters(parameters);
+    
     if(workflow==null)
       generator.generate(sinst,
     		  			 config,
@@ -224,25 +270,29 @@ public class GenerateActionHandler extends RamsesActionHandler {
                          monitor) ;
     else
     {
-      EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(workflow);
+      EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(
+                                             sinst.getComponentImplementation().
+                                                   eResource().getResourceSet(),
+                                                                      workflow);
       generator.generateWorkflow(sinst,
-    		  					 config,
+                                 config,
                                  xmlPilot,
                                  includeDirs,
                                  errReporter,
                                  monitor);
+      generator.cleanUp();
     }
     
     ResourcesPlugin.getWorkspace().getRoot().
     refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor()); 
   }
 
-  private String getWorkflow(Resource r) {
+  private String getConfigFile(Resource r, String extension) {
 	  IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 	  // look for a workflow file
 	  String s = r.getURI().segment(1);
 	  File rootDir = new File(workspaceRoot.getProject(s).getLocationURI());
-	  String workflow = GenerateActionUtils.findWorkflow(rootDir);
+	  String workflow = GenerateActionUtils.findConfigFile(rootDir, extension);
 	  return workflow;
   }
 }

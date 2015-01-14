@@ -42,112 +42,111 @@ public class AnalysisResultFactoryImpl extends EFactoryImpl implements AnalysisR
   private static Logger _LOGGER = Logger.getLogger(AnalysisResultFactoryImpl.class) ;
   
   /**
-	 * Creates the default factory implementation.
-	 * <!-- begin-user-doc -->
+   * Creates the default factory implementation.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public static AnalysisResultFactory init() {
-		try {
-			AnalysisResultFactory theAnalysisResultFactory = (AnalysisResultFactory)EPackage.Registry.INSTANCE.getEFactory("http://fr.tpt.aadl.ramses.analysis/Analysis/1.0"); 
-			if (theAnalysisResultFactory != null) {
-				return theAnalysisResultFactory;
-			}
-		}
-		catch (Exception exception) {
-			EcorePlugin.INSTANCE.log(exception);
-		}
-		return new AnalysisResultFactoryImpl();
-	}
+    try
+    {
+      AnalysisResultFactory theAnalysisResultFactory = (AnalysisResultFactory)EPackage.Registry.INSTANCE.getEFactory(AnalysisResultPackage.eNS_URI);
+      if (theAnalysisResultFactory != null)
+      {
+        return theAnalysisResultFactory;
+      }
+    }
+    catch (Exception exception)
+    {
+      EcorePlugin.INSTANCE.log(exception);
+    }
+    return new AnalysisResultFactoryImpl();
+  }
 
 	/**
-	 * Creates an instance of the factory.
-	 * <!-- begin-user-doc -->
+   * Creates an instance of the factory.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public AnalysisResultFactoryImpl() {
-		super();
-	}
+    super();
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public EObject create(EClass eClass) {
-		switch (eClass.getClassifierID()) {
-			case AnalysisResultPackage.ANALYSIS_ARTIFACT: return createAnalysisArtifact();
-			case AnalysisResultPackage.QUANTITATIVE_ANALYSIS_RESULT: return createQuantitativeAnalysisResult();
-			case AnalysisResultPackage.QUALITATIVE_ANALYSIS_RESULT: return createQualitativeAnalysisResult();
-			case AnalysisResultPackage.ANALYSIS_SOURCE: return createAnalysisSource();
-			default:
-			{
-			  String msg = "The class '" + eClass.getName() + "' is not a valid classifier" ;
-			  _LOGGER.fatal(msg) ;
-			  throw new IllegalArgumentException(msg);
-			}
-				
-		}
-	}
+    switch (eClass.getClassifierID())
+    {
+      case AnalysisResultPackage.ANALYSIS_ARTIFACT: return createAnalysisArtifact();
+      case AnalysisResultPackage.QUANTITATIVE_ANALYSIS_RESULT: return createQuantitativeAnalysisResult();
+      case AnalysisResultPackage.QUALITATIVE_ANALYSIS_RESULT: return createQualitativeAnalysisResult();
+      case AnalysisResultPackage.ANALYSIS_SOURCE: return createAnalysisSource();
+      default:
+        throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+    }
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public AnalysisArtifact createAnalysisArtifact() {
-		AnalysisArtifactImpl analysisArtifact = new AnalysisArtifactImpl();
-		return analysisArtifact;
-	}
+    AnalysisArtifactImpl analysisArtifact = new AnalysisArtifactImpl();
+    return analysisArtifact;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public QuantitativeAnalysisResult createQuantitativeAnalysisResult() {
-		QuantitativeAnalysisResultImpl quantitativeAnalysisResult = new QuantitativeAnalysisResultImpl();
-		return quantitativeAnalysisResult;
-	}
+    QuantitativeAnalysisResultImpl quantitativeAnalysisResult = new QuantitativeAnalysisResultImpl();
+    return quantitativeAnalysisResult;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public QualitativeAnalysisResult createQualitativeAnalysisResult() {
-		QualitativeAnalysisResultImpl qualitativeAnalysisResult = new QualitativeAnalysisResultImpl();
-		return qualitativeAnalysisResult;
-	}
+    QualitativeAnalysisResultImpl qualitativeAnalysisResult = new QualitativeAnalysisResultImpl();
+    return qualitativeAnalysisResult;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public AnalysisSource createAnalysisSource() {
-		AnalysisSourceImpl analysisSource = new AnalysisSourceImpl();
-		return analysisSource;
-	}
+    AnalysisSourceImpl analysisSource = new AnalysisSourceImpl();
+    return analysisSource;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public AnalysisResultPackage getAnalysisResultPackage() {
-		return (AnalysisResultPackage)getEPackage();
-	}
+    return (AnalysisResultPackage)getEPackage();
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @deprecated
-	 * @generated
-	 */
+   * @deprecated
+   * @generated
+   */
 	public static AnalysisResultPackage getPackage() {
-		return AnalysisResultPackage.eINSTANCE;
-	}
+    return AnalysisResultPackage.eINSTANCE;
+  }
 
 } //AnalysisResultFactoryImpl

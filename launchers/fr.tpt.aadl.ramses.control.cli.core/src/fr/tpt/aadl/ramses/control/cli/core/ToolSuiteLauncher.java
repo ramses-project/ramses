@@ -22,6 +22,7 @@
 package fr.tpt.aadl.ramses.control.cli.core ;
 
 import java.io.File ;
+import java.io.FileNotFoundException ;
 import java.io.IOException ;
 import java.io.PrintStream ;
 import java.util.ArrayList ;
@@ -49,7 +50,7 @@ import fr.tpt.aadl.ramses.control.support.instantiation.ParseException ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.workflow.WorkflowPilot ;
+import fr.tpt.aadl.ramses.control.workflow.EcoreWorkflowPilot ;
 
 /**
  * This class provides services to the Command 
@@ -66,7 +67,7 @@ public class ToolSuiteLauncher
   
   private static Logger _LOGGER = Logger.getLogger(ToolSuiteLauncher.class) ;
   
-  ToolSuiteLauncher(IProgressMonitor monitor,
+  public ToolSuiteLauncher(IProgressMonitor monitor,
                     StandAloneInstantiator instantiator,
                     PredefinedAadlModelManager modelManager)
   {
@@ -144,7 +145,7 @@ public class ToolSuiteLauncher
     }
   }
 
-  List<Resource> performParse(List<File> aadlFile) throws ParseException
+  public List<Resource> performParse(List<File> aadlFile) throws ParseException
   {
     List<Resource> result = _instantiator.parse(aadlFile) ;
     return result ;
@@ -155,7 +156,7 @@ public class ToolSuiteLauncher
    * and registers them in the OSATE resource set.
    * @throws ParseException 
    */
-  void parsePredefinedRessources() throws ParseException
+  public void parsePredefinedRessources() throws ParseException
   {
     _monitor.subTask("Parse predefined AADL models");
     _modelManager.parsePredefinedAadlModels();
@@ -164,8 +165,7 @@ public class ToolSuiteLauncher
   void launchDefaultGenerationProcess (List<File> mainModels,
                                      	 String systemToInstantiate,
                                      	 RamsesConfiguration config,
-                                     	 File[] includeDirs,
-                                     	 Map<String, Object> parameters)
+                                     	 File[] includeDirs)
                                                       throws AnalysisException,
                                                              GenerationException,
                                                          TransformationException,
@@ -189,26 +189,29 @@ public class ToolSuiteLauncher
       System.exit(-1);
     }
     
-    generator.setParameters(parameters) ;
-    
     generator.generate(instance, config, includeDirs,
                        ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER, _monitor) ;
   }
 
-  void launchWorkflowProcess (List<File> mainModels,
-                              String systemToInstantiate,
-                              RamsesConfiguration config,
-                              File[] includeDirs,
-                              WorkflowPilot xmlPilot,
-                              Map<String, Object> parameters)
+  void launchWorkflowProcessForGeneration (List<File> mainModels,
+                                           String systemToInstantiate,
+                                           RamsesConfiguration config,
+                                           File[] includeDirs,
+                                           String workflowFilePath)
                                                       throws AnalysisException,
-                                                            GenerationException,
+                                                      GenerationException,
                                                       TransformationException,
-                                                      ParseException
+                                                      ParseException, FileNotFoundException
   {
     ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
-    Generator generator = registry.getGenerator(config.getTargetId()) ;
-    
+    Generator generator;
+    if(config.getTargetId()!=null)
+    {
+      generator = registry.getGenerator(config.getTargetId()) ;
+    }
+    else
+      generator = registry.getGenerator("workflow_only");
+                                        
     _monitor.subTask("Parse AADL models");
     List<Resource> aadlModels = _instantiator.parse(mainModels) ;
     
@@ -224,11 +227,15 @@ public class ToolSuiteLauncher
       System.exit(-1);
     }
 
-    generator.setParameters(parameters) ;
+    EcoreWorkflowPilot workflowPilot = new EcoreWorkflowPilot(
+                                          instance.getComponentImplementation().
+                                                   eResource().getResourceSet(),
+                                                              workflowFilePath);
     
-    generator.generateWorkflow(instance, config, xmlPilot, includeDirs,
+    generator.generateWorkflow(instance, config, workflowPilot, includeDirs,
                                ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
                                _monitor) ;
+    generator.cleanUp();
   }
   
   void performAnalysis(List<File> mainModelFiles,

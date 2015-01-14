@@ -33,7 +33,9 @@ import java.util.Set ;
 
 import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.core.runtime.Platform ;
 import org.eclipse.emf.ecore.resource.Resource ;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.utils.Aadl2Utils ;
 
 import com.martiansoftware.jsap.FlaggedOption ;
@@ -78,10 +80,7 @@ public class ToolSuiteLauncherCommand
   private static final String ANALYSIS_LIST_OPTION_ID = "analysis_list" ;
   private static final String SOURCE_MODELS_OPTION_ID = "source_models" ;
   private static final String INCLUDES_OPTION_ID = "include_directories" ;
-  private static final String SUPERIMPOSITION_FILES_OPTION_ID =
-        "superimposition_files" ;
-  private static final String POST_TRANSFORMATION_FILES_OPTION_ID =
-        "post_transformation_files" ;
+  
   private static final String SYSTEM_TO_INSTANTIATE_OPTION_ID =
         "system_to_instantiate" ;
   private static final String OUTPUT_DIR_OPTION_ID = "output_directory" ;
@@ -163,7 +162,7 @@ public class ToolSuiteLauncherCommand
           }
           else // Case of generation.
           {
-            generation(options) ;
+            defaultProcess(options) ;
           }
           
           if(ServiceProvider.SYS_ERR_REP.hasDelayedErrors())
@@ -280,24 +279,7 @@ public class ToolSuiteLauncherCommand
     system_to_instantiate
           .setHelp("Name of the system to instantiate in input aadl files") ;
     
-    QualifiedSwitch superimposition_files =
-          (QualifiedSwitch) (new QualifiedSwitch(
-                SUPERIMPOSITION_FILES_OPTION_ID).setShortFlag('t')
-                .setLongFlag("transformation").setList(true)
-                .setListSeparator(',').setAllowMultipleDeclarations(false)) ;
-    superimposition_files
-          .setHelp("Determines whether model transformation is performed or not:\n"
-                + "-t or --transformation only launch the uninstanciate.atl model transformation"
-                + "-t:MyFile.asm launch the superimposition of uninstanciate.atl with MyFile.atl") ;
     
-    FlaggedOption post_transformation_files =
-          new FlaggedOption(POST_TRANSFORMATION_FILES_OPTION_ID)
-                .setStringParser(JSAP.STRING_PARSER).setRequired(false)
-                .setLongFlag("post-transformation").setShortFlag('x')
-                .setList(true).setListSeparator(',')
-                .setAllowMultipleDeclarations(false) ;
-    post_transformation_files
-          .setHelp("ASM file names used to refine the result of the superimposed uninstanciate model transformation") ;
     
     FlaggedOption generated_file_path =
           new FlaggedOption(OUTPUT_DIR_OPTION_ID)
@@ -341,8 +323,6 @@ public class ToolSuiteLauncherCommand
     jsap.registerParameter(system_to_instantiate) ;
     jsap.registerParameter(generated_file_path) ;
     
-    jsap.registerParameter(superimposition_files) ;
-    jsap.registerParameter(post_transformation_files) ;
     jsap.registerParameter(generation) ;
     jsap.registerParameter(runtimePath);
     jsap.registerParameter(workflow_path) ;
@@ -409,6 +389,8 @@ public class ToolSuiteLauncherCommand
     }
     
     /*** Always set Ramses resouce dirs before initialize Service Registry, instantiator and AADL models manager !!! ***/
+    
+    OsateResourceUtil.USES_GUI=false;
     setRamsesResourceDir(_includeDirs) ;
     
     _monitor = new RamsesProgressMonitor(System.out) ;
@@ -528,7 +510,7 @@ public class ToolSuiteLauncherCommand
     return result ;
   }
   
-  private static void generation(JSAPResult options) throws AnalysisException,
+  private static void defaultProcess(JSAPResult options) throws AnalysisException,
                                                          ConfigurationException,
                                                             GenerationException,
                                                          TransformationException,
@@ -538,6 +520,8 @@ public class ToolSuiteLauncherCommand
     instantiationOptionsHandler(options, config);
     
     String targetName = options.getString(GENERATION_OPTION_ID) ;
+    if(targetName==null)
+      targetName = "workflow_only";
     ConfigStatus status = config.setGenerationTargetId(targetName) ;
     if(status != ConfigStatus.SET)
     {
@@ -545,29 +529,36 @@ public class ToolSuiteLauncherCommand
       throw new ConfigurationException(status) ;
     }
     
-    String path = options.getString(RUNTIME_PATH_OPTION_ID) ;
+    String workflow_path =
+        options.getString(WORKFLOW_OPTION_ID) ;
+    boolean isWorkflow = workflow_path != null ; 
     
-    status = config.setRuntimePath(path) ;
-    if(status != ConfigStatus.SET)
+    if(isWorkflow==false
+        || false==targetName.equals("workflow_only"))
     {
-      _logger.fatal(status.msg) ;
-      throw new ConfigurationException(status) ;
+      String path = options.getString(RUNTIME_PATH_OPTION_ID) ;
+      status = config.setRuntimePath(path) ;
+      if(status != ConfigStatus.SET)
+      {
+        _logger.fatal(status.msg) ;
+        throw new ConfigurationException(status) ;
+      }
     }
+    
     
     File[] inclDirs = toArray(_includeDirs) ;
     
-    String workflow_path =
-          options.getString(WORKFLOW_OPTION_ID) ;
       
     Map<String, Object> parameters = parametersHandler(options) ;
-    
-    boolean isWorkflow = workflow_path != null ; 
+    config.setParameters(parameters);
     
     String mainTaskName = "Generate code for " + targetName ;
+
     
     if(isWorkflow)
     {
-      mainTaskName += " (workflow XML)" ;
+      
+      mainTaskName = "Processing workflow " + workflow_path;
     }
     
     _monitor.beginTask(mainTaskName, IProgressMonitor.UNKNOWN);
@@ -579,15 +570,11 @@ public class ToolSuiteLauncherCommand
       try
       {
         File workflowFile = org.osate.utils.FileUtils.stringToFile(workflow_path) ;
-        
-        EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(workflowFile.toString());
-          
-        _launcher.launchWorkflowProcess(_mainModelFiles,
+        _launcher.launchWorkflowProcessForGeneration(_mainModelFiles,
                                         _systemToInstantiate,
                                         config,
                                         inclDirs,
-                                        xmlPilot,
-                                        parameters) ;
+                                        workflowFile.toString()) ;
       }
       catch (FileNotFoundException ex)
       {
@@ -602,8 +589,7 @@ public class ToolSuiteLauncherCommand
       _launcher.launchDefaultGenerationProcess(_mainModelFiles,
                                                _systemToInstantiate,
                                                config,
-                                               inclDirs,
-                                               parameters) ;
+                                               inclDirs) ;
     }
     
     _monitor.done();
@@ -768,9 +754,21 @@ public class ToolSuiteLauncherCommand
       String folder = EnvUtils.getExternalVariable(Names.RAMSES_RESOURCES_VAR) ;
       if(folder == null || folder.isEmpty())
       {
-        folder = Names.DEFAULT_RAMSES_RESOUCE_DIR ;
+        try
+        {
+          if(Platform.isRunning())
+            folder = Aadl2Utils.getAbsolutePluginPath(Names.
+                                                      ATL_TRANSFORMATION_PLUGIN_ID).toString() ;
+        }
+        catch(Exception e)
+        {
+          ConfigStatus.NOT_FOUND.msg = e.getMessage() ;
+          throw new ConfigurationException(ConfigStatus.NOT_FOUND) ;
+        }
+        
+        if(folder == null || folder.isEmpty())
+          folder = Names.DEFAULT_RAMSES_RESOUCE_DIR ;
       }
-      
       status = RamsesConfiguration.setRamsesResourceDir(folder) ;
       if(status == ConfigStatus.SET)
       {
@@ -818,7 +816,7 @@ public class ToolSuiteLauncherCommand
     sb.append("******************************************") ;
     sb.append(Names.NEW_LINE) ;
               
-    sb.append("CODE GENERATION HAS SUCCESSFULLY COMPLETED") ;
+    sb.append("RAMSES HAS COMPLETED ITS EXECUTION") ;
     sb.append(Names.NEW_LINE) ;
     
     

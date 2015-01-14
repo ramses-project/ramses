@@ -68,7 +68,8 @@ public class PokGeneratorFactory implements GeneratorFactory
     AadlTargetSpecificGenerator result = 
                   new AadlTargetSpecificGenerator(targetTrans, tarSpecCodeGen,
                                                   modelInstantiatior,
-                                                  targetVal) ;
+                                                  targetVal,
+                                                  predefinedAadlModels) ;
     
     result.setRegistryName(POK_GENERATOR_NAME) ;
     

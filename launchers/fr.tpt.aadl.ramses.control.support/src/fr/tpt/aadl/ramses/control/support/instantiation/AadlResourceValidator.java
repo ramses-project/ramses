@@ -44,6 +44,15 @@ public class AadlResourceValidator {
   {
     for(Resource input_resource : resourceSet.getResources())
     {
+      if(input_resource.getContents().isEmpty())
+        continue;
+      if(false==(input_resource.getContents().get(0) instanceof Element))
+        continue;
+      if(false==input_resource.getURI().toString().endsWith(".aadl2")
+    		  && false==input_resource.getURI().toString().endsWith(".aadl"))
+      {
+    	  continue;
+      }
       for(EObject myModel : input_resource.getContents())
       {
         Diagnostic diagnostic = Diagnostician.INSTANCE.validate(myModel) ;

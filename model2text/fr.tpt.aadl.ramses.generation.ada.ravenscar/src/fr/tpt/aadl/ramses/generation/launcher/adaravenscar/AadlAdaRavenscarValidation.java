@@ -38,6 +38,7 @@ public class AadlAdaRavenscarValidation extends Aadl2ConstraintValidationEMFTVML
 		ATL_FILE_NAMES.add("tools/PropertiesTools");
 		ATL_FILE_NAMES.add("ACG/Constraints/shared/Common");
 		ATL_FILE_NAMES.add("ACG/Constraints/shared/ProcessInstances");
+		ATL_FILE_NAMES.add("ACG/Constraints/shared/DataInstances");
 		ATL_FILE_NAMES.add("ACG/Constraints/shared/ProcessorInstances");
 		ATL_FILE_NAMES.add("ACG/Constraints/shared/VirtualProcessorInstances");
 		ATL_FILE_NAMES.add("ACG/Constraints/shared/ThreadInstances");

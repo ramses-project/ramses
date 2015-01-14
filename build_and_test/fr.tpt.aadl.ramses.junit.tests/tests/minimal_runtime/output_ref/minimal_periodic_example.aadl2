@@ -64,7 +64,7 @@ Minimal_Runtime_Sync::Wait_Next_Period ! (Period)
   final_state : complete final state ;
 transitions
   init_state -[true]-> final_state {Minimal_Example::Transmitter1_Init_Subprog ! ;
-Transmitter1_Thread_Routine ! (P1_Portvariable, P1_Monitor, P1_Mutex, P1_Pending_Event_Chain, Period, Is_Alive) ;
+Transmitter1_Thread_Routine ! (P1_Portvariable, P1_Monitor, P1_Mutex, P1_Pending_Event_Chain, Transmitter1_Thread.impl#Period, Is_Alive) ;
 Minimal_Example::Transmitter1_Finalization_Subprog !} ;
 **};
   end Transmitter1_Thread.impl;
@@ -132,7 +132,7 @@ Minimal_Runtime_Sync::Wait_Next_Period ! (Period)
   final_state : complete final state ;
 transitions
   init_state -[true]-> final_state {Minimal_Example::Transmitter2_Init_Subprog ! ;
-Transmitter2_Thread_Routine ! (P2_Portvariable, P2_Monitor, P2_Mutex, P2_Pending_Event_Chain, Period, Is_Alive) ;
+Transmitter2_Thread_Routine ! (P2_Portvariable, P2_Monitor, P2_Mutex, P2_Pending_Event_Chain, Transmitter2_Thread.impl#Period, Is_Alive) ;
 Minimal_Example::Transmitter2_Finalization_Subprog !} ;
 **};
   end Transmitter2_Thread.impl;

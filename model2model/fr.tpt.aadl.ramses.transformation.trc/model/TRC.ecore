@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="trc" nsURI="http://fr.tpt.aadl.ramses.transformation/TRC/1.0"
+    nsPrefix="trc">
+  <eClassifiers xsi:type="ecore:EClass" name="TrcSpecification">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="transformationList" lowerBound="1"
+        eType="#//TransformationList" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dependencyList" lowerBound="1"
+        eType="#//TransformationDependencyList" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="moduleList" lowerBound="1"
+        eType="#//ModuleList" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TransformationImpact" eSuperTypes="#//TransformationElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="impactValue" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="qualityAttributeName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Module">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="path" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="rules" upperBound="-1"
+        eType="#//TrcRule" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Transformation">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="impacts" upperBound="-1"
+        eType="#//TransformationImpact" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="modules" lowerBound="1"
+        upperBound="-1" eType="#//Module"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="ruleName" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TransformationDependency">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="variableId" lowerBound="1"
+        upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="appliedTransformation"
+        lowerBound="1" eType="#//Transformation"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="requiredTransformations"
+        lowerBound="1" eType="#//AbstractRuleDependency" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="appliedRule" eType="#//TrcRule"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractRuleDependency" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="RuleDependencyConjunction" eSuperTypes="#//RuleDependencyComposite"/>
+  <eClassifiers xsi:type="ecore:EClass" name="RuleDependencyDisjunction" eSuperTypes="#//RuleDependencyComposite"/>
+  <eClassifiers xsi:type="ecore:EClass" name="RuleDependency" eSuperTypes="#//AbstractRuleDependency">
+    <eOperations name="isExclusion" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="variableId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fieldNames" lowerBound="1"
+        upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="requiredTransformation"
+        eType="#//Transformation"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isExclusion" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="requiredRule" lowerBound="1"
+        eType="#//TrcRule"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="RuleDependencyComposite" abstract="true"
+      eSuperTypes="#//AbstractRuleDependency">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="requiredTransformations"
+        lowerBound="1" upperBound="-1" eType="#//AbstractRuleDependency" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TransformationElement" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="ModuleList">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="modules" upperBound="-1"
+        eType="#//Module" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SpecificationElement" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="TransformationList">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="transformations" lowerBound="1"
+        upperBound="-1" eType="#//Transformation" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TransformationDependencyList">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="transformationDependencies"
+        lowerBound="1" upperBound="-1" eType="#//TransformationDependency" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TrcRule">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="superRule" eType="#//TrcRule"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isAbstract" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+</ecore:EPackage>

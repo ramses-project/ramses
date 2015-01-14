@@ -27,9 +27,22 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									AADL_RUNTIME: AADLBA,
 									DATA_MODEL: AADLBA,
 									PROGRAMMING_PROPERTIES: AADLBA,
-									HOOKS: ATLHOOKS,
+									HOOKS: ATLHOOKS;
 
-									ARINC653_RUNTIME: AADLBA;
+--- TO be superimposed in target specific module
+
+rule m_Thread_IntraProcess_Input_EventPort_Instance
+{
+	from
+		fi: AADLI!FeatureInstance
+}
+
+rule m_Thread_IntraProcess_Input_EventDataPort_Instance
+{
+	from
+		fi: AADLI!FeatureInstance
+}
+
 
 ------------------------------------------------------------
 --- Beginning of refactoring
@@ -39,9 +52,14 @@ helper context AADLI!ConnectionInstanceEnd def:getGlobalVariableImg(): AADLBA!Da
 	thisModule.resolveMatchedSingleIfExists(self,'globalVariable')
 ;
 
+helper context AADLI!ConnectionInstanceEnd def:getGlobalVariableImg(mode: AADLI!Mode): AADLBA!DataSubcomponent =
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,mode},'globalVariable')
+;
+
 helper context AADLI!FeatureInstance def : retreiveMessageAddress() : AADLBA!DataSubcomponent =
 	thisModule.resolveMatchedSingleIfExists(self, 'localVariable')
 ;
+
 
 abstract rule m_Not_PeriodicDelayed_Port
 {
@@ -51,7 +69,7 @@ abstract rule m_Not_PeriodicDelayed_Port
 }
 
 -- @extends m_Feature_Instance
-rule m_Thread_Port_Instance
+abstract rule m_Thread_Port_Instance
 {
 	from
 		fi: AADLI!FeatureInstance
@@ -71,6 +89,24 @@ rule m_Thread_Port_Instance
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
 	}
+}
+
+-- @extends m_Thread_Port_Instance
+abstract rule m_Thread_Port_Instance_Mode
+{
+	from
+		fi: AADLI!FeatureInstance,
+		mode: AADLI!Mode
+		(fi.connectedInMode(mode))
+	to
+		f: AADLBA!DataAccess
+		(
+			name <- fi.feature.name+'_'+mode.name
+		),
+		f_entrypoint: AADLBA!DataAccess
+		(
+			name <- fi.feature.name+'_'+mode.name
+		)
 }
 
 -- @extends m_Thread_Port_Instance
@@ -113,6 +149,26 @@ rule m_Thread_Output_Port_Instance
 		connectedAccess.setContext(thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'sub'));
 	}
 }
+
+-- @extends m_Thread_Output_Port_Instance
+rule m_Thread_Output_Port_Instance_Mode
+{
+	from
+		fi: AADLI!FeatureInstance,
+		cnxRef: AADLI!PortConnection,
+		mode: AADLI!Mode
+		(cnxRef.inModeOrTransition->includes(mode))
+	to
+		f: AADLBA!DataAccess
+		(
+			name <- cnxRef.uniqueName()+'_'+fi.feature.name+'_'+mode.name --connection data access (left side) in thread implementation
+		),
+		f_entrypoint: AADLBA!DataAccess
+		(
+			name <- cnxRef.uniqueName()+'_'+fi.feature.name+'_'+mode.name --connection data access (right side) in thread implementation
+		)
+}
+
 
 rule m_Process_Output_Port_Instance
 {
@@ -160,6 +216,28 @@ rule m_Thread_Input_Port_Instance
 	}
 }
 
+-- @extends m_Thread_Port_Instance_Mode,m_Thread_Input_Port_Instance
+rule m_Thread_Input_Port_Instance_Mode
+{
+	from
+		fi:AADLI!FeatureInstance,
+		mode: AADLI!Mode
+	to
+		f:AADLBA!DataAccess,
+		connectedSubcomponent: AADLBA!ConnectedElement,
+		accessConnection: AADLBA!AccessConnection
+		(
+			name <- 'Id_instance_to_'+fi.getComponentInstance().name+'_'+fi.name+'_'+mode.name,
+			source<-connectedSubcomponent,
+			accessCategory<-#data,
+			destination<-connectedAccess
+		),
+		connectedAccess: AADLBA!ConnectedElement
+		(
+			connectionEnd<-f
+		)
+}
+
 -- @extends m_Thread_Input_Port_Instance
 rule m_Thread_InterProcess_Input_Port_Instance
 {
@@ -172,6 +250,19 @@ rule m_Thread_InterProcess_Input_Port_Instance
 		connectedSubcomponent: AADLBA!ConnectedElement
 		(
 			connectionEnd<-fi.dstConnectionInstance->first().connectionReference->last().source.getGlobalVariableImg()
+		)
+}
+
+-- @extends m_Thread_InterProcess_Input_Port_Instance,m_Thread_Input_Port_Instance_Mode
+rule m_Thread_InterProcess_Input_Port_Instance_Mode
+{
+	from
+		fi:AADLI!FeatureInstance,
+		mode: AADLI!Mode
+	to
+		connectedSubcomponent: AADLBA!ConnectedElement
+		(
+			connectionEnd<-fi.dstConnectionInstance->any(e|e.connectionReference->exists(f|f.inMode->includes(mode))).connectionReference->last().source.getGlobalVariableImg()
 		)
 }
 
@@ -194,6 +285,21 @@ rule m_Thread_IntraProcess_Input_Port_Instance
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(globalVariable, fi);
 	}
+}
+
+-- @extends m_Thread_Input_Port_Instance_Mode,m_Thread_IntraProcess_Input_Port_Instance
+rule m_Thread_IntraProcess_Input_Port_Instance_Mode
+{
+	from
+		fi:AADLI!FeatureInstance,
+		mode: AADLI!Mode
+	to
+		globalVariable: AADLBA!DataSubcomponent
+		(name <- fi.getComponentInstance().name+'_'+fi.name+'_globalVariable'+'_'+mode.name), -- process subcomponents Task + _ + Port P + global variable 
+		connectedSubcomponent: AADLBA!ConnectedElement
+		(
+			connectionEnd<-fi.getGlobalVariableImg(mode)
+		)
 }
 
 rule m_Process_Input_Port_Instance
@@ -393,7 +499,7 @@ helper context AADLBA!Classifier def: needsToMapBehaviorAnnex(): Boolean =
 	self.getPropertyAssociation('Source_Text').oclIsUndefined()
 ;
 
--- @extends m_Feature_Instance
+-- @extends m_Feature_Instance,m_Thread_IntraProcess_Input_EventPort_Instance
 rule m_EventPort_Instance_with_BA
 {
 	from
@@ -409,12 +515,12 @@ rule m_EventPort_Instance_with_BA
 		-- target data access must be called 'f' to be retreived with resolveTemp
 		f: AADLBA!DataAccess
 			(
-				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction.getName(),
 				kind <- #requires
 			),
 		f_entrypoint: AADLBA!DataAccess
 			(
-				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction.getName(),
 				kind <- #requires
 			)
 	do
@@ -423,7 +529,7 @@ rule m_EventPort_Instance_with_BA
 	}
 }
 
--- @extends m_Feature_Instance
+-- @extends m_Feature_Instance,m_Thread_IntraProcess_Input_EventDataPort_Instance
 rule m_EventDataPort_Instance_with_BA
 {
 	from
@@ -440,7 +546,7 @@ rule m_EventDataPort_Instance_with_BA
 		-- target data access must be called 'f' to be retreived with resolveTemp 
 		f: AADLBA!DataAccess
 			(
-				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction.getName(),
 				kind <- #requires
 			),
 		dataSubcomponent: AADLBA!DataSubcomponent
@@ -450,7 +556,7 @@ rule m_EventDataPort_Instance_with_BA
 		),
 		f_entrypoint: AADLBA!DataAccess
 		(
-			name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+			name <- fi.name+thisModule.dataAccessSuffix()+fi.direction.getName(),
 			kind <- #requires
 		),
 		actualParam: AADLBA!Parameter
@@ -488,10 +594,6 @@ rule m_DataAccess_Instance_with_BA
 	}
 }
 
-helper def: getErrorCodeInitValue() : String =
-	thisModule.toStringLiteral('0')
-;
-
 unique lazy rule CreateReturnSubcomponentFromPort
 {
 	from
@@ -511,6 +613,69 @@ unique lazy rule CreateReturnSubcomponentFromPort
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, port);
 		dataSubcomponent;
+	}
+}
+
+
+
+helper def: GetOrCreateLengthDataSubcomponentHolder(port: AADLI!FeatureInstance): AADLBA!DataSubcomponent =
+	if port.getModalPropertyValue('length_data_subcomponent').oclIsUndefined() then
+		thisModule.CreateLengthDataSubcomponentHolder(port)
+	else
+		thisModule.CreateLengthParameterHolder(port)
+	endif
+;
+
+lazy rule CreateLengthParameterHolder
+{
+	from
+		port : AADLI!FeatureInstance
+	using
+	{
+		lengthSubcomponent: AADLI!DataSubcomponent = port.getModalPropertyValue('length_data_subcomponent').ownedValue.referencedInstanceObject.subcomponent;
+		c: AADLI!ComponentInstance = port.getComponentInstance();
+		impl: AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
+		callSequences: Sequence(AADLBA!SubprogramCallSequence) = impl.ownedSubprogramCallSequence->select(e|e.isComputeEntryPointOf(c));
+		param: AADLI!Parameter = impl.ownedParameterConnection
+								->select(e|e.source.connectionEnd=lengthSubcomponent)
+								->collect(e|
+									callSequences->collect(behavior |
+										thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(f|f.subcomponent=e.source.connectionEnd), behavior, e},'featureImg'))
+									)
+								->union
+								(
+									impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )
+									->select(e|e.destination.connectionEnd.oclIsKindOf(AADLI!DataSubcomponent))
+									->collect(e|
+										callSequences->collect(behavior |
+											thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(f|f.subcomponent=e.destination.connectionEnd), behavior, e},'featureImg'))
+										)
+								)->flatten()->first();
+	}
+	to
+		paramHolder: AADLBA!ParameterHolder
+		(
+			element <- param
+		)
+	do
+	{
+		paramHolder;
+	}
+}
+
+lazy rule CreateLengthDataSubcomponentHolder
+{
+	from
+		port : AADLI!FeatureInstance
+		(port.getModalPropertyValue('length_data_subcomponent').oclIsUndefined())
+	to
+		dataSubcomponentHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.CreateLengthDataSubcomponent(port)
+		)
+	do
+	{
+		dataSubcomponentHolder;
 	}
 }
 
@@ -537,29 +702,9 @@ unique lazy rule CreateLengthDataSubcomponent
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, port);
-		
 		dataSubcomponent;
 	}
 }
-
-helper context AADLI!FeatureInstance def: getLengthInitialValue() : String =
-	let ba: AADLBA!BehaviorAnnex = self.getBehaviorAnnex() in
-	let p: AADLI!FeatureInstance = self.getDirectlyUsedInFresh() in
-	if(not p.oclIsUndefined()) then
-		let package_name: String = p.getComponentInstance().subcomponent.classifier.getNamespace().getOwner().name in
-		if(p.getComponentInstance().eContainer() = self.getComponentInstance().eContainer()) then
-			package_name+thisModule.getPackageSuffix().concat('::'+p.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
-		else
-			package_name+thisModule.getPackageSuffix().concat('::'+self.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
-		endif
-	else
-		if(self.isEventPort()) then
-			'Integer_16'.asClassifier('BASE_TYPES').getProgrammationLanguageIdentifier()
-		else 
-			self.feature.dataFeatureClassifier.getProgrammationLanguageIdentifier()
-		endif
-	endif
-;
 
 unique lazy rule createResolvedSpg
 {
@@ -584,11 +729,11 @@ unique lazy rule createResolvedSpg
 		actualParam : AADLBA!Parameter
 		(
 			refined <- param,
-			direction <- param.direction,
 			dataFeatureClassifier <- classifier
 		)
 	do
 	{
+		thisModule.setDirection(actualParam, param);
 		spg_ResolvedType;
 	}
 }

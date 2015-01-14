@@ -84,7 +84,7 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 	)
 	->union
 	(
-		callSequences->collect(callSequence | c.subcomponent.classifier.ownedParameterConnection -> select(paramCnx| 
+		callSequences->collect(callSequence | c.subcomponent.classifier.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) ) -> select(paramCnx| 
 				paramCnx.isParamToParamConnection()
 				and
 				paramCnx.isPartOfCallSequence(callSequence)
@@ -446,7 +446,8 @@ unique lazy rule createResolvedSpg
 		actualParam : AADLBA!Parameter
 		(
 			refined <- param,
-			direction <- param.direction,
+			in <- param.in,
+			out <- param.out,
 			dataFeatureClassifier <- classifier
 		)
 	do
@@ -472,7 +473,30 @@ unique lazy rule CreateValidityDataSubcomponent
 	}
 }
 
-unique lazy rule CreateTimeOutSubcomponentFromCpt
+
+unique lazy rule CreateTimeOutSubcomponentFromCptPeriod
+{
+	from
+		inst : AADLI!ComponentInstance
+	using
+	{
+		initValuePE: AADLBA!PropertyExpression = thisModule.toStringLiteral(inst.getPeriodValue().toString());
+	}
+	to
+		dataSubcomponent: AADLBA!DataSubcomponent
+		(
+			name<-inst.name+'_TimeOut',
+			dataSubcomponentType<-'System_Time_Type'.asDataType('ARINC653_RUNTIME'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',thisModule.CreateListValueFromPropertyExpression(initValuePE))} 
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, inst);
+		dataSubcomponent;
+	}
+}
+
+unique lazy rule CreateInfiniteTimeOutSubcomponentFromCpt
 {
 	from
 		inst : AADLI!ComponentInstance
@@ -513,107 +537,6 @@ unique lazy rule CreateTimeOutSubcomponentFromPort
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, port);
 		dataSubcomponent;
-	}
-}
-
-helper def: getRuntimeReturnType() : AADLBA!DataSubcomponentType = 'Return_Code_Type'.asDataType('ARINC653_RUNTIME');
-
-
--------------------------------------------------------------------------------------------
----- End of refactoring
--------------------------------------------------------------------------------------------
-
-
--------------------------------------------------------------------------------------------
-----	OVERRIDEN HELPERS
--------------------------------------------------------------------------------------------
-
-
-
---helper context AADLI!ConnectionInstance def : isDefaultConnectionInstance() : Boolean =
---	not thisModule.toBeTransformedInterProcessConnection(self)
---	and
---	not thisModule.toBeTransformedIntraProcessConnection(self)
---;
-
-
-------------------------------------
----      ADDED CALLED RULES     ----
-------------------------------------
-
-rule addNextValueSubprogramCallAction(actions:AADLBA!BehaviorActions,
-								fi: AADLI!FeatureInstance,
-								implImg: AADLBA!ComponentImplementation)
-{
-	do
-	{
-		for(cnxInst in fi.dstConnectionInstance)
-		{
-			if(thisModule.toBeTransformedInterProcessConnection(cnxInst))
-			{
-				if(cnxInst.source.category=#eventPort or cnxInst.source.category=#eventDataPort)
-				{
-					thisModule.addReceiveQueuingAction(actions, fi, implImg);
-				}
-				else if(cnxInst.source.category=#dataPort)
-				{
-					thisModule.addReadSamplingAction(actions, fi, implImg);
-				}
-			}
-			else if(thisModule.toBeTransformedIntraProcessConnection(cnxInst))
-			{
-				if(cnxInst.source.category=#eventPort)
-				{
-					thisModule.addWaitEventAction(actions, fi, implImg);
-				}
-				else if(cnxInst.source.category=#eventDataPort)
-				{
-					thisModule.addReceiveBufferAction(actions, fi, implImg);
-				}
-				else if(cnxInst.source.category=#dataPort)
-				{
-					thisModule.addReadBlackBoardAction(actions, fi, implImg);
-				}
-			}
-		}
-	}
-}
-
-rule addPutValueSubprogramCallAction(actions:AADLBA!BehaviorActions,
-								fi: AADLI!FeatureInstance,
-								implImg: AADLBA!ComponentImplementation)
-{
-	do
-	{
-		for(cnxInst in fi.srcConnectionInstance)
-		{
-			if(thisModule.toBeTransformedInterProcessConnection(cnxInst))
-			{
-				if(cnxInst.source.category=#eventPort or cnxInst.source.category=#eventDataPort)
-				{
-					thisModule.addSendQueuingAction(actions, fi, implImg);
-				}
-				else if(cnxInst.source.category=#dataPort)
-				{
-					thisModule.addWriteSamplingAction(actions, fi, implImg);
-				}
-			}
-			else if(thisModule.toBeTransformedIntraProcessConnection(cnxInst))
-			{
-				if(cnxInst.source.category=#eventPort)
-				{
-					thisModule.addSetEventAction(actions, fi, implImg);
-				}
-				else if(cnxInst.source.category=#eventDataPort)
-				{
-					thisModule.addSendBufferAction(actions, fi, implImg);
-				}
-				else if(cnxInst.source.category=#dataPort)
-				{
-					thisModule.addDisplayBlackBoardAction(actions, fi, implImg);
-				}
-			}
-		}
 	}
 }
 

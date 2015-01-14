@@ -47,7 +47,7 @@ helper def : collectPeriodicDelayed_LocalVariables_LowET(c: AADLI!ComponentInsta
 	)
 ;
 
--- @extends m_Thread_Output_PeriodicDelayed_Port
+-- @extends m_Thread_Output_PeriodicDelayed_Port_No_Mutex
 rule m_Thread_Output_PeriodicDelayed_Port_LowET
 {
 	from
@@ -121,7 +121,7 @@ rule m_Thread_Output_PeriodicDelayed_Port_LowET
 		)
 }
 
--- @extends m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance,m_Thread_Output_PeriodicDelayed_Port_LowET
+-- @extends m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_No_Mutex,m_Thread_Output_PeriodicDelayed_Port_LowET
 rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_LowET
 {
   	from
@@ -223,7 +223,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		--- connect buffer
 		buffer_ThreadAccess_Holder: AADLBA!DataAccessHolder
 		(
-			element<-thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxRef}, 'f_entrypoint')
+			element<-fi.retreiveEntrypointFeature(cnxRef)
 		)
 }
 

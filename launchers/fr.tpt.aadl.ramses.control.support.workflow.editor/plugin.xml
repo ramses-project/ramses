@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+ AADL-RAMSES
+ 
+ Copyright © 2012 TELECOM ParisTech and CNRS
+ 
+ TELECOM ParisTech/LTCI
+ 
+ Authors: see AUTHORS
+ 
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the Eclipse Public License as published by Eclipse, either
+ version 1.0 of the License, or (at your option) any later version. This
+ program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE. See the Eclipse Public License for
+ more details. You should have received a copy of the Eclipse Public License
+ along with this program. If not, see
+ http://www.eclipse.org/org/documents/epl-v10.php
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.ui.newWizards">
+      <!-- @generated RamsesWorkflow -->
+      <category
+            id="org.eclipse.emf.ecore.Wizard.category.ID"
+            name="%_UI_Wizard_category"/>
+      <wizard
+            id="fr.tpt.aadl.ramses.control.workflow.presentation.WorkflowModelWizardID"
+            name="%_UI_WorkflowModelWizard_label"
+            class="fr.tpt.aadl.ramses.control.workflow.presentation.WorkflowModelWizard"
+            category="org.eclipse.emf.ecore.Wizard.category.ID"
+            icon="icons/full/obj16/WorkflowModelFile.gif">
+         <description>%_UI_WorkflowModelWizard_description</description>
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors">
+      <!-- @generated RamsesWorkflow -->
+      <editor
+            id="fr.tpt.aadl.ramses.control.workflow.presentation.WorkflowEditorID"
+            name="%_UI_WorkflowEditor_label"
+            icon="icons/full/obj16/WorkflowModelFile.gif"
+            extensions="workflow"
+            class="fr.tpt.aadl.ramses.control.workflow.presentation.WorkflowEditor"
+            contributorClass="fr.tpt.aadl.ramses.control.workflow.presentation.WorkflowActionBarContributor">
+      </editor>
+   </extension>
+
+</plugin>

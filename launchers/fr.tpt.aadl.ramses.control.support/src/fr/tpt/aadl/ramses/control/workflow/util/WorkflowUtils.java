@@ -27,9 +27,9 @@ import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
 
+import fr.tpt.aadl.ramses.control.workflow.ModelIdentifier ;
 import fr.tpt.aadl.ramses.control.workflow.Workflow ;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowElement ;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowFactory ;
@@ -37,7 +37,6 @@ import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage ;
 
 public class WorkflowUtils {
 
-	private static ResourceSet resourceSet;
 	private static Resource resource;
 	
 	private static Logger _LOGGER = Logger.getLogger(WorkflowUtils.class) ;
@@ -49,22 +48,23 @@ public class WorkflowUtils {
 	 *            String representing the workflow file path
 	 * @return Workflow object
 	 */
-	public static Workflow parse(String workflowPath) {
+	public static Workflow parse(ResourceSet resourceSet,
+	                             String workflowPath) {
 
-		getResourceSet().setResourceFactoryRegistry(
+	  resourceSet.setResourceFactoryRegistry(
 				Resource.Factory.Registry.INSTANCE);
 
-		getResourceSet().getResourceFactoryRegistry()
+	  resourceSet.getResourceFactoryRegistry()
 				.getExtensionToFactoryMap()
 				.put("xmi", new XMIResourceFactoryImpl());
-		getResourceSet().getPackageRegistry().put(WorkflowPackage.eNS_URI,
+	  resourceSet.getPackageRegistry().put(WorkflowPackage.eNS_URI,
 				WorkflowPackage.eINSTANCE);
 
 		final Resource resource;
 		URI workflow_uri = URI.createFileURI(workflowPath);
 
-		if (getResourceSet().getURIConverter().exists(workflow_uri, null)) {
-			resource = getResourceSet().getResource(workflow_uri, true);
+		if (resourceSet.getURIConverter().exists(workflow_uri, null)) {
+			resource = resourceSet.getResource(workflow_uri, true);
 			Workflow workflowRootObject = (Workflow) resource.getContents()
 					.get(0);
 			return workflowRootObject;
@@ -82,21 +82,24 @@ public class WorkflowUtils {
 	 * @param workflowElement
 	 * 			  root element of the created workflow.
 	 */
-	public static void createNewWorkflow(String workflowPath, WorkflowElement workflowElement) {
+	public static void createNewWorkflow(ResourceSet resourceSet,
+	                                     String workflowPath,
+	                                     WorkflowElement workflowElement,
+	                                     ModelIdentifier inputModelIdentifier) {
 
 		Workflow workflow = WorkflowFactory.eINSTANCE.createWorkflow();
-
 		workflow.setElement(workflowElement);
+		workflow.setInputModelIdentifier(inputModelIdentifier);
 		
 		URI wf_uri = URI.createFileURI(workflowPath);
 
-		getResourceSet().getResourceFactoryRegistry()
+		resourceSet.getResourceFactoryRegistry()
 				.getExtensionToFactoryMap()
 				.put("xmi", new XMIResourceFactoryImpl());
-		getResourceSet().getPackageRegistry().put(WorkflowPackage.eNS_URI,
+		resourceSet.getPackageRegistry().put(WorkflowPackage.eNS_URI,
 				WorkflowPackage.eINSTANCE);
 
-		resource = getResourceSet().createResource(wf_uri);
+		resource = resourceSet.createResource(wf_uri);
 		saveWorkflow(resource, workflow);
 	}
 
@@ -123,37 +126,4 @@ public class WorkflowUtils {
 		}
 	}
 
-	/**
-	 * Returns either existing ResourceSet object or a new one in case it was
-	 * not already existing
-	 * 
-	 * @return ResourceSet object
-	 */
-	protected static ResourceSet getResourceSet() {
-		if (resourceSet == null) {
-			resourceSet = new ResourceSetImpl();
-		}
-		return resourceSet;
-	}
-
-	/**
-	 * Returns a Resource object for a file of a given location
-	 * 
-	 * @param workflowPath
-	 *            String representing the workflow file path
-	 * @return Resource object
-	 */
-	protected static Resource getResource(String workflowPath) {
-		URI p_uri = URI.createFileURI(workflowPath);
-
-		getResourceSet().getResourceFactoryRegistry()
-				.getExtensionToFactoryMap()
-				.put("xmi", new XMIResourceFactoryImpl());
-		getResourceSet().getPackageRegistry().put(WorkflowPackage.eNS_URI,
-				WorkflowPackage.eINSTANCE);
-
-		resource = getResourceSet().getResource(p_uri, true);
-
-		return resource;
-	}
 }

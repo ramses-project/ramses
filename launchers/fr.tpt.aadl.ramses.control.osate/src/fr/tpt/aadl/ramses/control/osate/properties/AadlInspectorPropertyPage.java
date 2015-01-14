@@ -273,7 +273,7 @@ public class AadlInspectorPropertyPage extends RamsesPropertyPage {
 		}
 		catch(Exception e)
 		{
-			String msg = "cannot load RAMSES configuration" ;
+			String msg = "cannot load AADL Inspector configuration" ;
 			_LOGGER.fatal(msg, e) ;
 			throw new RuntimeException(msg, e) ;
 		}

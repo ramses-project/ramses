@@ -44,4 +44,6 @@ public interface Analyzer extends NamedPlugin
   public void setParameters(Map<String, Object> parameters) ;
 
   public List<String> getTransformationModuleList();
+
+  public void setIterationCounter(int i) ;
 }

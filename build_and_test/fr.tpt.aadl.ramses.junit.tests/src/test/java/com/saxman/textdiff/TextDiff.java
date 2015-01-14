@@ -4,7 +4,6 @@ import java.io.BufferedReader ;
 import java.io.DataInputStream ;
 import java.io.File;
 import java.io.FileInputStream ;
-import java.io.FileNotFoundException ;
 import java.io.IOException ;
 import java.io.InputStreamReader ;
 import java.util.ArrayList ;
@@ -27,8 +26,9 @@ public class TextDiff
     {
     }
 
-    /** Compare two Files */
-    public Report compare(File oldFile, File newFile) throws Exception
+    /** Compare two Files 
+     * @throws IOException */
+    public Report compare(File oldFile, File newFile) throws IOException
     {
         String[] lOld = fillInLinesArray( oldFile );
         String[] lNew = fillInLinesArray( newFile );
@@ -49,6 +49,7 @@ public class TextDiff
       }
       String[] result = new String[lines.size()];
       result = lines.toArray(result);
+      br.close();
       return result;
     }
     

@@ -1,0 +1,25 @@
+property set MCDA is
+
+Quality_Attribute: type enumeration (
+	Maintainability,
+	Memory_Footprint,
+	Threads_Response_Time
+);
+
+Quality_Attributes_Weight_Type: type record (
+	QualityAttribute : MCDA::Quality_Attribute;
+	Value            : aadlinteger;
+);
+
+Quality_Attributes_Weight:
+	list of MCDA::Quality_Attributes_Weight_Type applies to (System);
+
+Quality_Impact_Type: type record (
+	QualityAttribute : MCDA::Quality_Attribute;
+	Value            : aadlinteger;
+);
+
+Quality_Impact_Importance: 
+	list of MCDA::Quality_Impact_Type applies to (NamedElement);
+
+end MCDA;

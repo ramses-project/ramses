@@ -46,214 +46,237 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  *
  * @generated
  */
-public class UnparseImpl extends WorkflowElementImpl implements Unparse {
-	/**
-	 * The cached value of the '{@link #getElement() <em>Element</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getElement()
-	 * @generated
-	 * @ordered
-	 */
-	protected AnalysisElement element;
+public class UnparseImpl extends WorkflowElementImpl implements Unparse
+{
+  /**
+   * The cached value of the '{@link #getElement() <em>Element</em>}' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getElement()
+   * @generated
+   * @ordered
+   */
+  protected AnalysisElement element;
 
-	/**
-	 * The cached value of the '{@link #getOutputModelIdentifier() <em>Output Model Identifier</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getOutputModelIdentifier()
-	 * @generated
-	 * @ordered
-	 */
-	protected ModelIdentifier outputModelIdentifier;
+  /**
+   * The cached value of the '{@link #getOutputModelIdentifier() <em>Output Model Identifier</em>}' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getOutputModelIdentifier()
+   * @generated
+   * @ordered
+   */
+  protected ModelIdentifier outputModelIdentifier;
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected UnparseImpl() {
-		super();
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  protected UnparseImpl()
+  {
+    super();
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return WorkflowPackage.Literals.UNPARSE;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  protected EClass eStaticClass()
+  {
+    return WorkflowPackage.Literals.UNPARSE;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public AnalysisElement getElement() {
-		return element;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public AnalysisElement getElement()
+  {
+    return element;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetElement(AnalysisElement newElement, NotificationChain msgs) {
-		AnalysisElement oldElement = element;
-		element = newElement;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, WorkflowPackage.UNPARSE__ELEMENT, oldElement, newElement);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
-		}
-		return msgs;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public NotificationChain basicSetElement(AnalysisElement newElement, NotificationChain msgs)
+  {
+    AnalysisElement oldElement = element;
+    element = newElement;
+    if (eNotificationRequired())
+    {
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, WorkflowPackage.UNPARSE__ELEMENT, oldElement, newElement);
+      if (msgs == null) msgs = notification; else msgs.add(notification);
+    }
+    return msgs;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setElement(AnalysisElement newElement) {
-		if (newElement != element) {
-			NotificationChain msgs = null;
-			if (element != null)
-				msgs = ((InternalEObject)element).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.UNPARSE__ELEMENT, null, msgs);
-			if (newElement != null)
-				msgs = ((InternalEObject)newElement).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.UNPARSE__ELEMENT, null, msgs);
-			msgs = basicSetElement(newElement, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.UNPARSE__ELEMENT, newElement, newElement));
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public void setElement(AnalysisElement newElement)
+  {
+    if (newElement != element)
+    {
+      NotificationChain msgs = null;
+      if (element != null)
+        msgs = ((InternalEObject)element).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.UNPARSE__ELEMENT, null, msgs);
+      if (newElement != null)
+        msgs = ((InternalEObject)newElement).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.UNPARSE__ELEMENT, null, msgs);
+      msgs = basicSetElement(newElement, msgs);
+      if (msgs != null) msgs.dispatch();
+    }
+    else if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.UNPARSE__ELEMENT, newElement, newElement));
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ModelIdentifier getOutputModelIdentifier() {
-		return outputModelIdentifier;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public ModelIdentifier getOutputModelIdentifier()
+  {
+    return outputModelIdentifier;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetOutputModelIdentifier(ModelIdentifier newOutputModelIdentifier, NotificationChain msgs) {
-		ModelIdentifier oldOutputModelIdentifier = outputModelIdentifier;
-		outputModelIdentifier = newOutputModelIdentifier;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER, oldOutputModelIdentifier, newOutputModelIdentifier);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
-		}
-		return msgs;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public NotificationChain basicSetOutputModelIdentifier(ModelIdentifier newOutputModelIdentifier, NotificationChain msgs)
+  {
+    ModelIdentifier oldOutputModelIdentifier = outputModelIdentifier;
+    outputModelIdentifier = newOutputModelIdentifier;
+    if (eNotificationRequired())
+    {
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER, oldOutputModelIdentifier, newOutputModelIdentifier);
+      if (msgs == null) msgs = notification; else msgs.add(notification);
+    }
+    return msgs;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setOutputModelIdentifier(ModelIdentifier newOutputModelIdentifier) {
-		if (newOutputModelIdentifier != outputModelIdentifier) {
-			NotificationChain msgs = null;
-			if (outputModelIdentifier != null)
-				msgs = ((InternalEObject)outputModelIdentifier).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER, null, msgs);
-			if (newOutputModelIdentifier != null)
-				msgs = ((InternalEObject)newOutputModelIdentifier).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER, null, msgs);
-			msgs = basicSetOutputModelIdentifier(newOutputModelIdentifier, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER, newOutputModelIdentifier, newOutputModelIdentifier));
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public void setOutputModelIdentifier(ModelIdentifier newOutputModelIdentifier)
+  {
+    if (newOutputModelIdentifier != outputModelIdentifier)
+    {
+      NotificationChain msgs = null;
+      if (outputModelIdentifier != null)
+        msgs = ((InternalEObject)outputModelIdentifier).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER, null, msgs);
+      if (newOutputModelIdentifier != null)
+        msgs = ((InternalEObject)newOutputModelIdentifier).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER, null, msgs);
+      msgs = basicSetOutputModelIdentifier(newOutputModelIdentifier, msgs);
+      if (msgs != null) msgs.dispatch();
+    }
+    else if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER, newOutputModelIdentifier, newOutputModelIdentifier));
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case WorkflowPackage.UNPARSE__ELEMENT:
-				return basicSetElement(null, msgs);
-			case WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER:
-				return basicSetOutputModelIdentifier(null, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs)
+  {
+    switch (featureID)
+    {
+      case WorkflowPackage.UNPARSE__ELEMENT:
+        return basicSetElement(null, msgs);
+      case WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER:
+        return basicSetOutputModelIdentifier(null, msgs);
+    }
+    return super.eInverseRemove(otherEnd, featureID, msgs);
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-			case WorkflowPackage.UNPARSE__ELEMENT:
-				return getElement();
-			case WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER:
-				return getOutputModelIdentifier();
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public Object eGet(int featureID, boolean resolve, boolean coreType)
+  {
+    switch (featureID)
+    {
+      case WorkflowPackage.UNPARSE__ELEMENT:
+        return getElement();
+      case WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER:
+        return getOutputModelIdentifier();
+    }
+    return super.eGet(featureID, resolve, coreType);
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public void eSet(int featureID, Object newValue) {
-		switch (featureID) {
-			case WorkflowPackage.UNPARSE__ELEMENT:
-				setElement((AnalysisElement)newValue);
-				return;
-			case WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER:
-				setOutputModelIdentifier((ModelIdentifier)newValue);
-				return;
-		}
-		super.eSet(featureID, newValue);
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public void eSet(int featureID, Object newValue)
+  {
+    switch (featureID)
+    {
+      case WorkflowPackage.UNPARSE__ELEMENT:
+        setElement((AnalysisElement)newValue);
+        return;
+      case WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER:
+        setOutputModelIdentifier((ModelIdentifier)newValue);
+        return;
+    }
+    super.eSet(featureID, newValue);
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public void eUnset(int featureID) {
-		switch (featureID) {
-			case WorkflowPackage.UNPARSE__ELEMENT:
-				setElement((AnalysisElement)null);
-				return;
-			case WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER:
-				setOutputModelIdentifier((ModelIdentifier)null);
-				return;
-		}
-		super.eUnset(featureID);
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public void eUnset(int featureID)
+  {
+    switch (featureID)
+    {
+      case WorkflowPackage.UNPARSE__ELEMENT:
+        setElement((AnalysisElement)null);
+        return;
+      case WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER:
+        setOutputModelIdentifier((ModelIdentifier)null);
+        return;
+    }
+    super.eUnset(featureID);
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case WorkflowPackage.UNPARSE__ELEMENT:
-				return element != null;
-			case WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER:
-				return outputModelIdentifier != null;
-		}
-		return super.eIsSet(featureID);
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public boolean eIsSet(int featureID)
+  {
+    switch (featureID)
+    {
+      case WorkflowPackage.UNPARSE__ELEMENT:
+        return element != null;
+      case WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER:
+        return outputModelIdentifier != null;
+    }
+    return super.eIsSet(featureID);
+  }
 
 } //UnparseImpl

@@ -131,6 +131,8 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_AR
 			dataFeatureClassifier <- semaphoreType,
 			kind<-#requires
 		),
+		nextValueSpgImpl: AADLBA!SubprogramImplementation,
+		receiveInputSpgImpl: AADLBA!SubprogramImplementation,
 		semaphoreEntryPointAccessCnx: AADLBA!AccessConnection
 		(
 			source <- sourceSemEntryPointCE,
@@ -233,6 +235,11 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_AR
 												)
 									   }
 		)
+		
+		do
+		{
+			ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(semaphoreGlobalVariable, fi);
+		}
 }
 
 -- @extends m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_Mutex
@@ -370,6 +377,7 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 			name <- fi.uniqueName()+'_accessSemGlobalVariable',
 			accessCategory <- #data
 		),
+		putValueSpgImpl: AADLBA!SubprogramImplementation,
 		sourceSemGVCE: AADLBA!ConnectedElement
 		(
 			connectionEnd <- thisModule.resolveMatchedSingleIfExists(consumerPort, 'semaphoreGlobalVariable')

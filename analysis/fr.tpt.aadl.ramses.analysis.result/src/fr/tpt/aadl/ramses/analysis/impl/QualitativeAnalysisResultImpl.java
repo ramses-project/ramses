@@ -46,131 +46,135 @@ import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult;
  */
 public class QualitativeAnalysisResultImpl extends AnalysisResultImpl implements QualitativeAnalysisResult {
 	/**
-	 * The default value of the '{@link #isValidated() <em>Validated</em>}' attribute.
-	 * <!-- begin-user-doc -->
+   * The default value of the '{@link #isValidated() <em>Validated</em>}' attribute.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #isValidated()
-	 * @generated
-	 * @ordered
-	 */
+   * @see #isValidated()
+   * @generated
+   * @ordered
+   */
 	protected static final boolean VALIDATED_EDEFAULT = false;
 
 	/**
-	 * The cached value of the '{@link #isValidated() <em>Validated</em>}' attribute.
-	 * <!-- begin-user-doc -->
+   * The cached value of the '{@link #isValidated() <em>Validated</em>}' attribute.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #isValidated()
-	 * @generated
-	 * @ordered
-	 */
+   * @see #isValidated()
+   * @generated
+   * @ordered
+   */
 	protected boolean validated = VALIDATED_EDEFAULT;
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected QualitativeAnalysisResultImpl() {
-		super();
-	}
+    super();
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected EClass eStaticClass() {
-		return AnalysisResultPackage.Literals.QUALITATIVE_ANALYSIS_RESULT;
-	}
+    return AnalysisResultPackage.Literals.QUALITATIVE_ANALYSIS_RESULT;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public boolean isValidated() {
-		return validated;
-	}
+    return validated;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void setValidated(boolean newValidated) {
-		boolean oldValidated = validated;
-		validated = newValidated;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, AnalysisResultPackage.QUALITATIVE_ANALYSIS_RESULT__VALIDATED, oldValidated, validated));
-	}
+    boolean oldValidated = validated;
+    validated = newValidated;
+    if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, AnalysisResultPackage.QUALITATIVE_ANALYSIS_RESULT__VALIDATED, oldValidated, validated));
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-			case AnalysisResultPackage.QUALITATIVE_ANALYSIS_RESULT__VALIDATED:
-				return isValidated() ? Boolean.TRUE : Boolean.FALSE;
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
+    switch (featureID)
+    {
+      case AnalysisResultPackage.QUALITATIVE_ANALYSIS_RESULT__VALIDATED:
+        return isValidated() ? Boolean.TRUE : Boolean.FALSE;
+    }
+    return super.eGet(featureID, resolve, coreType);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void eSet(int featureID, Object newValue) {
-		switch (featureID) {
-			case AnalysisResultPackage.QUALITATIVE_ANALYSIS_RESULT__VALIDATED:
-				setValidated(((Boolean)newValue).booleanValue());
-				return;
-		}
-		super.eSet(featureID, newValue);
-	}
+    switch (featureID)
+    {
+      case AnalysisResultPackage.QUALITATIVE_ANALYSIS_RESULT__VALIDATED:
+        setValidated(((Boolean)newValue).booleanValue());
+        return;
+    }
+    super.eSet(featureID, newValue);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void eUnset(int featureID) {
-		switch (featureID) {
-			case AnalysisResultPackage.QUALITATIVE_ANALYSIS_RESULT__VALIDATED:
-				setValidated(VALIDATED_EDEFAULT);
-				return;
-		}
-		super.eUnset(featureID);
-	}
+    switch (featureID)
+    {
+      case AnalysisResultPackage.QUALITATIVE_ANALYSIS_RESULT__VALIDATED:
+        setValidated(VALIDATED_EDEFAULT);
+        return;
+    }
+    super.eUnset(featureID);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case AnalysisResultPackage.QUALITATIVE_ANALYSIS_RESULT__VALIDATED:
-				return validated != VALIDATED_EDEFAULT;
-		}
-		return super.eIsSet(featureID);
-	}
+    switch (featureID)
+    {
+      case AnalysisResultPackage.QUALITATIVE_ANALYSIS_RESULT__VALIDATED:
+        return validated != VALIDATED_EDEFAULT;
+    }
+    return super.eIsSet(featureID);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+    if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (validated: ");
-		result.append(validated);
-		result.append(')');
-		return result.toString();
-	}
+    StringBuffer result = new StringBuffer(super.toString());
+    result.append(" (validated: ");
+    result.append(validated);
+    result.append(')');
+    return result.toString();
+  }
 
 } //QualitativeAnalysisResultImpl

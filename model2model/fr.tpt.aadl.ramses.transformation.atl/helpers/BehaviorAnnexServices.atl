@@ -49,31 +49,9 @@ helper context AADLBA!BehaviorElement def: isThreadBehaviorElement(): Boolean =
 
 helper context AADLBA!BehaviorElement def: isPartOfBehaviorAnnexOf(c: AADLI!ComponentInstance): Boolean =
 	if(c.oclIsKindOf(AADLI!SystemInstance)) then
-		c.systemImplementation.getBA() = self.getBehaviorAnnex()
+		c.componentImplementation.getBA() = self.getBehaviorAnnex()
 	else
 		c.subcomponent.subcomponentType.getBA() = self.getBehaviorAnnex()
-	endif
-;
-
-helper context AADLI!FeatureInstance def: isDirectlyUsedInFresh() : Boolean =
-	let as: AADLBA!DefaultAnnexSubclause = self.eContainer().subcomponent.classifier.ownedAnnexSubclause->any(e|e.name='behavior_specification') in
-	if(as.oclIsKindOf(AADLBA!BehaviorAnnex)) then
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().isUsedInFreshClause
-			(as,
-			self.feature)
-	else
-		if(not as.oclIsUndefined()) then
-			let ba: AADLBA!BehaviorAnnex = as.parsedAnnexSubclause in 
-			if(not ba.oclIsUndefined()) then
-				ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().isUsedInFreshClause
-				(ba,
-				self.feature)
-			else
-				false
-			endif
-		else
-			false
-		endif
 	endif
 ;
 
@@ -91,6 +69,42 @@ helper context AADLI!FeatureInstance def: isUsedInFresh() : Boolean =
 		or
 		not self.dstConnectionInstance->any(e|e.source.isDirectlyUsedInFresh()).oclIsUndefined()
 	--endif
+;
+
+helper context OclAny def: isDirectlyUsedInFresh() : Boolean =
+	self.isUsedInSpecialOperator('fresh');
+
+
+helper context AADLI!FeatureInstance def: isUsedInCount() : Boolean =
+	self.isUsedInSpecialOperator('count')
+;
+
+helper context AADLI!FeatureInstance def: isUsedInSpecialOperator(operatorName: String) : Boolean =
+	let as: AADLBA!DefaultAnnexSubclause = self.eContainer().subcomponent.classifier.ownedAnnexSubclause->any(e|e.name='behavior_specification') in
+	if(as.oclIsKindOf(AADLBA!BehaviorAnnex)) then
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().isUsedInSpecialOperator
+			(as,
+			self.feature,
+			operatorName)
+	else
+		if(not as.oclIsUndefined()) then
+			let ba: AADLBA!BehaviorAnnex = as.parsedAnnexSubclause in 
+			if(not ba.oclIsUndefined()) then
+				ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().isUsedInSpecialOperator
+				(ba,
+				self.feature,
+				operatorName)
+			else
+				false
+			endif
+		else
+			false
+		endif
+	endif	
+;
+	
+helper context AADLI!ComponentInstance def: isUsedInSpecialOperator(operatorName: String) : Boolean =
+	false
 ;
 
 helper context AADLI!FeatureInstance def: getDirectlyUsedInFresh() : AADLI!FeatureInstance =

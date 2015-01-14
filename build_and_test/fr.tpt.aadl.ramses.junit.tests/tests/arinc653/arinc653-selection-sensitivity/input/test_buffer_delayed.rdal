@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdal:Specification xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rdal="http://www.open-people.fr/rdal2" name="PDP_spec" id="8528b6a8-8702-4e9c-9aab-c839546aadb0">
+  <ownedReferencedDesignElements xsi:type="rdal:RefManuallySelectedDesignElements" name="" id="_BlLDIR7oEeOonuLm9OUr6g">
+    <ownedDesignElementRefs id="_aqY8cNhmEeOuaJzFxBB1Yg">
+      <designElement href="instances/test_buffer_delayed_root_aadlre_test_impl_Instance.aaxl2#_l6-SINhhEeOxiunDY023AQ"/>
+    </ownedDesignElementRefs>
+  </ownedReferencedDesignElements>
+  <ownedPackages xsi:type="rdal:GoalsPackage" name="PDP_goals" id="a76054ae-198c-46b0-ac48-7b5cf6b74311">
+    <ownedGoals xsi:type="rdal:QualityObjective" name="Maintenance" id="_RbXCM1CMEeOuv63ORBTj3A" description="">
+      <ownedSensitivity name="Maintainability" id="_gKnr9lCMEeOuv63ORBTj3A">
+        <ownedReferencedDesignElements xsi:type="rdal:RefManuallySelectedDesignElements" id="_l4OvAFCMEeOuv63ORBTj3A">
+          <ownedDesignElementRefs xsi:type="rdal:PrioritizedSatDesignElementRef" id="_Mr198NhmEeOuaJzFxBB1Yg">
+            <designElement href="tests/arinc653/arinc653-selection-sensitivity/input/test_buffer_delayed.aadl2#//@ownedPublicSection/@ownedClassifier.7/@ownedThreadSubcomponent.0"/>
+          </ownedDesignElementRefs>
+        </ownedReferencedDesignElements>
+      </ownedSensitivity>
+    </ownedGoals>
+    <ownedGoals xsi:type="rdal:QualityObjective" name="TimeCriticality" id="cbd1aab2-20d9-4eed-b1d3-ae9f9739e5cd" description="" modality="Minimum">
+      <ownedSensitivity name="TimingPerformance" id="feaf4f6f-d27e-48d7-9c88-7abaaa3dd7b4">
+        <ownedReferencedDesignElements xsi:type="rdal:RefManuallySelectedDesignElements" id="_prlc0Ch0EeORsdz8NJ_-zA">
+          <ownedDesignElementRefs xsi:type="rdal:PrioritizedSatDesignElementRef" id="_dVwWg9hmEeOuaJzFxBB1Yg">
+            <designElement href="tests/arinc653/arinc653-selection-sensitivity/input/test_buffer_delayed.aadl2#//@ownedPublicSection/@ownedClassifier.10/@ownedEventDataPort.0"/>
+          </ownedDesignElementRefs>
+          <ownedDesignElementRefs xsi:type="rdal:PrioritizedSatDesignElementRef" id="_eqvMc9hmEeOuaJzFxBB1Yg">
+            <designElement href="tests/arinc653/arinc653-selection-sensitivity/input/test_buffer_delayed.aadl2#//@ownedPublicSection/@ownedClassifier.10/@ownedEventDataPort.0"/>
+          </ownedDesignElementRefs>
+          <ownedDesignElementRefs xsi:type="rdal:PrioritizedSatDesignElementRef" id="_fM9vw9hmEeOuaJzFxBB1Yg">
+            <designElement href="tests/arinc653/arinc653-selection-sensitivity/input/test_buffer_delayed.aadl2#//@ownedPublicSection/@ownedClassifier.10/@ownedEventDataPort.0"/>
+          </ownedDesignElementRefs>
+          <ownedDesignElementRefs xsi:type="rdal:PrioritizedSatDesignElementRef" id="_gB0UI9hmEeOuaJzFxBB1Yg">
+            <designElement href="tests/arinc653/arinc653-selection-sensitivity/input/test_buffer_delayed.aadl2#//@ownedPublicSection/@ownedClassifier.10/@ownedEventDataPort.0"/>
+          </ownedDesignElementRefs>
+        </ownedReferencedDesignElements>
+      </ownedSensitivity>
+    </ownedGoals>
+    <ownedGoals xsi:type="rdal:QualityObjective" name="MemoryUsage" id="e8b36bb4-e356-498f-aacf-4a3e9ae97f07" description="" modality="Minimum">
+      <ownedSensitivity name="MemoryFootprint" id="_XPZZRhoZEeOoW6O0eEynrg">
+        <ownedReferencedDesignElements xsi:type="rdal:RefManuallySelectedDesignElements" id="_yV5hkCh0EeORsdz8NJ_-zA">
+          <ownedDesignElementRefs xsi:type="rdal:PrioritizedSatDesignElementRef" id="_hhTJ49hmEeOuaJzFxBB1Yg">
+            <designElement href="tests/arinc653/arinc653-selection-sensitivity/input/test_buffer_delayed.aadl2#//@ownedPublicSection/@ownedClassifier.13/@ownedEventDataPort.0"/>
+          </ownedDesignElementRefs>
+          <ownedDesignElementRefs xsi:type="rdal:PrioritizedSatDesignElementRef" id="_hhTJ49hmEeOuaJzFxBB1Yg">
+            <designElement href="tests/arinc653/arinc653-selection-sensitivity/input/test_buffer_delayed.aadl2#//@ownedPublicSection/@ownedClassifier.13/@ownedEventDataPort.0"/>
+          </ownedDesignElementRefs>
+          <ownedDesignElementRefs xsi:type="rdal:PrioritizedSatDesignElementRef" id="_hhTJ49hmEeOuaJzFxBB1Yg">
+            <designElement href="tests/arinc653/arinc653-selection-sensitivity/input/test_buffer_delayed.aadl2#//@ownedPublicSection/@ownedClassifier.13/@ownedEventDataPort.0"/>
+          </ownedDesignElementRefs>
+          <ownedDesignElementRefs xsi:type="rdal:PrioritizedSatDesignElementRef" id="_hhTJ49hmEeOuaJzFxBB1Yg">
+            <designElement href="tests/arinc653/arinc653-selection-sensitivity/input/test_buffer_delayed.aadl2#//@ownedPublicSection/@ownedClassifier.13/@ownedEventDataPort.0"/>
+          </ownedDesignElementRefs>
+        </ownedReferencedDesignElements>
+      </ownedSensitivity>
+    </ownedGoals>
+  </ownedPackages>
+  <ownedPackages xsi:type="rdal:RequirementsPackage" id="3f943466-e16b-4a38-9437-a62273d42220">
+    <ownedRequirements xsi:type="rdal:Requirement" id="468deee4-41bf-4ab4-832f-498561413e64" description=""/>
+    <ownedRequirements xsi:type="rdal:Assumption" id="e27c8384-5b23-4c2c-9111-1704fb304aa2" description=""/>
+  </ownedPackages>
+  <constraintLanguagesSpec href="platform:/config/fr.openpeople.ide.settings/defaultConstraintsLanguages.constraints#5663deb5-f5c5-4a39-a324-8da2b395dd7c"/>
+</rdal:Specification>

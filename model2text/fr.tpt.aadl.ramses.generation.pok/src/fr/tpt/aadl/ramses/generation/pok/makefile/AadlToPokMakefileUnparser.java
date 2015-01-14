@@ -56,6 +56,7 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
   public final static String POK_RUNTIME_VAR_ENV = "POK_PATH" ;
   
   private static Logger _LOGGER = Logger.getLogger(AadlToPokMakefileUnparser.class) ;
+  static boolean isFirstConnected=true;
   
   public AadlToPokMakefileUnparser()
   {
@@ -82,39 +83,42 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
       {
         unparserContent.addOutputNewline("export " + POK_RUNTIME_VAR_ENV + "=" +
                                          _runtimePath.toString());
-        
+        unparserContent.addOutputNewline("") ;
         unparserContent.addOutputNewline("all:") ;
 
         for(ProcessorSubcomponent aProcessorSubcomponent : object
               .getOwnedProcessorSubcomponents())
         {
           unparserContent.addOutputNewline("\t$(MAKE) -C " +
-                aProcessorSubcomponent.getName() + " all\n") ;
+                aProcessorSubcomponent.getName() + " all") ;
         }
-
+        
+        unparserContent.addOutputNewline("") ;
         unparserContent.addOutputNewline("clean:") ;
 
         for(ProcessorSubcomponent aProcessorSubcomponent : object
               .getOwnedProcessorSubcomponents())
         {
           unparserContent.addOutputNewline("\t$(MAKE) -C " +
-                aProcessorSubcomponent.getName() + " clean\n") ;
+                aProcessorSubcomponent.getName() + " clean") ;
         }
-
+        
+        unparserContent.addOutputNewline("") ;
         unparserContent.addOutputNewline("run:") ;
 
         for(ProcessorSubcomponent aProcessorSubcomponent : object
               .getOwnedProcessorSubcomponents())
         {
           unparserContent.addOutputNewline("\t$(MAKE) -C " +
-                aProcessorSubcomponent.getName() + " run\n") ;
+                aProcessorSubcomponent.getName() + " run") ;
         }
-
+        
+        unparserContent.addOutputNewline("") ;
         unparserContent.addOutputNewline("test:") ;
         for(ProcessorSubcomponent aProcessorSubcomponent : object
                 .getOwnedProcessorSubcomponents())
           {
-            unparserContent.addOutput("\t$(MAKE) -C " + 
+            unparserContent.addOutputNewline("\t$(MAKE) -C " + 
             		aProcessorSubcomponent.getName() + " run " +
             		"QEMU_MISC=\"-nographic -serial /dev/stdout > " +
             		aProcessorSubcomponent.getName()+".trace\"") ;
@@ -174,7 +178,7 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
           while(it.hasNext())
           {
             include = it.next() ;
-            unparserContent.addOutput("-I" + include.getAbsolutePath() + " ") ;
+            unparserContent.addOutput("-I\"" + include.getAbsolutePath() + "\" ") ;
           }
           unparserContent.addOutput("\n") ;
         }
@@ -202,6 +206,18 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
           ServiceProvider.SYS_ERR_REP.error(errMsg, true);
         }
 
+        String address = PropertyUtils.getStringValue(object, "Address");
+        if(address!=null)
+        {
+          unparserContent.addOutputNewline("MAC_ADDR="+address);
+          String mode = "connect";
+          if(isFirstConnected)
+          {
+            mode="listen";
+            isFirstConnected=false;
+          }
+          unparserContent.addOutputNewline("QEMU_NETWORK_MODE="+mode);
+        }
         String bspName = PropertyUtils.getEnumValue(object, "BSP") ;
         if(bspName != null)
         {

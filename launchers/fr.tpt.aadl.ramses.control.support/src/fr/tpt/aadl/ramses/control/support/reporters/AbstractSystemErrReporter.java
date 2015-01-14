@@ -39,10 +39,10 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
   {
     StringBuilder sb = new StringBuilder() ;
     sb.append("Abort on fatal error ");
-    
+    String dir = System.getProperty("user.dir");
     if(RamsesConfiguration.IS_LOGGER_ON)
     {
-      sb.append("(see log file for more information): ") ;
+      sb.append("(see log file (in "+dir+") for more information): ") ;
     }
     else
     {
@@ -81,9 +81,10 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
   protected String formatFatalMsg(String initialMsg)
   {
     StringBuilder sb = new StringBuilder("<Fatal Error> Abort on fatal error ") ;
+    String dir = System.getProperty("user.dir");
     if(RamsesConfiguration.IS_LOGGER_ON)
     {
-      sb.append("(see log file for more information)") ;
+      sb.append("(see log file (in "+dir+") for more information)") ;
     }
     else
     {

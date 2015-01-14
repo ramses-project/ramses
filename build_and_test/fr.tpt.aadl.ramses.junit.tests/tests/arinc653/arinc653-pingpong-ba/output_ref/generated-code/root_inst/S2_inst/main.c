@@ -23,9 +23,6 @@ SAMPLING_PORT_ID_TYPE S2_inst_C2_badSequenceNumber_globalVariable;
 
 int main ()
 {
-PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_impl_Init();
-PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_impl_Init();
-PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_impl_Init();
   PROCESS_ATTRIBUTE_TYPE tattr;
   RETURN_CODE_TYPE ret;
   CREATE_BLACKBOARD ("IPingOrPong_Cping_ping_delayed_PongIn_globalVariable", sizeof (PingPongMessage), &(IPingOrPong_Cping_ping_delayed_PongIn_globalVariable), &(ret));
@@ -73,3 +70,26 @@ PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_impl_Init();
 }
 
 /******************************************************************************/
+/*                                SEND OUTPUT                                 */
+
+void __aadl_send_output (unsigned int port_variable, void * value)
+{
+  RETURN_CODE_TYPE ret;
+  SYSTEM_TIME_TYPE time_out;
+  MESSAGE_SIZE_TYPE length;
+  if(value==NULL)
+  {
+    char i=0;
+    value = &i;
+  }
+  switch (port_variable) {
+    case 0:
+      break;
+    case 1:
+      break;
+    case 2:
+      break;
+    case 3:
+      break;
+  }
+}

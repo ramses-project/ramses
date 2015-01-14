@@ -48,120 +48,135 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *
  * @generated
  */
-public abstract class AnalysisSequenceImpl extends AbstractAnalysisImpl implements AnalysisSequence {
-	/**
-	 * The cached value of the '{@link #getList() <em>List</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getList()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<AbstractAnalysis> list;
+public abstract class AnalysisSequenceImpl extends AbstractAnalysisImpl implements AnalysisSequence
+{
+  /**
+   * The cached value of the '{@link #getList() <em>List</em>}' containment reference list.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getList()
+   * @generated
+   * @ordered
+   */
+  protected EList<AbstractAnalysis> list;
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected AnalysisSequenceImpl() {
-		super();
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  protected AnalysisSequenceImpl()
+  {
+    super();
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return WorkflowPackage.Literals.ANALYSIS_SEQUENCE;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  protected EClass eStaticClass()
+  {
+    return WorkflowPackage.Literals.ANALYSIS_SEQUENCE;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<AbstractAnalysis> getList() {
-		if (list == null) {
-			list = new EObjectContainmentEList<AbstractAnalysis>(AbstractAnalysis.class, this, WorkflowPackage.ANALYSIS_SEQUENCE__LIST);
-		}
-		return list;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EList<AbstractAnalysis> getList()
+  {
+    if (list == null)
+    {
+      list = new EObjectContainmentEList<AbstractAnalysis>(AbstractAnalysis.class, this, WorkflowPackage.ANALYSIS_SEQUENCE__LIST);
+    }
+    return list;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case WorkflowPackage.ANALYSIS_SEQUENCE__LIST:
-				return ((InternalEList<?>)getList()).basicRemove(otherEnd, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs)
+  {
+    switch (featureID)
+    {
+      case WorkflowPackage.ANALYSIS_SEQUENCE__LIST:
+        return ((InternalEList<?>)getList()).basicRemove(otherEnd, msgs);
+    }
+    return super.eInverseRemove(otherEnd, featureID, msgs);
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-			case WorkflowPackage.ANALYSIS_SEQUENCE__LIST:
-				return getList();
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public Object eGet(int featureID, boolean resolve, boolean coreType)
+  {
+    switch (featureID)
+    {
+      case WorkflowPackage.ANALYSIS_SEQUENCE__LIST:
+        return getList();
+    }
+    return super.eGet(featureID, resolve, coreType);
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public void eSet(int featureID, Object newValue) {
-		switch (featureID) {
-			case WorkflowPackage.ANALYSIS_SEQUENCE__LIST:
-				getList().clear();
-				getList().addAll((Collection<? extends AbstractAnalysis>)newValue);
-				return;
-		}
-		super.eSet(featureID, newValue);
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @SuppressWarnings("unchecked")
+  @Override
+  public void eSet(int featureID, Object newValue)
+  {
+    switch (featureID)
+    {
+      case WorkflowPackage.ANALYSIS_SEQUENCE__LIST:
+        getList().clear();
+        getList().addAll((Collection<? extends AbstractAnalysis>)newValue);
+        return;
+    }
+    super.eSet(featureID, newValue);
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public void eUnset(int featureID) {
-		switch (featureID) {
-			case WorkflowPackage.ANALYSIS_SEQUENCE__LIST:
-				getList().clear();
-				return;
-		}
-		super.eUnset(featureID);
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public void eUnset(int featureID)
+  {
+    switch (featureID)
+    {
+      case WorkflowPackage.ANALYSIS_SEQUENCE__LIST:
+        getList().clear();
+        return;
+    }
+    super.eUnset(featureID);
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case WorkflowPackage.ANALYSIS_SEQUENCE__LIST:
-				return list != null && !list.isEmpty();
-		}
-		return super.eIsSet(featureID);
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public boolean eIsSet(int featureID)
+  {
+    switch (featureID)
+    {
+      case WorkflowPackage.ANALYSIS_SEQUENCE__LIST:
+        return list != null && !list.isEmpty();
+    }
+    return super.eIsSet(featureID);
+  }
 
 } //AnalysisSequenceImpl

@@ -35,6 +35,7 @@ public class EGAnalyzer extends AbstractAnalyzer
   private PredefinedAadlModelManager _predefinedResourcesManager ;
   
   private final AnalysisArtifact currentResult = createResult();
+  private int iterationCounter ;
   
   
   public EGAnalyzer(AadlModelInstantiatior instantiator,
@@ -47,7 +48,7 @@ public class EGAnalyzer extends AbstractAnalyzer
   private static AnalysisArtifact createResult()
   {
     /** WCET analysis returns always true (it must be followed 
-     * by a scheduling analysis */
+     * by a scheduling analysis) */
     
     final AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;
     
@@ -147,5 +148,11 @@ public class EGAnalyzer extends AbstractAnalyzer
   public List<String> getTransformationModuleList() {
 	// return null, no transformation performed in this analysis plugin
 	return null;
+  }
+
+  @Override
+  public void setIterationCounter(int iterationCounter)
+  {
+    this.iterationCounter = iterationCounter;
   }
 }

@@ -59,7 +59,8 @@ public class AdaRavenscarGeneratorFactory implements GeneratorFactory
     AadlTargetSpecificGenerator result = 
                   new AadlTargetSpecificGenerator(targetTrans, tarSpecCodeGen,
                 		  						  modelInstantiator,
-                                                  targetVal) ;
+                		  						  targetVal,
+                		  						  predefinedAadlModels) ;
     result.setRegistryName(ADA_RAVENSCAR_GENERATOR_NAME) ;
     
     return result ;

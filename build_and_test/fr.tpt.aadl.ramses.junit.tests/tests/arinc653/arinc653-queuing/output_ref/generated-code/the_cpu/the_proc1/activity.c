@@ -2,10 +2,6 @@
 #include "main.h"
 
 extern APEX_INTEGER the_proc1_p_out_globalVariable;
-void test_queuing_refined_model__the_proc1_the_sender_impl_Init()
-{
-}
-
 void* test_queuing_refined_model__the_proc1_the_sender_impl_Job()
 {
   while (1) {

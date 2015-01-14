@@ -23,18 +23,64 @@
 -- @atlcompiler emftvm
 
 module PokProperties;
-create OUT : CV 	from 		IN : AADLI;
+create OUT : CV 	from 		IN : AADLI,
+								POK: AADLI;
+
+helper context AADLI!PropertyAssociation def : isValidPartitionScheduler() : Boolean =
+	let schedValue: String = self.ownedValue->first().ownedValue.ownedListElement->first().namedValue.name in
+	schedValue.toLower() = 'round_robin_protocol'
+	or
+	schedValue.toLower() = 'rms'
+;
 
 
 --@extends check_VirtualProcessorInstance
-rule check_HasScheduler
+rule check_VirtualProcessorHasScheduler
+{
+	from
+	 	obj:AADLI!ComponentInstance
+		(
+			obj.hasProperty('Scheduling_Protocol')
+			and
+			not obj.ownedPropertyAssociation->any(
+				e | e.property.name.toLower() = 'scheduling_protocol'
+			).isValidPartitionScheduler()
+		)
+	to
+		err: CV!Error
+		(message <- obj.subcomponent.name + 
+			' has invalid scheduling_protocol for POK; supported '+
+			'values are: Round_Robin_Protocol and RMS' )
+}
+
+--@extends check_ProcessorInstance
+rule check_ProcessorHasBSP
 {
 	from
 	 	obj:AADLI!ComponentInstance,
-		p: AADLI!Property
-		(p.eContainer().name='POK' and p.name='Scheduler' and not obj.hasProperty('Scheduler'))
+		p: AADLI!Property in POK
+		(
+		 	p.name = 'BSP'
+			and
+			not obj.hasProperty('BSP')
+		)
 	to
 		err: CV!Error
-		(message <- 'For code generation towards POK, each virtual processor must'+ 
-			'have a property value for POK::Scheduler' )
+		(message <- 'Using POK target, add property POK::BSP to component ' + obj.subcomponent.name )
+}
+
+--@extends check_ProcessorInstance
+rule check_ProcessorHasArchitecture
+{
+	from
+	 	obj:AADLI!ComponentInstance,
+		p: AADLI!Property in POK
+		(
+		 	p.name = 'Architecture'
+			and
+			not obj.hasProperty('Architecture')
+		)
+	to
+		err: CV!Error
+		(message <- 'Using POK target, add property POK::Architecture to component ' + obj.subcomponent.name )
 }

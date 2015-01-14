@@ -39,109 +39,110 @@ package fr.tpt.aadl.ramses.control.workflow;
  * @model
  * @generated
  */
-public interface Transformation extends WorkflowElement, AnalysisElement {
-	/**
-	 * Returns the value of the '<em><b>Element</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Element</em>' containment reference isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Element</em>' containment reference.
-	 * @see #setElement(AnalysisElement)
-	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getTransformation_Element()
-	 * @model containment="true" required="true"
-	 * @generated
-	 */
-	AnalysisElement getElement();
+public interface Transformation extends WorkflowElement, AnalysisElement
+{
+  /**
+   * Returns the value of the '<em><b>Element</b></em>' containment reference.
+   * <!-- begin-user-doc -->
+   * <p>
+   * If the meaning of the '<em>Element</em>' containment reference isn't clear,
+   * there really should be more of a description here...
+   * </p>
+   * <!-- end-user-doc -->
+   * @return the value of the '<em>Element</em>' containment reference.
+   * @see #setElement(AnalysisElement)
+   * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getTransformation_Element()
+   * @model containment="true" required="true"
+   * @generated
+   */
+  AnalysisElement getElement();
 
-	/**
-	 * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getElement <em>Element</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Element</em>' containment reference.
-	 * @see #getElement()
-	 * @generated
-	 */
-	void setElement(AnalysisElement value);
+  /**
+   * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getElement <em>Element</em>}' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @param value the new value of the '<em>Element</em>' containment reference.
+   * @see #getElement()
+   * @generated
+   */
+  void setElement(AnalysisElement value);
 
-	/**
-	 * Returns the value of the '<em><b>List</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>List</em>' containment reference isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>List</em>' containment reference.
-	 * @see #setList(List)
-	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getTransformation_List()
-	 * @model containment="true"
-	 * @generated
-	 */
-	List getList();
+  /**
+   * Returns the value of the '<em><b>List</b></em>' containment reference.
+   * <!-- begin-user-doc -->
+   * <p>
+   * If the meaning of the '<em>List</em>' containment reference isn't clear,
+   * there really should be more of a description here...
+   * </p>
+   * <!-- end-user-doc -->
+   * @return the value of the '<em>List</em>' containment reference.
+   * @see #setList(List)
+   * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getTransformation_List()
+   * @model containment="true"
+   * @generated
+   */
+  List getList();
 
-	/**
-	 * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getList <em>List</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>List</em>' containment reference.
-	 * @see #getList()
-	 * @generated
-	 */
-	void setList(List value);
+  /**
+   * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getList <em>List</em>}' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @param value the new value of the '<em>List</em>' containment reference.
+   * @see #getList()
+   * @generated
+   */
+  void setList(List value);
 
-	/**
-	 * Returns the value of the '<em><b>Output Model Identifier</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Output Model Identifier</em>' containment reference isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Output Model Identifier</em>' containment reference.
-	 * @see #setOutputModelIdentifier(ModelIdentifier)
-	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getTransformation_OutputModelIdentifier()
-	 * @model containment="true"
-	 * @generated
-	 */
-	ModelIdentifier getOutputModelIdentifier();
+  /**
+   * Returns the value of the '<em><b>Output Model Identifier</b></em>' containment reference.
+   * <!-- begin-user-doc -->
+   * <p>
+   * If the meaning of the '<em>Output Model Identifier</em>' containment reference isn't clear,
+   * there really should be more of a description here...
+   * </p>
+   * <!-- end-user-doc -->
+   * @return the value of the '<em>Output Model Identifier</em>' containment reference.
+   * @see #setOutputModelIdentifier(ModelIdentifier)
+   * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getTransformation_OutputModelIdentifier()
+   * @model containment="true" required="true"
+   * @generated
+   */
+  ModelIdentifier getOutputModelIdentifier();
 
-	/**
-	 * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getOutputModelIdentifier <em>Output Model Identifier</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Output Model Identifier</em>' containment reference.
-	 * @see #getOutputModelIdentifier()
-	 * @generated
-	 */
-	void setOutputModelIdentifier(ModelIdentifier value);
+  /**
+   * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getOutputModelIdentifier <em>Output Model Identifier</em>}' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @param value the new value of the '<em>Output Model Identifier</em>' containment reference.
+   * @see #getOutputModelIdentifier()
+   * @generated
+   */
+  void setOutputModelIdentifier(ModelIdentifier value);
 
-	/**
-	 * Returns the value of the '<em><b>Identifier</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Identifier</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Identifier</em>' attribute.
-	 * @see #setIdentifier(String)
-	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getTransformation_Identifier()
-	 * @model
-	 * @generated
-	 */
-	String getIdentifier();
+  /**
+   * Returns the value of the '<em><b>Identifier</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <p>
+   * If the meaning of the '<em>Identifier</em>' attribute isn't clear,
+   * there really should be more of a description here...
+   * </p>
+   * <!-- end-user-doc -->
+   * @return the value of the '<em>Identifier</em>' attribute.
+   * @see #setIdentifier(String)
+   * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getTransformation_Identifier()
+   * @model
+   * @generated
+   */
+  String getIdentifier();
 
-	/**
-	 * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getIdentifier <em>Identifier</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Identifier</em>' attribute.
-	 * @see #getIdentifier()
-	 * @generated
-	 */
-	void setIdentifier(String value);
+  /**
+   * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getIdentifier <em>Identifier</em>}' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @param value the new value of the '<em>Identifier</em>' attribute.
+   * @see #getIdentifier()
+   * @generated
+   */
+  void setIdentifier(String value);
 
 } // Transformation

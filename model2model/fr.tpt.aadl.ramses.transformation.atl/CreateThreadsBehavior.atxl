@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:atl="http://www.eclipse.org/gmt/2005/ATL" xmlns:ocl="http://www.eclipse.org/gmt/2005/OCL">
+  <atl:Module location="25:1-29:15" name="CreateThreadsBehavior">
+    <commentsBefore>--</commentsBefore>
+    <commentsBefore>-- AADL-RAMSES</commentsBefore>
+    <commentsBefore>-- </commentsBefore>
+    <commentsBefore>-- Copyright &#xa9; 2012 TELECOM ParisTech and CNRS</commentsBefore>
+    <commentsBefore>-- </commentsBefore>
+    <commentsBefore>-- TELECOM ParisTech/LTCI</commentsBefore>
+    <commentsBefore>-- </commentsBefore>
+    <commentsBefore>-- Authors: see AUTHORS</commentsBefore>
+    <commentsBefore>-- </commentsBefore>
+    <commentsBefore>-- This program is free software: you can redistribute it and/or modify </commentsBefore>
+    <commentsBefore>-- it under the terms of the Eclipse Public License as published by Eclipse,</commentsBefore>
+    <commentsBefore>-- either version 1.0 of the License, or (at your option) any later version.</commentsBefore>
+    <commentsBefore>-- This program is distributed in the hope that it will be useful,</commentsBefore>
+    <commentsBefore>-- but WITHOUT ANY WARRANTY; without even the implied warranty of</commentsBefore>
+    <commentsBefore>-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the</commentsBefore>
+    <commentsBefore>-- Eclipse Public License for more details.</commentsBefore>
+    <commentsBefore>-- You should have received a copy of the Eclipse Public License</commentsBefore>
+    <commentsBefore>-- along with this program.  If not, see </commentsBefore>
+    <commentsBefore>-- http://www.eclipse.org/org/documents/epl-v10.php</commentsBefore>
+    <commentsBefore>--</commentsBefore>
+    <commentsBefore>-- @path AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore</commentsBefore>
+    <libraries location="29:1-29:15" name="Services"/>
+    <inModels location="26:28-26:39" name="IN" metamodel="/1"/>
+    <inModels location="27:9-27:24" name="HOOKS" metamodel="/2"/>
+    <outModels location="26:8-26:20" name="OUT" metamodel="/1"/>
+  </atl:Module>
+  <ocl:OclModel location="26:14-26:20" name="AADLBA" model="/0/@outModels.0 /0/@inModels.0"/>
+  <ocl:OclModel location="27:16-27:24" name="ATLHOOKS" model="/0/@inModels.1"/>
+</xmi:XMI>

@@ -56,14 +56,42 @@
    <extension
 		point="org.eclipse.ui.commands">
 		<command
-			description="RAMSES generation code from system instance"
+			description="RAMSES launch from system instance"
 			id="fr.tpt.aadl.ramses.control.osate.instance.generation"
-			name="Generate code">
+			name="RAMSES launch">
 		</command>
         <command
-            description="RAMSES generation code from aadl file outline"
+            description="RAMSES launch from aadl file outline"
         	id="fr.tpt.aadl.ramses.control.osate.outline.generation"
-        	name="Generate code">
+        	name="RAMSES launch">
+ 		</command>
+   </extension>
+
+   <extension
+		point="org.eclipse.ui.commands">
+		<command
+			description="Launch memory analysis from system instance"
+			id="fr.tpt.aadl.ramses.control.osate.instance.memory.analysis"
+			name="Launch memory analysis">
+		</command>
+        <command
+            description="Launch memory analysis launch from aadl file outline"
+        	id="fr.tpt.aadl.ramses.control.osate.outline.memory.analysis"
+        	name="launch Memory analysis">
+ 		</command>
+   </extension>
+
+   <extension
+		point="org.eclipse.ui.commands">
+		<command
+			description="Launch maintainability analysis from system instance"
+			id="fr.tpt.aadl.ramses.control.osate.instance.maintainability.analysis"
+			name="Launch memory analysis">
+		</command>
+        <command
+            description="Launch maintainability analysis launch from aadl file outline"
+        	id="fr.tpt.aadl.ramses.control.osate.outline.maintainability.analysis"
+        	name="launch Memory analysis">
  		</command>
    </extension>
 
@@ -130,9 +158,9 @@
 		<command
         commandId="fr.tpt.aadl.ramses.control.osate.outline.generation"
         icon="icons/RAMSES.gif"
-        label="RAMSES code generation"
+        label="Launch RAMSES"
         style="push"
-        tooltip="RAMSES code generation">
+        tooltip="Launch RAMSES">
 		</command>
 	</menuContribution>
     <menuContribution
@@ -143,10 +171,30 @@
        <command
              commandId="fr.tpt.aadl.ramses.control.osate.instance.generation"
              icon="icons/RAMSES.gif"
-             label="RAMSES code generation"
+             label="Launch RAMSES"
              style="push"
-             tooltip="RAMSES code generation">
+             tooltip="Launch RAMSES">
        </command>
+       <command
+             commandId="fr.tpt.aadl.ramses.control.osate.instance.memory.analysis"
+             label="Launch memory analysis"
+             style="push"
+             tooltip="Launch memory analysis">
+       </command>
+       <command
+             commandId="fr.tpt.aadl.ramses.control.osate.instance.maintainability.analysis"
+             label="Launch maintainability analysis"
+             style="push"
+             tooltip="Launch maintainability analysis">
+       </command>
+       <command
+             commandId="fr.tpt.aadl.ramses.control.osate.inspector.launch.instance"
+        	 icon="icons/Icon-inspector.jpg"
+        	 label="Launch AADL Inspector"
+             style="push"
+             tooltip="Launch AADL Inspector">
+      </command>
+        
     </menu>
  </menuContribution>
     <menuContribution
@@ -154,13 +202,13 @@
           locationURI="toolbar:org.eclipse.ui.main.toolbar">
        <toolbar
              id="fr.tpt.aadl.ramses.control.osate.toolbar.generation"
-             label="RAMSES code generation">
+             label="Launch RAMSES">
           <command
                 commandId="fr.tpt.aadl.ramses.control.osate.instance.generation"
                 icon="icons/RAMSES.gif"
-                label="RAMSES code generation"
+                label="Launch RAMSES"
                 style="push"
-                tooltip="RAMSES code generation">
+                tooltip="Launch RAMSES">
           </command>
        </toolbar>
     </menuContribution>
@@ -168,7 +216,7 @@
    
    <extension
 		point="org.eclipse.ui.handlers">
-		<handler 
+  <handler 
 			class="fr.tpt.aadl.ramses.control.osate.GenerateActionHandler"
 			commandId="fr.tpt.aadl.ramses.control.osate.instance.generation">
      <enabledWhen>
@@ -176,7 +224,25 @@
               definitionId="fr.tpt.aadl.ramses.instance.generation.expression">
         </reference>
      </enabledWhen>
-		</handler>
+  </handler>
+  <handler 
+			class="fr.tpt.aadl.ramses.control.osate.MemoryAnalysisActionHandler"
+			commandId="fr.tpt.aadl.ramses.control.osate.instance.memory.analysis">
+     <enabledWhen>
+        <reference
+              definitionId="fr.tpt.aadl.ramses.instance.generation.expression">
+        </reference>
+     </enabledWhen>
+  </handler>
+  <handler 
+			class="fr.tpt.aadl.ramses.control.osate.MaintainabilityAnalysisActionHandler"
+			commandId="fr.tpt.aadl.ramses.control.osate.instance.maintainability.analysis">
+     <enabledWhen>
+        <reference
+              definitionId="fr.tpt.aadl.ramses.instance.generation.expression">
+        </reference>
+     </enabledWhen>
+  </handler>
   <handler
         class="fr.tpt.aadl.ramses.control.osate.GenerateActionHandler"
         commandId="fr.tpt.aadl.ramses.control.osate.outline.generation">
@@ -186,7 +252,15 @@
         </reference>
      </enabledWhen>
   </handler>
-	
+	<handler
+        class="fr.tpt.aadl.ramses.control.osate.MemoryAnalysisActionHandler"
+        commandId="fr.tpt.aadl.ramses.control.osate.outline.memory.analysis">
+     <enabledWhen>
+        <reference
+              definitionId="fr.tpt.aadl.ramses.outline.generation.expression">
+        </reference>
+     </enabledWhen>
+  </handler>
 	</extension>
 	
 	

@@ -41,85 +41,85 @@ public class AtlHooksFactoryImpl extends EFactoryImpl implements AtlHooksFactory
   private static Logger _LOGGER = Logger.getLogger(AtlHooksFactoryImpl.class) ;
   
   /**
-	 * Creates the default factory implementation.
-	 * <!-- begin-user-doc -->
+   * Creates the default factory implementation.
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
   public static AtlHooksFactory init()
   {
-		try {
-			AtlHooksFactory theAtlHooksFactory = (AtlHooksFactory)EPackage.Registry.INSTANCE.getEFactory("http://fr.tpt.aadl.ramses.transformation.atl.launch"); 
-			if (theAtlHooksFactory != null) {
-				return theAtlHooksFactory;
-			}
-		}
-		catch (Exception exception) {
-			EcorePlugin.INSTANCE.log(exception);
-		}
-		return new AtlHooksFactoryImpl();
-	}
+    try
+    {
+      AtlHooksFactory theAtlHooksFactory = (AtlHooksFactory)EPackage.Registry.INSTANCE.getEFactory(AtlHooksPackage.eNS_URI);
+      if (theAtlHooksFactory != null)
+      {
+        return theAtlHooksFactory;
+      }
+    }
+    catch (Exception exception)
+    {
+      EcorePlugin.INSTANCE.log(exception);
+    }
+    return new AtlHooksFactoryImpl();
+  }
 
   /**
-	 * Creates an instance of the factory.
-	 * <!-- begin-user-doc -->
+   * Creates an instance of the factory.
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
   public AtlHooksFactoryImpl()
   {
-		super();
-	}
+    super();
+  }
 
   /**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
   @Override
   public EObject create(EClass eClass)
   {
-		switch (eClass.getClassifierID()) {
-			case AtlHooksPackage.HOOK_ACCESS: return createHookAccess();
-			default:
-			{
-				String msg = "The class '" + eClass.getName() + "' is not a valid classifier";
-				_LOGGER.fatal(msg) ;
-				throw new IllegalArgumentException(msg);
-			}
-		}
-	}
+    switch (eClass.getClassifierID())
+    {
+      case AtlHooksPackage.HOOK_ACCESS: return createHookAccess();
+      default:
+        throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+    }
+  }
 
   /**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
   public HookAccess createHookAccess()
   {
-		HookAccessImpl hookAccess = new HookAccessImpl();
-		return hookAccess;
-	}
+    HookAccessImpl hookAccess = new HookAccessImpl();
+    return hookAccess;
+  }
 
   /**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
   public AtlHooksPackage getAtlHooksPackage()
   {
-		return (AtlHooksPackage)getEPackage();
-	}
+    return (AtlHooksPackage)getEPackage();
+  }
 
   /**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @deprecated
-	 * @generated
-	 */
+   * @deprecated
+   * @generated
+   */
   @Deprecated
   public static AtlHooksPackage getPackage()
   {
-		return AtlHooksPackage.eINSTANCE;
-	}
+    return AtlHooksPackage.eINSTANCE;
+  }
 } //AtlHooksFactoryImpl

@@ -27,4 +27,5 @@ public abstract class AbstractAnalyzer implements Analyzer, NamedPlugin
 {
   protected String mode = "automatic";
   protected AnalysisArtifact currentResult = null;
+  
 }

@@ -50,7 +50,7 @@ public class FileUtils {
 	 * @param fileNamesArray the array fo String referencing files.
 	 * @param faultyFiles the files not found
 	 * @return a set of #{@link java.io.File} identified from the path in 
-	 * {@code includeDirArray}.
+	 * {@code includeDirArray}. 
 	 */
 	public static Set<File> checkFilesExist(String fileNamesArray[], boolean[] faultyFiles)
 	{
@@ -58,7 +58,6 @@ public class FileUtils {
 	    for(int i = 0 ; i < fileNamesArray.length ; i++)
 	    {
 	      File potentialFile = new File(fileNamesArray[i]) ;
-	      
 	      if(potentialFile.exists())
 	      {
 	    	  includeDirSet.add(potentialFile) ;

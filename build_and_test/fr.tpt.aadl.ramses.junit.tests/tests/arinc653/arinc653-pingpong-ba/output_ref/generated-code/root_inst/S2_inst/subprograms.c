@@ -52,10 +52,9 @@ while(1)
       }
       (*PingOut_freshnessIndicator_access) = (*PingOut_freshnessIndicator_access) + 1;
       PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_entrypoint_impl_PingOut_localVariable.fresh_ba = (*PingOut_freshnessIndicator_access);
+      (*Parent_BA_currentState_Access) = PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_currentState_switch;
       WRITE_SAMPLING_MESSAGE ((*PortCnx6_PingOut), &PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_entrypoint_impl_PingOut_localVariable, PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_entrypoint_impl_PingOut_Length, &PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_entrypoint_impl_S2_inst_IPingOrPong_Cping_ping_runtime_call_ret);
       WRITE_SAMPLING_MESSAGE ((*PortCnx8_badSequenceNumber), &PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_entrypoint_impl_badSequenceNumber_localVariable, PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_entrypoint_impl_badSequenceNumber_Length, &PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_entrypoint_impl_S2_inst_IPingOrPong_Cping_ping_runtime_call_ret);
-      PERIODIC_WAIT (&PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_entrypoint_impl_S2_inst_IPingOrPong_Cping_ping_runtime_call_ret);
-      (*Parent_BA_currentState_Access) = PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_currentState_switch;
       }
       break;
     }
@@ -111,9 +110,8 @@ while(1)
       if (PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_mode_aadlKeywords_localVariable == E_ROLE_CPING) {
       PingPong__IPingOrPong_Cping_delayed_PongIn (&PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_PongIn_localVariable, &PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_delayed_PongIn_localVariable);
       }
-      DISPLAY_BLACKBOARD ((*PortCnx9_delayed_PongIn), &PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_delayed_PongIn_localVariable, PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_delayed_PongIn_Length, &PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_S2_inst_IPingOrPong_Cping_delayed_PongIn_runtime_call_ret);
-      PERIODIC_WAIT (&PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_S2_inst_IPingOrPong_Cping_delayed_PongIn_runtime_call_ret);
       (*Parent_BA_currentState_Access) = PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_currentState_switch;
+      DISPLAY_BLACKBOARD ((*PortCnx9_delayed_PongIn), &PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_delayed_PongIn_localVariable, PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_delayed_PongIn_Length, &PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_S2_inst_IPingOrPong_Cping_delayed_PongIn_runtime_call_ret);
       }
       break;
     }
@@ -169,9 +167,8 @@ while(1)
       }
       }
       (*PingIn_freshnessIndicator_access) = PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PingIn_localVariable.fresh_ba;
-      WRITE_SAMPLING_MESSAGE ((*PortCnx7_PongOut), &PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PongOut_localVariable, PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PongOut_Length, &PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_entrypoint_impl_S2_inst_IPingOrPong_Cpong_pong_runtime_call_ret);
-      PERIODIC_WAIT (&PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_entrypoint_impl_S2_inst_IPingOrPong_Cpong_pong_runtime_call_ret);
       (*Parent_BA_currentState_Access) = PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_currentState_switch;
+      WRITE_SAMPLING_MESSAGE ((*PortCnx7_PongOut), &PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PongOut_localVariable, PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PongOut_Length, &PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_entrypoint_impl_S2_inst_IPingOrPong_Cpong_pong_runtime_call_ret);
       }
       break;
     }

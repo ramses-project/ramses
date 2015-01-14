@@ -95,6 +95,52 @@
     </dependency>
 
     <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.transformation.trc</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+
+    <dependency>
+	  <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.transformation.selection</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+
+<!--
+    <dependency>
+	  <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.transformation.selection.sensitivity</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+-->
+
+	<dependency>
+	  <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.transformation.tip</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+    
+    <dependency>
+	  <groupId>ramses</groupId>
+      <artifactId>fr.tpt.atl.utils</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+
+<!--
+	<dependency>
+	  <groupId>ramses</groupId>
+      <artifactId>fr.tpt.rdal.utils</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+-->
+	
+	<dependency>
+	  <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.transformation.merge.launcher</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.eclipse.core</groupId>
       <artifactId>runtime</artifactId>
       <version>3.7.0.v20110110</version>
@@ -215,12 +261,13 @@
       <version>${project.parent.version}</version>
     </dependency>
    
-
+<!--
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.sched.tools.cheddar</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
+-->
 
     <dependency>
       <groupId>ramses</groupId>
@@ -238,6 +285,18 @@
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.pok</artifactId>
       <version>${project.parent.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.generation.arinc653.xml</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.generation.integrity</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>

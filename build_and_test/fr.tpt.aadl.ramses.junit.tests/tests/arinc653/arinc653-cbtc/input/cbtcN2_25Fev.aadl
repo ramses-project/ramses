@@ -97,6 +97,7 @@ PROPERTIES
   Source_Language => (C);
   Source_Name => "TrainData";
   Source_Text => ("business-code/cbtc_module.h");
+  Data_Size => 2 bytes;
 END TrainData;
 
 DATA TrainPositionOffset
@@ -118,8 +119,10 @@ SUBCOMPONENTS
   root_inst : PROCESSOR root.impl {
     Thread_Swap_Execution_Time => 5ms..10ms;
     ARINC653::Module_Major_Frame => 600ms;
-    ARINC653::Partition_Slots => (300ms,300ms);
-    ARINC653::Slots_Allocation => (REFERENCE(VP_railway_inst),REFERENCE(VP_train_inst));
+    ARINC653::Module_Schedule => (
+       	[Partition => reference(VP_railway_inst); Duration => 300ms; Periodic_Processing_Start => true;],
+	[Partition => reference(VP_train_inst); Duration => 300ms; Periodic_Processing_Start => true;]
+    );
     ARINC653::HM_Error_ID_Levels => (
     	[ErrorIdentifier => 1; Description => "Module configuration error"; ErrorLevel=>Module_Level;ErrorCode=>Module_Config;]
     );
@@ -161,8 +164,16 @@ END root;
 
 PROCESSOR IMPLEMENTATION root.impl
 SUBCOMPONENTS
-  VP_train_inst : VIRTUAL PROCESSOR VP_train.impl;
-  VP_railway_inst : VIRTUAL PROCESSOR VP_railway.impl;
+  VP_train_inst : VIRTUAL PROCESSOR VP_train.impl
+  {
+  	Scheduling_Protocol => (Round_Robin_Protocol);
+  	Period => 600 Ms;
+  };
+  VP_railway_inst : VIRTUAL PROCESSOR VP_railway.impl
+  {
+  	Scheduling_Protocol => (Round_Robin_Protocol);
+  	Period => 600 Ms;
+  };
 END root.impl;
 
 MEMORY root_main_memory
@@ -171,7 +182,8 @@ PROPERTIES
   Base_Address => 16#2200#;
   Word_Size => 10000Bytes;
   ARINC653::Memory_Type => (Data_Memory,Code_Memory,IO_Memory);
-  Memory_Protocol => read_write;
+--  Write_Time => [Fixed => 5 ns .. 5 ns; PerByte =>  5 ns .. 5 ns; ];
+--  Read_Time => [Fixed => 5 ns .. 5 ns; PerByte =>  5 ns .. 5 ns; ];
 END root_main_memory;
 
 MEMORY IMPLEMENTATION root_main_memory.impl
@@ -185,8 +197,7 @@ PROPERTIES
   ARINC653::Partition_Identifier => 1;
   ARINC653::Partition_Name => "System";
   ARINC653::System_Partition => TRUE;
-  ARINC653::System_Overhead_Time => 10ms;
-  POK::Scheduler => RR;
+  Scheduling_Protocol => (Round_Robin_Protocol);
   POK::Additional_Features => (libc_stdio,console);
 END VP_System_aadlKeywords.impl;
 
@@ -195,12 +206,10 @@ END VP_train;
 
 VIRTUAL PROCESSOR IMPLEMENTATION VP_train.impl
 PROPERTIES
-  ARINC653::Partition_Identifier => 1;
+  ARINC653::Partition_Identifier => 2;
   ARINC653::Partition_Name => "train";
   ARINC653::System_Partition => FALSE;
-  ARINC653::System_Overhead_Time => 10ms;
--- EB: scheduler = RR
-  POK::Scheduler => RR;
+  Scheduling_Protocol => (Round_Robin_Protocol);
   POK::Additional_Features => (libc_stdio,console);
 END VP_train.impl;
 
@@ -212,8 +221,7 @@ PROPERTIES
   ARINC653::Partition_Identifier => 3;
   ARINC653::Partition_Name => "railway";
   ARINC653::System_Partition => FALSE;
-  ARINC653::System_Overhead_Time => 10ms;
-  POK::Scheduler => RR;
+  Scheduling_Protocol => (Round_Robin_Protocol);
   POK::Additional_Features => (libc_stdio,console);
 END VP_railway.impl;
 
@@ -612,7 +620,6 @@ ANNEX behavior_specification {**
     delayed_trainDataIn := trainDataIn
   };
 **};
-
 END TrainSimu_delayed_trainDataIn;
 
 THREAD TrainPpu_odometerAcquisition_Thread
@@ -640,7 +647,6 @@ ANNEX behavior_specification {**
     END IF
   };
 **};
-
 END TrainPpu_odometerAcquisition_Thread.impl;
 
 THREAD TrainPpu_trainTraction_Thread
@@ -664,7 +670,6 @@ ANNEX behavior_specification {**
     END IF
   };
 **};
-
 END TrainPpu_trainTraction_Thread.impl;
 
 THREAD VobcTrainPositionEstimation_vobcTrainPositionEstimation_Thread
@@ -696,7 +701,6 @@ ANNEX behavior_specification {**
     END IF
   };
 **};
-
 END VobcTrainPositionEstimation_vobcTrainPositionEstimation_Thread.impl;
 
 THREAD TrainSpeedAccelCompute_trainSpeedAccelCompute_Thread
@@ -726,7 +730,6 @@ ANNEX behavior_specification {**
     END IF
   };
 **};
-
 END TrainSpeedAccelCompute_trainSpeedAccelCompute_Thread.impl;
 
 THREAD TrainPositionsCorrelation_trainPositionsCorrelation_Thread

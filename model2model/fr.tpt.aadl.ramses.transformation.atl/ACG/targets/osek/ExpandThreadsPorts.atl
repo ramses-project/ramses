@@ -60,7 +60,7 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 	->union
 	(
 		c.featureInstance->select(e|not e.oclIsKindOf(AADLBA!DataAccess) and e.isInputFeature() and not e.isPeriodicDelayedPort())
-		->collect(fi| thisModule.resolveLazySingleIfExists(fi, 'CreateReturnSubcomponentFromPort', 'dataSubcomponent'))
+		->collect(fi| thisModule.CreateReturnSubcomponentFromPort(fi))
 		
 	)
 	->union
@@ -75,7 +75,7 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 	)
 	->union
 	(
-		callSequences->collect(callSequence | c.subcomponent.classifier.ownedParameterConnection -> select(paramCnx| 
+		callSequences->collect(callSequence | c.subcomponent.classifier.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) ) -> select(paramCnx| 
 				paramCnx.isParamToParamConnection()
 				and
 				paramCnx.isPartOfCallSequence(callSequence)
@@ -173,8 +173,53 @@ rule m_Process_Output_EventPort_Instance
 }
 
 helper context AADLI!FeatureInstance def: collectPortGlobalVariableImg() : Sequence(AADLBA!DataSubcomponent) =
-	Sequence{thisModule.resolveMatchedSingleIfExists(self, 'globalVariableValue'), thisModule.resolveMatchedSingleIfExists(self, 'globalVariable')}
+	if(self.getProcess().modeInstance->exists(mi| self.connectedInMode(mi.mode))) then
+		self.getProcess().modeInstance->collect(mi |
+			Sequence{
+			thisModule.resolveMatchedTupleIfExists(Sequence{self, mi.mode}, 'globalVariableValue'), 
+			thisModule.resolveMatchedTupleIfExists(Sequence{self, mi.mode}, 'globalVariable')
+		})->flatten()
+	else
+		Sequence{thisModule.resolveMatchedSingleIfExists(self, 'globalVariableValue'), thisModule.resolveMatchedSingleIfExists(self, 'globalVariable')}
+	endif
 ;
+
+-- @extends m_Thread_IntraProcess_Input_DataPort_Instance,m_Thread_DataOrEventDataPort_Input_Instance,m_Not_PeriodicDelayed_Port
+rule m_Thread_IntraProcess_Input_DataPort_Instance_to_DataSubcomponent
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(
+			fi.connectedToDataComponent()
+		)
+  	to
+		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
+		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
+		globalVariable:AADLBA!DataSubcomponent
+		(
+			dataSubcomponentType <- 'DataPortType'.asDataType('OSEK_RUNTIME'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													GvInit
+												)
+									    }
+		),
+		localVariable:AADLBA!DataSubcomponent,
+		GvInit: AADLBA!ListValue
+	do
+	{
+		GvInit.ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
+								thisModule.structInitInitiator+'&'+
+								globalVariable.name+'_rez, &'+
+								fi.connectedDataComponent().name+', '+ thisModule.getSizeOfType(fi.getLengthInitialValue())+
+								thisModule.structInitTerminator		
+							)
+						};
+	}
+}
 
 
 -- @extends m_Thread_IntraProcess_Input_Port_Instance,m_Thread_DataOrEventDataPort_Input_Instance,m_Not_PeriodicDelayed_Port
@@ -182,7 +227,8 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance
 {
   	from
 		fi: AADLI!FeatureInstance
-		(fi.isDataPort())
+		(fi.isDataPort()
+		)
   	to
   		f: AADLBA!DataAccess
 		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
@@ -215,6 +261,17 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance
 							)
 						};
 	}
+}
+
+-- @extends m_Thread_IntraProcess_Input_Port_Instance_Mode,m_Thread_IntraProcess_Input_DataPort_Instance
+rule m_Thread_IntraProcess_Input_DataPort_Instance_Mode
+{
+	from
+		fi: AADLI!FeatureInstance,
+		mode: AADLI!Mode
+	to
+		f: AADLBA!DataAccess,
+		f_entrypoint: AADLBA!DataAccess
 }
 
 -- @extends m_Not_PeriodicDelayed_Port,m_Thread_DataOrEventDataPort_Input_Instance,m_Thread_IntraProcess_Input_Port_Instance
@@ -268,6 +325,7 @@ rule m_Thread_IntraProcess_Input_EventDataPort_Instance
 		GvInit: AADLBA!ListValue
 	do
 	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(globalVariable, fi);
 		GvInit.ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
 								thisModule.structInitInitiator+
 								fi.getQueueSize().toString()+', 0, 0, 0, '+ thisModule.getSizeOfType(fi.getLengthInitialValue())
@@ -294,8 +352,50 @@ rule m_Thread_IntraProcess_Input_EventPort_Instance
 		localVariable:AADLBA!DataSubcomponent,
 		globalVariable:AADLBA!DataSubcomponent
 		(
-			dataSubcomponentType <- 'PortQueueType'.asDataType('OSEK_RUNTIME')
-		)
+			dataSubcomponentType <- 'PortQueueType'.asDataType('OSEK_RUNTIME'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													GvInit
+												)
+									    }
+		),
+		globalVariableValue: AADLBA!DataSubcomponent
+		(
+			name <- fi.getComponentInstance().name+'_'+fi.name+'_value',
+			dataSubcomponentType <- buffer
+		),
+		buffer: AADLBA!DataType
+		(
+			name <- fi.getComponentInstance().name+'_'+fi.name+'_bufferType',
+			ownedPropertyAssociation <- Sequence
+			{
+				thisModule.CreatePropertyAssociation('Data_Representation', 'DATA_MODEL',
+					'Array'.asEnumeration('DATA_MODEL').asNamedValue()),
+				thisModule.CreatePropertyAssociation('Base_Type', 'DATA_MODEL',
+					thisModule.CreateListValueFromClassifier(
+										'Integer'.asDataType('BASE_TYPES')
+									)
+				),
+				thisModule.CreatePropertyAssociation('Dimension',
+													  'DATA_MODEL',
+													  thisModule.CreateListValueFromInteger(
+														fi.getQueueSize())
+												)
+			}
+		),
+		GvInit: AADLBA!ListValue
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(globalVariable, fi);
+		GvInit.ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
+								thisModule.structInitInitiator+
+								fi.getQueueSize().toString()+', 0, 0, 0, '+ thisModule.getSizeOfType(fi.getLengthInitialValue())
+								+', '+globalVariableValue.name+', 0'+
+								thisModule.structInitTerminator		
+							)
+						};
+	}
 }
 
 -- @extends m_Thread_InterProcess_Input_Port_Instance,m_Thread_DataOrEventDataPort_Input_Instance
@@ -480,8 +580,30 @@ helper def : getTimeOutInitValue(port : AADLBA!Feature) : AADLBA!PropertyExpress
 	endif
 ;
 
-
-unique lazy rule CreateTimeOutSubcomponentFromCpt
+unique lazy rule CreateTimeOutSubcomponentFromCptPeriod
+{
+	from
+		inst : AADLI!ComponentInstance
+	using
+	{
+		initValuePE: AADLBA!PropertyExpression = thisModule.toStringLiteral(inst.getPeriodValue().toString());
+	}
+	to
+		dataSubcomponent: AADLBA!DataSubcomponent
+		(
+			name<-inst.name+'_TimeOut',
+			dataSubcomponentType<-'UNDEFINED'.asDataType('OSEK_RUNTIME'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',thisModule.CreateListValueFromPropertyExpression(initValuePE))} 
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, inst);
+		dataSubcomponent;
+	}
+}
+			
+			
+unique lazy rule CreateInfiniteTimeOutSubcomponentFromCpt
 {
 	from
 		inst : AADLI!ComponentInstance
@@ -503,7 +625,39 @@ unique lazy rule CreateTimeOutSubcomponentFromCpt
 	}
 }
 
-
+lazy rule createPortCountValueUpdate
+{
+	from
+		fi: AADLI!FeatureInstance
+	using
+	{
+		spg: AADLI!SubprogramType = 'GetCount'.asSubprogramType('OSEK_RUNTIME');
+		GLOBAL_Q: AADLBA!DataAccess = fi.getFeatureImg();
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.CreateReturnSubcomponentFromPort(fi);
+	}
+	to
+		callGetCount: AADLBA!SubprogramCallAction
+		(
+			subprogram <- getCountHolder,
+			parameterLabels <- Sequence{GLOBAL_Q_HOLDER,thisModule.createPortIdValueExpression(fi),COUNT_HOLDER,RETURN_CODE_HOLDER}
+		),
+		getCountHolder: AADLBA!SubprogramHolder
+		(
+			element <- spg
+		),
+		GLOBAL_Q_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-GLOBAL_Q
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		),
+		COUNT_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.createPortCountSubcomponent(fi)
+		)
+}
 
 -------------------------------------------------------------------------------------------
 ----	OVERRIDEN HELPERS
@@ -528,84 +682,4 @@ helper context AADLI!FeatureInstance def: getLengthInitialValue() : String =
 	endif
 ;
 
-
-------------------------------------
----      ADDED CALLED RULES     ----
-------------------------------------
-
-rule addNextValueSubprogramCallAction(actions:AADLBA!BehaviorActions,
-								fi: AADLI!FeatureInstance,
-								implImg: AADLBA!ComponentImplementation)
-{
-	do
-	{
-		for(cnxInst in fi.dstConnectionInstance)
-		{
-			if(thisModule.toBeTransformedInterProcessConnection(cnxInst))
-			{
-				if(cnxInst.source.category=#eventPort or cnxInst.source.category=#eventDataPort)
-				{
-					thisModule.addReceiveQueuingAction(actions, fi, implImg);
-				}
-				else if(cnxInst.source.category=#dataPort)
-				{
-					thisModule.addReadSamplingAction(actions, fi, implImg);
-				}
-			}
-			else if(thisModule.toBeTransformedIntraProcessConnection(cnxInst))
-			{
-				if(cnxInst.source.category=#eventPort)
-				{
-					thisModule.addWaitEventAction(actions, fi, implImg);
-				}
-				else if(cnxInst.source.category=#eventDataPort)
-				{
-					thisModule.addReceiveBufferAction(actions, fi, implImg);
-				}
-				else if(cnxInst.source.category=#dataPort)
-				{
-					thisModule.addReadBlackBoardAction(actions, fi, implImg);
-				}
-			}
-		}
-	}
-}
-
-rule addPutValueSubprogramCallAction(actions:AADLBA!BehaviorActions,
-								fi: AADLI!FeatureInstance,
-								implImg: AADLBA!ComponentImplementation)
-{
-	do
-	{
-		for(cnxInst in fi.srcConnectionInstance)
-		{
-			if(thisModule.toBeTransformedInterProcessConnection(cnxInst))
-			{
-				if(cnxInst.source.category=#eventPort or cnxInst.source.category=#eventDataPort)
-				{
-					thisModule.addSendQueuingAction(actions, fi, implImg);
-				}
-				else if(cnxInst.source.category=#dataPort)
-				{
-					thisModule.addWriteSamplingAction(actions, fi, implImg);
-				}
-			}
-			else if(thisModule.toBeTransformedIntraProcessConnection(cnxInst))
-			{
-				if(cnxInst.source.category=#eventPort)
-				{
-					thisModule.addSetEventAction(actions, fi, implImg);
-				}
-				else if(cnxInst.source.category=#eventDataPort)
-				{
-					thisModule.addSendBufferAction(actions, fi, implImg);
-				}
-				else if(cnxInst.source.category=#dataPort)
-				{
-					thisModule.addDisplayBlackBoardAction(actions, fi, implImg);
-				}
-			}
-		}
-	}
-}
 

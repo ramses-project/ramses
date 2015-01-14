@@ -1,0 +1,88 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+module Common;
+create OUT : CV 	from 		IN : AADLI;
+
+--@extends check_ComponentInstance
+abstract rule check_DataInstance
+{
+	from
+	  obj: AADLI!ComponentInstance
+	  (obj.category=#data)
+}
+
+-- @extends check_DataInstance
+rule check_DataHasConcreteDataType
+{
+	from
+		obj: AADLI!ComponentInstance
+		(
+			let dataClassifier: AADLI!DataClassifier = 
+				obj.subcomponent.dataSubcomponentType
+			in
+				not obj.hasConcreteDataType()
+		)
+	to
+	  err: CV!Error
+	  (
+	  	message <- 'In ' + obj.subcomponent.dataSubcomponentType.name + ', concrete data type is not defined. '
+		+'Use data modeling annex (Data_Model::Data_Representation property) '
+		+'of refer existing source code files '
+		+'(Source_Text property)'
+	  )
+}
+
+
+helper context AADLI!NamedElement def: hasConcreteDataType() : Boolean =
+	self.hasProperty('Data_Representation')
+	or
+	(
+		self.hasProperty('Source_Text')
+		and
+		self.hasProperty('Source_Name')
+	)
+;
+	
+
+-- @extends check_DataInstance
+rule check_DataHasHeaderInSourceCode
+{
+	from
+		obj: AADLI!ComponentInstance
+		(
+			let dataClassifier: AADLI!DataClassifier = 
+				obj.subcomponent.dataSubcomponentType
+			in
+				dataClassifier.hasProperty('Source_Text')
+				and
+				not dataClassifier.hasHeaderInSourceCode()	
+		)
+	to
+	  err: CV!Error
+	  (
+	  	message <- 'In ' + obj.name + ', header file (.h) were data type is defined'
+		+' is not set (in Source_Text property)'
+	  )
+}

@@ -1,0 +1,99 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLI=http:///AADL2/instance
+-- @atlcompiler emftvm
+
+module UninstanciateOverrideForRemoteConnections;
+
+create 
+	OUT 			: AADLBA
+from 
+	IN 				: AADLI;
+
+
+rule m_Subprogram_Type {
+	from
+		type : AADLI!SubprogramType
+}
+
+rule m_Subprogram_Implementation {
+	from
+		impl : AADLI!SubprogramImplementation
+}
+
+rule m_Data_Type {
+ from
+   type : AADLI!DataType 
+}
+
+rule m_Data_Implementation {
+  from
+ 	impl : AADLI!DataImplementation
+}
+
+
+helper context AADLI!ComponentImplementation def: needsCopy(): Boolean =
+	self.isInstanciated() or self.oclIsKindOf(AADLI!SystemImplementation)
+;
+
+helper context AADLI!ComponentType def: needsCopy(): Boolean =
+	self.isInstanciated() or self.oclIsKindOf(AADLI!SystemType)
+;
+
+helper context AADLI!ComponentType def : isInstanciated() : Boolean =
+	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|not e.subcomponent.oclIsUndefined())
+		->exists(e| e.subcomponent.subcomponentType=self or if e.subcomponent.subcomponentType.oclIsKindOf(AADLI!ComponentImplementation) then e.subcomponent.subcomponentType.type=self else false endif)
+;
+helper context AADLI!ComponentImplementation def: isInstanciated() : Boolean =
+	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|not e.subcomponent.oclIsUndefined())
+		->exists(e| e.subcomponent.subcomponentType=self)
+;
+
+helper context AADLI!ConnectionReference def: needsCopy() : Boolean =
+	if self.source.isThreadPort()
+		or
+		self.destination.isThreadPort() 
+	then
+		true
+	else 
+		if self.eContainer().isRemoteConnection() then
+			false
+		else
+			true
+		endif
+	endif
+;
+
+
+-- @extends m_Connection_Reference
+rule m_AccessConnection_Reference
+{
+	from
+		cnxRef: AADLI!ConnectionReference (
+			cnxRef.eContainer().kind = #accessConnection
+			and
+			not (cnxRef.connection.accessCategory=#subprogram)
+			)
+	to
+		cnxImg: AADLBA!AccessConnection
+		(accessCategory <- cnxRef.connection.accessCategory)
+}

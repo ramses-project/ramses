@@ -1,4 +1,5 @@
 export POK_PATH=/usr/share/pok
+
 all:
 	$(MAKE) -C root_inst all
 

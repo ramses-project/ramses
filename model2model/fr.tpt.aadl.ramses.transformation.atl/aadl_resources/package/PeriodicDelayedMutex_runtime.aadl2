@@ -1,7 +1,7 @@
 package PeriodicDelayedMutex_runtime
 public
 
-with Base_Types,Data_Model,Generation_Properties;
+with Base_Types,Data_Model,Generation_Properties,Maintainability_Property;
 
   data ReturnCodeType
     properties
@@ -60,6 +60,8 @@ prototypes
 features
   BufferAccess : requires data access  t_buffer;
   Size : requires data access Base_Types::Integer_16 {Access_Right=>read_only;};
+properties
+  Maintainability_Property::Maintenance_Cost => 1;
 annex behavior_specification {**
   variables
     j : Base_Types::Integer_16;
@@ -102,6 +104,8 @@ subcomponents
                   { Data_Model::Initial_Value => ("0"); };
   empty_slot    : data Base_Types::Integer_16
                   { Data_Model::Initial_Value => ("0"); };
+properties
+  Maintainability_Property::Maintenance_Cost => 1;
 annex behavior_specification {**
   variables
     isHigherPrio: Base_Types::Boolean;
@@ -157,6 +161,8 @@ subprogram implementation Receive_Input.impl
 subcomponents
 	j : data Base_Types::Integer_16;
     temp : data Base_Types::Integer_16;
+properties
+  Maintainability_Property::Maintenance_Cost => 1;
 annex behavior_specification {**
   states
     s: initial final state;
@@ -190,6 +196,8 @@ subprogram implementation Next_Value.impl
 subcomponents
   tmp: data Base_Types::Integer_16;
   j: data Base_Types::Integer_16;
+properties
+  Maintainability_Property::Maintenance_Cost => 1;
 annex behavior_specification {**
   states
     s: initial final state;
@@ -197,17 +205,17 @@ annex behavior_specification {**
     t: s -[]-> s
     {
      if (BufferAccess.first_write != -1)
-       BufferState := ReturnCodeType#Ok;
+       BufferState := ReturnCodeType#Enumerators.Ok;
        if (BufferAccess.buffer[BufferAccess.first_write].TimeStamp <= CurrentPeriod)
          DataValue := BufferAccess.buffer[BufferAccess.first_write].MsgValue;
          tmp := BufferAccess.first_write;
          BufferAccess.first_write := BufferAccess.buffer[BufferAccess.first_write].Next;
          BufferAccess.buffer[tmp].Next := -2 -- free slot
        else
-         BufferState := ReturnCodeType#EmptyQueue
+         BufferState := ReturnCodeType#Enumerators.EmptyQueue
        end if
      else
-       BufferState := ReturnCodeType#EmptyQueue
+       BufferState := ReturnCodeType#Enumerators.EmptyQueue
      end if
     };
 **};
@@ -219,6 +227,8 @@ features
   DeadlineValue   : in parameter Base_Types::Integer_16;
   CurrentPeriod   : in out parameter Base_Types::Integer_16;
   CurrentDeadline : in out parameter Base_Types::Integer_16;
+properties
+  Maintainability_Property::Maintenance_Cost => 1;  
 annex behavior_specification {**
   states
     s : initial final state;

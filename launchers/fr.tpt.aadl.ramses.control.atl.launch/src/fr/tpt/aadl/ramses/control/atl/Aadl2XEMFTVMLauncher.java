@@ -65,6 +65,7 @@ import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 
 public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
@@ -77,6 +78,7 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 
 	protected ResourceSet rs = new ResourceSetImpl();
 	private HookAccessImpl atlHook;
+ 	private List<Module> moduleList = new ArrayList<Module>();
  	
 	public HookAccessImpl getAtlHook()
 	{
@@ -130,10 +132,10 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	}
 
 	public Resource doTransformation(String transformationId,
-            Resource inputResource,
-                String outputDirPathName,
-                String resourceSuffix,
-                IProgressMonitor monitor)
+	                                 Resource inputResource,
+	                                 String outputDirPathName,
+	                                 String resourceSuffix,
+	                                 IProgressMonitor monitor)
 	{
 		env = AtlTransfoLauncher.getRamsesExecEnv(transformationId).getExecEnv();
 		
@@ -214,60 +216,46 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	    
 	    env.setMonitor(vmMonitor);
 		}
-		
-		env.run(td);
-		td.finish();
-		
-		// Save the resulting model
-		if(System.getProperty("DEBUG")!=null)
+		try
 		{
-			if(outModel.getResource() == null ||
-					! outModel.getResource().getContents().isEmpty())
-			{
-				outModel.getResource().setURI(outputResource.getURI());
-				try
-				{
-				  outModel.getResource().save(null);
-				}
-				catch(IOException ex)
-				{
-				  String errMsg = "cannot save the output AADL model" ;
-	        _LOGGER.fatal(errMsg, ex);
-	        throw new RuntimeException(errMsg, ex);
-				}
-			}
+		  env.run(td);
+		  td.finish();
 		}
-		
+		catch(Exception e)
+		{
+		  String msg = "EMFTVM transformation failed";
+		  _LOGGER.fatal(msg, e);
+		  ServiceProvider.SYS_ERR_REP.fatal(msg, e);
+		}
 		return outModel.getResource();
 	}
 
 	public Resource doTransformation(List<File> transformationFileList,
-	                                 Resource inputResource,
-			                             String outputDirPathName,
-			                             String resourceSuffix,
-			                             IProgressMonitor monitor)
+	                                  Resource inputResource,
+	                                  String outputDirPathName,
+	                                  String resourceSuffix,
+	                                  IProgressMonitor monitor)
 	{
-		
 		
 		if(env == null)
 		  env = EmftvmFactory.eINSTANCE.createExecEnv();
 		
 		// Load metamodels
-		  // Load aadl instance metamodel 
-		  Metamodel aadlInstanceMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
-		  aadlInstanceMetaModel.setResource(InstancePackage.eINSTANCE.eResource());
-		  env.registerMetaModel("AADLI", aadlInstanceMetaModel);
+		// Load aadl instance metamodel 
+		Metamodel aadlInstanceMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
+		aadlInstanceMetaModel.setResource(InstancePackage.eINSTANCE.eResource());
+		env.registerMetaModel("AADLI", aadlInstanceMetaModel);
 
-		  // Load aadl+BA metamodel
-		  Metamodel aadlBaMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
-		  aadlBaMetaModel.setResource(AadlBaPackage.eINSTANCE.eResource());
-		  env.registerMetaModel("AADLBA", aadlBaMetaModel);
+		// Load aadl+BA metamodel
+		Metamodel aadlBaMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
+		aadlBaMetaModel.setResource(AadlBaPackage.eINSTANCE.eResource());
+		env.registerMetaModel("AADLBA", aadlBaMetaModel);
 
-		  // Load atlHooks metamodel
-		  Metamodel atlHoolsMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
-		  atlHoolsMetaModel.setResource(AtlHooksPackage.eINSTANCE.eResource());
-		  env.registerMetaModel("ATLHOOKS", atlHoolsMetaModel);
-		  
+		// Load atlHooks metamodel
+		Metamodel atlHoolsMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
+		atlHoolsMetaModel.setResource(AtlHooksPackage.eINSTANCE.eResource());
+		env.registerMetaModel("ATLHOOKS", atlHoolsMetaModel);
+
 		
 		initTransformationInputs(inputResource);
 		
@@ -319,7 +307,9 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
           registeredReferences.add(r);
           Model referencedModel = EmftvmFactory.eINSTANCE.createModel();
           referencedModel.setResource(r);
-          env.registerInputModel(r.getURI().lastSegment(), referencedModel);
+          String id = r.getURI().lastSegment();
+          id = id.substring(0, id.lastIndexOf('.')).toUpperCase();
+          env.registerInputModel(id, referencedModel);
         }
       }
     }
@@ -359,7 +349,13 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		
 		for(File f : transformationFileList)
 		{
-		  env.loadModule(mr, f.getAbsolutePath());
+		  moduleList.add(env.loadModule(mr, f.getAbsolutePath()));
 		}
 	}
+
+  public List<Module> getModuleList()
+  {
+    return moduleList;
+  }
+  
 }

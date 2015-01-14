@@ -1,3 +1,5 @@
+/**
+ */
 package fr.tpt.aadl.ramses.constraintsreporter.util;
 
 import fr.tpt.aadl.ramses.constraintsreporter.reporterPackage;

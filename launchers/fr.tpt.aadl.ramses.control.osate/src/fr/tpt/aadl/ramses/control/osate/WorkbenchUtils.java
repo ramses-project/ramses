@@ -169,6 +169,7 @@ public class WorkbenchUtils
       ConfigStatus.NOT_FOUND.msg = e.getMessage() ;
       throw new ConfigurationException(ConfigStatus.NOT_FOUND) ;
     }
+    OsateResourceUtil.USES_GUI=true;
     
     RamsesConfiguration.setRamsesResourceDir(ramsesDirPath) ;
     RamsesConfiguration.setAtlResourceDir(ramsesDirPath) ;
@@ -180,15 +181,19 @@ public class WorkbenchUtils
   // included.
   public static Set<File> getIncludeDirs(IProject p)
   {
-    String fullProjectPath = ResourcesPlugin.getWorkspace().getRoot().getRawLocation().toOSString() + p.getFullPath().toOSString() ;
+    Set<File> result = null;
+    String fullProjectPath = p.getLocation().toOSString() ;
     
     File projectPath = new File(fullProjectPath) ;
     
-    Set<File> result = FileUtils.getSubDirectories(projectPath) ;
-    
-    result.add(projectPath) ;
+    if(projectPath.exists())
+    {
+      result = FileUtils.getSubDirectories(projectPath) ;
+      result.add(projectPath) ;
+    }
     
     return result ;
+    
   }
 
   public static void showGenerationReport()
@@ -198,10 +203,19 @@ public class WorkbenchUtils
     final IStatus status ;
 //    int style = StatusManager.BLOCK ;
     int code = IStatus.INFO ;
-    sb.append("Code generation was successfully done") ;
    
+    sb.append("RAMSES execution");
+    if(errRep.getNbErrors() != 0)
+    {
+      sb.append(" failed");
+    }
+    else
+    {
+      sb.append(" succeeded");
+    }
     if(errRep.hasDelayedErrors())
     {
+
       sb.append(" with ") ;
       
       if(errRep.getNbWarnings() != 0)

@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Genetic
+Bundle-SymbolicName: fr.tpt.aadl.ramses.transformation.selection.genetic;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: fr.tpt.aadl.ramses.transformation.selection.genetic.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.emf.ecore,
+ org.osate.aadl2.modelsupport,
+ fr.tpt.aadl.ramses.control.support,
+ fr.tpt.aadl.ramses.generation.target.specific,
+ fr.tpt.aadl.ramses.transformation.tip
+Bundle-ActivationPolicy: lazy

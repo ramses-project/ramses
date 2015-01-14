@@ -21,51 +21,79 @@
 
 package fr.tpt.aadl.ramses.analysis.util;
 
-import org.apache.log4j.Logger ;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
+import java.io.File ;
+import java.util.List ;
 
-import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage;
+import org.apache.log4j.Logger ;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
+
+import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage ;
+import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
+import fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 public class AnalysisParser {
 
-	private static ResourceSet resourceSet;
 	
 	private static Logger _LOGGER = Logger.getLogger(AnalysisParser.class) ;
 
-	public static AnalysisArtifact parse(String analysisPath){
+	public static AnalysisArtifact parse(String analysisPath,
+	                                     ResourceSet rs){
 		
 		final Resource resource;
-		
+		File analysisFile = new File(analysisPath);
 		URI p_uri = URI.createFileURI(analysisPath);
 		
-		getResourceSet().getResourceFactoryRegistry().getExtensionToFactoryMap().put(AnalysisResultPackage.eNS_PREFIX, new XMIResourceFactoryImpl());
-		getResourceSet().getPackageRegistry().put(AnalysisResultPackage.eNS_URI, AnalysisResultPackage.eINSTANCE);
+		rs.getResourceFactoryRegistry().getExtensionToFactoryMap().put(AnalysisResultPackage.eNS_PREFIX, new XMIResourceFactoryImpl());
+		rs.getPackageRegistry().put(AnalysisResultPackage.eNS_URI, AnalysisResultPackage.eINSTANCE);
 		
-		if (getResourceSet().getURIConverter().exists(p_uri, null))
+		resource = rs.getResource(p_uri, analysisFile.exists());
+		if (resource!=null)
 		{
-			resource = getResourceSet().getResource(p_uri, true);			
 			return (AnalysisArtifact) resource.getContents().get(0);	
 		}
 		else
 		{
 			String msg = "analysisArtifact of specified path \'"+analysisPath+"\' does not exit" ;
 		  _LOGGER.error(msg) ;
-		  ServiceProvider.SYS_ERR_REP.error(msg, true);
 		}
 		
 		return null;
 	}
+
+  public static int getLastIterationId(String analysisPath)
+  {
+    int res = -1;
+    AnalysisArtifact aa = parse(analysisPath, new ResourceSetImpl());
+    if(aa != null)
+    {
+      List<Object> resultsList = aa.getResults();
+      for(Object obj: resultsList)
+      {
+        if(obj instanceof QualitativeAnalysisResult)
+        {
+          QualitativeAnalysisResult qar = 
+              (QualitativeAnalysisResult) obj;
+          int iter = qar.getSource().getIterationId();
+          if(iter>res)
+            res=iter;
+        }
+        else if (obj instanceof QuantitativeAnalysisResult)
+        {
+          QuantitativeAnalysisResult qar = 
+              (QuantitativeAnalysisResult) obj;
+          int iter = qar.getSource().getIterationId();
+          if(iter>res)
+            res=iter;
+        }
+      }
+    }
+    return res ;
+  }
 	
-	protected static ResourceSet getResourceSet() {
-		if (resourceSet == null) {
-			resourceSet = new ResourceSetImpl();
-		}
-		return resourceSet;
-	}
 }

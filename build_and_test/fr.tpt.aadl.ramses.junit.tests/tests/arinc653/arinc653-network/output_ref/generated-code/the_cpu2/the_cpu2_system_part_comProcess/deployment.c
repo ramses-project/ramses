@@ -1,0 +1,2 @@
+#include "deployment.h"
+APEX_INTEGER the_cpu2_system_part_comProcess_the_proc2_p_in_globalVariable;

@@ -64,7 +64,7 @@ public class AdaPokGeneratorFactory implements GeneratorFactory
 
     AadlTargetSpecificGenerator result =
           new AadlTargetSpecificGenerator(targetTrans, tarSpecCodeGen,
-                modelInstantiatior, targetVal) ;
+                modelInstantiatior, targetVal, predefinedAadlModels) ;
 
     result.setRegistryName(ADA_GENERATOR_NAME) ;
 

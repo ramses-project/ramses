@@ -19,11 +19,16 @@ public class AadlOsekTransformation extends AadlToTargetSpecificAadl {
 	{
 	  super(modelInstantiator, predefinedAadlModels) ;
 	  _atlFileNames = new ArrayList<String>();
+	  _atlFileNames.add("ACG/targets/shared/ACGServices");
 	  _atlFileNames.add("ACG/targets/shared/UninstanciateOverride");
+	  _atlFileNames.add("ACG/targets/shared/DataUninstanciateOverride");
+	  _atlFileNames.add("ACG/targets/shared/SubprogramsUninstanciateOverride");
+	  _atlFileNames.add("ACG/targets/shared/ThreadsUninstanciateOverride");
 	  _atlFileNames.add("ACG/targets/shared/SubprogramCallsCommonRefinementSteps");
 	  _atlFileNames.add("ACG/targets/shared/PortsCommonRefinementSteps");
 	  _atlFileNames.add("ACG/targets/shared/DispatchCommonRefinementSteps");
 	  _atlFileNames.add("ACG/targets/shared/BehaviorAnnexCommonRefinementSteps");
+	  _atlFileNames.add("ACG/targets/osek/OSEKACGServices");
 	  _atlFileNames.add("ACG/targets/osek/ExpandThreadsPorts");
 	  _atlFileNames.add("ACG/targets/osek/BlackboardCommunications");
 	  _atlFileNames.add("ACG/targets/osek/BufferCommunications");

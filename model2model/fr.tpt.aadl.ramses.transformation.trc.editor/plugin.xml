@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.ui.newWizards">
+      <!-- @generated TRC -->
+      <category
+            id="org.eclipse.emf.ecore.Wizard.category.ID"
+            name="%_UI_Wizard_category"/>
+      <wizard
+            id="fr.tpt.aadl.ramses.transformation.trc.presentation.TrcModelWizardID"
+            name="%_UI_TrcModelWizard_label"
+            class="fr.tpt.aadl.ramses.transformation.trc.presentation.TrcModelWizard"
+            category="org.eclipse.emf.ecore.Wizard.category.ID"
+            icon="icons/full/obj16/TrcModelFile.gif">
+         <description>%_UI_TrcModelWizard_description</description>
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors">
+      <!-- @generated TRC -->
+      <editor
+            id="fr.tpt.aadl.ramses.transformation.trc.presentation.TrcEditorID"
+            name="%_UI_TrcEditor_label"
+            icon="icons/full/obj16/TrcModelFile.gif"
+            extensions="trc"
+            class="fr.tpt.aadl.ramses.transformation.trc.presentation.TrcEditor"
+            contributorClass="fr.tpt.aadl.ramses.transformation.trc.presentation.TrcActionBarContributor">
+      </editor>
+   </extension>
+
+</plugin>

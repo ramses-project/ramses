@@ -271,9 +271,18 @@ public class RamsesPropertyPage extends PropertyPage {
     ojr.setText("Java - OJR");
     ojr.setData(_OJR_PLATFORM);
 
+    Button arincIntegrity = new Button(composite, SWT.RADIO);
+    arincIntegrity.setText("ARINC653 - Integrity");
+    arincIntegrity.setData("integrity");
+    
     Button osek = new Button(composite, SWT.RADIO);
     osek.setText("OSEX/NXT - nxtOSEK (http://lejos-osek.sourceforge.net/)");
     osek.setData(OSEKGeneratorFactory.OSEK_GENERATOR_NAME);
+    
+    addSeparator(composite);
+    Label installDirInfo = new Label(composite, SWT.BOLD);
+    installDirInfo.setText("3 - Select install directory of target platforms");
+    
     
     if(config.getTargetId() != null)
     {
@@ -301,7 +310,7 @@ public class RamsesPropertyPage extends PropertyPage {
       public void handleEvent(Event event)
       {
         Button button = (Button)(event.widget);
-        selectedPathLabel.setText("Select path for :"+button);
+        selectedPathLabel.setText("Select path for " + button.getText());
         selectedPathLabel.redraw();
         if (button.getSelection())
         {
@@ -313,14 +322,15 @@ public class RamsesPropertyPage extends PropertyPage {
     osek.addListener(SWT.Selection, listener);
     arinc.addListener(SWT.Selection, listener);
     ojr.addListener(SWT.Selection, listener);
-
+    arincIntegrity.addListener(SWT.Selection, listener);
+    
     Button pathButton = new Button(composite, SWT.PUSH);
     pathButton.setText("Choose the target platform path");
     pathButton.setAlignment(SWT.RIGHT);
 
     selectedPathLabel = new Label(composite, SWT.BOLD); 
     selectedPathLabel.setText("Path for target not selected ...");
-    selectedPathLabel.setSize(TEXT_FIELD_WIDTH, 50);
+    selectedPathLabel.setSize(90, 50);
     GridData grdPath = new GridData();
     grdPath.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
     selectedPathLabel.setLayoutData(grdPath) ;
@@ -511,6 +521,8 @@ public class RamsesPropertyPage extends PropertyPage {
     String value = project.getPersistentProperty(new QualifiedName(
                                                    RamsesPropertyPage.PREFIX,
                                                    property));
+    if(value==null)
+        value = project.getLocation().toString();
     return value ;
   }
   

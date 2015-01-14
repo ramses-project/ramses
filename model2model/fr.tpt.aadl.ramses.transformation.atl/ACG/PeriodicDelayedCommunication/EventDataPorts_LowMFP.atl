@@ -22,7 +22,6 @@
 -- @atlcompiler emftvm
 
 -- TODO: make iteration_counter a global variable
--- TODO: remove CPRTable and CDWTable from SharedRules
 
 module EventDataPorts_LowMFP;
 
@@ -173,10 +172,6 @@ helper def: collectPeriodicDelayed_LocalVariables_LowMFP(c: AADLI!ComponentInsta
 		->flatten()
 ;
 
-helper def: getHyperperiod(destinationPort: AADLI!FeatureInstance) : Integer = 
-	thisModule.theHOOK.getHyperperiod(destinationPort)
-;
-
 helper context AADLI!FeatureInstance def: initWriterContext() : String =
 	thisModule.concatToString(
 	    self.dstConnectionInstance->collect(e| e.source.getComponentInstance())->asOrderedSet()
@@ -253,7 +248,7 @@ unique lazy rule createThreadID
 	}
 }
 
--- @extends m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance
+-- @extends m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_No_Mutex
 rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_LowMFP
 {
   	from
@@ -315,10 +310,10 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 		(
 			extended<-Put_Value_PrototypeSpg
 		),
-		putValueOutputPrototypeBinding: AADLBA!FeaturePrototypeBinding
+		putValueOutputPrototypeBinding: AADLBA!ComponentPrototypeBinding
 		(
 			formal <- Put_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 'value_type'),
-			actual <- putValueOutputActual
+			actual <- Sequence{thisModule.CreateDataComponentPrototypeActual(producerPort.feature.dataFeatureClassifier)}
 		),
 		putValueValueParam: AADLBA!Parameter
 		(
@@ -341,17 +336,13 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 			ownedParameter <- Sequence{putValueValueParam}, -- CDWParam
 			ownedDataAccess <- Sequence{BufferAccess}
 		),
-		putValueOutputActual: AADLBA!AccessSpecification
-		(
-			category<-#data
-		),
 		
-		putValueContextPrototypeBinding: AADLBA!FeaturePrototypeBinding
+		putValueContextPrototypeBinding: AADLBA!ComponentPrototypeBinding
 		(
 			formal <- Put_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 'context_prototype'),
-			actual <- putValueContextActual
+			actual <- Sequence{putValueContextActual}
 		),
-		putValueContextActual: AADLBA!AccessSpecification
+		putValueContextActual: AADLBA!ComponentPrototypeActual
 		(
 			category<-#data
 		),
@@ -363,8 +354,7 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 	{
 		-- next is a workaround
 		thisModule.theHOOK.setDirection(putValueValueParam, 'in');
-		putValueOutputActual.setClassifier(fi.feature.dataFeatureClassifier);
-		putValueContextActual.setClassifier(thisModule.resolveLazySingleIfExists(consumerPort, 'createContextDataImpl', 'PeriodicDelayedContext_Impl'));
+		putValueContextActual.setSubcomponentType(thisModule.resolveLazySingleIfExists(consumerPort, 'createContextDataImpl', 'PeriodicDelayedContext_Impl'));
 	}
 }
 
@@ -469,8 +459,28 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
      	--- connect buffer: requires data access ArrayDataType {Access_Right=>write_only;};
 		Buffer_Holder: AADLBA!DataAccessHolder
 		(
-			element<-thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxRef} ,'f_entrypoint')
+			element<-fi.retreiveEntrypointFeature(cnxRef)
 		)
+}
+
+unique lazy rule createContextDataType
+{
+	from
+		d: AADLI!DataType
+	to
+		PeriodicDelayedContext_Type: AADLBA!DataType
+		(
+			name <- d.name,
+			ownedExtension <- extensionPeriodicDelayedContextType
+		),
+		extensionPeriodicDelayedContextType: AADLBA!TypeExtension
+		(
+			extended<-d
+		)
+	do
+	{
+		PeriodicDelayedContext_Type;
+	}
 }
 
 unique lazy rule createContextDataImpl
@@ -480,6 +490,7 @@ unique lazy rule createContextDataImpl
 	using
 	{
 		Periodic_Delayed_Context_Prototype_Type: AADLBA!DataType = thisModule.Periodic_Delayed_Context_Type_Name.asDataType('PERIODICDELAYED_RUNTIME');
+		PeriodicDelayedContext_Type: AADLBA!DataType = thisModule.createContextDataType(Periodic_Delayed_Context_Prototype_Type);
 		Periodic_Delayed_Context_Prototype_Impl: AADLBA!DataImplementation = thisModule.Periodic_Delayed_Context_Impl_Name.asDataType('PERIODICDELAYED_RUNTIME');
 		Component_Instance_Array_Type: AADLBA!DataType = thisModule.Component_Instance_Array_Type_Name.asDataType('PERIODICDELAYED_RUNTIME');
 		Component_Instance_Type: AADLBA!DataImplementation = thisModule.Component_Instance_Type_Name.asDataType('PERIODICDELAYED_RUNTIME');
@@ -489,11 +500,7 @@ unique lazy rule createContextDataImpl
 		--- Define PeriodicDelayedContext data type
 		------------------------------------------------------------
 		
-		PeriodicDelayedContext_Type: AADLBA!DataType
-		(
-			name <- Periodic_Delayed_Context_Prototype_Type.name,
-			ownedExtension <- extensionPeriodicDelayedContextType
-		),
+		
 		PeriodicDelayedContext_Impl: AADLBA!DataImplementation
 		(
 			name <- Periodic_Delayed_Context_Prototype_Impl.name+'_'+thisModule.getProgrammationLanguageIdentifier(fi.getComponentInstancePath()),
@@ -544,10 +551,6 @@ unique lazy rule createContextDataImpl
 		extensionPeriodicDelayedContext: AADLBA!ImplementationExtension
 		(
 			extended<-Periodic_Delayed_Context_Prototype_Impl
-		),
-		extensionPeriodicDelayedContextType: AADLBA!TypeExtension
-		(
-			extended<-Periodic_Delayed_Context_Prototype_Type
 		)
 	do
 	{
@@ -676,18 +679,18 @@ rule m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance_L
 			ownedPrototypeBinding <- Sequence{receiveInputContextPrototypeBinding},
 			ownedParameter <- Sequence{}
 		),
-		receiveInputContextPrototypeBinding: AADLBA!FeaturePrototypeBinding
+		receiveInputContextPrototypeBinding: AADLBA!ComponentPrototypeBinding
 		(
 			formal <- Receive_Input_PrototypeSpg.ownedPrototype->any(e|e.name = 'context_prototype'),
-			actual <- receiveInputContextActual
+			actual <- Sequence{receiveInputContextActual}
 		),
-		receiveInputContextActual: AADLBA!AccessSpecification
+		receiveInputContextActual: AADLBA!ComponentPrototypeActual
 		(
 			category<-#data
 		)
 	do
 	{
-		receiveInputContextActual.setClassifier(thisModule.createContextDataImpl(fi));
+		receiveInputContextActual.setSubcomponentType(thisModule.createContextDataImpl(fi));
 		PeriodicDelayedContext_Access.setDataFeatureClassifier(thisModule.createContextDataImpl(fi));
 	}
 }

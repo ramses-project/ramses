@@ -23,6 +23,18 @@
 
 library Services;
 
+helper context AADLI!Element def: getInstanceObjectPathIfNE() : String = 
+	if(self.oclIsKindOf(AADLI!InstanceObject)) then
+		self.getInstanceObjectPath()
+	else
+		if(self.oclIsKindOf(AADLI!NamedElement)) then
+			self.getQualifiedName()
+		else
+			'NaNE'
+		endif
+	endif
+;
+
 --- Returns the same as thisModule.resolveTemp(var : OclAny, rule_name : String, target_pattern_name : String),
 --- except that it returns OclUndefined if no trace exists instead of throwing an error.
 helper def : resolveLazyTupleSingleIfExists(var : Sequence(OclAny), rule_name : String, target_pattern_name : String) : OclAny =
@@ -170,6 +182,19 @@ helper context AADLBA!SubprogramImplementation def: getOrderedFeature() : Sequen
 helper context AADLBA!ComponentImplementation def: getComponentType(): AADLBA!ComponentType = 
 	self.type;
 
+helper context AADLI!SubcomponentType def : getBA() : AADLBA!BehaviorAnnex = 
+	let as: AADLI!AnnexSubclause = self.ownedAnnexSubclause->any(e | e.name='behavior_specification') in
+	if(as.oclIsKindOf(AADLBA!BehaviorAnnex)) then
+		as
+	else 
+		if(not as.oclIsUndefined()) then
+			as.parsedAnnexSubclause
+		else
+			OclUndefined
+		endif
+	endif
+;
+
 helper context AADLBA!SubprogramSubcomponentType def: getSubprogramType() : AADLBA!SubprogramType = 
 	if(self.oclIsKindOf(AADLBA!SubprogramType)) then
 		self
@@ -188,6 +213,9 @@ helper context AADLBA!SubprogramType def: getSubprogramParameters() : Sequence(A
 helper context AADLBA!SubprogramImplementation def: getSubprogramParameters() : Sequence(AADLBA!Parameter) = 
 	self.type.ownedParameter;
 
+helper context AADLI!Feature def : isSubprogramPort() : Boolean =
+	self.eContainer().oclIsKindOf(AADLBA!Subprogram) and self.oclIsKindOf(AADLBA!Port)
+;
 
 helper context AADLI!Feature def : isThreadPort() : Boolean =
 	self.eContainer().oclIsKindOf(AADLBA!Thread) and self.oclIsKindOf(AADLBA!Port)
@@ -228,13 +256,40 @@ helper context AADLI!FeatureInstance def : isEventDataPort(): Boolean =
 helper context AADLI!FeatureInstance def : isDataPort(): Boolean =
 	self.feature.oclIsTypeOf(AADLI!DataPort);
 
+helper context AADLI!FeatureInstance def : connectedToDataComponent(): Boolean =
+	(not self.srcConnectionInstance->isEmpty() and self.srcConnectionInstance->first().destination.oclIsTypeOf(AADLI!ComponentInstance))
+	 or
+	(not self.dstConnectionInstance->isEmpty() and self.dstConnectionInstance->first().source.oclIsTypeOf(AADLI!ComponentInstance))
+;
+
+helper context AADLI!FeatureInstance def : connectedDataComponent(): AADLI!ComponentInstance =
+	if(not self.srcConnectionInstance->isEmpty() and self.srcConnectionInstance->first().destination.oclIsTypeOf(AADLI!ComponentInstance)) then
+		self.srcConnectionInstance->first().destination
+	else
+		self.dstConnectionInstance->first().source
+	endif
+;
+
+helper context AADLI!FeatureInstance def : connectedInMode(mode: AADLI!Mode) : Boolean =
+	let remainingModes: Sequence(AADLI!Mode) = self.getComponentInstance().inMode->select(e|not (e.mode=mode)) in
+	if(self.getComponentInstance().inMode->isEmpty()
+			or not remainingModes->isEmpty())
+	then
+		self.srcConnectionInstance->exists(e|e.connectionReference->exists(f|f.connection.inModeOrTransition->includes(mode)))
+		or
+		self.dstConnectionInstance->exists(e|e.connectionReference->exists(f|f.connection.inModeOrTransition->includes(mode)))
+	else
+		false
+	endif
+;
+
 helper context AADLI!FeatureInstance def : isIntraProcessFeatureInstance(): Boolean =
 	not self.srcConnectionInstance->exists(e| not (e.destination.getProcess() = self.getProcess()))
 	and
 	not self.dstConnectionInstance->exists(e| not (e.source.getProcess() = self.getProcess()))
 ;
 
-helper context AADLI!FeatureInstance def : getProcess(): AADLI!ComponentInstance =
+helper context AADLI!InstanceObject def : getProcess(): AADLI!ComponentInstance =
 	if(self.getComponentInstance().category=#process) then
 		self.getComponentInstance()
 	else
@@ -250,6 +305,20 @@ helper context AADLI!ComponentInstance def : getProcess(): AADLI!ComponentInstan
 	endif
 ;
 
+
+helper context AADLI!InstanceObject def: getRemoteConnections():  Sequence(AADLI!ConnectionInstance) =
+	AADLI!ConnectionInstance.allInstancesFrom('IN')->select(f |
+    	self.isPartOf(f) and f.isRemoteConnection())
+;
+
+helper context AADLI!ConnectionInstance def: isRemoteConnection() : Boolean =
+	not self.isIntraProcessorConnection()
+;
+
+helper context AADLI!InstanceObject def: isIntraProcessorConnection() : Boolean =
+	self.source.getProcess().getProcessorBinding()->first()=self.destination.getProcess().getProcessorBinding()->first()
+;
+	
 helper context AADLI!NamedElement def: getPeriodValue(): Integer =
 	let mpv: AADLBA!ModalPropertyValue = self.getModalPropertyValue('Period') in
 	if(mpv.oclIsUndefined()) then
@@ -322,6 +391,10 @@ helper context AADLI!ComponentInstance def: getPeriod() : Integer =
 	self.getModalPropertyValue('Period').ownedValue.value
 ;
 
+helper context AADLI!ComponentInstance def: getPeriodUnit(): AADLI!UnitLiteral =
+	self.getModalPropertyValue('Period').ownedValue.unit
+;
+	
 helper context AADLI!ComponentInstance def: getDeadline() : Integer = 
 	-- should call java code (PropertyUtils class) instead
 	if(self.getModalPropertyValue('Deadline').oclIsUndefined()) then
@@ -344,9 +417,25 @@ helper context AADLI!Connection def : uniqueName(): String =
 	endif
 ;
 
-helper context AADLI!ComponentInstance def : getProcessorBinding() : Sequence(AADLI!ComponentInstance) =
+helper context AADLI!ComponentInstance def : getActualProcessorBinding()  : Sequence(AADLI!ComponentInstance) =
 	self.ownedPropertyAssociation->any(e | e.property.name = 'Actual_Processor_Binding').ownedValue->first().ownedValue.ownedListElement
 	->collect(e|e.referencedInstanceObject)
+;
+	
+helper context AADLI!ComponentInstance def : getProcessorBinding() : Sequence(AADLI!ComponentInstance) =
+	self.getActualProcessorBinding()->collect(e|e.getProcessorContainer())
+;
+
+helper context AADLI!ComponentInstance def: getProcessorContainer() : AADLI!ComponentInstance =
+	if self.category=#processor then
+		self
+	else
+		if self.eContainer().oclIsUndefined() then
+			OclUndefined
+		else
+			self.eContainer().getProcessorContainer()
+		endif
+	endif
 ;
 
 helper context AADLI!FeatureInstance def: getInputMessagePortId(): Integer = 
@@ -387,10 +476,99 @@ helper def: collectPeriodicDelayed_LocalVariables(c: AADLI!ComponentInstance, be
 	Sequence{}
 ;
 
-helper def: collectPeriodicDelayed_ThreadVariables(c: AADLI!ComponentInstance, behavior: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
+helper def: collectPeriodicDelayed_ThreadVariables(c: AADLI!ComponentInstance): Sequence(AADLBA!DataSubcomponent)=
 	Sequence{}
 ;
 
 helper def: collectInitCallSequence(c: AADLI!ComponentInstance): AADLBA!SubprogramCallSequence =
-	OclUndefined
+	let mpv: AADLBA!ModalPropertyValue = c.getModalPropertyValue('Initialize_Entrypoint_Call_Sequence') in
+	if(mpv.oclIsUndefined()) then
+		OclUndefined
+	else
+		mpv.ownedValue.containmentPathElement->first().namedElement
+	endif
+;
+
+helper context AADLI!FeatureInstance def: getLengthInitialValue() : String =
+	let ba: AADLBA!BehaviorAnnex = self.getBehaviorAnnex() in
+	let p: AADLI!FeatureInstance = self.getDirectlyUsedInFresh() in
+	if(not p.oclIsUndefined()) then
+		let package_name: String = p.getComponentInstance().subcomponent.classifier.getNamespace().getOwner().name in
+		if(p.getComponentInstance().eContainer() = self.getComponentInstance().eContainer()) then
+			package_name+thisModule.getPackageSuffix().concat('::'+p.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
+		else
+			package_name+thisModule.getPackageSuffix().concat('::'+self.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
+		endif
+	else
+		if(self.isEventPort()) then
+			'Integer_16'.asClassifier('BASE_TYPES').getProgrammationLanguageIdentifier()
+		else 
+			self.feature.dataFeatureClassifier.getProgrammationLanguageIdentifier()
+		endif
+	endif
+;
+
+helper context AADLI!FeatureInstance def: getBehaviorAnnex() : AADLBA!BehaviorAnnex =
+	self.getComponentInstance().subcomponent.classifier.getBA()
+;
+
+helper context AADLI!SubprogramCall def: getSubprogramClassifier(): AADLBA!SubprogramClassifier = 
+	if(self.calledSubprogram.oclIsTypeOf(AADLBA!SubprogramAccess))then
+		self.calledSubprogram.subprogramFeatureClassifier
+	else
+		self.calledSubprogram
+	endif
+;
+
+helper context AADLI!SubprogramClassifier def: needsContext() : Boolean =
+	not self.getOrderedFeature()->select(e|e.oclIsKindOf(AADLI!Port))->isEmpty()
+;
+
+helper context AADLI!SubprogramClassifier def: getType() : AADLBA!SubprogramType =
+	if(self.oclIsKindOf(AADLBA!SubprogramImplementation)) then
+		self.type
+	else
+		self
+	endif
+;
+
+helper context AADLI!ComponentInstance def: getOSMaxPriority() : Integer =
+	let res: AADLBA!IntegerLiteral = self.ownedPropertyAssociation
+		->any(pa|pa.property.name='Priority_Range') in 
+	if(res.oclIsUndefined()) then
+		10
+	else
+		res.ownedValue
+		->first().ownedValue.maximum.value.longValue()
+	endif
+;
+
+-- getThreadsInMode
+helper context AADLI!ComponentInstance def: getThreadsInMode(m: AADLI!ModeInstance) : Sequence(AADLI!ComponentInstance) =
+	self.componentInstance->select(e | e.category = #thread)
+		->select(e|e.inMode->includes(m))
+;
+
+helper context OclAny def:minus(i: OclAny) : OclAny =
+	thisModule.theHOOK.minus(self,i)
+;
+
+helper context AADLI!InstanceObject def: getModeDataType(): AADLBA!DataClassifier = 
+	AADLI!DataType->allInstances()->any(e|e.name = self.getProcess().name+'_modeDataClassifier')
+;
+
+helper context AADLI!ComponentInstance def: needsModeVariable() : Boolean =
+	self.featureInstance->exists(f|f.needsModeVariable())
+;
+
+helper context AADLI!FeatureInstance def: needsModeVariable() : Boolean =
+	AADLI!ModeInstance.allInstancesFrom('IN')->exists(mi|self.connectedInMode(mi.mode))
+;
+
+helper def : getStringLiteral(pa: AADLBA!PropertyAssociation, stringLiteralValue: String) : AADLI!PropertyValue =
+	thisModule.theHOOK.getStringLiteral(pa, stringLiteralValue)
+;
+
+helper context AADLI!Classifier def: getEnumerators() : AADLI!PropertyValue =
+	thisModule.theHOOK.getEnumerators(self)
 ;

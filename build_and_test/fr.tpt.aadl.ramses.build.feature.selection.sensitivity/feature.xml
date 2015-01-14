@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="fr.tpt.aadl.ramses.build.selection.sensitivity"
+      label="Sensitivity"
+      version="1.0.0.qualifier">
+
+   <description url="http://www.example.com/description">
+      [Enter Feature Description here.]
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <requires>
+      <import plugin="fr.tpt.aadl.ramses.transformation.selection"/>
+      <import plugin="fr.tpt.aadl.ramses.transformation.tip"/>
+      <import plugin="fr.tpt.rdal.utils"/>
+      <import plugin="org.eclipse.equinox.registry"/>
+      <import plugin="org.osate.aadl2.modelsupport"/>
+      <import plugin="fr.tpt.aadl.ramses.transformation.trc"/>
+      <import plugin="fr.openpeople.rdal2.model"/>
+      <import plugin="org.apache.log4j"/>
+      <import plugin="fr.tpt.aadl.ramses.analysis.result"/>
+      <import plugin="fr.tpt.aadl.ramses.control.support"/>
+      <import plugin="fr.tpt.aadl.ramses.generation.target.specific" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="fr.tpt.aadl.ramses.transformation.merge.launcher"/>
+   </requires>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.transformation.selection.sensitivity"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

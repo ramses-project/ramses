@@ -109,7 +109,7 @@ rule m_Output_Buffer_ComputeEntrypointCallSequence
 		spg: AADLBA!SubprogramType = 'Send_Data'.asSubprogramType('OJR_RUNTIME');
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
-		BUFFER_ID: AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'f_entrypoint');
+		BUFFER_ID: AADLBA!DataAccess = fi.retreiveEntrypointFeature(cnxRef);
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.eContainer(), 'returnData');
 	}
 	to

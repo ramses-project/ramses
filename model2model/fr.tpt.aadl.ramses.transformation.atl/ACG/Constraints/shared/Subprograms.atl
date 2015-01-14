@@ -51,16 +51,52 @@ rule check_HasSourceCode
 	  )
 }
 
+-- @extends check_HasSourceCode
+rule check_HasHeaderInSourceCode
+{
+	from
+		obj: AADLI!SubprogramCall
+		(
+			let spg: AADLBA!SubprogramClassifier = obj.getSubprogramClassifier()
+			in
+			spg.referenceSourceCode()
+			and
+			not spg.hasHeaderInSourceCode()	
+		)
+	to
+		err: CV!Error
+	  (
+	  	message <- 'In ' + obj.name + ', called subprograms must have a behavior annex '+
+		'or reference existing source code (Source_Name and Source_Text properties)'
+	  )
+}
+
 helper context AADLI!SubprogramCall def: hasSourceCode(): Boolean =
-	self.hasBehaviorAnnex()
+	let spg: AADLBA!SubprogramClassifier = self.getSubprogramClassifier()
+	in
+	spg.hasBehaviorAnnex()
 	or
-	self.referenceSourceCode()
+	spg.referenceSourceCode()
+	or
+		if(spg.ownedExtension.oclIsUndefined()) then
+			false
+		else
+			spg.ownedExtension.extended.hasSourceCode()
+		endif
 ;
 
-helper context AADLI!SubprogramCall def: referenceSourceCode() : Boolean =
-	self.calledSubprogram.hasProperty('Source_Text') and self.calledSubprogram.hasProperty('Source_Name')
+helper context AADLI!SubprogramClassifier def: referenceSourceCode() : Boolean =
+	self.hasProperty('Source_Text') and self.hasProperty('Source_Name')
 ;
 
-helper context AADLI!SubprogramCall def: hasBehaviorAnnex() : Boolean =
-	self.calledSubprogram.ownedAnnexSubclause->exists(e | e.name = 'behavior_specification')
+helper context AADLI!SubprogramSubcomponent def: referenceSourceCode() : Boolean =
+	self.subcomponentType.referenceSourceCode()
+;
+
+helper context AADLI!SubprogramClassifier def: hasBehaviorAnnex() : Boolean =
+	self.ownedAnnexSubclause->exists(e | e.name = 'behavior_specification')
+;
+
+helper context AADLI!SubprogramSubcomponent def: hasBehaviorAnnex() : Boolean =
+	self.subcomponentType.hasBehaviorAnnex()
 ;

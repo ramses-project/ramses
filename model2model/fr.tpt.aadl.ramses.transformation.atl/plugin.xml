@@ -49,14 +49,44 @@
             name="OSEK-NXT-Properties">
       </aadlcontribution>
       <aadlcontribution
+            file="aadl_resources/propertyset/RAMSES.aadl2"
+            id="fr.tpt.aadl.propertyset.ramses.aadlcontribution"
+            name="RAMSES-Properties">
+      </aadlcontribution>
+      <aadlcontribution
+            file="aadl_resources/propertyset/AI.aadl"
+            id="fr.tpt.aadl.propetries.ai.aadlcontribution"
+            name="AI-Properties">
+      </aadlcontribution>
+      <aadlcontribution
             file="aadl_resources/propertyset/Generation_Properties.aadl2"
             id="fr.tpt.aadl.propetries.generation.aadlcontribution"
             name="Generation-Properties">
       </aadlcontribution>
       <aadlcontribution
+            file="aadl_resources/package/rtl8029_driver.aadl2"
+            id="fr.tpt.aadl.packages.rtl8029_driver.aadlcontribution"
+            name="rtl8029_driver">
+      </aadlcontribution>
+      <aadlcontribution
             file="aadl_resources/package/RAMSES_processors.aadl2"
             id="fr.tpt.aadl.packages.ramses_processors.aadlcontribution"
             name="RAMSES_processors">
+      </aadlcontribution>
+      <aadlcontribution
+            file="aadl_resources/package/RAMSES_buses.aadl2"
+            id="fr.tpt.aadl.packages.ramses_buses.aadlcontribution"
+            name="RAMSES_buses">
+      </aadlcontribution>
+      <aadlcontribution
+            file="aadl_resources/propertyset/MCDA.aadl2"
+            id="fr.tpt.aadl.properties.mcda.aadlcontribution"
+            name="MCDA">
+      </aadlcontribution>
+      <aadlcontribution
+            file="aadl_resources/propertyset/Maintainability_Properties.aadl2"
+            id="fr.tpt.aadl.properties.maintainability.aadlcontribution"
+            name="Maintainability">
       </aadlcontribution>
    </extension>
 </plugin>

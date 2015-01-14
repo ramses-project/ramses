@@ -16,6 +16,8 @@
     </genClasses>
     <genClasses ecoreClass="AnalysisResult.ecore#//QuantitativeAnalysisResult">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AnalysisResult.ecore#//QuantitativeAnalysisResult/margin"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AnalysisResult.ecore#//QuantitativeAnalysisResult/value"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AnalysisResult.ecore#//QuantitativeAnalysisResult/limit"/>
     </genClasses>
     <genClasses ecoreClass="AnalysisResult.ecore#//QualitativeAnalysisResult">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute AnalysisResult.ecore#//QualitativeAnalysisResult/validated"/>

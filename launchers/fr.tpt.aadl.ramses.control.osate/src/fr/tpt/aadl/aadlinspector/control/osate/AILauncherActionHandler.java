@@ -94,33 +94,26 @@ public class AILauncherActionHandler extends RamsesActionHandler {
 
 	@Override
 	protected void jobCore(IProgressMonitor monitor) throws Exception {
-		monitor.beginTask("Code generation", IProgressMonitor.UNKNOWN);
+		  monitor.beginTask("Launch AADL Inspector", IProgressMonitor.UNKNOWN);
 	    
 	    if(monitor.isCanceled())
 	    {
-	      String msg = "generation has been canceled at the begining" ;
+	      String msg = "analysis has been canceled at the begining" ;
 	      _LOGGER.trace(msg);
 	      throw new OperationCanceledException(msg) ;
 	    }
 	    
 	    ServiceRegistry sr = ServiceProvider.getServiceRegistry() ;
-	    AadlModelInstantiatior instantiator =sr.getModelInstantiatior() ;
+	    AadlModelInstantiatior instantiator = sr.getModelInstantiatior() ;
 	    
 	    instantiator.setProgressMonitor(monitor);
 	    
-	    // For the executed command from outline menu,the system implementation 
-	    // root has to be instantiated prior to the code generation.
-	    if(_isOutline)
-	    {
-	      // Fetch instantiate the model.
-	      _sysInst = instantiator.instantiate(_sysImpl) ;
-	    }
 	    // For executed command from the button or the RAMSES menu,system
 	    // implementation has already been instantiated.
 	    
 	    if(monitor.isCanceled())
 	    {
-	      String msg = "generation has been canceled after instantiation" ;
+	      String msg = "analysis has been canceled after instantiation" ;
 	      _LOGGER.trace(msg);
 	      throw new OperationCanceledException(msg) ;
 	    }
@@ -129,7 +122,7 @@ public class AILauncherActionHandler extends RamsesActionHandler {
 	    
 	    if(monitor.isCanceled())
 	    {
-	      String msg = "generation has been canceled after code generation" ;
+	      String msg = "analysis has been canceled after execution" ;
 	      _LOGGER.trace(msg);
 	      throw new OperationCanceledException(msg) ;
 	    }

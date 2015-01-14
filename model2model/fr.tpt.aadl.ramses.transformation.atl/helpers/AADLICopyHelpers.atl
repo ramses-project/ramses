@@ -44,13 +44,13 @@ helper context AADLI!ComponentInstance def : getType() : AADLI!ComponentType =
 ;
 
 helper context AADLI!ComponentInstance def : getImpl() : AADLI!ComponentImplementation =
-	if (self.category = #system) then
-		self.systemImplementation
+	if (self.category = #system and self.eContainer().oclIsUndefined()) then
+		self.componentImplementation
 	else
 		if (self.getSubcomponent().getClassifier().oclIsKindOf(AADLI!ComponentImplementation)) then
 			self.getSubcomponent().getClassifier()
 		else
-			OclUndefined
+			OclUndefined.debug(' WARNING: Implementation of ' + self.name + ' not identified')
 		endif
 	endif
 ;
@@ -72,8 +72,8 @@ helper context AADLI!InstanceObject def : uniqueName() : String =
 ;
 
 helper context AADLI!InstanceObject def : targetPackagePrefix() : String =
-	if (self.getSystemInstance().getSystemImplementation().eContainer().eContainer().oclIsKindOf(AADLI!AadlPackage)) then
-		self.getSystemInstance().getSystemImplementation().eContainer().eContainer().name+thisModule.getPackageSuffix()+'__'
+	if (self.getSystemInstance().getComponentImplementation().eContainer().eContainer().oclIsKindOf(AADLI!AadlPackage)) then
+		self.getSystemInstance().getComponentImplementation().eContainer().eContainer().name+thisModule.getPackageSuffix()+'__'
 	else
 		''
 	endif
@@ -93,7 +93,7 @@ helper context AADLI!ComponentInstance def : owner() : AADLI!ComponentInstance =
 
 helper context AADLI!ComponentInstance def : ownerImplImg() : AADLBA!ComponentImplementation = 
 	if (self.eContainer().category = #system) then
-		thisModule.resolveMatchedSingleIfExists(self.eContainer().systemImplementation, 'implImg')
+		thisModule.resolveMatchedSingleIfExists(self.eContainer().componentImplementation, 'implImg')
 	else
 		thisModule.resolveMatchedSingleIfExists(self.eContainer(), 'sub').getSubcomponentType()
 	endif
@@ -107,37 +107,152 @@ helper context AADLI!ConnectionInstanceEnd def : getFeatureImg() : AADLBA!Featur
 	thisModule.resolveMatchedSingleIfExists(self, 'f')
 ;
 
-helper context AADLI!ConnectionInstanceEnd def : getFeatureImg(cnxInst: AADLI!ConnectionInstance) : AADLBA!Feature =
-		thisModule.resolveMatchedTupleIfExists(Sequence{self,cnxInst.connectionReference->first()}, 'f')
+helper context AADLI!ConnectionInstanceEnd def : getFeatureImg(mode: AADLI!Mode) : AADLBA!Feature =
+	thisModule.resolveMatchedTupleIfExists(Sequence{self, mode}, 'f')
 ;
 
+helper context AADLI!ConnectionInstanceEnd def : getFeatureImg(cnxInst: AADLI!ConnectionInstance) : AADLBA!Feature =
+		thisModule.resolveMatchedTupleIfExists(Sequence{self,cnxInst.connectionReference->first().connection}, 'f')
+;
+
+helper context AADLI!ConnectionInstanceEnd def : getFeatureImg(cnxInst: AADLI!ConnectionInstance, mode: AADLI!Mode) : AADLBA!Feature =
+		thisModule.resolveMatchedTupleIfExists(Sequence{self,cnxInst.connectionReference->any(e|e.connection.inModeOrTransition->includes(mode)).connection,mode}, 'f')
+;
+
+helper context AADLI!ConnectionInstanceEnd def : collectOutputFeatureImg(): Sequence(AADLBA!Feature) = 
+	if(self.getProcess().modeInstance->exists(mi| self.connectedInMode(mi.mode))) then
+		self.getProcess().modeInstance->collect(mi |
+			self.srcConnectionInstance->collect(cnxInst |
+				self.getFeatureImg(cnxInst, mi.mode)
+			)
+		)
+		->flatten()
+	else
+		self.srcConnectionInstance->collect(cnxInst |
+			self.getFeatureImg(cnxInst)
+		)
+	endif
+;
+
+helper context AADLI!ConnectionInstanceEnd def : collectInputFeatureImg(): Sequence(AADLBA!Feature) =
+	if(self.getProcess().modeInstance->exists(mi| self.connectedInMode(mi.mode))) then
+		self.getProcess().modeInstance->collect(mi |
+			self.getFeatureImg(mi.mode)
+		)
+	else
+		Sequence{self.getFeatureImg()}
+	endif
+;
+
+helper context AADLI!ConnectionInstanceEnd def : collectEntrypointFeature() : Sequence(AADLBA!DataAccess) =
+	if(self.getProcess().modeInstance->exists(mi| self.connectedInMode(mi.mode))) then
+		self.getProcess().modeInstance->collect(mi | self.retreiveEntrypointFeature(mi.mode))
+		->flatten()
+	else
+		Sequence{self.retreiveEntrypointFeature()}
+	endif
+	->excluding(OclUndefined)
+;
+
+helper context AADLI!ConnectionInstanceEnd def : collectEntrypointFeature(cnx: AADLI!PortConnection) : Sequence(AADLBA!DataAccess) =
+	if(self.getProcess().modeInstance->exists(mi| self.connectedInMode(mi.mode))) then
+		self.getProcess().modeInstance->collect(mi | self.retreiveEntrypointFeature(cnx,mi.mode))
+		->flatten()
+	else
+		Sequence{self.retreiveEntrypointFeature(cnx)}
+	endif
+	->excluding(OclUndefined)
+;
+	
 helper context AADLI!ConnectionInstanceEnd def : retreiveEntrypointFeature() : AADLBA!DataAccess =
-	thisModule.resolveMatchedSingleIfExists(self, 'f_entrypoint')
+		thisModule.resolveMatchedSingleIfExists(self, 'f_entrypoint')
 ;
 
 helper context AADLI!ConnectionInstanceEnd def : retreiveEntrypointFeature(cnx: AADLI!PortConnection) : AADLBA!Feature =
 		thisModule.resolveMatchedTupleIfExists(Sequence{self,cnx}, 'f_entrypoint')
 ;
 
-helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
-	self.ownedPropertyAssociation->collectSelfPropertyAssociationImg()
+helper context AADLI!ConnectionInstanceEnd def : retreiveEntrypointFeature(mode: AADLI!Mode) : AADLBA!DataAccess =
+		thisModule.resolveMatchedTupleIfExists(Sequence{self,mode}, 'f_entrypoint')
 ;
+
+helper context AADLI!ConnectionInstanceEnd def : retreiveEntrypointFeature(cnx: AADLI!PortConnection,mode: AADLI!Mode) : AADLBA!Feature =
+		thisModule.resolveMatchedTupleIfExists(Sequence{self,cnx,mode}, 'f_entrypoint')
+;
+
+helper context AADLI!ConnectionInstanceEnd def : collectInputFeatureConnectionImg(callSequence: AADLI!SubprogramCallSequence): Sequence(AADLBA!Connection) =
+	if(self.getProcess().modeInstance->exists(mi| self.connectedInMode(mi.mode))) then
+		self.getProcess().modeInstance->collect(mi |
+			thisModule.resolveMatchedTupleIfExists(Sequence{self,callSequence,mi.mode}, 'f_connection')
+		)
+	else
+		Sequence{thisModule.resolveMatchedTupleIfExists(Sequence{self,callSequence}, 'f_connection')}
+	endif
+;
+
+helper context AADLI!ConnectionInstanceEnd def : collectOutputFeatureConnectionImg(callSequence: AADLI!SubprogramCallSequence): Sequence(AADLBA!Connection) =
+	if(self.getProcess().modeInstance->exists(mi| self.connectedInMode(mi.mode))) then
+		self.srcConnectionInstance->collect( cnxInst |
+			self.getProcess().modeInstance->collect(mi |
+				thisModule.resolveMatchedTupleIfExists(Sequence{self,callSequence,cnxInst.connectionReference->first().connection,mi.mode}, 'f_connection')
+			)
+		)
+	else
+		self.srcConnectionInstance->collect( cnxInst |
+			thisModule.resolveMatchedTupleIfExists(Sequence{self,callSequence,cnxInst.connectionReference->first().connection}, 'f_connection')
+		)
+	endif
+;
+
+helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
+	self.ownedPropertyAssociation
+	->select(e|e.isApplicableTo(self.resolve()))
+	->collectSelfPropertyAssociationImg()
+	
+;
+
+helper context AADLBA!PropertyAssociation def: isApplicableTo(ne: AADLI!NamedElement) : Boolean = 
+	if(ne.oclIsUndefined()) then
+		false
+	else
+		ne.acceptsProperty(self.property)
+	endif
+;
+
+helper context AADLBA!PropertyAssociation def: isApplicableTo(ne: AADLI!Element) : Boolean =
+	false
+;
+
 
 helper context Sequence(AADLBA!PropertyAssociation) def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
 	self->select(e|(e.collectInstanceReferenceValue()->isEmpty()))
 								 ->union(self->select(e|not e.collectInstanceReferenceValue()->isEmpty() 
-								 											  and e.collectInstanceReferenceValue()->select(f| not f.referencedInstanceObject.isContainedIn(f.eContainer().eContainer().eContainer().eContainer()))->isEmpty())) -- econtainer() 4 times retreives container component instance; recursive helper would be better...
+								 											  and e.collectInstanceReferenceValue()->select(f| not f.oclIsKindOf(AADLI!FeatureInstance) and not f.referencedInstanceObject.isContainedIn(thisModule.getInstance(f)))->isEmpty()))
 													 ->collect ( p |  thisModule.resolveMatchedSingleIfExists(p, 'p2'))
 ;
 
+helper def : getInstance(f: OclAny): AADLI!ComponentInstance =
+	if(f.oclIsUndefined()) then
+		OclUndefined
+	else
+		if(f.oclIsKindOf(AADLI!ComponentInstance)
+				or f.oclIsKindOf(AADLI!FeatureInstance))then
+			f
+		else
+			thisModule.getInstance(f.eContainer())
+		endif
+	endif
+;
+
 helper context AADLI!ComponentImplementation def : getSubcomponentsInstances(category : String) : Sequence(AADLI!ComponentInstance) =
-	let instance : AADLI!ComponentInstance = AADLI!ComponentInstance->allInstancesFrom('IN')->any(c|c.getImpl()=self)
+	let instance : AADLI!ComponentInstance = AADLI!ComponentInstance->allInstancesFrom('IN')->any(c|
+		c.getImpl()=self)
 	in
 	if(not instance.oclIsUndefined()) then
 		instance.componentInstance
 	                        ->select(c|c.category.getName()=category)
 	else
-		Sequence{}
+		Sequence{}.debug('WARNING: instances of ' + self.name + ' is empty')
 	endif
 ;
 	
@@ -145,9 +260,9 @@ helper context AADLI!Feature def : getFeaturesInstances(category : String) : AAD
 	let featureInstance : AADLI!FeatureInstance = AADLI!FeatureInstance->allInstancesFrom('IN')->any(f|f.feature=self)
 	in
 	if(not featureInstance.oclIsUndefined()) then
-		featureInstance
+		thisModule.resolveMatchedSingleIfExists(featureInstance, 'f')
 	else
-		OclUndefined
+		OclUndefined.debug( 'INSTANCE NOT FOUND '+self.eContainer().name+' '+self.name)
 	endif
 ;
 
@@ -251,3 +366,26 @@ helper context AADLI!DataClassifier def : mapDataClassifier() : AADLBA!DataClass
 	endif
 ;
 
+
+helper context AADLI!NamedElement def : mapSpgPropertyAssociationList() : Sequence (AADLBA!PropertyAssociation) =
+	let result : Sequence (AADLBA!PropertyAssociation) = self.ownedPropertyAssociation->
+		select(e|not (e.property.name.toLower() = 'source_text'))
+		->collect (e|thisModule.PropertyAssociation (e,false))->select(e| not e.oclIsUndefined())
+	in
+	let sourceTextPA: AADLBA!PropertyAssociation = self.ownedPropertyAssociation-> any(e| e.property.name.toLower() = 'source_text')
+	in
+	if (not result.isEmpty()) then
+		result->
+		append( 
+			if sourceTextPA.oclIsUndefined() then
+				OclUndefined
+			else
+				thisModule.copySourceText(sourceTextPA)
+			endif
+		)
+		->flatten()->select(e| not e.oclIsUndefined())
+	else
+		result
+	endif
+;
+		

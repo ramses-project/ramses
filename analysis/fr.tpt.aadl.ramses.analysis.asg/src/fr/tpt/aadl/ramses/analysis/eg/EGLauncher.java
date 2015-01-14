@@ -134,7 +134,7 @@ public class EGLauncher {
 	  if (ba != null)
     {
 	    /** Behavior annex found on the entrypoint */
-      return new BA2EG (ba).toEG();
+      return new BA2EG (ba, entry).toEG();
     }
 	  else
 	  {

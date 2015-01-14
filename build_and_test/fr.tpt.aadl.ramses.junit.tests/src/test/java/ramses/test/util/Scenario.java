@@ -5,12 +5,17 @@ import static org.junit.Assert.fail ;
 import java.io.File ;
 import java.io.IOException ;
 import java.util.Calendar ;
+import java.util.HashMap ;
+import java.util.Iterator ;
+import java.util.Map ;
+import java.util.Map.Entry ;
 import java.util.concurrent.Callable ;
 import java.util.concurrent.FutureTask ;
 import java.util.concurrent.TimeUnit ;
 import java.util.concurrent.TimeoutException ;
 
-import junit.framework.Assert ;
+import org.junit.Assert ;
+
 import fr.tpt.aadl.ramses.control.support.reporters.StdProcessTraceDisplay ;
 import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
@@ -27,15 +32,49 @@ public abstract class Scenario
   protected String aadlInspectorPath="";
   protected String target="";
   protected String includeList="";
+  protected Map<String, Object> parameters = new HashMap<String, Object>();
   
   private Process ramsesProcess;
+  protected long codeGenerationTimeout = 5 ;
   
-  abstract Process executeGeneratedCode() throws Exception;
-  abstract void init();
+  protected abstract Process executeGeneratedCode() throws Exception;
+  
+  protected abstract void init();
+  
+  protected abstract void initAdditionalParameters();
+  
+  protected void setupCommandLineArgsPrefix(StringBuilder args)
+  {
+    args.append("java") ;
+
+    String debug = "true";
+    parameters.put("debug", debug);
+    
+    if(ramses_dir != null)
+    {
+      args.append(" -D") ;
+      args.append(Names.RAMSES_RESOURCES_VAR) ;
+      args.append('=') ;
+      args.append(ramses_dir) ;
+    }
+
+    args.append(" -DAADLINSPECTOR_PATH=") ;
+    args.append(aadlInspectorPath) ;
+
+    args.append(" -jar ") ;
+
+    if(ramses_dir != null)
+    {
+      args.append(ramses_dir) ;
+    }
+
+    args.append("ramses-exe.jar") ;
+  }
   
   protected void exec()
   {
     init() ;
+    initAdditionalParameters();
     this.cleanOutputDirectory(new File(output)) ;
     Process executeProcess = null ;
     try
@@ -68,29 +107,7 @@ public abstract class Scenario
       {
         StringBuilder args = new StringBuilder() ;
 
-        args.append("java") ;
-
-        args.append(" -DDEBUG") ;
-
-        if(ramses_dir != null)
-        {
-          args.append(" -D") ;
-          args.append(Names.RAMSES_RESOURCES_VAR) ;
-          args.append('=') ;
-          args.append(ramses_dir) ;
-        }
-
-        args.append(" -DAADLINSPECTOR_PATH=") ;
-        args.append(aadlInspectorPath) ;
-
-        args.append(" -jar ") ;
-
-        if(ramses_dir != null)
-        {
-          args.append(ramses_dir) ;
-        }
-
-        args.append("ramses-exe.jar") ;
+        this.setupCommandLineArgsPrefix(args);
 
         args.append(" -l trace") ;
 
@@ -114,38 +131,53 @@ public abstract class Scenario
           args.append(includeList) ;
         }
         
-        if(workflowPath != null && workflowPath != "")
+        if(workflowPath != null && false==workflowPath.equals(""))
         {
           args.append(" --workflow=") ;
           args.append(workflowPath) ;
         }
 
+        if(parameters!=null)
+        {
+          args.append(" --parameter ") ;
+          Iterator<Entry<String, Object>> it = parameters.entrySet().iterator();
+          while (it.hasNext()) {
+              Entry<String, Object> pairs = it.next();
+              args.append(pairs.getKey());
+              args.append("=");
+              args.append(pairs.getValue());
+              if(it.hasNext())
+                args.append(",");
+          }
+        }
+        
         Runtime runtime = Runtime.getRuntime() ;
         // Launch code generation
         String line = args.toString() ;
         System.out.println(line) ;
         ramsesProcess = runtime.exec(line) ;
         new Thread(ft).start() ;
-        ft.get(300, TimeUnit.SECONDS) ;
+        ft.get(codeGenerationTimeout, TimeUnit.MINUTES) ;
         displayProcessMessages(ramsesProcess, 1) ;
       }
       catch(TimeoutException ee)
       {
         displayProcessMessages(ramsesProcess, 1, "exited on timeout") ;
-        fail() ;
         if(ramsesProcess != null)
         {
           ramsesProcess.destroy() ;
         }
+        fail() ;
+          System.exit(-1) ;
       }
       catch(Exception e)
       {
         e.printStackTrace() ;
-        fail() ;
         if(ramsesProcess != null)
         {
           ramsesProcess.destroy() ;
         }
+        fail() ;
         System.exit(-1) ;
       }
       

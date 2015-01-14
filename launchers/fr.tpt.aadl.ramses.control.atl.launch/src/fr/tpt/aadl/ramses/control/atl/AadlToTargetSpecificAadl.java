@@ -155,45 +155,62 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
     URI uri ;
     SystemInstance si = (SystemInstance) inputResource.getContents().get(0) ;
     final Resource xtextResource ;
-    if(Platform.isRunning())
+    if(OsateResourceUtil.USES_GUI)
     {
       String workspaceLocation =
             ResourcesPlugin.getWorkspace().getRoot().getLocationURI().getPath() ;
       int outputPathHeaderIndex = workspaceLocation.length() ;
       String outputAbsolutePath = outputFile.getAbsolutePath().toString() ;
       String outputPlatformRelativePath = "" ;
+      String finalResourcePath = "";
       String projectName=null;
       if(outputPathHeaderIndex > 0)
       {
         String inputURI = inputResource.getURI().toString() ;
         projectName =
-              inputURI.substring(inputURI.indexOf("resource") + 9) ;
+            inputURI.substring(inputURI.indexOf("resource") + 9) ;
         projectName = projectName.substring(0, projectName.indexOf('/')) ;
         outputPathHeaderIndex = outputAbsolutePath.indexOf(projectName) ;
         outputPlatformRelativePath =
-              outputAbsolutePath.substring(outputPathHeaderIndex) ;
+            outputAbsolutePath.substring(outputPathHeaderIndex) ;
       }
-      outputPlatformRelativePath =
+
+      if (Platform.getOS().equalsIgnoreCase(Platform.OS_WIN32))
+      {
+        workspaceLocation = workspaceLocation.substring(1, workspaceLocation.length());
+        workspaceLocation = workspaceLocation.replace("/", "\\");
+        outputPlatformRelativePath =
+            outputAbsolutePath.replace(workspaceLocation, "") ;
+        outputPlatformRelativePath = outputPlatformRelativePath.replace("\\", "/");
+      }
+      else
+      {
+        finalResourcePath =
             outputAbsolutePath.replace(workspaceLocation + Path.SEPARATOR, "") ;
+      }
+      if(finalResourcePath.charAt(0) == Path.SEPARATOR)
+        uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true);
+      else
+        uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true) ;
 
-      uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true) ;
-
+      OsateResourceUtil.refreshResourceSet();
       ResourceSet rs = OsateResourceUtil.getResourceSet() ;
       xtextResource = rs.getResource(uri, true) ;
       IResource folderToUpdate = ResourcesPlugin.getWorkspace().getRoot().findMember(projectName);
       try {
-		folderToUpdate.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-	  } catch (CoreException e) {
-		String errMsg = "could not refresh output directory" ;
+        folderToUpdate.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+
+      } catch (CoreException e) {
+        String errMsg = "could not refresh output directory" ;
         _LOGGER.fatal(errMsg, e) ;
         throw new RuntimeException(errMsg, e) ;
-	  }
+      }
     }
     else
     {
       uri = URI.createFileURI(outputFile.getAbsolutePath().toString()) ;
       xtextResource =
-            si.getSystemImplementation().eResource().getResourceSet()
+            si.getComponentImplementation().eResource().getResourceSet()
                   .getResource(uri, true) ;
       xtextResource.load(null) ;
 
@@ -356,7 +373,7 @@ abstract public void setParameters(Map<Enum<?>, Object> parameters);
     for(String resourceFileName : resourceFileNameList)
     {
       String resourcePath = resourceFileName ;
-      if(false == resourceFileName.startsWith(File.separator))
+      if(false == new File(resourcePath).exists())
         resourcePath =
               RamsesConfiguration.getAtlResourceDir() + File.separator +
                     resourceFileName ;

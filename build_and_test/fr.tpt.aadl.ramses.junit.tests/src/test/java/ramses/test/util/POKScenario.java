@@ -7,36 +7,42 @@ import fr.tpt.aadl.ramses.control.support.utils.EnvUtils ;
 public abstract class POKScenario extends Scenario
 {
   private static final String DEFAULT_RUNTIME_PATH = "/usr/share/pok" ;
-	void init()
+	protected void init()
 	{
 		target="pok";
 		
-		if(runtimePath==null || runtimePath=="")
+		if(runtimePath==null || runtimePath.equals(""))
 		{
 		  runtimePath=EnvUtils.getExternalVariable("POK_PATH");
 	    
-	    if(runtimePath==null || runtimePath=="")
+	    if(runtimePath==null || runtimePath.equals(""))
 	    {
 	      runtimePath = DEFAULT_RUNTIME_PATH ;
 	    }
 		}
 		aadlInspectorPath = System.getenv("AADLINSPECTOR_PATH");
-		if(aadlInspectorPath == null || aadlInspectorPath=="")
+		if(aadlInspectorPath == null || aadlInspectorPath.equals(""))
 			aadlInspectorPath = System.getProperty("AADLINSPECTOR_PATH");
 		
 		aadlInspectorPath = System.getenv("AADLINSPECTOR_PATH");
-		if(aadlInspectorPath == null || aadlInspectorPath=="")
+		if(aadlInspectorPath == null || aadlInspectorPath.equals(""))
 			aadlInspectorPath = System.getProperty("AADLINSPECTOR_PATH");
 		
 	}
 	
-	 @Override
-	  Process executeGeneratedCode() throws IOException, InterruptedException
-	  {
-	    Runtime runtime = Runtime.getRuntime();
-	    String[] testCommandArray = {"make","-C"+ output + "/generated-code", "test"};
-	    Process generatedCodeExecProcess = runtime.exec(testCommandArray);
-	    Thread.sleep(45000);
-	    return generatedCodeExecProcess ;
-	  }
+	@Override
+	protected Process executeGeneratedCode() throws IOException, InterruptedException
+	{
+	  Runtime runtime = Runtime.getRuntime();
+	  String[] testCommandArray = {"make","-C"+ output + "/generated-code", "test"};
+	  Process generatedCodeExecProcess = runtime.exec(testCommandArray);
+	  Thread.sleep(45000);
+	  return generatedCodeExecProcess ;
+	}
+	
+	@Override
+	protected void initAdditionalParameters()
+	{
+	  return;
+	}
 }

@@ -1,4 +1,4 @@
-/**
+  /**
  * AADL-RAMSES
  * 
  * Copyright ¬© 2012 TELECOM ParisTech and CNRS
@@ -23,10 +23,14 @@
 #include <types.h>
 #include <libc/stdio.h>
 
+int counter=0;
 void receive(uint8_t d)
 {
-  if(d<10 && d>1)
+  if(d<10 && d>1 && counter<10)
+  {
     printf("received value: %d\n", d);
+    counter++;
+  }
 }
 
 uint8_t value=0;
@@ -37,27 +41,6 @@ void send(uint8_t* d)
   value++;
   if(*d<10 && *d>1)
     printf("send value: %d\n", *d);
-}
-
-uint8_t counter=0;
-
-void event_received()
-{
-  if(counter<10 && counter>1)
-    printf("received event: %d\n", counter);
-  counter++;
-}
-
-void nothing_received()
-{
-  if(counter<10 && counter>1)
-    printf("nothing received\n");
-}
-
-void send_event ()
-{
-  if(counter<10 && counter>1)
-    printf("send event\n");
 }
 
 void periodic()

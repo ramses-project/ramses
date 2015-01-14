@@ -17,8 +17,6 @@ BUFFER_ID_TYPE the_receiver_p_in_globalVariable;
 
 int main ()
 {
-test_buffer_refined_model__the_proc_the_sender_impl_Init();
-test_buffer_refined_model__the_proc_the_receiver_impl_Init();
   PROCESS_ATTRIBUTE_TYPE tattr;
   RETURN_CODE_TYPE ret;
   CREATE_BUFFER ("the_receiver_p_in_globalVariable",    sizeof( common_pkg__Integer ), 10, FIFO,&the_receiver_p_in_globalVariable,& (ret));
@@ -43,3 +41,23 @@ test_buffer_refined_model__the_proc_the_receiver_impl_Init();
 }
 
 /******************************************************************************/
+/*                                SEND OUTPUT                                 */
+
+void __aadl_send_output (unsigned int port_variable, void * value)
+{
+  RETURN_CODE_TYPE ret;
+  SYSTEM_TIME_TYPE time_out;
+  MESSAGE_SIZE_TYPE length;
+  if(value==NULL)
+  {
+    char i=0;
+    value = &i;
+  }
+  switch (port_variable) {
+    case 0:
+      time_out = 0;
+      length = sizeof( common_pkg__Integer );
+      SEND_BUFFER(the_receiver_p_in_globalVariable, value, length, time_out, &ret);
+      break;
+  }
+}

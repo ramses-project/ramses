@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trc:TrcSpecification xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:trc="http://fr.tpt.aadl.ramses.transformation/TRC/1.0">
+  <transformationList>
+    <transformations modules="//@moduleList/@modules.2 //@moduleList/@modules.1 //@moduleList/@modules.0 //@moduleList/@modules.6 //@moduleList/@modules.7 //@moduleList/@modules.8 //@moduleList/@modules.9 //@moduleList/@modules.10 //@moduleList/@modules.11 //@moduleList/@modules.12 //@moduleList/@modules.13 //@moduleList/@modules.14 //@moduleList/@modules.15 //@moduleList/@modules.16 //@moduleList/@modules.17 //@moduleList/@modules.18 //@moduleList/@modules.19 //@moduleList/@modules.20 //@moduleList/@modules.21 //@moduleList/@modules.22 //@moduleList/@modules.23 //@moduleList/@modules.24 //@moduleList/@modules.25 //@moduleList/@modules.26 //@moduleList/@modules.27 //@moduleList/@modules.28 //@moduleList/@modules.29 //@moduleList/@modules.30 //@moduleList/@modules.31 //@moduleList/@modules.32" name="lowET">
+      <impacts impactValue="-4" qualityAttributeName="MemoryFootprint"/>
+      <impacts impactValue="5" qualityAttributeName="TimingPerformance"/>
+      <impacts impactValue="4" qualityAttributeName="Determinism"/>
+      <impacts impactValue="-3" qualityAttributeName="Maintainability"/>
+    </transformations>
+    <transformations modules="//@moduleList/@modules.3 //@moduleList/@modules.1 //@moduleList/@modules.0 //@moduleList/@modules.6 //@moduleList/@modules.7 //@moduleList/@modules.8 //@moduleList/@modules.9 //@moduleList/@modules.10 //@moduleList/@modules.11 //@moduleList/@modules.12 //@moduleList/@modules.13 //@moduleList/@modules.14 //@moduleList/@modules.15 //@moduleList/@modules.16 //@moduleList/@modules.17 //@moduleList/@modules.18 //@moduleList/@modules.19 //@moduleList/@modules.20 //@moduleList/@modules.21 //@moduleList/@modules.22 //@moduleList/@modules.23 //@moduleList/@modules.24 //@moduleList/@modules.25 //@moduleList/@modules.26 //@moduleList/@modules.27 //@moduleList/@modules.28 //@moduleList/@modules.29 //@moduleList/@modules.30 //@moduleList/@modules.31 //@moduleList/@modules.32" name="lowMFP">
+      <impacts impactValue="2" qualityAttributeName="MemoryFootprint"/>
+      <impacts impactValue="-3" qualityAttributeName="TimingPerformance"/>
+      <impacts impactValue="4" qualityAttributeName="Determinism"/>
+      <impacts impactValue="2" qualityAttributeName="Maintainability"/>
+    </transformations>
+    <transformations modules="//@moduleList/@modules.4 //@moduleList/@modules.5 //@moduleList/@modules.0 //@moduleList/@modules.6 //@moduleList/@modules.7 //@moduleList/@modules.8 //@moduleList/@modules.9 //@moduleList/@modules.10 //@moduleList/@modules.11 //@moduleList/@modules.12 //@moduleList/@modules.13 //@moduleList/@modules.14 //@moduleList/@modules.15 //@moduleList/@modules.16 //@moduleList/@modules.17 //@moduleList/@modules.18 //@moduleList/@modules.19 //@moduleList/@modules.20 //@moduleList/@modules.21 //@moduleList/@modules.22 //@moduleList/@modules.23 //@moduleList/@modules.24 //@moduleList/@modules.25 //@moduleList/@modules.26 //@moduleList/@modules.27 //@moduleList/@modules.28 //@moduleList/@modules.29 //@moduleList/@modules.30 //@moduleList/@modules.31 //@moduleList/@modules.32" name="LowMC">
+      <impacts qualityAttributeName="MemoryFootprint"/>
+      <impacts impactValue="-3" qualityAttributeName="TimingPerformance"/>
+      <impacts impactValue="-1" qualityAttributeName="Determinism"/>
+      <impacts impactValue="4" qualityAttributeName="Maintainability"/>
+    </transformations>
+  </transformationList>
+  <dependencyList>
+    <transformationDependencies appliedTransformation="//@transformationList/@transformations.0" appliedRule="EventDataPorts_LowET.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_LowET">
+      <variableId>fi</variableId>
+      <requiredTransformations xsi:type="trc:RuleDependencyConjunction">
+        <requiredTransformations xsi:type="trc:RuleDependency" requiredTransformation="//@transformationList/@transformations.0" requiredRule="EventDataPorts_LowET.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_LowET">
+          <fieldNames>self</fieldNames>
+        </requiredTransformations>
+        <requiredTransformations xsi:type="trc:RuleDependency" requiredTransformation="//@transformationList/@transformations.0" requiredRule="EventDataPorts_LowET.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_ReceiveInputs_LowET">
+          <fieldNames>self</fieldNames>
+        </requiredTransformations>
+      </requiredTransformations>
+    </transformationDependencies>
+    <transformationDependencies appliedTransformation="//@transformationList/@transformations.1" appliedRule="EventDataPorts_LowMFP.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_LowMFP">
+      <variableId>fi</variableId>
+      <requiredTransformations xsi:type="trc:RuleDependencyConjunction">
+        <requiredTransformations xsi:type="trc:RuleDependency" requiredTransformation="//@transformationList/@transformations.1" requiredRule="EventDataPorts_LowMFP.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_LowMFP">
+          <fieldNames>self</fieldNames>
+        </requiredTransformations>
+        <requiredTransformations xsi:type="trc:RuleDependency" requiredTransformation="//@transformationList/@transformations.1" requiredRule="EventDataPorts_LowMFP.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_ReceiveInputs_LowMFP">
+          <fieldNames>self</fieldNames>
+        </requiredTransformations>
+      </requiredTransformations>
+    </transformationDependencies>
+    <transformationDependencies appliedTransformation="//@transformationList/@transformations.2" appliedRule="EventDataPorts_Mutex_ARINC653.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_ARINC653">
+      <variableId>fi</variableId>
+      <requiredTransformations xsi:type="trc:RuleDependencyConjunction">
+        <requiredTransformations xsi:type="trc:RuleDependency" requiredTransformation="//@transformationList/@transformations.1" requiredRule="EventDataPorts_Mutex_ARINC653.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_Mutex_ARINC653">
+          <fieldNames>self</fieldNames>
+        </requiredTransformations>
+        <requiredTransformations xsi:type="trc:RuleDependency" requiredTransformation="//@transformationList/@transformations.2" requiredRule="EventDataPorts_Mutex.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_ReceiveInputs_Mutex">
+          <fieldNames>self</fieldNames>
+        </requiredTransformations>
+        <requiredTransformations xsi:type="trc:RuleDependency" requiredTransformation="//@transformationList/@transformations.1" requiredRule="EventDataPorts_Mutex.m_Thread_With_Input_PeriodicDelayed_Port">
+          <fieldNames>self</fieldNames>
+          <fieldNames>getComponentInstance()</fieldNames>
+        </requiredTransformations>
+        <requiredTransformations xsi:type="trc:RuleDependency" requiredTransformation="//@transformationList/@transformations.1" requiredRule="EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex">
+          <fieldNames>self</fieldNames>
+          <fieldNames>getDstConnectionInstances()</fieldNames>
+          <fieldNames>source</fieldNames>
+        </requiredTransformations>
+      </requiredTransformations>
+    </transformationDependencies>
+  </dependencyList>
+  <moduleList>
+    <modules name="SharedRules" path="ACG/PeriodicDelayedCommunication/SharedRules.atl"/>
+    <modules name="SharedRules_No_Mutex" path="ACG/PeriodicDelayedCommunication/SharedRules_No_Mutex.atl"/>
+    <modules name="EventDataPorts_LowET" path="ACG/PeriodicDelayedCommunication/EventDataPorts_LowET.atl"/>
+    <modules name="EventDataPorts_LowMFP" path="ACG/PeriodicDelayedCommunication/EventDataPorts_LowMFP.atl"/>
+    <modules name="EventDataPorts_Mutex_ARINC653" path="ACG/PeriodicDelayedCommunication/EventDataPorts_Mutex_ARINC653.atl"/>
+    <modules name="EventDataPorts_Mutex" path="ACG/PeriodicDelayedCommunication/EventDataPorts_Mutex.atl"/>
+    <modules name="ExpandThreadsDispatchProtocol" path="ACG/targets/arinc653/ExpandThreadsDispatchProtocol.atl"/>
+    <modules name="BlackboardCommunications" path="ACG/targets/arinc653/BlackboardCommunications.atl"/>
+    <modules name="BufferCommunications" path="ACG/targets/arinc653/BufferCommunications.atl"/>
+    <modules name="EventsCommunications" path="ACG/targets/arinc653/EventsCommunications.atl"/>
+    <modules name="QueuingCommunications" path="ACG/targets/arinc653/QueuingCommunications.atl"/>
+    <modules name="SamplingCommunications" path="ACG/targets/arinc653/SamplingCommunications.atl"/>
+    <modules name="ExpandThreadsPorts" path="ACG/targets/arinc653/ExpandThreadsPorts.atl"/>
+    <modules name="BehaviorAnnexCommonRefinementSteps" path="ACG/targets/shared/BehaviorAnnexCommonRefinementSteps.atl"/>
+    <modules name="PortsCommonRefinementSteps" path="ACG/targets/shared/PortsCommonRefinementSteps.atl"/>
+    <modules name="DispatchCommonRefinementSteps" path="ACG/targets/shared/DispatchCommonRefinementSteps.atl"/>
+    <modules name="PortsCommonRefinementSteps" path="ACG/targets/shared/PortsCommonRefinementSteps.atl"/>
+    <modules name="SubprogramCallsCommonRefinementSteps" path="ACG/targets/shared/SubprogramCallsCommonRefinementSteps.atl"/>
+    <modules name="UninstanciateOverride" path="ACG/targets/shared/UninstanciateOverride.atl"/>
+    <modules name="copyBehaviorActionBlock" path="BehaviorAnnexCopy/copyBehaviorActionBlock.atl"/>
+    <modules name="copyBehaviorCondition" path="BehaviorAnnexCopy/copyBehaviorCondition.atl"/>
+    <modules name="copyBehaviorSpecification" path="BehaviorAnnexCopy/copyBehaviorSpecification.atl"/>
+    <modules name="copyBehaviorTime" path="BehaviorAnnexCopy/copyBehaviorTime.atl"/>
+    <modules name="copyElementHolders" path="BehaviorAnnexCopy/copyElementHolders.atl"/>
+    <modules name="PropertiesTools" path="tools/PropertiesTools.atl"/>
+    <modules name="Services" path="helpers/Services.atl"/>
+    <modules name="IOHelpers" path="helpers/IOHelpers.atl"/>
+    <modules name="BehaviorAnnexServices" path="helpers/BehaviorAnnexServices.atl"/>
+    <modules name="LanguageSpecificitiesC" path="helpers/LanguageSpecificitiesC.atl"/>
+    <modules name="Types" path="uninstanciate/Types.atl"/>
+    <modules name="Features" path="uninstanciate/Features.atl"/>
+    <modules name="Connections" path="uninstanciate/Connections.atl"/>
+    <modules name="Uninstanciate" path="Uninstanciate.atl"/>
+  </moduleList>
+</trc:TrcSpecification>

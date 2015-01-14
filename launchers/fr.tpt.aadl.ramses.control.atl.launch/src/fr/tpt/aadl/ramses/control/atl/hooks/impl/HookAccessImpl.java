@@ -21,51 +21,68 @@
 
 package fr.tpt.aadl.ramses.control.atl.hooks.impl ;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File ;
+import java.util.ArrayList ;
+import java.util.Collections ;
+import java.util.HashMap ;
+import java.util.HashSet ;
+import java.util.List ;
+import java.util.Map ;
+import java.util.Set ;
 
 import org.apache.log4j.Logger ;
-import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.impl.EObjectImpl;
-import org.eclipse.xtext.nodemodel.INode;
-import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
-import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.ComponentType;
-import org.osate.aadl2.DirectedFeature;
-import org.osate.aadl2.DirectionType;
-import org.osate.aadl2.Element;
-import org.osate.aadl2.Feature;
-import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.Port;
-import org.osate.aadl2.instance.FeatureInstance;
-import org.osate.aadl2.SystemImplementation;
-import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.aadl2.instance.ConnectionInstance;
-import org.osate.aadl2.instance.InstanceObject;
-import org.osate.aadl2.instance.SystemInstance;
-import org.osate.aadl2.parsesupport.LocationReference;
+import org.eclipse.emf.common.util.BasicEList ;
+import org.eclipse.emf.common.util.EList ;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.EClass ;
+import org.eclipse.emf.ecore.EObject ;
+import org.eclipse.emf.ecore.impl.EObjectImpl ;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.xtext.EcoreUtil2 ;
+import org.eclipse.xtext.nodemodel.INode ;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils ;
+import org.osate.aadl2.AadlPackage ;
+import org.osate.aadl2.Classifier ;
+import org.osate.aadl2.ComponentImplementation ;
+import org.osate.aadl2.ComponentType ;
+import org.osate.aadl2.ContainmentPathElement;
+import org.osate.aadl2.DirectedFeature ;
+import org.osate.aadl2.Element ;
+import org.osate.aadl2.Feature ;
+import org.osate.aadl2.ListValue ;
+import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.Port ;
+import org.osate.aadl2.PropertyAssociation ;
+import org.osate.aadl2.PropertyExpression ;
+import org.osate.aadl2.PublicPackageSection ;
+import org.osate.aadl2.StringLiteral ;
+import org.osate.aadl2.SystemImplementation ;
+import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.aadl2.instance.ConnectionInstance ;
+import org.osate.aadl2.instance.FeatureInstance ;
+import org.osate.aadl2.instance.InstanceObject ;
+import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
+import org.osate.aadl2.parsesupport.LocationReference ;
 import org.osate.ba.aadlba.BehaviorAnnex ;
 import org.osate.ba.aadlba.BehaviorElement ;
 import org.osate.ba.aadlba.BehaviorState ;
 import org.osate.ba.aadlba.BehaviorTransition ;
+import org.osate.ba.aadlba.PortCountValue ;
 import org.osate.ba.utils.AadlBaLocationReference ;
 import org.osate.ba.utils.AadlBaVisitors ;
 import org.osate.utils.Aadl2Utils ;
-import org.osate.utils.PropertyUtils;
+import org.osate.utils.PropertyUtils ;
 
-import fr.tpt.aadl.ramses.communication.dimensioning.DimensioningException;
-import fr.tpt.aadl.ramses.communication.periodic.delayed.EventDataPortCommunicationDimensioning;
+import fr.tpt.aadl.ramses.communication.dimensioning.DimensioningException ;
+import fr.tpt.aadl.ramses.communication.periodic.delayed.EventDataPortCommunicationDimensioning ;
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage ;
 import fr.tpt.aadl.ramses.control.atl.hooks.HookAccess ;
 import fr.tpt.aadl.ramses.control.atl.hooks.utils.ComparablePortByCriticality ;
 import fr.tpt.aadl.ramses.control.support.RamsesException ;
-import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.util.math.LeastCommonMultiple ;
 import fr.tpt.aadl.ramses.util.properties.AadlUtil ;
 
 /**
@@ -83,32 +100,33 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   private String outputPackageName;
   
   private static Logger _LOGGER = Logger.getLogger(HookAccessImpl.class);
+  
+  private static final String _ENUMERATORS = "Enumerators" ;
 
 /**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
   protected HookAccessImpl()
   {
-		super();
-	}
-
-  /**
-	 * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-	 * @generated
-	 */
-  @Override
-  protected EClass eStaticClass()
-  {
-		return AtlHooksPackage.Literals.HOOK_ACCESS;
-	}
+    super();
+  }
 
   /**
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated NOT
+   * @generated
+   */
+  @Override
+  protected EClass eStaticClass()
+  {
+    return AtlHooksPackage.Literals.HOOK_ACCESS;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
    */
   public EList<Feature> orderFeatures(ComponentType cpt)
   {
@@ -120,7 +138,6 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   /**
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated NOT
    */
   public void copyLocationReference(Element target,
                                     Element source)
@@ -159,7 +176,6 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
     /**
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated NOT
    */
     private static Map<NamedElement, NamedElement> _transformationTrace = new HashMap<NamedElement, NamedElement>();
     
@@ -175,18 +191,16 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   /**
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated NOT
    */
   public void putTransitionWhereSrc(BehaviorState state, BehaviorTransition transition)
   {
-    AadlBaVisitors.putTransitionWhereSrc(state, transition);
+    AadlBaVisitors.putTransitionWhereSrc(state,transition);
   }
 
   
   /**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated NOT
 	 */
 	public EList<Long> getCurrentPerionReadTable(FeatureInstance port) {
 		EList<Long> CPRTable = new BasicEList<Long>();
@@ -219,33 +233,39 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated NOT
 	 */
-	public Long getHyperperiod(FeatureInstance port) {
-		Long hyperperiod= new Long(0);
-		try {
-			EventDataPortCommunicationDimensioning EDPCD = 
-					EventDataPortCommunicationDimensioning.create(port);
-			ArrayList<ComponentInstance> threads = new ArrayList<ComponentInstance>();
-			for(ConnectionInstance fi: port.getDstConnectionInstances())
-			{
-				threads.add((ComponentInstance) fi.getSource().eContainer());
-			}
-			threads.add((ComponentInstance) port.eContainer());
-			hyperperiod = EDPCD.getHyperperiod(threads);
-		} catch (DimensioningException e) {
-		  String errMsg =  RamsesException.formatRethrowMessage("cannot get the hyper period for \'"+
-		port + '\'', e) ;
-      _LOGGER.error(errMsg, e);
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
-		}
-		return hyperperiod;
+	public long getHyperperiod(FeatureInstance port) {
+	  Long hyperperiod= new Long(0);
+	  ArrayList<ComponentInstance> threads = new ArrayList<ComponentInstance>();
+	  for(ConnectionInstance fi: port.getDstConnectionInstances())
+	  {
+	    threads.add((ComponentInstance) fi.getSource().eContainer());
+	  }
+	  threads.add((ComponentInstance) port.eContainer());
+	  hyperperiod = getHyperperiod(threads);
+	  return hyperperiod;
 	}
 	
+	public Long getHyperperiodFromThreads(List<ComponentInstance> consideredTasks)
+	{
+	  return getHyperperiod(consideredTasks);
+	}
+	
+	public long getHyperperiod(List<ComponentInstance> consideredTasks)
+	{
+	  Long[] periods = new Long[consideredTasks.size()];
+	  ArrayList<Long> consideredPeriods = new ArrayList<Long>();
+	  for(ComponentInstance ci : consideredTasks)
+	  {
+	    consideredPeriods.add( AadlUtil.getInfoTaskPeriod(ci));
+	  }
+	  consideredPeriods.toArray(periods);
+	  return LeastCommonMultiple.lcm(periods);
+	}
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated NOT
 	 */
 	public EList<Long> getCurrentDeadlineWriteTable(FeatureInstance port, FeatureInstance destinationPort) {
 		EList<Long> CDWTable = new BasicEList<Long>();
@@ -278,7 +298,6 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated NOT
 	 */
 	public long getBufferSize(FeatureInstance destinationFeatureInstance) {
 		try {
@@ -300,43 +319,50 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated NOT
 	 */
 	public void setDirection(DirectedFeature feature, String direction) {
 		if(direction.equals("in"))
-			feature.setDirection(DirectionType.IN);
+		{
+		  feature.setIn(true);
+		  feature.setOut(false);
+		}
 		else if(direction.equals("out"))
-			feature.setDirection(DirectionType.OUT);
+		{
+		  feature.setIn(false);
+      feature.setOut(true);
+		}
 		else
-			feature.setDirection(DirectionType.IN_OUT);
+		{
+		  feature.setIn(true);
+      feature.setOut(true);
+		}
 	}
 
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated NOT
 	 */
+	private static PublicPackageSection getPublicPackageSection(NamedElement ne)
+	{
+	  if(ne.eContainer() instanceof PublicPackageSection)
+	    return (PublicPackageSection) ne.eContainer();
+	  else if(ne.eContainer() instanceof NamedElement)
+	  {
+	    NamedElement neContainer = (NamedElement) ne.eContainer();
+	    return getPublicPackageSection(neContainer);
+	  }
+	  return null;
+	}
+	
   public static NamedElement getTransformationTrace(NamedElement targetDeclarative)
   {
-	for(NamedElement ne: _transformationTrace.keySet())
-	{
-	  if(ne.getQualifiedName().equals(targetDeclarative.getQualifiedName()))
-		  return _transformationTrace.get(ne);
-	}
+    for(NamedElement ne: _transformationTrace.keySet())
+    {
+      if(ne.getQualifiedName().equals(targetDeclarative.getQualifiedName()))
+        return _transformationTrace.get(ne);
+    }
+    
     return null;
-  }
-  
-  public static List<NamedElement> getTransformationTracesFromSource(InstanceObject sourceInstance)
-  {
-	  ArrayList<NamedElement> l = new ArrayList<NamedElement>();
-	  for(NamedElement e : _transformationTrace.keySet())
-	  {
-		  if (_transformationTrace.get(e) == sourceInstance)
-		  {
-			  l.add(e);
-		  }
-	  }
-	  return l;
   }
   
   public static List<NamedElement> getTransformationTracesFromSourceDecl(ComponentImplementation el)
@@ -357,10 +383,20 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	  return l;
   }
 
-  public Boolean isUsedInFreshClause(BehaviorAnnex ba, Port p) {
-	return AadlBaVisitors.isFresh(ba, p);
+  public boolean isUsedInSpecialOperator(BehaviorAnnex ba, Port p, String operatorName) {
+    if(operatorName.equalsIgnoreCase("fresh"))
+      return AadlBaVisitors.isFresh(ba, p);
+    else if(operatorName.equalsIgnoreCase("count"))
+    {
+      for(PortCountValue pcv : EcoreUtil2.getAllContentsOfType(ba, PortCountValue.class))
+      {
+        if(pcv.getElement().equals(p))
+          return true;
+      }
+    }
+    return false;
   }
-  
+    
   public List<FeatureInstance> getFeaturesOrderedByCriticality(ComponentInstance ci)
   {
 	List<FeatureInstance> result = new ArrayList<FeatureInstance>();
@@ -424,8 +460,10 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	  Boolean b = (Boolean) o;
 	  _LOGGER.trace("\t"+b.toString()+": "+ msg);
 	}
-	else
+	else if(o!=null)
 	  _LOGGER.trace("\t"+o.toString()+": "+ msg);
+	else
+	  _LOGGER.trace("\t NULL: "+ msg);
 	return o;
   }
   
@@ -477,4 +515,99 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   }
 
   
+  public EList<String> getListOfPath(PropertyAssociation pa)
+  {
+    List<String> res = new BasicEList<String>();
+    ListValue lv = (ListValue) pa.getOwnedValues().get(0).getOwnedValue();
+    URI dirURI = pa.eResource().getURI();
+    String path = "";
+    if(dirURI.isFile())
+      path = dirURI.toFileString();
+    else
+      path = dirURI.toString();
+    int index = path.lastIndexOf(File.separator);
+    path = path.substring(0, index+1);
+    
+    for(PropertyExpression pe: lv.getOwnedListElements())
+    {
+      StringLiteral sl = (StringLiteral) pe;
+      String fileName = sl.getValue();
+      File f = new File(fileName);
+      if(f.exists())
+        res.add(fileName);
+      else
+      {
+        File prefixedF = new File(path+fileName);
+        if(prefixedF.exists())
+          res.add(path+fileName);
+      }
+    }
+    return (EList<String>) res;
+  }
+
+  public Integer minus (Long lhs, Long rhs)
+  {
+    return (int) (lhs-rhs);
+  }
+  
+  void allPortCount(List<PortCountValue> result, EObject e)
+  {
+    if(e instanceof BehaviorTransition)
+    {
+      BehaviorTransition bt = (BehaviorTransition) e;
+      allPortCount(result, bt.getActionBlock());
+    }
+    for(EObject be : EcoreUtil2.getAllContentsOfType(e, EObject.class))
+    {
+      if(be instanceof PortCountValue)
+        result.add((PortCountValue) be);
+      else
+        allPortCount(result, be);
+    }
+  }
+  
+  public EList<Port> allPortCount(BehaviorElement e)
+  {
+    List<PortCountValue> pcvList =  new ArrayList<PortCountValue>();
+    allPortCount(pcvList, e);
+    
+    Set<Port> pList = new HashSet<Port>();
+    for(PortCountValue pcv: pcvList)
+    {
+      pList.add((Port) pcv.getElement());
+    }
+    EList<Port> res = new BasicEList<Port>(pList);
+    return res;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   */
+  public StringLiteral getStringLiteral(PropertyAssociation pa,
+                                        String stringLiteralValue)
+  {
+    Element el = null ;
+    EList<PropertyExpression> pes = PropertyUtils.getPropertyExpression(pa) ;
+    for(PropertyExpression pe : pes)
+    {
+      el = PropertyUtils.getValue(pe, stringLiteralValue) ;
+      
+      if(el != null)
+      {
+        return (StringLiteral) el ;
+      }
+    }
+    
+    return null ;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   */
+  public PropertyAssociation getEnumerators(Classifier classifier)
+  {
+    return PropertyUtils.findPropertyAssociation(_ENUMERATORS, classifier);
+  }
 } //HookAccessImpl

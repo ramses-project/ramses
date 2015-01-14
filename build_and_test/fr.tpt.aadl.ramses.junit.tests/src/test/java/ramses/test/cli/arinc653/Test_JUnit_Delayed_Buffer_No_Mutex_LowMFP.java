@@ -3,9 +3,9 @@ package ramses.test.cli.arinc653;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ramses.test.util.POKScenario;
+import ramses.test.util.OSGIPOKScenario ;
 
-public class Test_JUnit_Delayed_Buffer_No_Mutex_LowMFP extends POKScenario {
+public class Test_JUnit_Delayed_Buffer_No_Mutex_LowMFP extends OSGIPOKScenario {
 
 
 	@BeforeClass
@@ -19,7 +19,14 @@ public class Test_JUnit_Delayed_Buffer_No_Mutex_LowMFP extends POKScenario {
 		ramses_dir = System.getProperty("RAMSES_DIR");
 		output = "tests/arinc653/arinc653-buffer-delayed-no_mutex_lowmfp/output";
 		output_ref = "tests/arinc653/arinc653-buffer-delayed-no_mutex_lowmfp/output_ref";
-		workflowPath = "tests/arinc653/arinc653-buffer-delayed-no_mutex_lowmfp/input/Workflow.xmi";
+		workflowPath = "tests/arinc653/arinc653-buffer-delayed-no_mutex_lowmfp/input/PDP_no_mutex_lowMFP.workflow";
 		this.exec();
 	}
+
+  @Override
+  protected void initAdditionalParameters()
+  {
+    // TODO Auto-generated method stub
+    
+  }
 }

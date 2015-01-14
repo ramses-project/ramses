@@ -53,12 +53,11 @@ while(1)
       READ_BLACKBOARD ((*delayed_error_C2), PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_delayed_error_C2_TimeOut, &PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_delayed_error_C2_localVariable, &PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_delayed_error_C2_Length, &PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_S1_inst_Monitor_changeState_runtime_call_ret);
       PingPong__Monitor_delayed_error_C1 (&PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_error_C1_localVariable, &delayed_error_C1);
       Monitor_changeState (&delayed_error_C1, &PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_delayed_error_C2_localVariable, &PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_mode_C1_localVariable, &PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_mode_C2_localVariable, State_baKeywords, State_baKeywords);
+      (*Parent_BA_currentState_Access) = PingPong_refined_model__S1_inst_Monitor_changeState_currentState_switch;
       DISPLAY_BLACKBOARD ((*PortCnx1_mode_C1), &PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_mode_C1_localVariable, PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_mode_C1_Length, &PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_S1_inst_Monitor_changeState_runtime_call_ret);
       DISPLAY_BLACKBOARD ((*PortCnx2_mode_C1), &PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_mode_C1_localVariable, PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_mode_C1_Length, &PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_S1_inst_Monitor_changeState_runtime_call_ret);
       DISPLAY_BLACKBOARD ((*PortCnx3_mode_C1), &PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_mode_C1_localVariable, PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_mode_C1_Length, &PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_S1_inst_Monitor_changeState_runtime_call_ret);
       WRITE_SAMPLING_MESSAGE ((*PortCnx8_mode_C2), &PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_mode_C2_localVariable, PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_mode_C2_Length, &PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_S1_inst_Monitor_changeState_runtime_call_ret);
-      PERIODIC_WAIT (&PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_S1_inst_Monitor_changeState_runtime_call_ret);
-      (*Parent_BA_currentState_Access) = PingPong_refined_model__S1_inst_Monitor_changeState_currentState_switch;
       }
       break;
     }
@@ -107,9 +106,8 @@ while(1)
       if ((*Parent_BA_currentState_Access) == PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_currentState_switch) {
       READ_SAMPLING_MESSAGE ((*error_C2), &PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl_error_C2_localVariable, PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl_error_C2_Length, &PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl_error_C2_Validity, &PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl_S1_inst_Monitor_delayed_error_C2_runtime_call_ret);
       PingPong__Monitor_delayed_error_C2 (&PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl_error_C2_localVariable, &PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl_delayed_error_C2_localVariable);
-      DISPLAY_BLACKBOARD ((*PortCnx11_delayed_error_C2), &PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl_delayed_error_C2_localVariable, PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl_delayed_error_C2_Length, &PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl_S1_inst_Monitor_delayed_error_C2_runtime_call_ret);
-      PERIODIC_WAIT (&PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl_S1_inst_Monitor_delayed_error_C2_runtime_call_ret);
       (*Parent_BA_currentState_Access) = PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_currentState_switch;
+      DISPLAY_BLACKBOARD ((*PortCnx11_delayed_error_C2), &PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl_delayed_error_C2_localVariable, PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl_delayed_error_C2_Length, &PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl_S1_inst_Monitor_delayed_error_C2_runtime_call_ret);
       }
       break;
     }
@@ -166,10 +164,9 @@ while(1)
       }
       (*PingOut_freshnessIndicator_access) = (*PingOut_freshnessIndicator_access) + 1;
       PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_PingOut_localVariable.fresh_ba = (*PingOut_freshnessIndicator_access);
+      (*Parent_BA_currentState_Access) = PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_currentState_switch;
       WRITE_SAMPLING_MESSAGE ((*PortCnx9_PingOut), &PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_PingOut_localVariable, PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_PingOut_Length, &PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_S1_inst_IPingOrPong_Cping_ping_runtime_call_ret);
       DISPLAY_BLACKBOARD ((*PortCnx4_badSequenceNumber), &PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_badSequenceNumber_localVariable, PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_badSequenceNumber_Length, &PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_S1_inst_IPingOrPong_Cping_ping_runtime_call_ret);
-      PERIODIC_WAIT (&PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_S1_inst_IPingOrPong_Cping_ping_runtime_call_ret);
-      (*Parent_BA_currentState_Access) = PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_currentState_switch;
       }
       break;
     }
@@ -225,9 +222,8 @@ while(1)
       if (PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_mode_aadlKeywords_localVariable == E_ROLE_CPING) {
       PingPong__IPingOrPong_Cping_delayed_PongIn (&PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_PongIn_localVariable, &PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_delayed_PongIn_localVariable);
       }
-      DISPLAY_BLACKBOARD ((*PortCnx12_delayed_PongIn), &PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_delayed_PongIn_localVariable, PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_delayed_PongIn_Length, &PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_S1_inst_IPingOrPong_Cping_delayed_PongIn_runtime_call_ret);
-      PERIODIC_WAIT (&PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_S1_inst_IPingOrPong_Cping_delayed_PongIn_runtime_call_ret);
       (*Parent_BA_currentState_Access) = PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_currentState_switch;
+      DISPLAY_BLACKBOARD ((*PortCnx12_delayed_PongIn), &PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_delayed_PongIn_localVariable, PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_delayed_PongIn_Length, &PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_S1_inst_IPingOrPong_Cping_delayed_PongIn_runtime_call_ret);
       }
       break;
     }
@@ -283,9 +279,8 @@ while(1)
       }
       }
       (*PingIn_freshnessIndicator_access) = PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PingIn_localVariable.fresh_ba;
-      WRITE_SAMPLING_MESSAGE ((*PortCnx10_PongOut), &PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PongOut_localVariable, PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PongOut_Length, &PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_S1_inst_IPingOrPong_Cpong_pong_runtime_call_ret);
-      PERIODIC_WAIT (&PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_S1_inst_IPingOrPong_Cpong_pong_runtime_call_ret);
       (*Parent_BA_currentState_Access) = PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_currentState_switch;
+      WRITE_SAMPLING_MESSAGE ((*PortCnx10_PongOut), &PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PongOut_localVariable, PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PongOut_Length, &PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_S1_inst_IPingOrPong_Cpong_pong_runtime_call_ret);
       }
       break;
     }

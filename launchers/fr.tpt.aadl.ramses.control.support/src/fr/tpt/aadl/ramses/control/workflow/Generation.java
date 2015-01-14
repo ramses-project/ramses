@@ -30,5 +30,6 @@ package fr.tpt.aadl.ramses.control.workflow;
  * @model
  * @generated
  */
-public interface Generation extends WorkflowElement, AnalysisElement {
+public interface Generation extends WorkflowElement, AnalysisElement
+{
 } // Generation

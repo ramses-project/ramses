@@ -25,17 +25,14 @@ import java.util.List ;
 import java.util.Set ;
 
 import org.apache.log4j.Logger ;
-import org.osate.aadl2.BooleanLiteral;
+import org.osate.aadl2.BooleanLiteral ;
 import org.osate.aadl2.ComponentImplementation ;
 import org.osate.aadl2.ComponentType ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.Parameter ;
-import org.osate.aadl2.Property;
-import org.osate.aadl2.ThreadImplementation ;
+import org.osate.aadl2.Property ;
 import org.osate.utils.PropertyUtils ;
-import org.osate.xtext.aadl2.properties.util.GetProperties;
-
-import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import org.osate.xtext.aadl2.properties.util.GetProperties ;
 
 public class GenerationUtilsC
 {
@@ -44,14 +41,6 @@ public class GenerationUtilsC
   
   private static Logger _LOGGER = Logger.getLogger(GenerationUtilsC.class) ;
   
-  public static String getInitializationCall(ThreadImplementation object)
-  {
-    StringBuilder result = new StringBuilder();
-    result.append(GenerationUtilsC
-              .getGenerationCIdentifier(object.getQualifiedName())) ;
-    result.append(THREAD_INIT_SUFFIX + "();") ;
-    return result.toString();
-  }
   
   // Give file name, in upper case or not and with or without extension.
   public static String generateHeaderInclusionGuard(String fileName)

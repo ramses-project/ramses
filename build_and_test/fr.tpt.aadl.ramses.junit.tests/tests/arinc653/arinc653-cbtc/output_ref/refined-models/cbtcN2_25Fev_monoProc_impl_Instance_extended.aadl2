@@ -3,6 +3,10 @@ public
 with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thread_Properties,Programming_Properties,Deployment_Properties,ARINC653,COAL,POK,Generation_Properties,cbtc_refined_model,cbtc,arinc653_runtime,PeriodicDelayed_runtime;
   process implementation train.impl
     subcomponents
+      TrainPpu_odometerAcquisitionParent_BA_currentState: data train_inst_TrainPpu_odometerAcquisition_currentState;
+      TrainPpu_trainTractionParent_BA_currentState: data train_inst_TrainPpu_trainTraction_currentState;
+      VobcTrainPositionEstimation_vobcTrainPositionEstimationParent_BA_currentState: data train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState;
+      TrainSpeedAccelCompute_trainSpeedAccelComputeParent_BA_currentState: data train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState;
       TrainPpu_trainTraction_tractionIn_globalVariable: data arinc653_runtime::Blackboard_Id_Type {
         Concurrency_Control_Protocol => Priority_Ceiling;
         };
@@ -69,10 +73,18 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
       Id_instance_to_VobcTrainPositionEstimation_vobcTrainPositionEstimation_wheelAngleIn: data access VobcTrainPositionEstimation_vobcTrainPositionEstimation_wheelAngleIn_globalVariable -> VobcTrainPositionEstimation_vobcTrainPositionEstimation.wheelAngleIn;
       Id_instance_to_TrainSpeedAccelCompute_trainSpeedAccelCompute_eoaIn: data access train_inst_TrainSpeedAccelCompute_inst_eoaInglobalVariable -> TrainSpeedAccelCompute_trainSpeedAccelCompute.eoaIn;
       Id_instance_to_TrainSpeedAccelCompute_trainSpeedAccelCompute_trainPositionIn: data access TrainSpeedAccelCompute_trainSpeedAccelCompute_trainPositionIn_globalVariable -> TrainSpeedAccelCompute_trainSpeedAccelCompute.trainPositionIn;
+      TrainPpu_odometerAcquisition_CNX_CURRENT_STATE_BA: data access TrainPpu_odometerAcquisition.Parent_BA_currentState_Access -> TrainPpu_odometerAcquisitionParent_BA_currentState;
+      TrainPpu_trainTraction_CNX_CURRENT_STATE_BA: data access TrainPpu_trainTraction.Parent_BA_currentState_Access -> TrainPpu_trainTractionParent_BA_currentState;
+      VobcTrainPositionEstimation_vobcTrainPositionEstimation_CNX_CURRENT_STATE_BA: data access VobcTrainPositionEstimation_vobcTrainPositionEstimation.Parent_BA_currentState_Access -> VobcTrainPositionEstimation_vobcTrainPositionEstimationParent_BA_currentState;
+      TrainSpeedAccelCompute_trainSpeedAccelCompute_CNX_CURRENT_STATE_BA: data access TrainSpeedAccelCompute_trainSpeedAccelCompute.Parent_BA_currentState_Access -> TrainSpeedAccelCompute_trainSpeedAccelComputeParent_BA_currentState;
   end train.impl;
   
   process implementation railway.impl
     subcomponents
+      TrainPositionsCorrelation_trainPositionsCorrelationParent_BA_currentState: data railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState;
+      ViuTrainPositionEstimation_viuTrainPositionEstimationParent_BA_currentState: data railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState;
+      TrainSimu_trainSimulationParent_BA_currentState: data railway_inst_TrainSimu_trainSimulation_currentState;
+      TrainSimu_delayed_trainDataInParent_BA_currentState: data railway_inst_TrainSimu_delayed_trainDataIn_currentState;
       TrainPositionsCorrelation_trainPositionsCorrelation_trainPositionViuForMauIn_globalVariable: data arinc653_runtime::Blackboard_Id_Type {
         Concurrency_Control_Protocol => Priority_Ceiling;
         };
@@ -133,32 +145,31 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
       Id_instance_to_ViuTrainPositionEstimation_viuTrainPositionEstimation_trackIn: data access ViuTrainPositionEstimation_viuTrainPositionEstimation_trackIn_globalVariable -> ViuTrainPositionEstimation_viuTrainPositionEstimation.trackIn;
       Id_instance_to_TrainSimu_trainSimulation_delayed_trainDataIn: data access TrainSimu_trainSimulation_delayed_trainDataIn_globalVariable -> TrainSimu_trainSimulation.delayed_trainDataIn;
       Id_instance_to_TrainSimu_delayed_trainDataIn_trainDataIn: data access railway_inst_TrainSimu_inst_trainDataInglobalVariable -> TrainSimu_delayed_trainDataIn.trainDataIn;
+      TrainPositionsCorrelation_trainPositionsCorrelation_CNX_CURRENT_STATE_BA: data access TrainPositionsCorrelation_trainPositionsCorrelation.Parent_BA_currentState_Access -> TrainPositionsCorrelation_trainPositionsCorrelationParent_BA_currentState;
+      ViuTrainPositionEstimation_viuTrainPositionEstimation_CNX_CURRENT_STATE_BA: data access ViuTrainPositionEstimation_viuTrainPositionEstimation.Parent_BA_currentState_Access -> ViuTrainPositionEstimation_viuTrainPositionEstimationParent_BA_currentState;
+      TrainSimu_trainSimulation_CNX_CURRENT_STATE_BA: data access TrainSimu_trainSimulation.Parent_BA_currentState_Access -> TrainSimu_trainSimulationParent_BA_currentState;
+      TrainSimu_delayed_trainDataIn_CNX_CURRENT_STATE_BA: data access TrainSimu_delayed_trainDataIn.Parent_BA_currentState_Access -> TrainSimu_delayed_trainDataInParent_BA_currentState;
   end railway.impl;
   
   processor implementation root.impl
     subcomponents
       VP_train_inst: virtual processor VP_train.impl {
-        ARINC653::Partition_Identifier => 1;
+        Scheduling_Protocol => (Round_Robin_Protocol);
+        Period => 600 ms;
+        ARINC653::Partition_Identifier => 2;
         ARINC653::Partition_Name => "train";
         ARINC653::System_Partition => false;
-        ARINC653::System_Overhead_Time => 10 ms;
-        POK::Scheduler => RR;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (Rate_Monotonic_Protocol);
         };
       VP_railway_inst: virtual processor VP_railway.impl {
+        Scheduling_Protocol => (Round_Robin_Protocol);
+        Period => 600 ms;
         ARINC653::Partition_Identifier => 3;
         ARINC653::Partition_Name => "railway";
         ARINC653::System_Partition => false;
-        ARINC653::System_Overhead_Time => 10 ms;
-        POK::Scheduler => RR;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (Rate_Monotonic_Protocol);
         };
   end root.impl;
-  
-  virtual processor implementation VP_System_aadlKeywords.impl
-  end VP_System_aadlKeywords.impl;
   
   virtual processor implementation VP_train.impl
   end VP_train.impl;
@@ -176,7 +187,6 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
         Base_Address => 8704;
         Word_Size => 10000 Bytes;
         ARINC653::Memory_Type => (Data_Memory, Code_Memory, IO_Memory);
-        Memory_Protocol => read_write;
         };
       train_inst: process train.impl {
         Data_Size => 200 KByte;
@@ -189,8 +199,6 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
       root_inst: processor root.impl {
         Thread_Swap_Execution_Time => 5 ms .. 10 ms;
         ARINC653::Module_Major_Frame => 600 ms;
-        ARINC653::Partition_Slots => (300 ms, 300 ms);
-        ARINC653::Slots_Allocation => (reference(VP_railway_inst), reference(VP_train_inst));
         ARINC653::HM_Error_ID_Levels => ([
           ErrorIdentifier=> 1;
           Description=> "Module configuration error";
@@ -205,16 +213,25 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
         ARINC653::Module_Version => "1.0";
         ARINC653::Module_Identifier => "cbtc.root";
         Process_Swap_Execution_Time => 5 ms .. 10 ms;
+        Scheduling_Protocol => (ARINC653);
         POK::Ports_Flush_Time => Partition_Slot_Switch;
         POK::Architecture => x86;
         POK::BSP => x86_qemu;
-        Scheduling_Protocol => (ARINC653);
         };
     properties
       Actual_Processor_Binding => (reference(root_inst.VP_train_inst)) applies to train_inst;
       Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst;
       Actual_Processor_Binding => (reference(root_inst.VP_railway_inst)) applies to railway_inst;
       Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst;
+      ARINC653::Module_Schedule => ([
+        Partition=> reference(root_inst.VP_railway_inst);
+        Duration=> 300 ms;
+        Periodic_Processing_Start=> true;
+      ], [
+        Partition=> reference(root_inst.VP_train_inst);
+        Duration=> 300 ms;
+        Periodic_Processing_Start=> true;
+      ]) applies to root_inst;
       Actual_Processor_Binding => (reference(root_inst.VP_train_inst)) applies to train_inst.TrainPpu_odometerAcquisition;
       Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.TrainPpu_odometerAcquisition;
       Actual_Processor_Binding => (reference(root_inst.VP_train_inst)) applies to train_inst.TrainPpu_trainTraction;
@@ -254,12 +271,6 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
   processor root
   end root;
   
-  processor cpu_x86
-  end cpu_x86;
-  
-  virtual processor VP_System_aadlKeywords
-  end VP_System_aadlKeywords;
-  
   virtual processor VP_train
   end VP_train;
   
@@ -268,9 +279,6 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
   
   memory root_main_memory
   end root_main_memory;
-  
-  process System_aadlKeywords
-  end System_aadlKeywords;
   
   process train
   end train;
@@ -372,7 +380,7 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = train_inst_TrainPpu_odometerAcquisition_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = train_inst_TrainPpu_odometerAcquisition_currentState#switch) Read_Sampling_Message_TrainData ! (trainDataIn, trainDataIn_localVariable, trainDataIn_Length, trainDataIn_Validity, train_inst_TrainPpu_odometerAcquisition_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = train_inst_TrainPpu_odometerAcquisition_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = train_inst_TrainPpu_odometerAcquisition_currentState#Enumerators.switch) Read_Sampling_Message_TrainData ! (trainDataIn, trainDataIn_localVariable, trainDataIn_Length, trainDataIn_Validity, train_inst_TrainPpu_odometerAcquisition_runtime_call_ret) ;
 if ((trainDataIn_localVariable.fresh_ba != trainDataIn_freshnessIndicator_access)) cbtc::TrainPpu_odometerAcquisition ! (trainDataIn_localVariable.pvalue, odometerOut) ;
 odometerIn := odometerOut ;
 cbtc::WheelAngleAcquisition_wheelAngleAcquisition ! (odometerIn, wheelAngleOut_localVariable.pvalue) end if
@@ -380,11 +388,10 @@ cbtc::WheelAngleAcquisition_wheelAngleAcquisition ! (odometerIn, wheelAngleOut_l
 trainDataIn_freshnessIndicator_access := trainDataIn_localVariable.fresh_ba ;
 wheelAngleOut_freshnessIndicator_access := wheelAngleOut_freshnessIndicator_access + 1 ;
 wheelAngleOut_localVariable.fresh_ba := wheelAngleOut_freshnessIndicator_access ;
-Display_Blackboard_OdometerData ! (PortCnx1_wheelAngleOut, wheelAngleOut_localVariable, wheelAngleOut_Length, train_inst_TrainPpu_odometerAcquisition_runtime_call_ret) ;
-arinc653_runtime::Periodic_Wait ! (train_inst_TrainPpu_odometerAcquisition_runtime_call_ret) ;
-Parent_BA_currentState_Access := train_inst_TrainPpu_odometerAcquisition_currentState#switch end if
+Parent_BA_currentState_Access := train_inst_TrainPpu_odometerAcquisition_currentState#Enumerators.switch ;
+Display_Blackboard_OdometerData ! (PortCnx1_wheelAngleOut, wheelAngleOut_localVariable, wheelAngleOut_Length, train_inst_TrainPpu_odometerAcquisition_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := train_inst_TrainPpu_odometerAcquisition_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := train_inst_TrainPpu_odometerAcquisition_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (train_inst_TrainPpu_odometerAcquisition_runtime_call_ret)} ;
 **};
   end train_inst_TrainPpu_odometerAcquisition_entrypoint.impl;
@@ -408,7 +415,6 @@ Parent_BA_currentState_Access := train_inst_TrainPpu_odometerAcquisition_current
         Source_Name => "WheelAngleAcquisition_wheelAngleAcquisition";
         Source_Text => ("business-code/cbtc_vobc_subsystem_Implementations_WheelAngleAcquisition_impl.h", "business-code/cbtc_vobc_subsystem_Implementations_WheelAngleAcquisition_impl.c");
         };
-      Parent_BA_currentState: data train_inst_TrainPpu_odometerAcquisition_currentState;
       trainDataIn_persistentFreshnessIndicator: data Base_Types::Integer_16 {
         Data_Model::Initial_Value => ("0");
         };
@@ -423,7 +429,7 @@ Parent_BA_currentState_Access := train_inst_TrainPpu_odometerAcquisition_current
     connections
       trainDataIn_accessCnx_1: data access trainDataIn -> call_entrypoint.trainDataIn;
       PortCnx1_wheelAngleOut_accessCnx_1: data access PortCnx1_wheelAngleOut -> call_entrypoint.PortCnx1_wheelAngleOut;
-      CNX_CURRENT_STATE_BA: data access call_entrypoint.Parent_BA_currentState_Access -> Parent_BA_currentState;
+      CNX_CURRENT_STATE_BA: data access call_entrypoint.Parent_BA_currentState_Access -> Parent_BA_currentState_Access;
       trainDataIn_to_persistentFreshnessIndicator: data access trainDataIn_persistentFreshnessIndicator -> call_entrypoint.trainDataIn_freshnessIndicator_access;
       wheelAngleOut_to_persistentFreshnessIndicator: data access wheelAngleOut_persistentFreshnessIndicator -> call_entrypoint.wheelAngleOut_freshnessIndicator_access;
   end train_inst_TrainPpu_odometerAcquisition.impl;
@@ -431,7 +437,11 @@ Parent_BA_currentState_Access := train_inst_TrainPpu_odometerAcquisition_current
   thread train_inst_TrainPpu_odometerAcquisition
     features
       trainDataIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx1_wheelAngleOut: requires data access arinc653_runtime::Blackboard_Id_Type;
+      PortCnx1_wheelAngleOut: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Source_Name => "OdometerData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      Parent_BA_currentState_Access: requires data access train_inst_TrainPpu_odometerAcquisition_currentState;
   end train_inst_TrainPpu_odometerAcquisition;
   
   subprogram train_inst_TrainPpu_trainTraction_entrypoint
@@ -483,18 +493,17 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = train_inst_TrainPpu_trainTraction_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = train_inst_TrainPpu_trainTraction_currentState#switch) Read_Blackboard_TractionData ! (tractionIn, tractionIn_TimeOut, tractionIn_localVariable, tractionIn_Length, train_inst_TrainPpu_trainTraction_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = train_inst_TrainPpu_trainTraction_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = train_inst_TrainPpu_trainTraction_currentState#Enumerators.switch) Read_Blackboard_TractionData ! (tractionIn, tractionIn_TimeOut, tractionIn_localVariable, tractionIn_Length, train_inst_TrainPpu_trainTraction_runtime_call_ret) ;
 Read_Sampling_Message_TrainData ! (trainDataIn, trainDataIn_localVariable, trainDataIn_Length, trainDataIn_Validity, train_inst_TrainPpu_trainTraction_runtime_call_ret) ;
 if ((tractionIn_localVariable.fresh_ba != tractionIn_freshnessIndicator_access) and (trainDataIn_localVariable.fresh_ba != trainDataIn_freshnessIndicator_access)) cbtc::TrainPpu_trainTraction ! (tractionIn_localVariable.pvalue, trainDataIn_localVariable.pvalue, additionalTrainPositionOffset_localVariable, trainDataOut_localVariable) end if
    ;
 tractionIn_freshnessIndicator_access := tractionIn_localVariable.fresh_ba ;
 trainDataIn_freshnessIndicator_access := trainDataIn_localVariable.fresh_ba ;
+Parent_BA_currentState_Access := train_inst_TrainPpu_trainTraction_currentState#Enumerators.switch ;
 Display_Blackboard_TrainPositionOffset ! (PortCnx2_additionalTrainPositionOffset, additionalTrainPositionOffset_localVariable, additionalTrainPositionOffset_Length, train_inst_TrainPpu_trainTraction_runtime_call_ret) ;
-Write_Sampling_Message_TrainData ! (PortCnx9_trainDataOut, trainDataOut_localVariable, trainDataOut_Length, train_inst_TrainPpu_trainTraction_runtime_call_ret) ;
-arinc653_runtime::Periodic_Wait ! (train_inst_TrainPpu_trainTraction_runtime_call_ret) ;
-Parent_BA_currentState_Access := train_inst_TrainPpu_trainTraction_currentState#switch end if
+Write_Sampling_Message_TrainData ! (PortCnx9_trainDataOut, trainDataOut_localVariable, trainDataOut_Length, train_inst_TrainPpu_trainTraction_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := train_inst_TrainPpu_trainTraction_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := train_inst_TrainPpu_trainTraction_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (train_inst_TrainPpu_trainTraction_runtime_call_ret)} ;
 **};
   end train_inst_TrainPpu_trainTraction_entrypoint.impl;
@@ -513,7 +522,6 @@ Parent_BA_currentState_Access := train_inst_TrainPpu_trainTraction_currentState#
         Source_Name => "TrainPpu_trainTraction";
         Source_Text => ("business-code/cbtc_trainPpu_subsystem_Implementations_TrainPpu_impl.h", "business-code/cbtc_trainPpu_subsystem_Implementations_TrainPpu_impl.c");
         };
-      Parent_BA_currentState: data train_inst_TrainPpu_trainTraction_currentState;
       tractionIn_persistentFreshnessIndicator: data Base_Types::Integer_16 {
         Data_Model::Initial_Value => ("0");
         };
@@ -530,7 +538,7 @@ Parent_BA_currentState_Access := train_inst_TrainPpu_trainTraction_currentState#
       trainDataIn_accessCnx_1: data access trainDataIn -> call_entrypoint.trainDataIn;
       PortCnx2_additionalTrainPositionOffset_accessCnx_1: data access PortCnx2_additionalTrainPositionOffset -> call_entrypoint.PortCnx2_additionalTrainPositionOffset;
       PortCnx9_trainDataOut_accessCnx_1: data access PortCnx9_trainDataOut -> call_entrypoint.PortCnx9_trainDataOut;
-      CNX_CURRENT_STATE_BA: data access call_entrypoint.Parent_BA_currentState_Access -> Parent_BA_currentState;
+      CNX_CURRENT_STATE_BA: data access call_entrypoint.Parent_BA_currentState_Access -> Parent_BA_currentState_Access;
       tractionIn_to_persistentFreshnessIndicator: data access tractionIn_persistentFreshnessIndicator -> call_entrypoint.tractionIn_freshnessIndicator_access;
       trainDataIn_to_persistentFreshnessIndicator: data access trainDataIn_persistentFreshnessIndicator -> call_entrypoint.trainDataIn_freshnessIndicator_access;
   end train_inst_TrainPpu_trainTraction.impl;
@@ -539,8 +547,12 @@ Parent_BA_currentState_Access := train_inst_TrainPpu_trainTraction_currentState#
     features
       tractionIn: requires data access arinc653_runtime::Blackboard_Id_Type;
       trainDataIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx2_additionalTrainPositionOffset: requires data access arinc653_runtime::Blackboard_Id_Type;
+      PortCnx2_additionalTrainPositionOffset: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Source_Name => "TrainPositionOffset";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
       PortCnx9_trainDataOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      Parent_BA_currentState_Access: requires data access train_inst_TrainPpu_trainTraction_currentState;
   end train_inst_TrainPpu_trainTraction;
   
   subprogram train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_entrypoint
@@ -592,7 +604,7 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState#switch) Read_Blackboard_TrainPositionOffset ! (additionalTrainPositionOffset, additionalTrainPositionOffset_TimeOut, additionalTrainPositionOffset_localVariable, additionalTrainPositionOffset_Length, train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState#Enumerators.switch) Read_Blackboard_TrainPositionOffset ! (additionalTrainPositionOffset, additionalTrainPositionOffset_TimeOut, additionalTrainPositionOffset_localVariable, additionalTrainPositionOffset_Length, train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_runtime_call_ret) ;
 Read_Blackboard_OdometerData ! (wheelAngleIn, wheelAngleIn_TimeOut, wheelAngleIn_localVariable, wheelAngleIn_Length, train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_runtime_call_ret) ;
 cbtc::VobcTrainPositionEstimation_delayed_additionalTrainPositionOffset ! (additionalTrainPositionOffset_localVariable, delayed_additionalTrainPositionOffset) ;
 if ((wheelAngleIn_localVariable.fresh_ba != wheelAngleIn_freshnessIndicator_access)) cbtc::VobcTrainPositionEstimation_vobcTrainPositionEstimation ! (wheelAngleIn_localVariable.pvalue, delayed_additionalTrainPositionOffset, trainPositionOut) ;
@@ -602,11 +614,10 @@ cbtc::VobcTrainPositionSending_vobcTrainPositionSending ! (trainPositionIn, trai
 wheelAngleIn_freshnessIndicator_access := wheelAngleIn_localVariable.fresh_ba ;
 trainPositionOut_F_freshnessIndicator_access := trainPositionOut_F_freshnessIndicator_access + 1 ;
 trainPositionOut_F_localVariable.fresh_ba := trainPositionOut_F_freshnessIndicator_access ;
-Display_Blackboard_VobcData ! (PortCnx3_trainPositionOut_F, trainPositionOut_F_localVariable, trainPositionOut_F_Length, train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_runtime_call_ret) ;
-arinc653_runtime::Periodic_Wait ! (train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_runtime_call_ret) ;
-Parent_BA_currentState_Access := train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState#switch end if
+Parent_BA_currentState_Access := train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState#Enumerators.switch ;
+Display_Blackboard_VobcData ! (PortCnx3_trainPositionOut_F, trainPositionOut_F_localVariable, trainPositionOut_F_Length, train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_runtime_call_ret)} ;
 **};
   end train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_entrypoint.impl;
@@ -631,7 +642,6 @@ Parent_BA_currentState_Access := train_inst_VobcTrainPositionEstimation_vobcTrai
         Source_Name => "VobcTrainPositionSending_vobcTrainPositionSending";
         Source_Text => ("business-code/cbtc_vobc_subsystem_Implementations_VobcTrainPositionSending_impl.h", "business-code/cbtc_vobc_subsystem_Implementations_VobcTrainPositionSending_impl.c");
         };
-      Parent_BA_currentState: data train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState;
       wheelAngleIn_persistentFreshnessIndicator: data Base_Types::Integer_16 {
         Data_Model::Initial_Value => ("0");
         };
@@ -647,7 +657,7 @@ Parent_BA_currentState_Access := train_inst_VobcTrainPositionEstimation_vobcTrai
       additionalTrainPositionOffset_accessCnx_1: data access additionalTrainPositionOffset -> call_entrypoint.additionalTrainPositionOffset;
       wheelAngleIn_accessCnx_1: data access wheelAngleIn -> call_entrypoint.wheelAngleIn;
       PortCnx3_trainPositionOut_F_accessCnx_1: data access PortCnx3_trainPositionOut_F -> call_entrypoint.PortCnx3_trainPositionOut_F;
-      CNX_CURRENT_STATE_BA: data access call_entrypoint.Parent_BA_currentState_Access -> Parent_BA_currentState;
+      CNX_CURRENT_STATE_BA: data access call_entrypoint.Parent_BA_currentState_Access -> Parent_BA_currentState_Access;
       wheelAngleIn_to_persistentFreshnessIndicator: data access wheelAngleIn_persistentFreshnessIndicator -> call_entrypoint.wheelAngleIn_freshnessIndicator_access;
       trainPositionOut_F_to_persistentFreshnessIndicator: data access trainPositionOut_F_persistentFreshnessIndicator -> call_entrypoint.trainPositionOut_F_freshnessIndicator_access;
   end train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation.impl;
@@ -656,7 +666,11 @@ Parent_BA_currentState_Access := train_inst_VobcTrainPositionEstimation_vobcTrai
     features
       additionalTrainPositionOffset: requires data access arinc653_runtime::Blackboard_Id_Type;
       wheelAngleIn: requires data access arinc653_runtime::Blackboard_Id_Type;
-      PortCnx3_trainPositionOut_F: requires data access arinc653_runtime::Blackboard_Id_Type;
+      PortCnx3_trainPositionOut_F: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Source_Name => "VobcData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      Parent_BA_currentState_Access: requires data access train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState;
   end train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation;
   
   subprogram train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_entrypoint
@@ -712,7 +726,7 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState#switch) Read_Sampling_Message_EndOfAuthority ! (eoaIn, eoaIn_localVariable, eoaIn_Length, eoaIn_Validity, train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState#Enumerators.switch) Read_Sampling_Message_EndOfAuthority ! (eoaIn, eoaIn_localVariable, eoaIn_Length, eoaIn_Validity, train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_runtime_call_ret) ;
 Read_Blackboard_VobcData ! (trainPositionIn, trainPositionIn_TimeOut, trainPositionIn_localVariable, trainPositionIn_Length, train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_runtime_call_ret) ;
 if ((eoaIn_localVariable.fresh_ba != eoaIn_freshnessIndicator_access) and (trainPositionIn_localVariable.fresh_ba != trainPositionIn_freshnessIndicator_access)) cbtc::TrainSpeedAccelCompute_trainSpeedAccelCompute ! (eoaIn_localVariable.pvalue, trainPositionIn_localVariable.pvalue, trainAccelOut, trainPositionForMauOut_localVariable.pvalue) ;
 trainAccelIn := trainAccelOut ;
@@ -724,12 +738,11 @@ trainPositionForMauOut_freshnessIndicator_access := trainPositionForMauOut_fresh
 trainPositionForMauOut_localVariable.fresh_ba := trainPositionForMauOut_freshnessIndicator_access ;
 tractionOut_freshnessIndicator_access := tractionOut_freshnessIndicator_access + 1 ;
 tractionOut_localVariable.fresh_ba := tractionOut_freshnessIndicator_access ;
+Parent_BA_currentState_Access := train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState#Enumerators.switch ;
 Write_Sampling_Message_VobcData ! (PortCnx8_trainPositionForMauOut, trainPositionForMauOut_localVariable, trainPositionForMauOut_Length, train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_runtime_call_ret) ;
-Display_Blackboard_TractionData ! (PortCnx4_tractionOut, tractionOut_localVariable, tractionOut_Length, train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_runtime_call_ret) ;
-arinc653_runtime::Periodic_Wait ! (train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_runtime_call_ret) ;
-Parent_BA_currentState_Access := train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState#switch end if
+Display_Blackboard_TractionData ! (PortCnx4_tractionOut, tractionOut_localVariable, tractionOut_Length, train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_runtime_call_ret)} ;
 **};
   end train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_entrypoint.impl;
@@ -753,7 +766,6 @@ Parent_BA_currentState_Access := train_inst_TrainSpeedAccelCompute_trainSpeedAcc
         Source_Name => "AccelerationSending_accelerationSending";
         Source_Text => ("business-code/cbtc_vobc_subsystem_Implementations_AccelerationSending_impl.h", "business-code/cbtc_vobc_subsystem_Implementations_AccelerationSending_impl.c");
         };
-      Parent_BA_currentState: data train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState;
       eoaIn_persistentFreshnessIndicator: data Base_Types::Integer_16 {
         Data_Model::Initial_Value => ("0");
         };
@@ -776,7 +788,7 @@ Parent_BA_currentState_Access := train_inst_TrainSpeedAccelCompute_trainSpeedAcc
       trainPositionIn_accessCnx_1: data access trainPositionIn -> call_entrypoint.trainPositionIn;
       PortCnx8_trainPositionForMauOut_accessCnx_1: data access PortCnx8_trainPositionForMauOut -> call_entrypoint.PortCnx8_trainPositionForMauOut;
       PortCnx4_tractionOut_accessCnx_1: data access PortCnx4_tractionOut -> call_entrypoint.PortCnx4_tractionOut;
-      CNX_CURRENT_STATE_BA: data access call_entrypoint.Parent_BA_currentState_Access -> Parent_BA_currentState;
+      CNX_CURRENT_STATE_BA: data access call_entrypoint.Parent_BA_currentState_Access -> Parent_BA_currentState_Access;
       eoaIn_to_persistentFreshnessIndicator: data access eoaIn_persistentFreshnessIndicator -> call_entrypoint.eoaIn_freshnessIndicator_access;
       trainPositionIn_to_persistentFreshnessIndicator: data access trainPositionIn_persistentFreshnessIndicator -> call_entrypoint.trainPositionIn_freshnessIndicator_access;
       trainPositionForMauOut_to_persistentFreshnessIndicator: data access trainPositionForMauOut_persistentFreshnessIndicator -> call_entrypoint.trainPositionForMauOut_freshnessIndicator_access;
@@ -788,7 +800,11 @@ Parent_BA_currentState_Access := train_inst_TrainSpeedAccelCompute_trainSpeedAcc
       eoaIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       trainPositionIn: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx8_trainPositionForMauOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx4_tractionOut: requires data access arinc653_runtime::Blackboard_Id_Type;
+      PortCnx4_tractionOut: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Source_Name => "TractionData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      Parent_BA_currentState_Access: requires data access train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState;
   end train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute;
   
   subprogram railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_entrypoint
@@ -841,7 +857,7 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState#switch) Read_Sampling_Message_VobcData ! (trainPositionVobcForMauIn, trainPositionVobcForMauIn_localVariable, trainPositionVobcForMauIn_Length, trainPositionVobcForMauIn_Validity, railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState#Enumerators.switch) Read_Sampling_Message_VobcData ! (trainPositionVobcForMauIn, trainPositionVobcForMauIn_localVariable, trainPositionVobcForMauIn_Length, trainPositionVobcForMauIn_Validity, railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_runtime_call_ret) ;
 Read_Blackboard_ViuData ! (trainPositionViuForMauIn, trainPositionViuForMauIn_TimeOut, trainPositionViuForMauIn_localVariable, trainPositionViuForMauIn_Length, railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_runtime_call_ret) ;
 if ((trainPositionVobcForMauIn_localVariable.fresh_ba != trainPositionVobcForMauIn_freshnessIndicator_access) and (trainPositionViuForMauIn_localVariable.fresh_ba != trainPositionViuForMauIn_freshnessIndicator_access)) cbtc::TrainPositionsCorrelation_trainPositionsCorrelation ! (trainPositionVobcForMauIn_localVariable.pvalue, trainPositionViuForMauIn_localVariable.pvalue, delayed_trainPositionMauOut) ;
 cbtc::TrainPositionsCorrelation_store_trainPositionMauOut ! (delayed_trainPositionMauOut, trainPositionMauOut) ;
@@ -854,11 +870,10 @@ trainPositionVobcForMauIn_freshnessIndicator_access := trainPositionVobcForMauIn
 trainPositionViuForMauIn_freshnessIndicator_access := trainPositionViuForMauIn_localVariable.fresh_ba ;
 eoaForVobcOut_freshnessIndicator_access := eoaForVobcOut_freshnessIndicator_access + 1 ;
 eoaForVobcOut_localVariable.fresh_ba := eoaForVobcOut_freshnessIndicator_access ;
-Write_Sampling_Message_EndOfAuthority ! (PortCnx7_eoaForVobcOut, eoaForVobcOut_localVariable, eoaForVobcOut_Length, railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_runtime_call_ret) ;
-arinc653_runtime::Periodic_Wait ! (railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_runtime_call_ret) ;
-Parent_BA_currentState_Access := railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState#switch end if
+Parent_BA_currentState_Access := railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState#Enumerators.switch ;
+Write_Sampling_Message_EndOfAuthority ! (PortCnx7_eoaForVobcOut, eoaForVobcOut_localVariable, eoaForVobcOut_Length, railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_runtime_call_ret)} ;
 **};
   end railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_entrypoint.impl;
@@ -888,7 +903,6 @@ Parent_BA_currentState_Access := railway_inst_TrainPositionsCorrelation_trainPos
         Source_Name => "EoaSending_eoaSending";
         Source_Text => ("business-code/cbtc_mau_subsystem_Implementations_EoaSending_impl.h", "business-code/cbtc_mau_subsystem_Implementations_EoaSending_impl.c");
         };
-      Parent_BA_currentState: data railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState;
       trainPositionVobcForMauIn_persistentFreshnessIndicator: data Base_Types::Integer_16 {
         Data_Model::Initial_Value => ("0");
         };
@@ -907,7 +921,7 @@ Parent_BA_currentState_Access := railway_inst_TrainPositionsCorrelation_trainPos
       trainPositionVobcForMauIn_accessCnx_1: data access trainPositionVobcForMauIn -> call_entrypoint.trainPositionVobcForMauIn;
       trainPositionViuForMauIn_accessCnx_1: data access trainPositionViuForMauIn -> call_entrypoint.trainPositionViuForMauIn;
       PortCnx7_eoaForVobcOut_accessCnx_1: data access PortCnx7_eoaForVobcOut -> call_entrypoint.PortCnx7_eoaForVobcOut;
-      CNX_CURRENT_STATE_BA: data access call_entrypoint.Parent_BA_currentState_Access -> Parent_BA_currentState;
+      CNX_CURRENT_STATE_BA: data access call_entrypoint.Parent_BA_currentState_Access -> Parent_BA_currentState_Access;
       trainPositionVobcForMauIn_to_persistentFreshnessIndicator: data access trainPositionVobcForMauIn_persistentFreshnessIndicator -> call_entrypoint.trainPositionVobcForMauIn_freshnessIndicator_access;
       trainPositionViuForMauIn_to_persistentFreshnessIndicator: data access trainPositionViuForMauIn_persistentFreshnessIndicator -> call_entrypoint.trainPositionViuForMauIn_freshnessIndicator_access;
       eoaForVobcOut_to_persistentFreshnessIndicator: data access eoaForVobcOut_persistentFreshnessIndicator -> call_entrypoint.eoaForVobcOut_freshnessIndicator_access;
@@ -917,7 +931,11 @@ Parent_BA_currentState_Access := railway_inst_TrainPositionsCorrelation_trainPos
     features
       trainPositionVobcForMauIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       trainPositionViuForMauIn: requires data access arinc653_runtime::Blackboard_Id_Type;
-      PortCnx7_eoaForVobcOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      PortCnx7_eoaForVobcOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Source_Name => "EndOfAuthority";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      Parent_BA_currentState_Access: requires data access railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState;
   end railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation;
   
   subprogram railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_entrypoint
@@ -957,7 +975,7 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState#switch) Read_Blackboard_CdvData ! (trackIn, trackIn_TimeOut, trackIn_localVariable, trackIn_Length, railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState#Enumerators.switch) Read_Blackboard_CdvData ! (trackIn, trackIn_TimeOut, trackIn_localVariable, trackIn_Length, railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_runtime_call_ret) ;
 if ((trackIn_localVariable.fresh_ba != trackIn_freshnessIndicator_access)) cbtc::ViuTrainPositionEstimation_viuTrainPositionEstimation ! (trackIn_localVariable.pvalue, trainPositionOut) ;
 trainPositionIn := trainPositionOut ;
 cbtc::ViuTrainPositionSending_viuTrainPositionSending ! (trainPositionIn, trainPositionForMauOut_localVariable.pvalue) end if
@@ -965,11 +983,10 @@ cbtc::ViuTrainPositionSending_viuTrainPositionSending ! (trainPositionIn, trainP
 trackIn_freshnessIndicator_access := trackIn_localVariable.fresh_ba ;
 trainPositionForMauOut_freshnessIndicator_access := trainPositionForMauOut_freshnessIndicator_access + 1 ;
 trainPositionForMauOut_localVariable.fresh_ba := trainPositionForMauOut_freshnessIndicator_access ;
-Display_Blackboard_ViuData ! (PortCnx1_trainPositionForMauOut, trainPositionForMauOut_localVariable, trainPositionForMauOut_Length, railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_runtime_call_ret) ;
-arinc653_runtime::Periodic_Wait ! (railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_runtime_call_ret) ;
-Parent_BA_currentState_Access := railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState#switch end if
+Parent_BA_currentState_Access := railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState#Enumerators.switch ;
+Display_Blackboard_ViuData ! (PortCnx1_trainPositionForMauOut, trainPositionForMauOut_localVariable, trainPositionForMauOut_Length, railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_runtime_call_ret)} ;
 **};
   end railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_entrypoint.impl;
@@ -993,7 +1010,6 @@ Parent_BA_currentState_Access := railway_inst_ViuTrainPositionEstimation_viuTrai
         Source_Name => "ViuTrainPositionSending_viuTrainPositionSending";
         Source_Text => ("business-code/cbtc_viu_subsystem_Implementations_ViuTrainPositionSending_impl.h", "business-code/cbtc_viu_subsystem_Implementations_ViuTrainPositionSending_impl.c");
         };
-      Parent_BA_currentState: data railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState;
       trackIn_persistentFreshnessIndicator: data Base_Types::Integer_16 {
         Data_Model::Initial_Value => ("0");
         };
@@ -1008,7 +1024,7 @@ Parent_BA_currentState_Access := railway_inst_ViuTrainPositionEstimation_viuTrai
     connections
       trackIn_accessCnx_1: data access trackIn -> call_entrypoint.trackIn;
       PortCnx1_trainPositionForMauOut_accessCnx_1: data access PortCnx1_trainPositionForMauOut -> call_entrypoint.PortCnx1_trainPositionForMauOut;
-      CNX_CURRENT_STATE_BA: data access call_entrypoint.Parent_BA_currentState_Access -> Parent_BA_currentState;
+      CNX_CURRENT_STATE_BA: data access call_entrypoint.Parent_BA_currentState_Access -> Parent_BA_currentState_Access;
       trackIn_to_persistentFreshnessIndicator: data access trackIn_persistentFreshnessIndicator -> call_entrypoint.trackIn_freshnessIndicator_access;
       trainPositionForMauOut_to_persistentFreshnessIndicator: data access trainPositionForMauOut_persistentFreshnessIndicator -> call_entrypoint.trainPositionForMauOut_freshnessIndicator_access;
   end railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation.impl;
@@ -1016,7 +1032,11 @@ Parent_BA_currentState_Access := railway_inst_ViuTrainPositionEstimation_viuTrai
   thread railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation
     features
       trackIn: requires data access arinc653_runtime::Blackboard_Id_Type;
-      PortCnx1_trainPositionForMauOut: requires data access arinc653_runtime::Blackboard_Id_Type;
+      PortCnx1_trainPositionForMauOut: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Source_Name => "ViuData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      Parent_BA_currentState_Access: requires data access railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState;
   end railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation;
   
   subprogram railway_inst_TrainSimu_trainSimulation_entrypoint
@@ -1062,7 +1082,7 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = railway_inst_TrainSimu_trainSimulation_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = railway_inst_TrainSimu_trainSimulation_currentState#switch) Read_Blackboard_TrainData ! (delayed_trainDataIn, delayed_trainDataIn_TimeOut, delayed_trainDataIn_localVariable, delayed_trainDataIn_Length, railway_inst_TrainSimu_trainSimulation_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = railway_inst_TrainSimu_trainSimulation_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = railway_inst_TrainSimu_trainSimulation_currentState#Enumerators.switch) Read_Blackboard_TrainData ! (delayed_trainDataIn, delayed_trainDataIn_TimeOut, delayed_trainDataIn_localVariable, delayed_trainDataIn_Length, railway_inst_TrainSimu_trainSimulation_runtime_call_ret) ;
 cbtc::TrainSimu_trainSimulation ! (delayed_trainDataIn_localVariable, trainDataOut_localVariable.pvalue) ;
 trainDataOut_localVariable.pvalue := trainDataIn ;
 cbtc::TrackPpu_cdvAcquisition ! (trainDataIn, cdvOut) ;
@@ -1072,12 +1092,11 @@ trainDataOut_freshnessIndicator_access := trainDataOut_freshnessIndicator_access
 trainDataOut_localVariable.fresh_ba := trainDataOut_freshnessIndicator_access ;
 trackOut_freshnessIndicator_access := trackOut_freshnessIndicator_access + 1 ;
 trackOut_localVariable.fresh_ba := trackOut_freshnessIndicator_access ;
+Parent_BA_currentState_Access := railway_inst_TrainSimu_trainSimulation_currentState#Enumerators.switch ;
 Write_Sampling_Message_TrainData ! (PortCnx6_trainDataOut, trainDataOut_localVariable, trainDataOut_Length, railway_inst_TrainSimu_trainSimulation_runtime_call_ret) ;
-Display_Blackboard_CdvData ! (PortCnx3_trackOut, trackOut_localVariable, trackOut_Length, railway_inst_TrainSimu_trainSimulation_runtime_call_ret) ;
-arinc653_runtime::Periodic_Wait ! (railway_inst_TrainSimu_trainSimulation_runtime_call_ret) ;
-Parent_BA_currentState_Access := railway_inst_TrainSimu_trainSimulation_currentState#switch end if
+Display_Blackboard_CdvData ! (PortCnx3_trackOut, trackOut_localVariable, trackOut_Length, railway_inst_TrainSimu_trainSimulation_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := railway_inst_TrainSimu_trainSimulation_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := railway_inst_TrainSimu_trainSimulation_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (railway_inst_TrainSimu_trainSimulation_runtime_call_ret)} ;
 **};
   end railway_inst_TrainSimu_trainSimulation_entrypoint.impl;
@@ -1106,7 +1125,6 @@ Parent_BA_currentState_Access := railway_inst_TrainSimu_trainSimulation_currentS
         Source_Name => "TrackAcquisition_trackAcquisition";
         Source_Text => ("business-code/cbtc_viu_subsystem_Implementations_TrackAcquisition_impl.h", "business-code/cbtc_viu_subsystem_Implementations_TrackAcquisition_impl.c");
         };
-      Parent_BA_currentState: data railway_inst_TrainSimu_trainSimulation_currentState;
       trainDataOut_persistentFreshnessIndicator: data Base_Types::Integer_16 {
         Data_Model::Initial_Value => ("0");
         };
@@ -1122,7 +1140,7 @@ Parent_BA_currentState_Access := railway_inst_TrainSimu_trainSimulation_currentS
       delayed_trainDataIn_accessCnx_1: data access delayed_trainDataIn -> call_entrypoint.delayed_trainDataIn;
       PortCnx6_trainDataOut_accessCnx_1: data access PortCnx6_trainDataOut -> call_entrypoint.PortCnx6_trainDataOut;
       PortCnx3_trackOut_accessCnx_1: data access PortCnx3_trackOut -> call_entrypoint.PortCnx3_trackOut;
-      CNX_CURRENT_STATE_BA: data access call_entrypoint.Parent_BA_currentState_Access -> Parent_BA_currentState;
+      CNX_CURRENT_STATE_BA: data access call_entrypoint.Parent_BA_currentState_Access -> Parent_BA_currentState_Access;
       trainDataOut_to_persistentFreshnessIndicator: data access trainDataOut_persistentFreshnessIndicator -> call_entrypoint.trainDataOut_freshnessIndicator_access;
       trackOut_to_persistentFreshnessIndicator: data access trackOut_persistentFreshnessIndicator -> call_entrypoint.trackOut_freshnessIndicator_access;
   end railway_inst_TrainSimu_trainSimulation.impl;
@@ -1130,8 +1148,15 @@ Parent_BA_currentState_Access := railway_inst_TrainSimu_trainSimulation_currentS
   thread railway_inst_TrainSimu_trainSimulation
     features
       delayed_trainDataIn: requires data access arinc653_runtime::Blackboard_Id_Type;
-      PortCnx6_trainDataOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx3_trackOut: requires data access arinc653_runtime::Blackboard_Id_Type;
+      PortCnx6_trainDataOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Source_Name => "TrainData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      PortCnx3_trackOut: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Source_Name => "CdvData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      Parent_BA_currentState_Access: requires data access railway_inst_TrainSimu_trainSimulation_currentState;
   end railway_inst_TrainSimu_trainSimulation;
   
   subprogram railway_inst_TrainSimu_delayed_trainDataIn_entrypoint
@@ -1165,13 +1190,12 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = railway_inst_TrainSimu_delayed_trainDataIn_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = railway_inst_TrainSimu_delayed_trainDataIn_currentState#switch) Read_Sampling_Message_TrainData ! (trainDataIn, trainDataIn_localVariable, trainDataIn_Length, trainDataIn_Validity, railway_inst_TrainSimu_delayed_trainDataIn_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = railway_inst_TrainSimu_delayed_trainDataIn_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = railway_inst_TrainSimu_delayed_trainDataIn_currentState#Enumerators.switch) Read_Sampling_Message_TrainData ! (trainDataIn, trainDataIn_localVariable, trainDataIn_Length, trainDataIn_Validity, railway_inst_TrainSimu_delayed_trainDataIn_runtime_call_ret) ;
 cbtc::TrainSimu_delayed_trainDataIn ! (trainDataIn_localVariable, delayed_trainDataIn_localVariable) ;
-Display_Blackboard_TrainData ! (PortCnx2_delayed_trainDataIn, delayed_trainDataIn_localVariable, delayed_trainDataIn_Length, railway_inst_TrainSimu_delayed_trainDataIn_runtime_call_ret) ;
-arinc653_runtime::Periodic_Wait ! (railway_inst_TrainSimu_delayed_trainDataIn_runtime_call_ret) ;
-Parent_BA_currentState_Access := railway_inst_TrainSimu_delayed_trainDataIn_currentState#switch end if
+Parent_BA_currentState_Access := railway_inst_TrainSimu_delayed_trainDataIn_currentState#Enumerators.switch ;
+Display_Blackboard_TrainData ! (PortCnx2_delayed_trainDataIn, delayed_trainDataIn_localVariable, delayed_trainDataIn_Length, railway_inst_TrainSimu_delayed_trainDataIn_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := railway_inst_TrainSimu_delayed_trainDataIn_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := railway_inst_TrainSimu_delayed_trainDataIn_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (railway_inst_TrainSimu_delayed_trainDataIn_runtime_call_ret)} ;
 **};
   end railway_inst_TrainSimu_delayed_trainDataIn_entrypoint.impl;
@@ -1186,7 +1210,6 @@ Parent_BA_currentState_Access := railway_inst_TrainSimu_delayed_trainDataIn_curr
   thread implementation railway_inst_TrainSimu_delayed_trainDataIn.impl
     subcomponents
       TrainSimu_delayed_trainDataIn: subprogram cbtc::TrainSimu_delayed_trainDataIn;
-      Parent_BA_currentState: data railway_inst_TrainSimu_delayed_trainDataIn_currentState;
     calls
       main_call:  {
         call_entrypoint: subprogram railway_inst_TrainSimu_delayed_trainDataIn_entrypoint.impl;
@@ -1195,13 +1218,17 @@ Parent_BA_currentState_Access := railway_inst_TrainSimu_delayed_trainDataIn_curr
     connections
       trainDataIn_accessCnx_1: data access trainDataIn -> call_entrypoint.trainDataIn;
       PortCnx2_delayed_trainDataIn_accessCnx_1: data access PortCnx2_delayed_trainDataIn -> call_entrypoint.PortCnx2_delayed_trainDataIn;
-      CNX_CURRENT_STATE_BA: data access call_entrypoint.Parent_BA_currentState_Access -> Parent_BA_currentState;
+      CNX_CURRENT_STATE_BA: data access call_entrypoint.Parent_BA_currentState_Access -> Parent_BA_currentState_Access;
   end railway_inst_TrainSimu_delayed_trainDataIn.impl;
   
   thread railway_inst_TrainSimu_delayed_trainDataIn
     features
       trainDataIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx2_delayed_trainDataIn: requires data access arinc653_runtime::Blackboard_Id_Type;
+      PortCnx2_delayed_trainDataIn: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Source_Name => "TrainData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      Parent_BA_currentState_Access: requires data access railway_inst_TrainSimu_delayed_trainDataIn_currentState;
   end railway_inst_TrainSimu_delayed_trainDataIn;
   
   data TrainData_freshness_t

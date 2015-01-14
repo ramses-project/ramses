@@ -139,21 +139,14 @@ emit ! (received_ping)} ;
   
   process implementation ping_or_pong.impl
     subcomponents
-      the_ping: thread Cping_t.impl in modes (ping_m: mode ;
-      );
-      the_pong: thread Cpong_t.impl in modes (pong_m: mode ;
-      );
+      the_ping: thread Cping_t.impl in modes (ping_m);
+      the_pong: thread Cpong_t.impl in modes (pong_m);
     connections
-      cnx1: port the_ping.emit -> emit in modes (ping_m: mode ;
-      );
-      cnx2: port receive -> the_ping.receive in modes (ping_m: mode ;
-      );
-      cnx3: port the_pong.emit -> emit in modes (pong_m: mode ;
-      );
-      cnx4: port receive -> the_pong.receive in modes (pong_m: mode ;
-      );
-      cnx5: port the_ping.result -> result in modes (ping_m: mode ;
-      );
+      cnx1: port the_ping.emit -> emit in modes (ping_m);
+      cnx2: port receive -> the_ping.receive in modes (ping_m);
+      cnx3: port the_pong.emit -> emit in modes (pong_m);
+      cnx4: port receive -> the_pong.receive in modes (pong_m);
+      cnx5: port the_ping.result -> result in modes (ping_m);
   end ping_or_pong.impl;
   
   system global_sys

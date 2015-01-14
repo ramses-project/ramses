@@ -59,14 +59,14 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,PeriodicDelayed_runtime,arinc65
   processor implementation node_1.impl
     subcomponents
       VP_S1_inst: virtual processor VP_S1.impl {
-        POK::Scheduler => RR;
+        Period => 1000 ms;
+        Scheduling_Protocol => (Round_Robin_Protocol);
         POK::Additional_Features => (console);
-        Scheduling_Protocol => (Rate_Monotonic_Protocol);
         };
       VP_S2_inst: virtual processor VP_S2.impl {
-        POK::Scheduler => RR;
+        Period => 1000 ms;
+        Scheduling_Protocol => (Round_Robin_Protocol);
         POK::Additional_Features => (console);
-        Scheduling_Protocol => (Rate_Monotonic_Protocol);
         };
   end node_1.impl;
   
@@ -81,30 +81,40 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,PeriodicDelayed_runtime,arinc65
   
   system implementation refined_model.impl
     subcomponents
-      node1_main_memory_inst: memory node1_main_memory.impl;
-      S1_inst: process S1.impl {
-        POK::Needed_Memory_Size => 200 KByte;
+      node1_main_memory_inst: memory node1_main_memory.impl {
+        Memory_Size => 90 KByte;
         };
-      S2_inst: process S2.impl {
-        POK::Needed_Memory_Size => 200 KByte;
-        };
+      S1_inst: process S1.impl;
+      S2_inst: process S2.impl;
       node_1_inst: processor node_1.impl {
+        Scheduling_Protocol => (ARINC653);
         ARINC653::Module_Major_Frame => 2000 ms;
-        ARINC653::Partition_Slots => (1000 ms, 1000 ms);
-        ARINC653::Slots_Allocation => (reference(VP_S1_inst), reference(VP_S2_inst));
         POK::Architecture => x86;
         POK::BSP => x86_qemu;
-        Scheduling_Protocol => (ARINC653);
         };
     properties
       Actual_Processor_Binding => (reference(node_1_inst.VP_S1_inst)) applies to S1_inst;
+      Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S1_inst;
       Actual_Processor_Binding => (reference(node_1_inst.VP_S2_inst)) applies to S2_inst;
+      Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S2_inst;
+      ARINC653::Module_Schedule => ([
+        Partition=> reference(node_1_inst.VP_S1_inst);
+        Duration=> 1000 ms;
+        Periodic_Processing_Start=> true;
+      ], [
+        Partition=> reference(node_1_inst.VP_S2_inst);
+        Duration=> 1000 ms;
+        Periodic_Processing_Start=> true;
+      ]) applies to node_1_inst;
+      Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S1_inst.state_baKeywords;
       Actual_Processor_Binding => (reference(node_1_inst.VP_S1_inst)) applies to S1_inst.a1_inst;
+      Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S1_inst.a1_inst;
+      Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S1_inst.a1_inst.state_baKeywords;
+      Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S1_inst.a1_inst.seqNb;
       Actual_Processor_Binding => (reference(node_1_inst.VP_S2_inst)) applies to S2_inst.a2_inst;
+      Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S2_inst.a2_inst;
+      Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S2_inst.a2_inst.seqNb;
   end refined_model.impl;
-  
-  processor cpu_x86
-  end cpu_x86;
   
   processor node_1
   end node_1;
@@ -189,7 +199,7 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  call_seq [0] : BA_entrypoint_exec_state -[whichPortActivated = S1_inst_a1_inst_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {Read_Sampling_Message_PingPongMessage ! (C1_PingIn, C1_PingIn_localVariable, C1_PingIn_Length, C1_PingIn_Validity, C1_PingIn_ErrorCode) ;
+  call_seq [0] : BA_entrypoint_exec_state -[whichPortActivated = S1_inst_a1_inst_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {Read_Sampling_Message_PingPongMessage ! (C1_PingIn, C1_PingIn_localVariable, C1_PingIn_Length, C1_PingIn_Validity, C1_PingIn_ErrorCode) ;
 Read_Sampling_Message_PingPongMessage ! (C1_PongIn, C1_PongIn_localVariable, C1_PongIn_Length, C1_PongIn_Validity, C1_PongIn_ErrorCode) ;
 Read_Sampling_Message_Exception ! (Mon_error_C2, Mon_error_C2_localVariable, Mon_error_C2_Length, Mon_error_C2_Validity, Mon_error_C2_ErrorCode) ;
 if (Mon_error_C2_ErrorCode = 0) PingPong::Monitor_activate ! (call_seq_state_baKeywords_entrypoint, cnx7_localVariable, Mon_error_C2_localVariable, cnx9_localVariable, Mon_mode_C2_localVariable) end if
@@ -199,7 +209,7 @@ if (C1_PingIn_ErrorCode = 0 and C1_PongIn_ErrorCode = 0) PingPong::IPingOrPong_m
 Write_Sampling_Message_ROLE ! (mode_implicit_cnx_Mon_mode_C2, Mon_mode_C2_localVariable, Mon_mode_C2_Length, S1_inst_a1_inst_runtime_call_ret) ;
 Write_Sampling_Message_PingPongMessage ! (C1_ping_implicit_cnx_C1_PingOut, C1_PingOut_localVariable, C1_PingOut_Length, S1_inst_a1_inst_runtime_call_ret) ;
 Write_Sampling_Message_PingPongMessage ! (C1_pong_implicit_cnx_C1_PongOut, C1_PongOut_localVariable, C1_PongOut_Length, S1_inst_a1_inst_runtime_call_ret)} ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S1_inst_a1_inst_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S1_inst_a1_inst_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (S1_inst_a1_inst_runtime_call_ret)} ;
 **};
   end S1_inst_a1_inst_entrypoint.impl;
@@ -233,9 +243,9 @@ Write_Sampling_Message_PingPongMessage ! (C1_pong_implicit_cnx_C1_PongOut, C1_Po
         } 
       ;
     connections
-      Mon_mode_C2_accessCnx_call_seq: data access mode_implicit_cnx_Mon_mode_C2 -> call_entrypoint.mode_implicit_cnx_Mon_mode_C2;
-      C1_PingOut_accessCnx_call_seq: data access C1_ping_implicit_cnx_C1_PingOut -> call_entrypoint.C1_ping_implicit_cnx_C1_PingOut;
-      C1_PongOut_accessCnx_call_seq: data access C1_pong_implicit_cnx_C1_PongOut -> call_entrypoint.C1_pong_implicit_cnx_C1_PongOut;
+      Mon_mode_C2_accessCnx_call_seq_mode_implicit_cnx: data access mode_implicit_cnx_Mon_mode_C2 -> call_entrypoint.mode_implicit_cnx_Mon_mode_C2;
+      C1_PingOut_accessCnx_call_seq_C1_ping_implicit_cnx: data access C1_ping_implicit_cnx_C1_PingOut -> call_entrypoint.C1_ping_implicit_cnx_C1_PingOut;
+      C1_PongOut_accessCnx_call_seq_C1_pong_implicit_cnx: data access C1_pong_implicit_cnx_C1_PongOut -> call_entrypoint.C1_pong_implicit_cnx_C1_PongOut;
       C1_PingIn_accessCnx_call_seq: data access C1_PingIn -> call_entrypoint.C1_PingIn;
       C1_PongIn_accessCnx_call_seq: data access C1_PongIn -> call_entrypoint.C1_PongIn;
       Mon_error_C2_accessCnx_call_seq: data access Mon_error_C2 -> call_entrypoint.Mon_error_C2;
@@ -312,7 +322,7 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  call_seq [0] : BA_entrypoint_exec_state -[whichPortActivated = S2_inst_a2_inst_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {Read_Sampling_Message_ROLE ! (C2_mode, C2_mode_localVariable, C2_mode_Length, C2_mode_Validity, C2_mode_ErrorCode) ;
+  call_seq [0] : BA_entrypoint_exec_state -[whichPortActivated = S2_inst_a2_inst_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {Read_Sampling_Message_ROLE ! (C2_mode, C2_mode_localVariable, C2_mode_Length, C2_mode_Validity, C2_mode_ErrorCode) ;
 Read_Sampling_Message_PingPongMessage ! (C2_PingIn, C2_PingIn_localVariable, C2_PingIn_Length, C2_PingIn_Validity, C2_PingIn_ErrorCode) ;
 Read_Sampling_Message_PingPongMessage ! (C2_PongIn, C2_PongIn_localVariable, C2_PongIn_Length, C2_PongIn_Validity, C2_PongIn_ErrorCode) ;
 if (C2_mode_ErrorCode = 0 and C2_PingIn_ErrorCode = 0 and C2_PongIn_ErrorCode = 0) PingPong::IPingOrPong_mode ! (call_seq_seqNb_entrypoint, C2_PingIn_localVariable, C2_PingOut_localVariable, C2_PongIn_localVariable, C2_PongOut_localVariable, C2_badSequenceNumber_localVariable, C2_mode_localVariable) end if
@@ -320,7 +330,7 @@ if (C2_mode_ErrorCode = 0 and C2_PingIn_ErrorCode = 0 and C2_PongIn_ErrorCode = 
 Write_Sampling_Message_PingPongMessage ! (C2_ping_implicit_cnx_C2_PingOut, C2_PingOut_localVariable, C2_PingOut_Length, S2_inst_a2_inst_runtime_call_ret) ;
 Write_Sampling_Message_PingPongMessage ! (C2_pong_implicit_cnx_C2_PongOut, C2_PongOut_localVariable, C2_PongOut_Length, S2_inst_a2_inst_runtime_call_ret) ;
 Write_Sampling_Message_Exception ! (C2_error_implicit_cnx_C2_badSequenceNumber, C2_badSequenceNumber_localVariable, C2_badSequenceNumber_Length, S2_inst_a2_inst_runtime_call_ret)} ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S2_inst_a2_inst_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S2_inst_a2_inst_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (S2_inst_a2_inst_runtime_call_ret)} ;
 **};
   end S2_inst_a2_inst_entrypoint.impl;
@@ -350,9 +360,9 @@ Write_Sampling_Message_Exception ! (C2_error_implicit_cnx_C2_badSequenceNumber, 
       C2_mode_accessCnx_call_seq: data access C2_mode -> call_entrypoint.C2_mode;
       C2_PingIn_accessCnx_call_seq: data access C2_PingIn -> call_entrypoint.C2_PingIn;
       C2_PongIn_accessCnx_call_seq: data access C2_PongIn -> call_entrypoint.C2_PongIn;
-      C2_PingOut_accessCnx_call_seq: data access C2_ping_implicit_cnx_C2_PingOut -> call_entrypoint.C2_ping_implicit_cnx_C2_PingOut;
-      C2_PongOut_accessCnx_call_seq: data access C2_pong_implicit_cnx_C2_PongOut -> call_entrypoint.C2_pong_implicit_cnx_C2_PongOut;
-      C2_badSequenceNumber_accessCnx_call_seq: data access C2_error_implicit_cnx_C2_badSequenceNumber -> call_entrypoint.C2_error_implicit_cnx_C2_badSequenceNumber;
+      C2_PingOut_accessCnx_call_seq_C2_ping_implicit_cnx: data access C2_ping_implicit_cnx_C2_PingOut -> call_entrypoint.C2_ping_implicit_cnx_C2_PingOut;
+      C2_PongOut_accessCnx_call_seq_C2_pong_implicit_cnx: data access C2_pong_implicit_cnx_C2_PongOut -> call_entrypoint.C2_pong_implicit_cnx_C2_PongOut;
+      C2_badSequenceNumber_accessCnx_call_seq_C2_error_implicit_cnx: data access C2_error_implicit_cnx_C2_badSequenceNumber -> call_entrypoint.C2_error_implicit_cnx_C2_badSequenceNumber;
       cnx7_entrypoint: data access call_entrypoint.call_seq_seqNb_entrypoint -> seqNb;
   end S2_inst_a2_inst.impl;
   
@@ -361,8 +371,14 @@ Write_Sampling_Message_Exception ! (C2_error_implicit_cnx_C2_badSequenceNumber, 
       C2_mode: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       C2_PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       C2_PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      C2_ping_implicit_cnx_C2_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      C2_pong_implicit_cnx_C2_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      C2_ping_implicit_cnx_C2_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Source_Name => "PingPongMessage";
+        Source_Text => ("pingpong.h");
+        };
+      C2_pong_implicit_cnx_C2_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Source_Name => "PingPongMessage";
+        Source_Text => ("pingpong.h");
+        };
       C2_error_implicit_cnx_C2_badSequenceNumber: requires data access arinc653_runtime::Sampling_Port_Id_Type;
   end S2_inst_a2_inst;
   

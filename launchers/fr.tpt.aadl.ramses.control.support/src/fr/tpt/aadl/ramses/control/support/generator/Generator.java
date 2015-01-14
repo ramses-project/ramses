@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 
@@ -48,7 +49,7 @@ public interface Generator extends NamedPlugin
 
   // TODO: doc me !
   // runtimePath can be null.
-  public void generateWorkflow(SystemInstance systemInstance,
+  public Map<String, Resource> generateWorkflow(SystemInstance systemInstance,
                                RamsesConfiguration config,
                                WorkflowPilot xmlPilot,
                                File[] includeDirs,
@@ -65,7 +66,7 @@ public interface Generator extends NamedPlugin
   public List<String> getTransformationModuleList();
 
   public List<String> getValidationModuleList();
-  
-  public void setParameters(Map<String, Object> parameters) ;
+
+  void cleanUp() ;
 
 }

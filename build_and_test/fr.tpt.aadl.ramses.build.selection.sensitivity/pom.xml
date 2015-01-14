@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  
+  <properties>
+    <tycho-version>0.20.0</tycho-version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <platform-version-name>kepler</platform-version-name>
+    <eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site>
+    <xtext-site>http://download.itemis.com/updates/releases</xtext-site>
+    <osate-version>1.0.0-SNAPSHOT</osate-version>
+  </properties>
+  
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ramses</groupId>
+  <artifactId>fr.tpt.aadl.ramses.build.main</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>../../launchers/fr.tpt.aadl.ramses.control.support</module>
+    <module>../../launchers/fr.tpt.aadl.ramses.control.atl.launch</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.merge.launcher</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.tip</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc.edit</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc.editor</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.selection</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.selection.sensitivity</module>
+    <module>../../model2model/fr.tpt.atl.hots</module>
+    <module>../../model2model/fr.tpt.atl.utils</module>
+    <module>../../analysis/fr.tpt.aadl.ramses.util.properties</module>
+    <module>../../analysis/fr.tpt.aadl.sched.propertiesextractor</module>
+    <module>../../requirements/fr.tpt.rdal.utils</module>
+    <module>../fr.tpt.aadl.ramses.build.feature.selection.sensitivity</module>
+    <module>../fr.tpt.aadl.ramses.build.update.site.selection.sensitivity</module>
+  </modules>
+
+  <dependencies> 
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-eclipse-plugin</artifactId>
+      <version>2.9</version>	
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>emftvm</id>
+      <layout>p2</layout>
+      <url>http://download.eclipse.org/mmt/atl/updates/milestones/3.5/S201405200835/</url>
+    </repository>
+    <repository>
+      <id>rdal</id>
+      <layout>p2</layout>
+      <url>http://aadl.telecom-paristech.fr/download/rdal-update-site/</url>
+    </repository>
+    <repository>
+      <id>${platform-version-name}</id>
+      <layout>p2</layout>
+      <url>${eclipse-site}</url>
+    </repository>
+    <repository>
+      <id>xtext</id>
+      <layout>p2</layout>
+      <url>${xtext-site}</url>
+    </repository>
+    <repository>
+      <snapshots>
+	      <enabled>true</enabled>
+      </snapshots>
+      <id>TPT</id>
+      <name>TPT Internal Repo</name>
+      <url>http://aadl.telecom-paristech.fr/download/maven-site</url>
+    </repository>
+    <repository>
+      <snapshots>
+	      <enabled>true</enabled>
+      </snapshots>
+      <id>osate2</id>
+      <name>osate2 tpt internal Repo</name>
+      <url>http://aadl.enst.fr/download/maven-site</url>
+    </repository>
+  </repositories>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-maven-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <extensions>true</extensions>
+      </plugin>
+    
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-source-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <executions>
+          <execution>
+            <id>plugin-source</id>
+            <goals>
+              <goal>plugin-source</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>target-platform-configuration</artifactId>
+        <version>${tycho-version}</version>
+        <configuration>
+          <resolver>p2</resolver>
+      
+          <environments>
+
+            <environment>
+              <os>linux</os>
+              <ws>gtk</ws>
+              <arch>x86</arch>
+            </environment>
+
+            <environment>
+              <os>linux</os>
+              <ws>gtk</ws>
+              <arch>x86_64</arch>
+            </environment>
+
+            <environment>
+              <os>win32</os>
+              <ws>win32</ws>
+              <arch>x86</arch>
+            </environment>
+            
+            <environment>
+              <os>win32</os>
+              <ws>win32</ws>
+              <arch>x86_64</arch>
+            </environment>
+            
+            <environment>
+              <os>macosx</os>
+              <ws>cocoa</ws>
+              <arch>x86</arch>
+            </environment>
+            
+            <environment>
+              <os>macosx</os>
+              <ws>cocoa</ws>
+              <arch>x86_64</arch>
+            </environment>
+ 
+          </environments>
+        </configuration>
+      </plugin>
+      
+       <plugin>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <version>2.9</version>
+        <configuration>
+          <pde>true</pde>
+        </configuration>
+      </plugin>
+      
+    </plugins>
+  </build>
+</project>

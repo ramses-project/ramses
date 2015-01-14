@@ -49,9 +49,16 @@ helper def : SharedStruct_Prototype : AADLBA!DataClassifier = 'SharedStructure'
 					.asDataType(thisModule.PeriodicDelayedMutexRuntime_Name);
 -----------------------------------------------------------------------------------------------------
 
+helper def: collectInitCallSubpgList(c: AADLI!ComponentInstance): Sequence(ADLBA!SubprogramCall) =
+	c.featureInstance->select(e|e.isInputFeature())
+										->collect(e|thisModule.resolveMatchedSingleIfExists(e,'callInit'))
+										->excluding(OclUndefined);
+
 helper def: collectInitCallSequence(c: AADLI!ComponentInstance): AADLBA!SubprogramCallSequence =
-  if(c.featureInstance->exists(e|e.isInputFeature() and e.isPeriodicDelayedPort())) then
-	thisModule.resolveMatchedSingleIfExists(c, 'initCallSequence')
+  let result: AADLBA!SubprogramCallSequence = thisModule.resolveMatchedSingleIfExists(c, 'initCallSequence') in
+  let subpgList: Sequence(ADLBA!SubprogramCall) =  thisModule.collectInitCallSubpgList(c) in
+  if(not result.oclIsUndefined() and not subpgList->isEmpty()) then
+	result
   else
   	OclUndefined
   endif
@@ -89,7 +96,7 @@ helper def : collectPeriodicDelayed_LocalVariables_Mutex(c: AADLI!ComponentInsta
 	->union(thisModule.collectPeriodicDelayed_LocalVariables_Mutex_PFSpec(c, behavior))
 	
 	->append(
-		thisModule.createIterationCounter(c)
+		thisModule.resolveLazySingleIfExists(c, 'createIterationCounter', 'IterationCounter')
 	)
 	->union
 	(
@@ -107,7 +114,9 @@ helper def : collectPeriodicDelayed_LocalVariables_Mutex_PFSpec(c: AADLI!Compone
 ;
 
 helper def : collectInitializationEntryPoint(c: AADLI!ComponentInstance): AADLBA!PropertyAssociation =
-  if(c.featureInstance->exists(e|e.isInputFeature() and e.isPeriodicDelayedPort())) then
+  let result: AADLBA!SubprogramCallSequence = thisModule.resolveMatchedSingleIfExists(c, 'initCallSequence') in
+  let subpgList: Sequence(ADLBA!SubprogramCall) =  thisModule.collectInitCallSubpgList(c) in
+  if(not result.oclIsUndefined() and not subpgList->isEmpty()) then
 	thisModule.resolveMatchedSingleIfExists(c, 'pa')
   else
   	OclUndefined
@@ -139,6 +148,10 @@ rule m_Thread_With_Output_PeriodicDelayed_Port
 	}
 	to
 		sub: AADLBA!ThreadSubcomponent,
+		periodSub : AADLBA!DataSubcomponent,
+		currentPeriodSub : AADLBA!DataSubcomponent,
+		currentDeadlineSub : AADLBA!DataSubcomponent,
+		deadlineSub : AADLBA!DataSubcomponent,
 		msgPrioritySub : AADLBA!DataSubcomponent (
 			name <- 'MsgPriority',
 			dataSubcomponentType <- 'Integer_16'.asDataType('BASE_TYPES'),
@@ -163,6 +176,10 @@ rule m_Thread_With_Input_PeriodicDelayed_Port
 		)
 	to
 		sub: AADLBA!ThreadSubcomponent,
+		periodSub : AADLBA!DataSubcomponent,
+		currentPeriodSub : AADLBA!DataSubcomponent,
+		currentDeadlineSub : AADLBA!DataSubcomponent,
+		deadlineSub : AADLBA!DataSubcomponent,
 		pa: AADLBA!PropertyAssociation
 		(
 			property <- thisModule.getProperty('Initialize_Entrypoint_Call_Sequence'),  
@@ -174,7 +191,7 @@ rule m_Thread_With_Input_PeriodicDelayed_Port
 		),
 		v: AADLBA!ReferenceValue
 		(
-			containmentPathElement <- Sequence{cpe}
+			path <- cpe
 		),
 		cpe: AADLBA!ContainmentPathElement
 		(
@@ -183,8 +200,7 @@ rule m_Thread_With_Input_PeriodicDelayed_Port
 		initCallSequence: AADLBA!SubprogramCallSequence
 		(
 			name <- 'initLikedList',
-			ownedSubprogramCall <- c.featureInstance->select(e|e.isInputFeature())
-										->collect(e|thisModule.resolveMatchedSingleIfExists(e,'callInit'))
+			ownedSubprogramCall <- thisModule.collectInitCallSubpgList(c)
 		)
 	do
 	{
@@ -391,7 +407,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 --		PortVariable    : requires data access t_aadl_thread_data_queue.impl; 
 		portVariableHolder: AADLBA!DataAccessHolder
 		(
-			element <- thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxRef}, 'f_entrypoint')
+			element <- fi.retreiveEntrypointFeature(cnxRef)
 		),
 --  	DataValue       : requires data access t_request;
 		dataValueHolder: AADLBA!DataSubcomponentHolder
@@ -477,7 +493,7 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	),
   	portVariableHolder: AADLBA!DataAccessHolder
 	(
-		element <- thisModule.resolveMatchedSingleIfExists(fi, 'f_entrypoint')	
+		element <- fi.retreiveEntrypointFeature()	
 	)
 }
 
@@ -677,7 +693,7 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 		),
 		portVariableHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveMatchedSingleIfExists(fi, 'f_entrypoint')
+			element <- fi.retreiveEntrypointFeature()
 		),
 		dataValueHolder: AADLBA!DataSubcomponentHolder
 		(
@@ -771,7 +787,7 @@ rule m_Input_PeriodicDelayed_Port_Mutex
 		),
 		initSpg: AADLBA!SubprogramType
 		(
-			name <- fi.name+'_Init_Spg',
+			name <- fi.getInstanceObjectPath().getProgrammationLanguageIdentifier()+'_Init_Spg',
 			ownedExtension <- initSpgTypeExtension,
 			ownedPrototypeBinding <- Sequence{initSpgProtoBinding}
 		),

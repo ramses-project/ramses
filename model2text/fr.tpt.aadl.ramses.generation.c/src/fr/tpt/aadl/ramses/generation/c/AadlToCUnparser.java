@@ -59,7 +59,7 @@ import org.osate.aadl2.DataSubcomponent ;
 import org.osate.aadl2.DataSubcomponentType ;
 import org.osate.aadl2.DataType ;
 import org.osate.aadl2.DefaultAnnexLibrary ;
-import org.osate.aadl2.DefaultAnnexSubclause;
+import org.osate.aadl2.DefaultAnnexSubclause ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.EnumerationLiteral ;
 import org.osate.aadl2.Feature ;
@@ -464,8 +464,13 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     	  }
     	}
       } else
-    	sourceNameDest.addOutput(GenerationUtilsC.getGenerationCIdentifier(dst
-    	  .getQualifiedName())) ;
+      {
+        String id = PropertyUtils.getStringValue(dst, "Source_Name");
+        if(id == null)
+          id = GenerationUtilsC.getGenerationCIdentifier(dst
+                                                         .getQualifiedName()) ;
+        sourceNameDest.addOutput(id);
+      }
     }
   }
   
@@ -590,8 +595,11 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   
   protected void getCTypeDeclarator(NamedElement object)
   {
-    String id =
-          GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName()) ;
+    
+    String id = PropertyUtils.getStringValue(object, "Source_Name");
+    if(id == null
+        || PropertyUtils.getStringListValue(object, "Source_Text")!=null)
+      id = GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName()) ;
     TypeHolder dataTypeHolder = null ;
 
     try
@@ -609,7 +617,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
     EList<PropertyExpression> numberRepresentation =
           PropertyUtils
-                .getPropertyExpression(dataTypeHolder.klass,
+                .findPropertyExpression(dataTypeHolder.klass,
                                        DataModelProperties.NUMBER_REPRESENTATION) ;
     String numberRepresentationValue = "" ;
 
@@ -627,7 +635,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     // define types the current data type depends on
     EList<PropertyExpression> referencedBaseType =
           PropertyUtils
-                .getPropertyExpression(dataTypeHolder.klass,
+                .findPropertyExpression(dataTypeHolder.klass,
                                        DataModelProperties.BASE_TYPE) ;
 
     for(PropertyExpression baseTypeProperty : referencedBaseType)
@@ -686,7 +694,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         List<String> stringifiedRepresentation = new ArrayList<String>() ;
         EList<PropertyExpression> dataRepresentation =
               PropertyUtils
-                    .getPropertyExpression(dataTypeHolder.klass,
+                    .findPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.REPRESENTATION) ;
 
         for(PropertyExpression representationProperty : dataRepresentation)
@@ -708,7 +716,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
         EList<PropertyExpression> dataEnumerators =
               PropertyUtils
-                    .getPropertyExpression(dataTypeHolder.klass,
+                    .findPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.ENUMERATORS) ;
 
         for(PropertyExpression enumeratorProperty : dataEnumerators)
@@ -757,7 +765,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         StringBuilder structDefinition = new StringBuilder("typedef struct " + id + " {\n");
         EList<PropertyExpression> elementNames =
               PropertyUtils
-                    .getPropertyExpression(dataTypeHolder.klass,
+                    .findPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.ELEMENT_NAMES) ;
         if(elementNames.isEmpty()==false)
         {
@@ -782,7 +790,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
           EList<PropertyExpression> elementTypes =
                 PropertyUtils
-                      .getPropertyExpression(dataTypeHolder.klass,
+                      .findPropertyExpression(dataTypeHolder.klass,
                                              DataModelProperties.BASE_TYPE) ;
 
           for(PropertyExpression elementTypeProperty : elementTypes)
@@ -796,9 +804,22 @@ public class AadlToCUnparser extends AadlProcessingSwitch
                 if(v instanceof ClassifierValue)
                 {
                   ClassifierValue cv = (ClassifierValue) v ;
-                  String type =
-                        GenerationUtilsC.getGenerationCIdentifier(cv
-                              .getClassifier().getQualifiedName()) ;
+                  String type = PropertyUtils.getStringValue(cv.getClassifier(), "Source_Name");
+                  List<String> fileNameList = PropertyUtils.getStringListValue(cv.getClassifier(), "Source_Text");
+                  boolean headerReferenced = false;
+                  if(fileNameList != null)
+                  {
+                    for(String fileName : fileNameList)
+                    {
+                      if(fileName.endsWith(".h"))
+                      {
+                        headerReferenced=true;
+                        _additionalHeaders.get(_gtypesHeaderCode).add(fileName);
+                      }
+                    }
+                  }
+                  if(type == null || headerReferenced==false)
+                    type = GenerationUtilsC.getGenerationCIdentifier(cv.getClassifier().getQualifiedName()) ;
                   structDefinition.append("\t"+type +
                         " " +
                         stringifiedElementNames.get(lv.getOwnedListElements()
@@ -848,8 +869,12 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         			    	      process(dstActual);
         			    	      sourceName = GenerationUtilsC.resolveExistingCodeDependencies(dstActual, l);
         			    	      if(sourceName==null)
-        			    	    	  sourceName = GenerationUtilsC.getGenerationCIdentifier(dstActual.getQualifiedName());
-        			    	      break;
+        			    	      {
+        			    	        sourceName = PropertyUtils.getStringValue(dstActual, "Source_Name");
+        	                  if(sourceName == null)
+        	                    sourceName = GenerationUtilsC.getGenerationCIdentifier(dstActual.getQualifiedName());
+        			    	    	  break;
+        			    	      }
         			    	    }
         			    	  }
         			    	}
@@ -857,7 +882,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         				}
         				else
         				{
-        				  sourceName = GenerationUtilsC.getGenerationCIdentifier(dst.getQualifiedName());
+        				  sourceName = PropertyUtils.getStringValue(dst, "Source_Name");
+                  if(sourceName == null)
+                    sourceName = GenerationUtilsC.getGenerationCIdentifier(dst.getQualifiedName());
         				}
         			}
         			if(sourceName!=null)
@@ -875,7 +902,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     	StringBuilder unionDeclaration = new StringBuilder("typedef union " + id + " {\n");
         EList<PropertyExpression> elementNames =
               PropertyUtils
-                    .getPropertyExpression(dataTypeHolder.klass,
+                    .findPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.ELEMENT_NAMES) ;
         List<String> stringifiedElementNames = new ArrayList<String>() ;
 
@@ -898,7 +925,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
         EList<PropertyExpression> elementTypes =
               PropertyUtils
-                    .getPropertyExpression(dataTypeHolder.klass,
+                    .findPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.BASE_TYPE) ;
 
         for(PropertyExpression elementTypeProperty : elementTypes)
@@ -912,7 +939,11 @@ public class AadlToCUnparser extends AadlProcessingSwitch
               if(v instanceof ClassifierValue)
               {
                 ClassifierValue cv = (ClassifierValue) v ;
-                String type =
+                
+                String type = PropertyUtils.getStringValue(cv
+                                                          .getClassifier(), "Source_Name");
+                if(type == null)
+                  type =
                       GenerationUtilsC.getGenerationCIdentifier(cv
                             .getClassifier().getQualifiedName()) ;
                 unionDeclaration.append("\t"+type +
@@ -932,7 +963,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     	StringBuilder arrayDef = new StringBuilder ("typedef ");
         EList<PropertyExpression> baseType =
               PropertyUtils
-                    .getPropertyExpression(dataTypeHolder.klass,
+                    .findPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.BASE_TYPE) ;
         boolean found = false;
         boolean isAbstract = false;
@@ -974,7 +1005,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         _gtypesHeaderCode.addOutput(id) ;
         EList<PropertyExpression> arrayDimensions =
               PropertyUtils
-                    .getPropertyExpression(dataTypeHolder.klass,
+                    .findPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.DIMENSION) ;
 
         if(arrayDimensions.isEmpty())
@@ -1009,7 +1040,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       case UNKNOWN :
       {
         try
-        {
+        { 
           _gtypesHeaderCode.addOutput("typedef ") ;
           resolveExistingCodeDependencies(object, _gtypesHeaderCode,
                                           _gtypesHeaderCode) ;
@@ -1021,8 +1052,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         {
           String errMsg =  RamsesException.formatRethrowMessage("cannot resolve dependencies for \'"+
                           object + '\'', e) ;
-          _LOGGER.error(errMsg, e);
-          ServiceProvider.SYS_ERR_REP.error(errMsg, true); ;
+          _LOGGER.warn(errMsg, e);
+          ServiceProvider.SYS_ERR_REP.warning(errMsg, true); ;
         }
 
         break ;
@@ -1270,28 +1301,6 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         GeneratorUtils.buildDataAccessMapping(object, _dataAccessMapping) ;
         process(object.getType()) ;
 
-        _currentImplUnparser.addOutput("void ") ;
-        _currentImplUnparser.addOutput(GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName())) ;
-        _currentImplUnparser.addOutputNewline(GenerationUtilsC.THREAD_INIT_SUFFIX +
-                                              "()") ;
-        _currentImplUnparser.addOutputNewline("{") ;
-        _currentImplUnparser.incrementIndent() ;
-
-        if(_initBehaviorCallSequence != null)
-        {
-          for(DataSubcomponent d : getAllDataSubcomponents(object))
-          {
-            if(isUsedInCallSequence(d, _initBehaviorCallSequence))
-              process(d) ;
-          }
-          process(_initBehaviorCallSequence) ;
-          _initBehaviorCallSequence = null ;
-        }
-
-        _activityImplCode.decrementIndent() ;
-        _activityImplCode.addOutputNewline("}") ;
-        _activityImplCode.addOutputNewline("") ;
-
         _currentImplUnparser.addOutput("void* ") ;
         _currentImplUnparser.addOutput(GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName())) ;
         _currentImplUnparser.addOutputNewline(GenerationUtilsC.THREAD_SUFFIX +
@@ -1300,9 +1309,25 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         _currentImplUnparser.incrementIndent() ;
         _owner = object ;
 
+        List<DataSubcomponent> processedDS = new ArrayList<DataSubcomponent>();
+        if(_initBehaviorCallSequence != null)
+        {
+          for(DataSubcomponent d : getAllDataSubcomponents(object))
+          {
+            if(isUsedInCallSequence(d, _initBehaviorCallSequence))
+            {
+              process(d) ;
+              processedDS.add(d);
+            }
+          }
+          process(_initBehaviorCallSequence) ;
+          _initBehaviorCallSequence = null ;
+        }
+        
         for(DataSubcomponent d : getAllDataSubcomponents(object))
         {
-          if(isUsedInCallSequence(d, _currentBehaviorCallSequence))
+          if(isUsedInCallSequence(d, _currentBehaviorCallSequence)
+              &&!processedDS.contains(d))
             process(d) ;
         }
 
@@ -1720,7 +1745,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       private void processConnectionEnd(ConnectionEnd ce)
       {
         if(ce instanceof DataSubcomponent)
+        {
           _currentImplUnparser.addOutput(GenerationUtilsC.getGenerationCIdentifier(ce.getQualifiedName())) ;
+        }
         else
         {
           _currentImplUnparser.addOutput(ce.getName()) ;
@@ -1729,8 +1756,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       
       public String caseThreadSubcomponent(ThreadSubcomponent object)
       {
-        PropertyAssociation pa = PropertyUtils.getPropertyAssociation(object,
-                                           "Compute_Entrypoint_Call_Sequence") ;
+        PropertyAssociation pa = PropertyUtils.findPropertyAssociation(
+                                   "Compute_Entrypoint_Call_Sequence", object) ;
         
         if(pa != null)
         {
@@ -1739,8 +1766,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           _currentBehaviorCallSequence = (SubprogramCallSequence) rv.getContainmentPathElements()
                                                                     .get(0)
                                                                     .getNamedElement() ;
-          pa = PropertyUtils.getPropertyAssociation(object,
-                                                    "Initialize_Entrypoint_Call_Sequence") ;
+          pa = PropertyUtils.findPropertyAssociation(
+                                "Initialize_Entrypoint_Call_Sequence", object) ;
           if(pa != null)
           {
             rv = (ReferenceValue) pa.getOwnedValues().get(0).getOwnedValue() ;
@@ -1806,9 +1833,12 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         }
         catch(GenerationException e)
         {
-          _currentImplUnparser.addOutput(GenerationUtilsC
+          String id = PropertyUtils.getStringValue(object.getDataFeatureClassifier(), "Source_Name");
+          if(id == null)
+            id = GenerationUtilsC
                 .getGenerationCIdentifier(object.getDataFeatureClassifier()
-                      .getQualifiedName())) ;
+                .getQualifiedName());
+          _currentImplUnparser.addOutput(id) ;
         }
         _currentImplUnparser.addOutput(" ") ;
         if(dataSubprogramName != null)

@@ -1,0 +1,109 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+module ExpandModes;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS;
+
+
+helper def: getRuntimeModeType() : AADLBA!DataClassifier = 
+	'AppModeType'.asDataType('OSEK_RUNTIME')
+;
+
+lazy rule CreateReturnSubcomponentForModeTransition
+{
+	from
+		p : AADLI!ComponentInstance
+}
+
+-- createModeSwitchAction; this one is target specific
+unique lazy rule createModeSwitchAction
+{
+	from
+		mti: AADLI!ModeTransitionInstance
+	using
+	{
+		spg: AADLBA!Subprogram = 'StartOS'.asSubprogramType('OSEK_RUNTIME');
+	}
+	to
+		bab: AADLBA!BehaviorActionBlock
+		(content<-recoveryactions),
+		recoveryactions: AADLBA!BehaviorActionSequence
+		(actions <- Sequence{initTargetModeValue, switchModeCall}),
+		switchModeCall: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{MODE_HOLDER}
+		),
+		callHolder: AADLBA!SubprogramHolder
+		(
+			element <- spg
+		),
+		MODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element<-thisModule.resolveTemp(Sequence{mti.source, mti.getProcess()}, 'targetModeValue')
+		),
+		initTargetModeValue: AADLBA!AssignmentAction
+		(
+			target <- targetModeValueHolder,
+			valueExpression <- targetModeValueExpression
+		),
+		targetModeValueHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.resolveTemp(Sequence{mti.source, mti.eContainer()}, 'targetModeValue')
+		),
+		targetModeValueExpression: AADLBA!ValueExpression
+		(
+			relations <- Sequence{targetModeRelation}
+		),
+		targetModeRelation: AADLBA!Relation
+		(
+			relationalOperator<-#None,
+			firstExpression<-targetModeExpression
+		),
+		targetModeExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{targetModeTerm}
+		),
+		targetModeTerm: AADLBA!Term
+		(
+			factors <- Sequence{targetModeFactor}
+		),
+		targetModeFactor: AADLBA!Factor
+		(
+			firstValue <- thisModule.bindDatatypeEnumStringliteral
+						  (
+						  	thisModule.resolveTemp(mti.eContainer(), 'modeDataClassifier'),
+							mti.destination.name
+						  )
+		)
+	do
+	{
+		thisModule.addImportedUnit(thisModule.public(), 'OSEK_RUNTIME', 'OSEK_runtime');
+		bab;
+	}
+}

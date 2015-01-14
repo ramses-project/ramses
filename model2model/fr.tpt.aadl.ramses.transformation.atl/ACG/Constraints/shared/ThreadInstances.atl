@@ -24,7 +24,8 @@
 -- @atlcompiler emftvm
 
 module ThreadInstances;
-create OUT : CV 	from 		IN : AADLI;
+create OUT : CV 	from 		IN : AADLI,
+								THREAD_PROPERTIES: AADLI;
 
 -- @extends check_ComponentInstance
 abstract rule check_ThreadInstance
@@ -78,4 +79,18 @@ rule check_HasPeriodIfNeeded
 	  (
 		message <- 'With this dispatch protocol, thread must have a period value'
 	  )
+}
+
+-- @extends check_ThreadInstance
+rule check_HasDispatchProtocol
+{
+	from
+	  obj: AADLI!ComponentInstance,
+	  p: AADLI!Property in THREAD_PROPERTIES
+	  (
+	  	p.name='Dispatch_Protocol' and not obj.hasPropertyAssigned(p)
+	  )
+	to
+	err: CV!Error
+	(message <- 'Thread subcomponent ' + obj.subcomponent.name + ' must have a dispatch protocol assigned')
 }

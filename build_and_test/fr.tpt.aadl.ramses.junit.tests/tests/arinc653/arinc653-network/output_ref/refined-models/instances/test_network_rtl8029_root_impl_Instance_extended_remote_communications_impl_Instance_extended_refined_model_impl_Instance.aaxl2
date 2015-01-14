@@ -1,0 +1,1877 @@
+<?xml version="1.0" encoding="ASCII"?>
+<instance:SystemInstance xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aadl2="http://aadl.info/AADL/2.0" xmlns:instance="http://aadl.info/AADL/2.0/instance" xmi:id="_mSE78JLcEeSnQukVSXzSBA" name="refined_model_impl_Instance" category="system">
+  <componentInstance xmi:id="_mSGKEJLcEeSnQukVSXzSBA" name="the_bus" dstConnectionInstance="_mSLCkpLcEeSnQukVSXzSBA _mSLpoJLcEeSnQukVSXzSBA" category="bus">
+    <subcomponent xsi:type="aadl2:BusSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedBusSubcomponent.0"/>
+    <index>0</index>
+  </componentInstance>
+  <componentInstance xmi:id="_mSGxIJLcEeSnQukVSXzSBA" name="the_mem1" category="memory">
+    <ownedPropertyAssociation xmi:id="_mSWBsJLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.12"/>
+      <ownedValue xmi:id="_mSWBsZLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSWBspLcEeSnQukVSXzSBA" value="200000">
+          <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <componentInstance xmi:id="_mSGxIZLcEeSnQukVSXzSBA" name="part1_mem" category="memory">
+      <ownedPropertyAssociation xmi:id="_mSWBs5LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.12"/>
+        <ownedValue xmi:id="_mSWowJLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSWowZLcEeSnQukVSXzSBA" value="150000">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSWowpLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.24"/>
+        <ownedValue xmi:id="_mSWow5LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSWoxJLcEeSnQukVSXzSBA">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.24/@ownedPropertyType/@ownedLiteral.2"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSWoxZLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.2"/>
+        <ownedValue xmi:id="_mSWoxpLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSWox5LcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mSWoyJLcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.1/@ownedLiteral.0"/>
+            </ownedListElement>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.5/@ownedMemorySubcomponent.0"/>
+      <index>0</index>
+    </componentInstance>
+    <componentInstance xmi:id="_mSGxIpLcEeSnQukVSXzSBA" name="part2_mem" category="memory">
+      <ownedPropertyAssociation xmi:id="_mSWoyZLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.12"/>
+        <ownedValue xmi:id="_mSWoypLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSWoy5LcEeSnQukVSXzSBA" value="150000">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSWozJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.24"/>
+        <ownedValue xmi:id="_mSWozZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSWozpLcEeSnQukVSXzSBA">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.24/@ownedPropertyType/@ownedLiteral.2"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSWoz5LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.2"/>
+        <ownedValue xmi:id="_mSXP0JLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSXP0ZLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mSXP0pLcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.1/@ownedLiteral.0"/>
+            </ownedListElement>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.5/@ownedMemorySubcomponent.1"/>
+      <index>0</index>
+    </componentInstance>
+    <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedMemorySubcomponent.0"/>
+    <index>0</index>
+  </componentInstance>
+  <componentInstance xmi:id="_mSGxI5LcEeSnQukVSXzSBA" name="the_mem2" category="memory">
+    <ownedPropertyAssociation xmi:id="_mSXP05LcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.12"/>
+      <ownedValue xmi:id="_mSX24JLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSX24ZLcEeSnQukVSXzSBA" value="200000">
+          <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <componentInstance xmi:id="_mSGxJJLcEeSnQukVSXzSBA" name="part1_mem" category="memory">
+      <ownedPropertyAssociation xmi:id="_mSX24pLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.12"/>
+        <ownedValue xmi:id="_mSX245LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSX25JLcEeSnQukVSXzSBA" value="150000">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSX25ZLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.24"/>
+        <ownedValue xmi:id="_mSX25pLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSX255LcEeSnQukVSXzSBA">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.24/@ownedPropertyType/@ownedLiteral.2"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSX26JLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.2"/>
+        <ownedValue xmi:id="_mSX26ZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSX26pLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mSX265LcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.1/@ownedLiteral.0"/>
+            </ownedListElement>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.5/@ownedMemorySubcomponent.0"/>
+      <index>0</index>
+    </componentInstance>
+    <componentInstance xmi:id="_mSGxJZLcEeSnQukVSXzSBA" name="part2_mem" category="memory">
+      <ownedPropertyAssociation xmi:id="_mSYd8JLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.12"/>
+        <ownedValue xmi:id="_mSYd8ZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSYd8pLcEeSnQukVSXzSBA" value="150000">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSYd85LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.24"/>
+        <ownedValue xmi:id="_mSYd9JLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSYd9ZLcEeSnQukVSXzSBA">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.24/@ownedPropertyType/@ownedLiteral.2"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSYd9pLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.2"/>
+        <ownedValue xmi:id="_mSYd95LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSYd-JLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mSYd-ZLcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.1/@ownedLiteral.0"/>
+            </ownedListElement>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.5/@ownedMemorySubcomponent.1"/>
+      <index>0</index>
+    </componentInstance>
+    <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedMemorySubcomponent.1"/>
+    <index>0</index>
+  </componentInstance>
+  <componentInstance xmi:id="_mSGxJpLcEeSnQukVSXzSBA" name="the_cpu1_system_part_comProcess" category="process">
+    <ownedPropertyAssociation xmi:id="_mSZFAJLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.2"/>
+      <ownedValue xmi:id="_mSZFAZLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSZFApLcEeSnQukVSXzSBA">
+          <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSZFA5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSImUZLcEeSnQukVSXzSBA"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSZFBJLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+      <ownedValue xmi:id="_mSZFBZLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSZFBpLcEeSnQukVSXzSBA">
+          <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSZFB5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxIpLcEeSnQukVSXzSBA"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <componentInstance xmi:id="_mSHYMJLcEeSnQukVSXzSBA" name="the_cpu1_system_part_comProcess_the_proc1_p_outglobalVariable" srcConnectionInstance="_mSJ0cJLcEeSnQukVSXzSBA" category="data">
+      <ownedPropertyAssociation xmi:id="_mSZsEJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+        <ownedValue xmi:id="_mSZsEZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSZsEpLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSZsE5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxIpLcEeSnQukVSXzSBA"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSaTIJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.19"/>
+        <ownedValue xmi:id="_mSaTIZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSaTIpLcEeSnQukVSXzSBA" value="APEX_INTEGER"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSaTI5LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.20"/>
+        <ownedValue xmi:id="_mSaTJJLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSaTJZLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:StringLiteral" xmi:id="_mSaTJpLcEeSnQukVSXzSBA" value="arinc653/queueing.h"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" xmi:id="_mSaTJ5LcEeSnQukVSXzSBA" value="arinc653/apex-queuing.ads"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedDataSubcomponent.0"/>
+      <index>0</index>
+    </componentInstance>
+    <componentInstance xmi:id="_mSHYMZLcEeSnQukVSXzSBA" name="system_part_comm" category="thread">
+      <ownedPropertyAssociation xmi:id="_mSaTKJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.2"/>
+        <ownedValue xmi:id="_mSaTKZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSaTKpLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSaTK5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSImUZLcEeSnQukVSXzSBA"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSa6MJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+        <ownedValue xmi:id="_mSa6MZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSa6MpLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSa6M5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxIpLcEeSnQukVSXzSBA"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSa6NJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.18"/>
+        <ownedValue xmi:id="_mSa6NZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSa6NpLcEeSnQukVSXzSBA" value="1000">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSa6N5LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Thread_Properties.aadl2#//@ownedProperty.3"/>
+        <ownedValue xmi:id="_mSa6OJLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSa6OZLcEeSnQukVSXzSBA" value="5"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSa6OpLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.13"/>
+        <ownedValue xmi:id="_mSa6O5LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ReferenceValue" xmi:id="_mSa6PJLcEeSnQukVSXzSBA">
+            <path xmi:id="_mSa6PZLcEeSnQukVSXzSBA">
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.20/@ownedSubprogramCallSequence.1"/>
+            </path>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSa6PpLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Thread_Properties.aadl2#//@ownedProperty.0"/>
+        <ownedValue xmi:id="_mSa6P5LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSa6QJLcEeSnQukVSXzSBA">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.3/@ownedLiteral.0"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSa6QZLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.4"/>
+        <ownedValue xmi:id="_mSa6QpLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ReferenceValue" xmi:id="_mSa6Q5LcEeSnQukVSXzSBA">
+            <path xmi:id="_mSa6RJLcEeSnQukVSXzSBA">
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.20/@ownedSubprogramCallSequence.0"/>
+            </path>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <featureInstance xmi:id="_mSHYNZLcEeSnQukVSXzSBA" name="p_out" dstConnectionInstance="_mSJ0cJLcEeSnQukVSXzSBA" category="dataAccess" direction="in out">
+        <feature xsi:type="aadl2:DataAccess" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.21/@ownedDataAccess.0"/>
+      </featureInstance>
+      <componentInstance xmi:id="_mSHYMpLcEeSnQukVSXzSBA" name="the_proc1_p_out_createVirtualPortId" category="data">
+        <ownedPropertyAssociation xmi:id="_mSbhQJLcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+          <ownedValue xmi:id="_mScIUJLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mScIUZLcEeSnQukVSXzSBA">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mScIUpLcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxIpLcEeSnQukVSXzSBA"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_mScIU5LcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.19"/>
+          <ownedValue xmi:id="_mScIVJLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mScIVZLcEeSnQukVSXzSBA" value="pok_port_id_t"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_mScIVpLcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.20"/>
+          <ownedValue xmi:id="_mScIV5LcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mScIWJLcEeSnQukVSXzSBA">
+              <ownedListElement xsi:type="aadl2:StringLiteral" xmi:id="_mScIWZLcEeSnQukVSXzSBA" value="types.h"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_mScIWpLcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.18"/>
+          <ownedValue xmi:id="_mScIW5LcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mScIXJLcEeSnQukVSXzSBA">
+              <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mScIXZLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.8/@ownedLiteral.2"/>
+              </ownedListElement>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.20/@ownedDataSubcomponent.0"/>
+        <index>0</index>
+      </componentInstance>
+      <componentInstance xmi:id="_mSHYM5LcEeSnQukVSXzSBA" name="the_proc1_p_out_createVirtualPortName" category="data">
+        <ownedPropertyAssociation xmi:id="_mScvYJLcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+          <ownedValue xmi:id="_mScvYZLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mScvYpLcEeSnQukVSXzSBA">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mScvY5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxIpLcEeSnQukVSXzSBA"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_mScvZJLcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4"/>
+          <ownedValue xmi:id="_mScvZZLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mScvZpLcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4/@ownedPropertyType/@ownedLiteral.7"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_mScvZ5LcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.9"/>
+          <ownedValue xmi:id="_mScvaJLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mScvaZLcEeSnQukVSXzSBA">
+              <ownedListElement xsi:type="aadl2:StringLiteral" xmi:id="_mScvapLcEeSnQukVSXzSBA" value="the_proc1_p_out_virtual_port"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.20/@ownedDataSubcomponent.1"/>
+        <index>0</index>
+      </componentInstance>
+      <componentInstance xmi:id="_mSHYNJLcEeSnQukVSXzSBA" name="the_proc1_p_out_length" category="data">
+        <ownedPropertyAssociation xmi:id="_mSdWcJLcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+          <ownedValue xmi:id="_mSdWcZLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSdWcpLcEeSnQukVSXzSBA">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSdWc5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxIpLcEeSnQukVSXzSBA"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_mSdWdJLcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4"/>
+          <ownedValue xmi:id="_mSdWdZLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSdWdpLcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_mSdWd5LcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.9"/>
+          <ownedValue xmi:id="_mSdWeJLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSdWeZLcEeSnQukVSXzSBA">
+              <ownedListElement xsi:type="aadl2:StringLiteral" xmi:id="_mSdWepLcEeSnQukVSXzSBA" value="sizeof(common_pkg__Integer)"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_mSdWe5LcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.8"/>
+          <ownedValue xmi:id="_mSdWfJLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSdWfZLcEeSnQukVSXzSBA" value="4">
+              <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_mSdWfpLcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.12"/>
+          <ownedValue xmi:id="_mSdWf5LcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSdWgJLcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.12/@ownedPropertyType/@ownedLiteral.1"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.20/@ownedDataSubcomponent.2"/>
+        <index>0</index>
+      </componentInstance>
+      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedThreadSubcomponent.0"/>
+      <index>0</index>
+    </componentInstance>
+    <componentInstance xmi:id="_mSHYNpLcEeSnQukVSXzSBA" name="the_cpu1_system_part_comm" category="thread">
+      <ownedPropertyAssociation xmi:id="_mSd9gJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.2"/>
+        <ownedValue xmi:id="_mSd9gZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSd9gpLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSd9g5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSImUZLcEeSnQukVSXzSBA"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSd9hJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+        <ownedValue xmi:id="_mSd9hZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSd9hpLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSd9h5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxIpLcEeSnQukVSXzSBA"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSd9iJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.18"/>
+        <ownedValue xmi:id="_mSd9iZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSd9ipLcEeSnQukVSXzSBA" value="1000">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSd9i5LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Thread_Properties.aadl2#//@ownedProperty.3"/>
+        <ownedValue xmi:id="_mSekkJLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSekkZLcEeSnQukVSXzSBA" value="8"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSekkpLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.13"/>
+        <ownedValue xmi:id="_mSekk5LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ReferenceValue" xmi:id="_mSeklJLcEeSnQukVSXzSBA">
+            <path xmi:id="_mSeklZLcEeSnQukVSXzSBA">
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.25/@ownedSubprogramCallSequence.1"/>
+            </path>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSeklpLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Thread_Properties.aadl2#//@ownedProperty.0"/>
+        <ownedValue xmi:id="_mSekl5LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSekmJLcEeSnQukVSXzSBA">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.3/@ownedLiteral.0"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSekmZLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.4"/>
+        <ownedValue xmi:id="_mSekmpLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ReferenceValue" xmi:id="_mSekm5LcEeSnQukVSXzSBA">
+            <path xmi:id="_mSeknJLcEeSnQukVSXzSBA">
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.25/@ownedSubprogramCallSequence.0"/>
+            </path>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedThreadSubcomponent.1"/>
+      <index>0</index>
+    </componentInstance>
+    <connectionInstance xmi:id="_mSJ0cJLcEeSnQukVSXzSBA" name="the_cpu1_system_part_comProcess_the_proc1_p_outglobalVariable -> system_part_comm.p_out" complete="true" kind="accessConnection" destination="_mSHYNZLcEeSnQukVSXzSBA" source="_mSHYMJLcEeSnQukVSXzSBA">
+      <connectionReference xmi:id="_mSJ0cZLcEeSnQukVSXzSBA" context="_mSGxJpLcEeSnQukVSXzSBA" source="_mSHYMJLcEeSnQukVSXzSBA" destination="_mSHYNZLcEeSnQukVSXzSBA">
+        <connection xsi:type="aadl2:AccessConnection" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedAccessConnection.0"/>
+      </connectionReference>
+    </connectionInstance>
+    <subcomponent xsi:type="aadl2:ProcessSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedProcessSubcomponent.0"/>
+    <index>0</index>
+  </componentInstance>
+  <componentInstance xmi:id="_mSHYN5LcEeSnQukVSXzSBA" name="the_cpu2_system_part_comProcess" category="process">
+    <ownedPropertyAssociation xmi:id="_mSfLoJLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.2"/>
+      <ownedValue xmi:id="_mSfysJLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSfysZLcEeSnQukVSXzSBA">
+          <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSfyspLcEeSnQukVSXzSBA" referencedInstanceObject="_mSImVZLcEeSnQukVSXzSBA"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSfys5LcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+      <ownedValue xmi:id="_mSfytJLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSfytZLcEeSnQukVSXzSBA">
+          <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSfytpLcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxJZLcEeSnQukVSXzSBA"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <componentInstance xmi:id="_mSHYOJLcEeSnQukVSXzSBA" name="the_cpu2_system_part_comProcess_the_proc2_p_in_globalVariable" srcConnectionInstance="_mSKbgJLcEeSnQukVSXzSBA" category="data">
+      <ownedPropertyAssociation xmi:id="_mSgZwJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+        <ownedValue xmi:id="_mSgZwZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSgZwpLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSgZw5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxJZLcEeSnQukVSXzSBA"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSgZxJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.19"/>
+        <ownedValue xmi:id="_mSgZxZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSgZxpLcEeSnQukVSXzSBA" value="APEX_INTEGER"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSgZx5LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.20"/>
+        <ownedValue xmi:id="_mSgZyJLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSgZyZLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:StringLiteral" xmi:id="_mSgZypLcEeSnQukVSXzSBA" value="arinc653/queueing.h"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" xmi:id="_mSgZy5LcEeSnQukVSXzSBA" value="arinc653/apex-queuing.ads"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.1/@ownedDataSubcomponent.0"/>
+      <index>0</index>
+    </componentInstance>
+    <componentInstance xmi:id="_mSHYOZLcEeSnQukVSXzSBA" name="system_part_comm" category="thread">
+      <ownedPropertyAssociation xmi:id="_mShA0JLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.2"/>
+        <ownedValue xmi:id="_mShA0ZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mShA0pLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mShA05LcEeSnQukVSXzSBA" referencedInstanceObject="_mSImVZLcEeSnQukVSXzSBA"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mShA1JLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+        <ownedValue xmi:id="_mShA1ZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mShA1pLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mShA15LcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxJZLcEeSnQukVSXzSBA"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mShA2JLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.18"/>
+        <ownedValue xmi:id="_mShA2ZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mShA2pLcEeSnQukVSXzSBA" value="1000">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mShn4JLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Thread_Properties.aadl2#//@ownedProperty.3"/>
+        <ownedValue xmi:id="_mShn4ZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mShn4pLcEeSnQukVSXzSBA" value="5"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mShn45LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.13"/>
+        <ownedValue xmi:id="_mShn5JLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ReferenceValue" xmi:id="_mShn5ZLcEeSnQukVSXzSBA">
+            <path xmi:id="_mShn5pLcEeSnQukVSXzSBA">
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.30/@ownedSubprogramCallSequence.1"/>
+            </path>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mShn55LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Thread_Properties.aadl2#//@ownedProperty.0"/>
+        <ownedValue xmi:id="_mShn6JLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mShn6ZLcEeSnQukVSXzSBA">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.3/@ownedLiteral.0"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mShn6pLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.4"/>
+        <ownedValue xmi:id="_mShn65LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ReferenceValue" xmi:id="_mShn7JLcEeSnQukVSXzSBA">
+            <path xmi:id="_mShn7ZLcEeSnQukVSXzSBA">
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.30/@ownedSubprogramCallSequence.0"/>
+            </path>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <featureInstance xmi:id="_mSH_QZLcEeSnQukVSXzSBA" name="the_proc2_p_in_cnx_p_in" dstConnectionInstance="_mSKbgJLcEeSnQukVSXzSBA" category="dataAccess" direction="in out">
+        <feature xsi:type="aadl2:DataAccess" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.31/@ownedDataAccess.0"/>
+      </featureInstance>
+      <componentInstance xmi:id="_mSHYOpLcEeSnQukVSXzSBA" name="the_proc2_p_in_createVirtualPortId" category="data">
+        <ownedPropertyAssociation xmi:id="_mSiO8JLcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+          <ownedValue xmi:id="_mSiO8ZLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSiO8pLcEeSnQukVSXzSBA">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSiO85LcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxJZLcEeSnQukVSXzSBA"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_mSiO9JLcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.19"/>
+          <ownedValue xmi:id="_mSiO9ZLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSiO9pLcEeSnQukVSXzSBA" value="pok_port_id_t"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_mSiO95LcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.20"/>
+          <ownedValue xmi:id="_mSiO-JLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSiO-ZLcEeSnQukVSXzSBA">
+              <ownedListElement xsi:type="aadl2:StringLiteral" xmi:id="_mSiO-pLcEeSnQukVSXzSBA" value="types.h"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_mSiO-5LcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.18"/>
+          <ownedValue xmi:id="_mSiO_JLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSiO_ZLcEeSnQukVSXzSBA">
+              <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mSiO_pLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.8/@ownedLiteral.2"/>
+              </ownedListElement>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.30/@ownedDataSubcomponent.0"/>
+        <index>0</index>
+      </componentInstance>
+      <componentInstance xmi:id="_mSHYO5LcEeSnQukVSXzSBA" name="the_proc2_p_in_createVirtualPortName" category="data">
+        <ownedPropertyAssociation xmi:id="_mSi2AJLcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+          <ownedValue xmi:id="_mSi2AZLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSi2ApLcEeSnQukVSXzSBA">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSi2A5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxJZLcEeSnQukVSXzSBA"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_mSi2BJLcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4"/>
+          <ownedValue xmi:id="_mSi2BZLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSi2BpLcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4/@ownedPropertyType/@ownedLiteral.7"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_mSi2B5LcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.9"/>
+          <ownedValue xmi:id="_mSi2CJLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSi2CZLcEeSnQukVSXzSBA">
+              <ownedListElement xsi:type="aadl2:StringLiteral" xmi:id="_mSi2CpLcEeSnQukVSXzSBA" value="the_proc2_p_in_virtual_port"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.30/@ownedDataSubcomponent.1"/>
+        <index>0</index>
+      </componentInstance>
+      <componentInstance xmi:id="_mSH_QJLcEeSnQukVSXzSBA" name="the_proc2_p_in_length" category="data">
+        <ownedPropertyAssociation xmi:id="_mSjdEJLcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+          <ownedValue xmi:id="_mSjdEZLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSjdEpLcEeSnQukVSXzSBA">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSjdE5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxJZLcEeSnQukVSXzSBA"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_mSjdFJLcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4"/>
+          <ownedValue xmi:id="_mSjdFZLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSjdFpLcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_mSjdF5LcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.9"/>
+          <ownedValue xmi:id="_mSjdGJLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSjdGZLcEeSnQukVSXzSBA">
+              <ownedListElement xsi:type="aadl2:StringLiteral" xmi:id="_mSjdGpLcEeSnQukVSXzSBA" value="sizeof(common_pkg__Integer)"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_mSkEIJLcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.8"/>
+          <ownedValue xmi:id="_mSkEIZLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSkEIpLcEeSnQukVSXzSBA" value="4">
+              <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_mSkEI5LcEeSnQukVSXzSBA">
+          <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.12"/>
+          <ownedValue xmi:id="_mSkEJJLcEeSnQukVSXzSBA">
+            <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSkEJZLcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.12/@ownedPropertyType/@ownedLiteral.1"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.30/@ownedDataSubcomponent.2"/>
+        <index>0</index>
+      </componentInstance>
+      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.1/@ownedThreadSubcomponent.0"/>
+      <index>0</index>
+    </componentInstance>
+    <componentInstance xmi:id="_mSH_QpLcEeSnQukVSXzSBA" name="the_cpu2_system_part_comm" category="thread">
+      <ownedPropertyAssociation xmi:id="_mSkEJpLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.2"/>
+        <ownedValue xmi:id="_mSkEJ5LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSkEKJLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSkEKZLcEeSnQukVSXzSBA" referencedInstanceObject="_mSImVZLcEeSnQukVSXzSBA"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSkEKpLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+        <ownedValue xmi:id="_mSkEK5LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSkELJLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSkELZLcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxJZLcEeSnQukVSXzSBA"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSkELpLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.18"/>
+        <ownedValue xmi:id="_mSkEL5LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSkEMJLcEeSnQukVSXzSBA" value="1000">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSkrMJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Thread_Properties.aadl2#//@ownedProperty.3"/>
+        <ownedValue xmi:id="_mSkrMZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSkrMpLcEeSnQukVSXzSBA" value="8"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSkrM5LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.13"/>
+        <ownedValue xmi:id="_mSkrNJLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ReferenceValue" xmi:id="_mSkrNZLcEeSnQukVSXzSBA">
+            <path xmi:id="_mSkrNpLcEeSnQukVSXzSBA">
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.35/@ownedSubprogramCallSequence.1"/>
+            </path>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSkrN5LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Thread_Properties.aadl2#//@ownedProperty.0"/>
+        <ownedValue xmi:id="_mSkrOJLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSkrOZLcEeSnQukVSXzSBA">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.3/@ownedLiteral.0"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSkrOpLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.4"/>
+        <ownedValue xmi:id="_mSkrO5LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ReferenceValue" xmi:id="_mSkrPJLcEeSnQukVSXzSBA">
+            <path xmi:id="_mSkrPZLcEeSnQukVSXzSBA">
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.35/@ownedSubprogramCallSequence.0"/>
+            </path>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.1/@ownedThreadSubcomponent.1"/>
+      <index>0</index>
+    </componentInstance>
+    <connectionInstance xmi:id="_mSKbgJLcEeSnQukVSXzSBA" name="the_cpu2_system_part_comProcess_the_proc2_p_in_globalVariable -> system_part_comm.the_proc2_p_in_cnx_p_in" complete="true" kind="accessConnection" destination="_mSH_QZLcEeSnQukVSXzSBA" source="_mSHYOJLcEeSnQukVSXzSBA">
+      <connectionReference xmi:id="_mSKbgZLcEeSnQukVSXzSBA" context="_mSHYN5LcEeSnQukVSXzSBA" source="_mSHYOJLcEeSnQukVSXzSBA" destination="_mSH_QZLcEeSnQukVSXzSBA">
+        <connection xsi:type="aadl2:AccessConnection" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.1/@ownedAccessConnection.0"/>
+      </connectionReference>
+    </connectionInstance>
+    <subcomponent xsi:type="aadl2:ProcessSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedProcessSubcomponent.1"/>
+    <index>0</index>
+  </componentInstance>
+  <componentInstance xmi:id="_mSH_Q5LcEeSnQukVSXzSBA" name="the_proc1" category="process">
+    <ownedPropertyAssociation xmi:id="_mSlSQJLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.2"/>
+      <ownedValue xmi:id="_mSl5UJLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSl5UZLcEeSnQukVSXzSBA">
+          <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSl5UpLcEeSnQukVSXzSBA" referencedInstanceObject="_mSImUJLcEeSnQukVSXzSBA"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSl5U5LcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+      <ownedValue xmi:id="_mSl5VJLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSl5VZLcEeSnQukVSXzSBA">
+          <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSl5VpLcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxIZLcEeSnQukVSXzSBA"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <componentInstance xmi:id="_mSH_RJLcEeSnQukVSXzSBA" name="the_proc1_p_out_globalVariable" srcConnectionInstance="_mSKbgpLcEeSnQukVSXzSBA" category="data">
+      <ownedPropertyAssociation xmi:id="_mSmgYJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+        <ownedValue xmi:id="_mSmgYZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSmgYpLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSmgY5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxIZLcEeSnQukVSXzSBA"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSmgZJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.19"/>
+        <ownedValue xmi:id="_mSmgZZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSmgZpLcEeSnQukVSXzSBA" value="APEX_INTEGER"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSmgZ5LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.20"/>
+        <ownedValue xmi:id="_mSmgaJLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSmgaZLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:StringLiteral" xmi:id="_mSmgapLcEeSnQukVSXzSBA" value="arinc653/queueing.h"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" xmi:id="_mSmga5LcEeSnQukVSXzSBA" value="arinc653/apex-queuing.ads"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.2/@ownedDataSubcomponent.0"/>
+      <index>0</index>
+    </componentInstance>
+    <componentInstance xmi:id="_mSH_RZLcEeSnQukVSXzSBA" name="the_sender" category="thread">
+      <ownedPropertyAssociation xmi:id="_mSnHcJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.2"/>
+        <ownedValue xmi:id="_mSnHcZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSnHcpLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSnHc5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSImUJLcEeSnQukVSXzSBA"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSnHdJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+        <ownedValue xmi:id="_mSnHdZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSnHdpLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSnHd5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxIZLcEeSnQukVSXzSBA"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSnHeJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.18"/>
+        <ownedValue xmi:id="_mSnHeZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSnHepLcEeSnQukVSXzSBA" value="2000">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSnugJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Thread_Properties.aadl2#//@ownedProperty.3"/>
+        <ownedValue xmi:id="_mSnugZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSnugpLcEeSnQukVSXzSBA" value="5"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSnug5LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Thread_Properties.aadl2#//@ownedProperty.0"/>
+        <ownedValue xmi:id="_mSnuhJLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSnuhZLcEeSnQukVSXzSBA">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.3/@ownedLiteral.0"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSnuhpLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.4"/>
+        <ownedValue xmi:id="_mSnuh5LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ReferenceValue" xmi:id="_mSnuiJLcEeSnQukVSXzSBA">
+            <path xmi:id="_mSnuiZLcEeSnQukVSXzSBA">
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.40/@ownedSubprogramCallSequence.0"/>
+            </path>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSnuipLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.8"/>
+        <ownedValue xmi:id="_mSnui5LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSnujJLcEeSnQukVSXzSBA" value="40000">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSnujZLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.3"/>
+        <ownedValue xmi:id="_mSnujpLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:RangeValue" xmi:id="_mSnuj5LcEeSnQukVSXzSBA">
+            <minimum xsi:type="aadl2:IntegerLiteral" xmi:id="_mSnukJLcEeSnQukVSXzSBA">
+              <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+            </minimum>
+            <maximum xsi:type="aadl2:IntegerLiteral" xmi:id="_mSnukZLcEeSnQukVSXzSBA" value="1">
+              <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+            </maximum>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSnukpLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.10"/>
+        <ownedValue xmi:id="_mSoVkJLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSoVkZLcEeSnQukVSXzSBA" value="40000">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSoVkpLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.7"/>
+        <ownedValue xmi:id="_mSoVk5LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSoVlJLcEeSnQukVSXzSBA" value="40">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <featureInstance xmi:id="_mSH_RpLcEeSnQukVSXzSBA" name="cnx_p_out" dstConnectionInstance="_mSKbgpLcEeSnQukVSXzSBA" category="dataAccess" direction="in out">
+        <feature xsi:type="aadl2:DataAccess" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.41/@ownedDataAccess.0"/>
+      </featureInstance>
+      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.2/@ownedThreadSubcomponent.0"/>
+      <index>0</index>
+    </componentInstance>
+    <connectionInstance xmi:id="_mSKbgpLcEeSnQukVSXzSBA" name="the_proc1_p_out_globalVariable -> the_sender.cnx_p_out" complete="true" kind="accessConnection" destination="_mSH_RpLcEeSnQukVSXzSBA" source="_mSH_RJLcEeSnQukVSXzSBA">
+      <connectionReference xmi:id="_mSKbg5LcEeSnQukVSXzSBA" context="_mSH_Q5LcEeSnQukVSXzSBA" source="_mSH_RJLcEeSnQukVSXzSBA" destination="_mSH_RpLcEeSnQukVSXzSBA">
+        <connection xsi:type="aadl2:AccessConnection" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.2/@ownedAccessConnection.0"/>
+      </connectionReference>
+    </connectionInstance>
+    <subcomponent xsi:type="aadl2:ProcessSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedProcessSubcomponent.2"/>
+    <index>0</index>
+  </componentInstance>
+  <componentInstance xmi:id="_mSH_R5LcEeSnQukVSXzSBA" name="the_proc2" category="process">
+    <ownedPropertyAssociation xmi:id="_mSo8oJLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.2"/>
+      <ownedValue xmi:id="_mSo8oZLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSo8opLcEeSnQukVSXzSBA">
+          <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSo8o5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSImVJLcEeSnQukVSXzSBA"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSo8pJLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+      <ownedValue xmi:id="_mSo8pZLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSo8ppLcEeSnQukVSXzSBA">
+          <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSo8p5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxJJLcEeSnQukVSXzSBA"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <componentInstance xmi:id="_mSH_SJLcEeSnQukVSXzSBA" name="the_proc2_p_inglobalVariable" srcConnectionInstance="_mSLCkJLcEeSnQukVSXzSBA" category="data">
+      <ownedPropertyAssociation xmi:id="_mSpjsJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+        <ownedValue xmi:id="_mSpjsZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSpjspLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSpjs5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxJJLcEeSnQukVSXzSBA"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSpjtJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.19"/>
+        <ownedValue xmi:id="_mSpjtZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSpjtpLcEeSnQukVSXzSBA" value="APEX_INTEGER"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSqKwJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.20"/>
+        <ownedValue xmi:id="_mSqKwZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSqKwpLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:StringLiteral" xmi:id="_mSqKw5LcEeSnQukVSXzSBA" value="arinc653/queueing.h"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" xmi:id="_mSqKxJLcEeSnQukVSXzSBA" value="arinc653/apex-queuing.ads"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.3/@ownedDataSubcomponent.0"/>
+      <index>0</index>
+    </componentInstance>
+    <componentInstance xmi:id="_mSH_SZLcEeSnQukVSXzSBA" name="the_receiver" category="thread">
+      <ownedPropertyAssociation xmi:id="_mSqKxZLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.2"/>
+        <ownedValue xmi:id="_mSqKxpLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSqKx5LcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSqKyJLcEeSnQukVSXzSBA" referencedInstanceObject="_mSImVJLcEeSnQukVSXzSBA"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSqKyZLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+        <ownedValue xmi:id="_mSqKypLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSqKy5LcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_mSqKzJLcEeSnQukVSXzSBA" referencedInstanceObject="_mSGxJJLcEeSnQukVSXzSBA"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSqx0JLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.18"/>
+        <ownedValue xmi:id="_mSqx0ZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSqx0pLcEeSnQukVSXzSBA" value="1000">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSqx05LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Thread_Properties.aadl2#//@ownedProperty.3"/>
+        <ownedValue xmi:id="_mSqx1JLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSqx1ZLcEeSnQukVSXzSBA" value="10"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSqx1pLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Thread_Properties.aadl2#//@ownedProperty.0"/>
+        <ownedValue xmi:id="_mSqx15LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSqx2JLcEeSnQukVSXzSBA">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.3/@ownedLiteral.0"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSqx2ZLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.4"/>
+        <ownedValue xmi:id="_mSqx2pLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ReferenceValue" xmi:id="_mSqx25LcEeSnQukVSXzSBA">
+            <path xmi:id="_mSqx3JLcEeSnQukVSXzSBA">
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.45/@ownedSubprogramCallSequence.0"/>
+            </path>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSqx3ZLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.8"/>
+        <ownedValue xmi:id="_mSrY4JLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSrY4ZLcEeSnQukVSXzSBA" value="40000">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSrY4pLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.3"/>
+        <ownedValue xmi:id="_mSrY45LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:RangeValue" xmi:id="_mSrY5JLcEeSnQukVSXzSBA">
+            <minimum xsi:type="aadl2:IntegerLiteral" xmi:id="_mSrY5ZLcEeSnQukVSXzSBA">
+              <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+            </minimum>
+            <maximum xsi:type="aadl2:IntegerLiteral" xmi:id="_mSrY5pLcEeSnQukVSXzSBA" value="1">
+              <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+            </maximum>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSrY55LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.10"/>
+        <ownedValue xmi:id="_mSrY6JLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSrY6ZLcEeSnQukVSXzSBA" value="40000">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSrY6pLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.7"/>
+        <ownedValue xmi:id="_mSrY65LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSrY7JLcEeSnQukVSXzSBA" value="40">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <featureInstance xmi:id="_mSH_SpLcEeSnQukVSXzSBA" name="p_in" dstConnectionInstance="_mSLCkJLcEeSnQukVSXzSBA" category="dataAccess" direction="in out">
+        <feature xsi:type="aadl2:DataAccess" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.46/@ownedDataAccess.0"/>
+      </featureInstance>
+      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.3/@ownedThreadSubcomponent.0"/>
+      <index>0</index>
+    </componentInstance>
+    <connectionInstance xmi:id="_mSLCkJLcEeSnQukVSXzSBA" name="the_proc2_p_inglobalVariable -> the_receiver.p_in" complete="true" kind="accessConnection" destination="_mSH_SpLcEeSnQukVSXzSBA" source="_mSH_SJLcEeSnQukVSXzSBA">
+      <connectionReference xmi:id="_mSLCkZLcEeSnQukVSXzSBA" context="_mSH_R5LcEeSnQukVSXzSBA" source="_mSH_SJLcEeSnQukVSXzSBA" destination="_mSH_SpLcEeSnQukVSXzSBA">
+        <connection xsi:type="aadl2:AccessConnection" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.3/@ownedAccessConnection.0"/>
+      </connectionReference>
+    </connectionInstance>
+    <subcomponent xsi:type="aadl2:ProcessSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedProcessSubcomponent.3"/>
+    <index>0</index>
+  </componentInstance>
+  <componentInstance xmi:id="_mSH_S5LcEeSnQukVSXzSBA" name="the_cpu1" category="processor">
+    <ownedPropertyAssociation xmi:id="_mSr_8JLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.15"/>
+      <ownedValue xmi:id="_mSsnAJLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSsnAZLcEeSnQukVSXzSBA">
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSsnApLcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mSsnA5LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.8/@ownedField.0"/>
+              <ownedValue xsi:type="instance:InstanceReferenceValue" xmi:id="_mSsnBJLcEeSnQukVSXzSBA" referencedInstanceObject="_mSImUJLcEeSnQukVSXzSBA"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSsnBZLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.8/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSsnBpLcEeSnQukVSXzSBA" value="1000">
+                <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+              </ownedValue>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSsnB5LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.8/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:BooleanLiteral" xmi:id="_mSsnCJLcEeSnQukVSXzSBA" value="true"/>
+            </ownedFieldValue>
+          </ownedListElement>
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSsnCZLcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mSsnCpLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.8/@ownedField.0"/>
+              <ownedValue xsi:type="instance:InstanceReferenceValue" xmi:id="_mSsnC5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSImUZLcEeSnQukVSXzSBA"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSsnDJLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.8/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSsnDZLcEeSnQukVSXzSBA" value="1000">
+                <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+              </ownedValue>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSsnDpLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.8/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:BooleanLiteral" xmi:id="_mSsnD5LcEeSnQukVSXzSBA" value="true"/>
+            </ownedFieldValue>
+          </ownedListElement>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSsnEJLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.11"/>
+      <ownedValue xmi:id="_mSsnEZLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSsnEpLcEeSnQukVSXzSBA" value="00:1F:C6:BF:74:06"/>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSsnE5LcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.0"/>
+      <ownedValue xmi:id="_mSsnFJLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSsnFZLcEeSnQukVSXzSBA" value="2000">
+          <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSsnFpLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.25"/>
+      <ownedValue xmi:id="_mSsnF5LcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSsnGJLcEeSnQukVSXzSBA">
+          <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mSsnGZLcEeSnQukVSXzSBA">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.7/@ownedLiteral.9"/>
+          </ownedListElement>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSsnGpLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.21"/>
+      <ownedValue xmi:id="_mSsnG5LcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSsnHJLcEeSnQukVSXzSBA">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.5/@ownedLiteral.2"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSsnHZLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.11"/>
+      <ownedValue xmi:id="_mStOEJLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mStOEZLcEeSnQukVSXzSBA">
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mStOEpLcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mStOE5LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.0"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mStOFJLcEeSnQukVSXzSBA" value="1"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mStOFZLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mStOFpLcEeSnQukVSXzSBA" value="Numeric error"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mStOF5LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mStOGJLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.3/@ownedLiteral.0"/>
+              </ownedValue>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mStOGZLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.3"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mStOGpLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.0/@ownedLiteral.9"/>
+              </ownedValue>
+            </ownedFieldValue>
+          </ownedListElement>
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mStOG5LcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mStOHJLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.0"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mStOHZLcEeSnQukVSXzSBA" value="2"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mStOHpLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mStOH5LcEeSnQukVSXzSBA" value="Illegal request"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mStOIJLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mStOIZLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.3/@ownedLiteral.0"/>
+              </ownedValue>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mStOIpLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.3"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mStOI5LcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.0/@ownedLiteral.10"/>
+              </ownedValue>
+            </ownedFieldValue>
+          </ownedListElement>
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mStOJJLcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mStOJZLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.0"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mStOJpLcEeSnQukVSXzSBA" value="3"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mStOJ5LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mStOKJLcEeSnQukVSXzSBA" value="Numeric error"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mStOKZLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mStOKpLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.3/@ownedLiteral.1"/>
+              </ownedValue>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mStOK5LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.3"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mStOLJLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.0/@ownedLiteral.9"/>
+              </ownedValue>
+            </ownedFieldValue>
+          </ownedListElement>
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mStOLZLcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mStOLpLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.0"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mStOL5LcEeSnQukVSXzSBA" value="4"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mStOMJLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mStOMZLcEeSnQukVSXzSBA" value="Illegal request"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mStOMpLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mStOM5LcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.3/@ownedLiteral.1"/>
+              </ownedValue>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mStONJLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.3"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mStONZLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.0/@ownedLiteral.10"/>
+              </ownedValue>
+            </ownedFieldValue>
+          </ownedListElement>
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mStONpLcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mStON5LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.0"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mStOOJLcEeSnQukVSXzSBA" value="5"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mStOOZLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mStOOpLcEeSnQukVSXzSBA" value="Numeric error"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mStOO5LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mStOPJLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.3/@ownedLiteral.2"/>
+              </ownedValue>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mStOPZLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.3"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mStOPpLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.0/@ownedLiteral.9"/>
+              </ownedValue>
+            </ownedFieldValue>
+          </ownedListElement>
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mStOP5LcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mStOQJLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.0"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mStOQZLcEeSnQukVSXzSBA" value="6"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mStOQpLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mStOQ5LcEeSnQukVSXzSBA" value="Illegal request"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mStORJLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mStORZLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.3/@ownedLiteral.2"/>
+              </ownedValue>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mStORpLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.3"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mStOR5LcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.0/@ownedLiteral.10"/>
+              </ownedValue>
+            </ownedFieldValue>
+          </ownedListElement>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mStOSJLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.12"/>
+      <ownedValue xmi:id="_mSt1IJLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSt1IZLcEeSnQukVSXzSBA">
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSt1IpLcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mSt1I5LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.0"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSt1JJLcEeSnQukVSXzSBA" value="1"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSt1JZLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSt1JpLcEeSnQukVSXzSBA" value="Restart partition"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSt1J5LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSt1KJLcEeSnQukVSXzSBA" value="Stop"/>
+            </ownedFieldValue>
+          </ownedListElement>
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSt1KZLcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mSt1KpLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.0"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSt1K5LcEeSnQukVSXzSBA" value="2"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSt1LJLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSt1LZLcEeSnQukVSXzSBA" value="Warm partition restart"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSt1LpLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSt1L5LcEeSnQukVSXzSBA" value="Reset"/>
+            </ownedFieldValue>
+          </ownedListElement>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSt1MJLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.8"/>
+      <ownedValue xmi:id="_mSt1MZLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSt1MpLcEeSnQukVSXzSBA">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.2/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSt1M5LcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.7"/>
+      <ownedValue xmi:id="_mSt1NJLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSt1NZLcEeSnQukVSXzSBA">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.1/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <featureInstance xmi:id="_mSImUpLcEeSnQukVSXzSBA" name="bus_access" srcConnectionInstance="_mSLCkpLcEeSnQukVSXzSBA" category="busAccess" direction="in out">
+      <feature xsi:type="aadl2:BusAccess" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.8/@ownedBusAccess.0"/>
+    </featureInstance>
+    <componentInstance xmi:id="_mSImUJLcEeSnQukVSXzSBA" name="the_part" category="virtual processor">
+      <ownedPropertyAssociation xmi:id="_mSvDQJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.25"/>
+        <ownedValue xmi:id="_mSvDQZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSvDQpLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mSvDQ5LcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.7/@ownedLiteral.1"/>
+            </ownedListElement>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSvDRJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.12"/>
+        <ownedValue xmi:id="_mSvDRZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSvDRpLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSvDR5LcEeSnQukVSXzSBA">
+              <ownedFieldValue xmi:id="_mSvDSJLcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.0"/>
+                <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSvDSZLcEeSnQukVSXzSBA" value="3"/>
+              </ownedFieldValue>
+              <ownedFieldValue xmi:id="_mSvDSpLcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.1"/>
+                <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSvDS5LcEeSnQukVSXzSBA" value="Restart process"/>
+              </ownedFieldValue>
+              <ownedFieldValue xmi:id="_mSvDTJLcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.2"/>
+                <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSvDTZLcEeSnQukVSXzSBA" value="Cold_Restart"/>
+              </ownedFieldValue>
+            </ownedListElement>
+            <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSvDTpLcEeSnQukVSXzSBA">
+              <ownedFieldValue xmi:id="_mSvDT5LcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.0"/>
+                <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSvDUJLcEeSnQukVSXzSBA" value="4"/>
+              </ownedFieldValue>
+              <ownedFieldValue xmi:id="_mSvDUZLcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.1"/>
+                <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSvDUpLcEeSnQukVSXzSBA" value="Warm partition restart"/>
+              </ownedFieldValue>
+              <ownedFieldValue xmi:id="_mSvDU5LcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.2"/>
+                <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSvDVJLcEeSnQukVSXzSBA" value="Warm_Restart"/>
+              </ownedFieldValue>
+            </ownedListElement>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSvDVZLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.18"/>
+        <ownedValue xmi:id="_mSvDVpLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSvDV5LcEeSnQukVSXzSBA" value="1000">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSvDWJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.7"/>
+        <ownedValue xmi:id="_mSvqUJLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSvqUZLcEeSnQukVSXzSBA" value="1"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSvqUpLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.15"/>
+        <ownedValue xmi:id="_mSvqU5LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSvqVJLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mSvqVZLcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.3/@ownedLiteral.2"/>
+            </ownedListElement>
+            <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mSvqVpLcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.3/@ownedLiteral.6"/>
+            </ownedListElement>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <subcomponent xsi:type="aadl2:VirtualProcessorSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.4/@ownedVirtualProcessorSubcomponent.0"/>
+      <index>0</index>
+    </componentInstance>
+    <componentInstance xmi:id="_mSImUZLcEeSnQukVSXzSBA" name="system_part" category="virtual processor">
+      <ownedPropertyAssociation xmi:id="_mSvqV5LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.25"/>
+        <ownedValue xmi:id="_mSvqWJLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSvqWZLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mSvqWpLcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.7/@ownedLiteral.1"/>
+            </ownedListElement>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSvqW5LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.12"/>
+        <ownedValue xmi:id="_mSwRYJLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSwRYZLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSwRYpLcEeSnQukVSXzSBA">
+              <ownedFieldValue xmi:id="_mSwRY5LcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.0"/>
+                <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSwRZJLcEeSnQukVSXzSBA" value="3"/>
+              </ownedFieldValue>
+              <ownedFieldValue xmi:id="_mSwRZZLcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.1"/>
+                <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSwRZpLcEeSnQukVSXzSBA" value="Restart process"/>
+              </ownedFieldValue>
+              <ownedFieldValue xmi:id="_mSwRZ5LcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.2"/>
+                <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSwRaJLcEeSnQukVSXzSBA" value="Cold_Restart"/>
+              </ownedFieldValue>
+            </ownedListElement>
+            <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSwRaZLcEeSnQukVSXzSBA">
+              <ownedFieldValue xmi:id="_mSwRapLcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.0"/>
+                <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSwRa5LcEeSnQukVSXzSBA" value="4"/>
+              </ownedFieldValue>
+              <ownedFieldValue xmi:id="_mSwRbJLcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.1"/>
+                <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSwRbZLcEeSnQukVSXzSBA" value="Warm partition restart"/>
+              </ownedFieldValue>
+              <ownedFieldValue xmi:id="_mSwRbpLcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.2"/>
+                <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSwRb5LcEeSnQukVSXzSBA" value="Warm_Restart"/>
+              </ownedFieldValue>
+            </ownedListElement>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSwRcJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.18"/>
+        <ownedValue xmi:id="_mSwRcZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSwRcpLcEeSnQukVSXzSBA" value="1000">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSwRc5LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.7"/>
+        <ownedValue xmi:id="_mSwRdJLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSwRdZLcEeSnQukVSXzSBA" value="1"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSwRdpLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.15"/>
+        <ownedValue xmi:id="_mSwRd5LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSwReJLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mSwReZLcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.3/@ownedLiteral.2"/>
+            </ownedListElement>
+            <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mSwRepLcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.3/@ownedLiteral.6"/>
+            </ownedListElement>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSwRe5LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.9"/>
+        <ownedValue xmi:id="_mSwRfJLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:BooleanLiteral" xmi:id="_mSwRfZLcEeSnQukVSXzSBA" value="true"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <subcomponent xsi:type="aadl2:VirtualProcessorSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.4/@ownedVirtualProcessorSubcomponent.1"/>
+      <index>0</index>
+    </componentInstance>
+    <subcomponent xsi:type="aadl2:ProcessorSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedProcessorSubcomponent.0"/>
+    <index>0</index>
+  </componentInstance>
+  <componentInstance xmi:id="_mSImU5LcEeSnQukVSXzSBA" name="the_cpu2" category="processor">
+    <ownedPropertyAssociation xmi:id="_mSw4cJLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.15"/>
+      <ownedValue xmi:id="_mSxfgJLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSxfgZLcEeSnQukVSXzSBA">
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSxfgpLcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mSxfg5LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.8/@ownedField.0"/>
+              <ownedValue xsi:type="instance:InstanceReferenceValue" xmi:id="_mSxfhJLcEeSnQukVSXzSBA" referencedInstanceObject="_mSImVJLcEeSnQukVSXzSBA"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSxfhZLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.8/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSxfhpLcEeSnQukVSXzSBA" value="1000">
+                <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+              </ownedValue>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSxfh5LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.8/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:BooleanLiteral" xmi:id="_mSxfiJLcEeSnQukVSXzSBA" value="true"/>
+            </ownedFieldValue>
+          </ownedListElement>
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSxfiZLcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mSxfipLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.8/@ownedField.0"/>
+              <ownedValue xsi:type="instance:InstanceReferenceValue" xmi:id="_mSxfi5LcEeSnQukVSXzSBA" referencedInstanceObject="_mSImVZLcEeSnQukVSXzSBA"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSxfjJLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.8/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSxfjZLcEeSnQukVSXzSBA" value="1000">
+                <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+              </ownedValue>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSxfjpLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.8/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:BooleanLiteral" xmi:id="_mSxfj5LcEeSnQukVSXzSBA" value="true"/>
+            </ownedFieldValue>
+          </ownedListElement>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSxfkJLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.11"/>
+      <ownedValue xmi:id="_mSxfkZLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSxfkpLcEeSnQukVSXzSBA" value="00:1E:A5:32:DE:32"/>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSxfk5LcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.0"/>
+      <ownedValue xmi:id="_mSxflJLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSxflZLcEeSnQukVSXzSBA" value="2000">
+          <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSxflpLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.25"/>
+      <ownedValue xmi:id="_mSxfl5LcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSxfmJLcEeSnQukVSXzSBA">
+          <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mSxfmZLcEeSnQukVSXzSBA">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.7/@ownedLiteral.9"/>
+          </ownedListElement>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSxfmpLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.21"/>
+      <ownedValue xmi:id="_mSxfm5LcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSxfnJLcEeSnQukVSXzSBA">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.5/@ownedLiteral.2"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSxfnZLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.11"/>
+      <ownedValue xmi:id="_mSyGkJLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSyGkZLcEeSnQukVSXzSBA">
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSyGkpLcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mSyGk5LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.0"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSyGlJLcEeSnQukVSXzSBA" value="1"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGlZLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSyGlpLcEeSnQukVSXzSBA" value="Numeric error"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGl5LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSyGmJLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.3/@ownedLiteral.0"/>
+              </ownedValue>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGmZLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.3"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSyGmpLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.0/@ownedLiteral.9"/>
+              </ownedValue>
+            </ownedFieldValue>
+          </ownedListElement>
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSyGm5LcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mSyGnJLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.0"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSyGnZLcEeSnQukVSXzSBA" value="2"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGnpLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSyGn5LcEeSnQukVSXzSBA" value="Illegal request"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGoJLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSyGoZLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.3/@ownedLiteral.0"/>
+              </ownedValue>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGopLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.3"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSyGo5LcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.0/@ownedLiteral.10"/>
+              </ownedValue>
+            </ownedFieldValue>
+          </ownedListElement>
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSyGpJLcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mSyGpZLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.0"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSyGppLcEeSnQukVSXzSBA" value="3"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGp5LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSyGqJLcEeSnQukVSXzSBA" value="Numeric error"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGqZLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSyGqpLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.3/@ownedLiteral.1"/>
+              </ownedValue>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGq5LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.3"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSyGrJLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.0/@ownedLiteral.9"/>
+              </ownedValue>
+            </ownedFieldValue>
+          </ownedListElement>
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSyGrZLcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mSyGrpLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.0"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSyGr5LcEeSnQukVSXzSBA" value="4"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGsJLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSyGsZLcEeSnQukVSXzSBA" value="Illegal request"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGspLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSyGs5LcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.3/@ownedLiteral.1"/>
+              </ownedValue>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGtJLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.3"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSyGtZLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.0/@ownedLiteral.10"/>
+              </ownedValue>
+            </ownedFieldValue>
+          </ownedListElement>
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSyGtpLcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mSyGt5LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.0"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSyGuJLcEeSnQukVSXzSBA" value="5"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGuZLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSyGupLcEeSnQukVSXzSBA" value="Numeric error"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGu5LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSyGvJLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.3/@ownedLiteral.2"/>
+              </ownedValue>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGvZLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.3"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSyGvpLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.0/@ownedLiteral.9"/>
+              </ownedValue>
+            </ownedFieldValue>
+          </ownedListElement>
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSyGv5LcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mSyGwJLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.0"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSyGwZLcEeSnQukVSXzSBA" value="6"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGwpLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSyGw5LcEeSnQukVSXzSBA" value="Illegal request"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGxJLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSyGxZLcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.3/@ownedLiteral.2"/>
+              </ownedValue>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGxpLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.4/@ownedField.3"/>
+              <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSyGx5LcEeSnQukVSXzSBA">
+                <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.0/@ownedLiteral.10"/>
+              </ownedValue>
+            </ownedFieldValue>
+          </ownedListElement>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSyGyJLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.12"/>
+      <ownedValue xmi:id="_mSyGyZLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSyGypLcEeSnQukVSXzSBA">
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSyGy5LcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mSyGzJLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.0"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSyGzZLcEeSnQukVSXzSBA" value="1"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyGzpLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSyGz5LcEeSnQukVSXzSBA" value="Restart partition"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyG0JLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSyG0ZLcEeSnQukVSXzSBA" value="Stop"/>
+            </ownedFieldValue>
+          </ownedListElement>
+          <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSyG0pLcEeSnQukVSXzSBA">
+            <ownedFieldValue xmi:id="_mSyG05LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.0"/>
+              <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSyG1JLcEeSnQukVSXzSBA" value="2"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyG1ZLcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.1"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSyG1pLcEeSnQukVSXzSBA" value="Warm partition restart"/>
+            </ownedFieldValue>
+            <ownedFieldValue xmi:id="_mSyG15LcEeSnQukVSXzSBA">
+              <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.2"/>
+              <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSyG2JLcEeSnQukVSXzSBA" value="Reset"/>
+            </ownedFieldValue>
+          </ownedListElement>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSytoJLcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.8"/>
+      <ownedValue xmi:id="_mSytoZLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSytopLcEeSnQukVSXzSBA">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.2/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_mSyto5LcEeSnQukVSXzSBA">
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.7"/>
+      <ownedValue xmi:id="_mSytpJLcEeSnQukVSXzSBA">
+        <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_mSytpZLcEeSnQukVSXzSBA">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.1/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <featureInstance xmi:id="_mSImVpLcEeSnQukVSXzSBA" name="bus_access" srcConnectionInstance="_mSLpoJLcEeSnQukVSXzSBA" category="busAccess" direction="in out">
+      <feature xsi:type="aadl2:BusAccess" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.8/@ownedBusAccess.0"/>
+    </featureInstance>
+    <componentInstance xmi:id="_mSImVJLcEeSnQukVSXzSBA" name="the_part" category="virtual processor">
+      <ownedPropertyAssociation xmi:id="_mSzUsJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.25"/>
+        <ownedValue xmi:id="_mSzUsZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSzUspLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mSzUs5LcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.7/@ownedLiteral.1"/>
+            </ownedListElement>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSz7wJLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.12"/>
+        <ownedValue xmi:id="_mSz7wZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSz7wpLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSz7w5LcEeSnQukVSXzSBA">
+              <ownedFieldValue xmi:id="_mSz7xJLcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.0"/>
+                <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSz7xZLcEeSnQukVSXzSBA" value="3"/>
+              </ownedFieldValue>
+              <ownedFieldValue xmi:id="_mSz7xpLcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.1"/>
+                <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSz7x5LcEeSnQukVSXzSBA" value="Restart process"/>
+              </ownedFieldValue>
+              <ownedFieldValue xmi:id="_mSz7yJLcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.2"/>
+                <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSz7yZLcEeSnQukVSXzSBA" value="Cold_Restart"/>
+              </ownedFieldValue>
+            </ownedListElement>
+            <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mSz7ypLcEeSnQukVSXzSBA">
+              <ownedFieldValue xmi:id="_mSz7y5LcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.0"/>
+                <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSz7zJLcEeSnQukVSXzSBA" value="4"/>
+              </ownedFieldValue>
+              <ownedFieldValue xmi:id="_mSz7zZLcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.1"/>
+                <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSz7zpLcEeSnQukVSXzSBA" value="Warm partition restart"/>
+              </ownedFieldValue>
+              <ownedFieldValue xmi:id="_mSz7z5LcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.2"/>
+                <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mSz70JLcEeSnQukVSXzSBA" value="Warm_Restart"/>
+              </ownedFieldValue>
+            </ownedListElement>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSz70ZLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.18"/>
+        <ownedValue xmi:id="_mSz70pLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSz705LcEeSnQukVSXzSBA" value="1000">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSz71JLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.7"/>
+        <ownedValue xmi:id="_mSz71ZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mSz71pLcEeSnQukVSXzSBA" value="1"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mSz715LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.15"/>
+        <ownedValue xmi:id="_mSz72JLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mSz72ZLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mSz72pLcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.3/@ownedLiteral.2"/>
+            </ownedListElement>
+            <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mSz725LcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.3/@ownedLiteral.6"/>
+            </ownedListElement>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <subcomponent xsi:type="aadl2:VirtualProcessorSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.4/@ownedVirtualProcessorSubcomponent.0"/>
+      <index>0</index>
+    </componentInstance>
+    <componentInstance xmi:id="_mSImVZLcEeSnQukVSXzSBA" name="system_part" category="virtual processor">
+      <ownedPropertyAssociation xmi:id="_mS0i0JLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.25"/>
+        <ownedValue xmi:id="_mS0i0ZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mS0i0pLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mS0i05LcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.7/@ownedLiteral.1"/>
+            </ownedListElement>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mS0i1JLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.12"/>
+        <ownedValue xmi:id="_mS0i1ZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mS0i1pLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mS0i15LcEeSnQukVSXzSBA">
+              <ownedFieldValue xmi:id="_mS0i2JLcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.0"/>
+                <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mS0i2ZLcEeSnQukVSXzSBA" value="3"/>
+              </ownedFieldValue>
+              <ownedFieldValue xmi:id="_mS0i2pLcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.1"/>
+                <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mS0i25LcEeSnQukVSXzSBA" value="Restart process"/>
+              </ownedFieldValue>
+              <ownedFieldValue xmi:id="_mS0i3JLcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.2"/>
+                <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mS0i3ZLcEeSnQukVSXzSBA" value="Cold_Restart"/>
+              </ownedFieldValue>
+            </ownedListElement>
+            <ownedListElement xsi:type="aadl2:RecordValue" xmi:id="_mS0i3pLcEeSnQukVSXzSBA">
+              <ownedFieldValue xmi:id="_mS0i35LcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.0"/>
+                <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mS0i4JLcEeSnQukVSXzSBA" value="4"/>
+              </ownedFieldValue>
+              <ownedFieldValue xmi:id="_mS0i4ZLcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.1"/>
+                <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mS0i4pLcEeSnQukVSXzSBA" value="Warm partition restart"/>
+              </ownedFieldValue>
+              <ownedFieldValue xmi:id="_mS0i45LcEeSnQukVSXzSBA">
+                <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.5/@ownedField.2"/>
+                <ownedValue xsi:type="aadl2:StringLiteral" xmi:id="_mS0i5JLcEeSnQukVSXzSBA" value="Warm_Restart"/>
+              </ownedFieldValue>
+            </ownedListElement>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mS1J4JLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.18"/>
+        <ownedValue xmi:id="_mS1J4ZLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mS1J4pLcEeSnQukVSXzSBA" value="1000">
+            <unit href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mS1J45LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.7"/>
+        <ownedValue xmi:id="_mS1J5JLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_mS1J5ZLcEeSnQukVSXzSBA" value="1"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mS1J5pLcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.15"/>
+        <ownedValue xmi:id="_mS1J55LcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_mS1J6JLcEeSnQukVSXzSBA">
+            <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mS1J6ZLcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.3/@ownedLiteral.2"/>
+            </ownedListElement>
+            <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_mS1J6pLcEeSnQukVSXzSBA">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.3/@ownedLiteral.6"/>
+            </ownedListElement>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_mS1J65LcEeSnQukVSXzSBA">
+        <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.9"/>
+        <ownedValue xmi:id="_mS1J7JLcEeSnQukVSXzSBA">
+          <ownedValue xsi:type="aadl2:BooleanLiteral" xmi:id="_mS1J7ZLcEeSnQukVSXzSBA" value="true"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <subcomponent xsi:type="aadl2:VirtualProcessorSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.4/@ownedVirtualProcessorSubcomponent.1"/>
+      <index>0</index>
+    </componentInstance>
+    <subcomponent xsi:type="aadl2:ProcessorSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedProcessorSubcomponent.1"/>
+    <index>0</index>
+  </componentInstance>
+  <connectionInstance xmi:id="_mSLCkpLcEeSnQukVSXzSBA" name="the_cpu1.bus_access -> the_bus" complete="true" kind="accessConnection" destination="_mSGKEJLcEeSnQukVSXzSBA" source="_mSImUpLcEeSnQukVSXzSBA">
+    <connectionReference xmi:id="_mSLCk5LcEeSnQukVSXzSBA" context="_mSE78JLcEeSnQukVSXzSBA" source="_mSImUpLcEeSnQukVSXzSBA" destination="_mSGKEJLcEeSnQukVSXzSBA">
+      <connection xsi:type="aadl2:AccessConnection" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedAccessConnection.0"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance xmi:id="_mSLpoJLcEeSnQukVSXzSBA" name="the_cpu2.bus_access -> the_bus" complete="true" kind="accessConnection" destination="_mSGKEJLcEeSnQukVSXzSBA" source="_mSImVpLcEeSnQukVSXzSBA">
+    <connectionReference xmi:id="_mSLpoZLcEeSnQukVSXzSBA" context="_mSE78JLcEeSnQukVSXzSBA" source="_mSImVpLcEeSnQukVSXzSBA" destination="_mSGKEJLcEeSnQukVSXzSBA">
+      <connection xsi:type="aadl2:AccessConnection" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedAccessConnection.1"/>
+    </connectionReference>
+  </connectionInstance>
+  <systemOperationMode xmi:id="_mSImV5LcEeSnQukVSXzSBA" name="No Modes"/>
+  <componentImplementation xsi:type="aadl2:SystemImplementation" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6"/>
+</instance:SystemInstance>

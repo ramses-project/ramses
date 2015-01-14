@@ -28,6 +28,8 @@ import org.eclipse.equinox.app.IApplication ;
 import org.eclipse.equinox.app.IApplicationContext ;
 
 import fr.tpt.aadl.ramses.control.cli.core.ToolSuiteLauncherCommand ;
+import fr.tpt.aadl.ramses.control.support.reporters.MessageReporter4Cli ;
+import fr.tpt.aadl.ramses.control.support.reporters.SysErrReporter4Cli ;
 import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
@@ -49,6 +51,9 @@ public class Application implements IApplication
         throws Exception
   {
     ServiceProvider.setDefault(new OSGiServiceRegistry()) ;
+    ServiceProvider.SYS_ERR_REP = new SysErrReporter4Cli(new
+                                                         MessageReporter4Cli()) ;
+    
     @SuppressWarnings("unchecked")
     Map<String, String[]> argsMap = context.getArguments() ;
     String[] args = argsMap.get("application.args") ;

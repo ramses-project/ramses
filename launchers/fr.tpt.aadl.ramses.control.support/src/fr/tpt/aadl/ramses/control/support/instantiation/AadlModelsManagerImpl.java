@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.NullProgressMonitor ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
 import org.osate.aadl2.AadlPackage ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.SystemImplementation ;
@@ -29,7 +28,7 @@ public class AadlModelsManagerImpl implements AadlModelInstantiatior {
 
 	protected InstantiateModel _instantiateModel ;
         
-	private ResourceSet aadlResourceSet = new ResourceSetImpl();
+	
 //	protected AadlModelInstantiatior _modelInstantiator ;
 	protected IProgressMonitor _monitor = new NullProgressMonitor() ;
 	protected AnalysisErrorReporterManager _errManager ;
@@ -63,34 +62,43 @@ public class AadlModelsManagerImpl implements AadlModelInstantiatior {
 	public SystemInstance instantiate(SystemImplementation si) {
 	  if(si == null)
 	  {
-		String errMsg =  "cannot delete the previous AADL resource set" ;
-        _LOGGER.fatal(errMsg);
-        throw new RuntimeException(errMsg) ;
+	    String errMsg =  "could not find system implementation in generated package" ;
+	    _LOGGER.fatal(errMsg);
+	    throw new RuntimeException(errMsg) ;
 	  }
-	  URI instanceURI =
-	       OsateResourceUtil.getInstanceModelURI(si) ;
+	  String instanceURIString =
+	      OsateResourceUtil.getInstanceModelURI(si).toString() ;
 	  
-	  Resource aadlResource = aadlResourceSet.getResource(instanceURI,
-	                                                      false) ;
-    if(aadlResource != null)
-    {
-      try
-      {
-        aadlResource.delete(null) ;
-      }
-      catch(IOException e)
-      {
-        String errMsg =  "cannot delete the previous AADL resource set" ;
-        _LOGGER.fatal(errMsg, e);
-        throw new RuntimeException(errMsg, e) ;
-      }
-    }
-    
-	  aadlResource = aadlResourceSet
-              .createResource(instanceURI) ;
+	  int indexOfSharp = instanceURIString.indexOf('#');
+	  if(indexOfSharp>0)
+	    instanceURIString = instanceURIString.substring(0, indexOfSharp);
+	  URI instanceURI = URI.createURI(instanceURIString);
+	  ResourceSet rs = si.eResource().getResourceSet();
+	  Resource aadlResource = rs.getResource(instanceURI,
+	                                         false) ;
+	  
+	  SystemInstance instance = null;
+	  if(aadlResource != null)
+	  {
+	    try
+	    {
+	      instance = InstantiateModel.buildInstanceModelFile(si);
+	      aadlResource.load(null);
+	    }
+	    catch(Exception e)
+	    {
+	      String errMsg =  "cannot delete the previous AADL resource set" ;
+	      _LOGGER.fatal(errMsg, e);
+	      throw new RuntimeException(errMsg, e) ;
+	    }
+	  }
+	  else
+	  {
+	    aadlResource = rs.createResource(instanceURI);
+	    instance = _instantiateModel.createSystemInstanceInt(si,
+	                                                         aadlResource) ;
+	  }
 
-	  SystemInstance instance = _instantiateModel.createSystemInstanceInt(si,
-	                                                    aadlResource) ;
 	  
 	  if(instance == null)
 	  {

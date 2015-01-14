@@ -16,6 +16,7 @@ public class AadlOSEKValidation extends Aadl2ConstraintValidationEMFTVMLauncher 
 	ATL_FILE_NAMES.add("helpers/Services");
 	ATL_FILE_NAMES.add("tools/PropertiesTools");
 	ATL_FILE_NAMES.add("ACG/Constraints/shared/Common");
+	ATL_FILE_NAMES.add("ACG/Constraints/shared/DataInstances");
 	ATL_FILE_NAMES.add("ACG/Constraints/shared/ProcessInstances");
 	ATL_FILE_NAMES.add("ACG/Constraints/shared/ProcessorInstances");
 	ATL_FILE_NAMES.add("ACG/Constraints/shared/VirtualProcessorInstances");

@@ -33,24 +33,27 @@ import org.eclipse.emf.ecore.EClass;
  *
  * @generated
  */
-public class ConjunctionImpl extends AnalysisSequenceImpl implements Conjunction {
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected ConjunctionImpl() {
-		super();
-	}
+public class ConjunctionImpl extends AnalysisSequenceImpl implements Conjunction
+{
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  protected ConjunctionImpl()
+  {
+    super();
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return WorkflowPackage.Literals.CONJUNCTION;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  protected EClass eStaticClass()
+  {
+    return WorkflowPackage.Literals.CONJUNCTION;
+  }
 
 } //ConjunctionImpl

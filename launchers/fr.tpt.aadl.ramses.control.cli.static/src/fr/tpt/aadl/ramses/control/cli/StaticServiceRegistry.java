@@ -44,6 +44,7 @@ import fr.tpt.aadl.ramses.control.support.services.AbstractServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.generation.ada.annex.behavior.AadlBaToADAUnparserAction ;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction ;
+import fr.tpt.aadl.ramses.generation.integrity.IntegrityGeneratorFactory ;
 import fr.tpt.aadl.ramses.generation.launcher.adaravenscar.AdaRavenscarGeneratorFactory ;
 import fr.tpt.aadl.ramses.generation.osek.OSEKGeneratorFactory ;
 import fr.tpt.aadl.ramses.generation.pok.ada.AdaPokGeneratorFactory ;
@@ -101,6 +102,7 @@ public class StaticServiceRegistry extends AbstractServiceRegistry implements Se
     GeneratorFactory oSEKGeneratorFactory =new OSEKGeneratorFactory();
     GeneratorFactory adaGeneratorFactory = new AdaPokGeneratorFactory();
     GeneratorFactory adaRavenscarGeneratorFactory = new AdaRavenscarGeneratorFactory();
+    GeneratorFactory arincGeneratorFactory =new IntegrityGeneratorFactory();
     
     Generator genPok = pokGeneratorFactory.createGenerator(modelInstantiatior,
                                                            predefinedAadlModels);
@@ -114,11 +116,14 @@ public class StaticServiceRegistry extends AbstractServiceRegistry implements Se
     Generator genAdaRavenscar = adaRavenscarGeneratorFactory.
                                              createGenerator(modelInstantiatior,
                                                           predefinedAadlModels);
-    
+    Generator genIntegrityArinc = arincGeneratorFactory.
+                                            createGenerator(modelInstantiatior, 
+                                                            predefinedAadlModels);
     _gen.put(genPok.getRegistryName(), genPok) ;
     _gen.put(genOsek.getRegistryName(), genOsek) ;
     _gen.put(genAda.getRegistryName(), genAda) ;
     _gen.put(genAdaRavenscar.getRegistryName(), genAdaRavenscar) ;
+    _gen.put(genIntegrityArinc.getRegistryName(), genIntegrityArinc) ;
 
   }
 
