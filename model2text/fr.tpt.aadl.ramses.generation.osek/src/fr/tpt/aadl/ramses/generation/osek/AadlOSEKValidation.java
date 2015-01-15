@@ -23,5 +23,6 @@ public class AadlOSEKValidation extends Aadl2ConstraintValidationEMFTVMLauncher 
 	ATL_FILE_NAMES.add("ACG/Constraints/shared/ThreadInstances");
 	ATL_FILE_NAMES.add("ACG/Constraints/shared/FeatureInstances");
 	ATL_FILE_NAMES.add("ACG/Constraints/shared/Subprograms");
+	ATL_FILE_NAMES.add("ACG/Constraints/nxtOSEK/OsekProperties");
   }
 }
