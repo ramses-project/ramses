@@ -1,0 +1,65 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLI=http://aadl.info/AADL/2.0/instance
+-- @nsURI AADLBA=http://aadl.info/AADL/2.0
+-- @atlcompiler emftvm
+
+
+module OsekProperties;
+
+create OUT : CV 	from 		IN : AADLI,
+								THREAD_PROPERTIES: AADLBA;
+
+
+--@extends check_ComponentInstance
+abstract rule check_ThreadInstance
+{
+	from
+	  obj: AADLI!ComponentInstance
+	  (obj.category = #thread)
+}
+
+--@extends check_ThreadInstance
+rule no_timedThread
+{
+	from 
+		obj: AADLI!ComponentInstance
+		(obj.isTimedThread())
+	to	
+		err: CV!Error
+		(
+		message <- 'Timed thread instance not supported for nxtOSEK code generation!'	
+		)
+}
+
+--@extends check_ThreadInstance
+rule thread_priority_must_be_set
+{
+	from 
+		obj: AADLI!ComponentInstance
+		(not obj.hasProperty('Priority'))
+	to	
+		err: CV!Error
+		(
+		message <- 'Threads need priority to be set for nxtOSEK code generation!'	
+		)
+}
