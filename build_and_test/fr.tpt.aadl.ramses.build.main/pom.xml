@@ -54,7 +54,7 @@
     <module>../../analysis/fr.tpt.aadl.ramses.analysis.memoryfootprint</module>
     <module>../../analysis/fr.tpt.aadl.ramses.analysis.maintainability</module>
     <module>../../analysis/fr.tpt.aadl.ramses.analysis.sched.execution.graph</module>
-    <module>../../analysis/fr.tpt.aadl.analysis.sched.ba.reduced</module>
+    <module>../../analysis/fr.tpt.aadl.ramses.analysis.sched.ba.reduced</module>
     <module>../../analysis/fr.tpt.aadl.ramses.analysis.result</module>
     <module>../../analysis/fr.tpt.aadl.ramses.constraints.reporter.metamodel</module>
     <module>../fr.tpt.aadl.ramses.build.feature</module>
