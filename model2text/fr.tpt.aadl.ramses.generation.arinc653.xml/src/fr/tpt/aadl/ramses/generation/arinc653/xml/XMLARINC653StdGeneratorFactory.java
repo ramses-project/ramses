@@ -34,7 +34,7 @@ public class XMLARINC653StdGeneratorFactory implements GeneratorFactory
 {
   public static final String ARINC653_GENERATOR_NAME = "xmlarinc653" ;
   
-  private static Generator createIntegrityGenerator(AadlModelInstantiatior instantiator,
+  private static Generator createARINC653XMLGenerator(AadlModelInstantiatior instantiator,
 		  PredefinedAadlModelManager predefinedAadlModels)
   {
     
@@ -77,6 +77,6 @@ public class XMLARINC653StdGeneratorFactory implements GeneratorFactory
   public Generator createGenerator(AadlModelInstantiatior modelInstantiatior,
           PredefinedAadlModelManager predefinedAadlModels)
   {
-      return createIntegrityGenerator(modelInstantiatior, predefinedAadlModels);
+      return createARINC653XMLGenerator(modelInstantiatior, predefinedAadlModels);
   }
 }
