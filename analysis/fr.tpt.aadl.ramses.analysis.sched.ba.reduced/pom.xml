@@ -12,7 +12,7 @@
   </parent>
   
 	<groupId>ramses</groupId>
-	<artifactId>fr.tpt.aadl.analysis.sched.ba.reduced</artifactId>
+	<artifactId>fr.tpt.aadl.ramses.analysis.sched.ba.reduced</artifactId>
 	<version>${project.parent.version}</version>
 	<packaging>eclipse-plugin</packaging>
 	
