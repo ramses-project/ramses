@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="fr.tpt.aadl.ramses.control.support.generator">
+      <generator
+            class="fr.tpt.aadl.ramses.generation.arinc653.xml.XMLARINC653StdGeneratorFactory"
+            id="fr.tpt.aadl.ramses.generation.arinc653.xml"
+            transformationName="xmlarinc653">
+      </generator>
+   </extension>
+</plugin>

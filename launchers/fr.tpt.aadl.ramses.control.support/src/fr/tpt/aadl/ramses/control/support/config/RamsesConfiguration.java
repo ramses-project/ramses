@@ -261,7 +261,7 @@ public class RamsesConfiguration
       Generator gen = reg.getGenerator(_targetId) ;
       
       File runtimePath = null ;
-      if(path != null)
+      if(path != null && !path.isEmpty())
       {
         runtimePath = fileChecker(path) ;
       }

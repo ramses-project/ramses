@@ -31,7 +31,8 @@ Require-Bundle: org.eclipse.ui.ide,
  org.eclipse.emf.common,
  fr.tpt.aadl.ramses.analysis.maintainability;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.analysis.memoryfootprint;bundle-version="1.0.0",
- fr.tpt.aadl.ramses.analysis.result
+ fr.tpt.aadl.ramses.analysis.result,
+ fr.tpt.aadl.ramses.generation.arinc653.xml
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: TELECOM ParisTech

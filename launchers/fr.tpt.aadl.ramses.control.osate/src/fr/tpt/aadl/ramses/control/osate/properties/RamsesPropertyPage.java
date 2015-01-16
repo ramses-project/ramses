@@ -60,6 +60,7 @@ import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.generation.arinc653.xml.XMLARINC653StdGeneratorFactory ;
 import fr.tpt.aadl.ramses.generation.osek.OSEKGeneratorFactory ;
 import fr.tpt.aadl.ramses.generation.pok.c.PokGeneratorFactory ;
 
@@ -272,8 +273,8 @@ public class RamsesPropertyPage extends PropertyPage {
     ojr.setData(_OJR_PLATFORM);
 
     Button arincIntegrity = new Button(composite, SWT.RADIO);
-    arincIntegrity.setText("ARINC653 - Integrity");
-    arincIntegrity.setData("integrity");
+    arincIntegrity.setText("ARINC653 - Standard");
+    arincIntegrity.setData(XMLARINC653StdGeneratorFactory.ARINC653_GENERATOR_NAME);
     
     Button osek = new Button(composite, SWT.RADIO);
     osek.setText("OSEX/NXT - nxtOSEK (http://lejos-osek.sourceforge.net/)");
