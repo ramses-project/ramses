@@ -36,6 +36,39 @@ from
 	SCHEDULER_RUNTIME	   : AADLBA;
 
 
+helper context AADLI!ComponentInstance def : hasProperty(propertyName: String) : Boolean =
+	self.ownedPropertyAssociation->exists(
+				e | e.property.name.toLower() = propertyName.toLower()
+				)
+;
+
+helper context AADLI!ComponentInstance def : hasPropertyAssigned(p: AADLI!Property): Boolean =
+	self.ownedPropertyAssociation->exists(
+				e | e.property = p
+				)
+;
+
+helper context AADLI!ComponentImplementation def : hasProperty(propertyName: String) : Boolean =
+	self.getAllPropertyAssociations()->exists(
+				e | e.property.name.toLower() = propertyName.toLower()
+				)
+	or
+	self.type.hasProperty(propertyName)
+;
+
+helper context AADLI!ComponentType def : hasProperty(propertyName: String) : Boolean =
+	self.getAllPropertyAssociations()->exists(
+				e | e.property.name.toLower() = propertyName.toLower()
+				)
+;
+
+helper context AADLI!NamedElement def : hasPropertyAssigned(p: AADLI!Property): Boolean =
+	self.getAllPropertyAssociations()->exists(
+				e | e.property = p
+				)
+;
+
+
 helper context String def : asBaseType() : AADLBA!Classifier =
 	AADLBA!Classifier->allInstancesFrom('BASE_TYPES')->any(c|c.name=self)
 ;
