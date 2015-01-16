@@ -50,7 +50,6 @@
       <plugin id="fr.tpt.aadl.ramses.generation.ada.ravenscar"/>
       <plugin id="fr.tpt.aadl.ramses.generation.arinc653.xml"/>
       <plugin id="fr.tpt.aadl.ramses.generation.c"/>
-      <plugin id="fr.tpt.aadl.ramses.generation.integrity"/>
       <plugin id="fr.tpt.aadl.ramses.generation.osek"/>
       <plugin id="fr.tpt.aadl.ramses.generation.pok"/>
       <plugin id="fr.tpt.aadl.ramses.generation.target.specific"/>
