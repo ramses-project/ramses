@@ -242,7 +242,7 @@ You should have received a copy of the Eclipse Public License along with this pr
          unpack="false"/>
 
    <plugin
-         id="fr.tpt.aadl.ramses.analysis.asg"
+         id="fr.tpt.aadl.ramses.analysis.sched.ba.reduced"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -270,7 +270,7 @@ You should have received a copy of the Eclipse Public License along with this pr
          unpack="false"/>
 
    <plugin
-         id="fr.tpt.aadl.analysis.sched.wcrtanalysis.results"
+         id="fr.tpt.aadl.ramses.analysis.sched.execution.graph"
          download-size="0"
          install-size="0"
          version="0.0.0"

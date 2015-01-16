@@ -10,10 +10,24 @@
     <version>1.0.0-SNAPSHOT</version>
     <relativePath>../../build_and_test/fr.tpt.aadl.ramses.build.main/pom.xml</relativePath>
   </parent>
-  
+	
 	<groupId>ramses</groupId>
-	<artifactId>fr.tpt.aadl.analysis.sched.wcrtanalysis.results</artifactId>
+	<artifactId>fr.tpt.aadl.ramses.analysis.sched.execution.graph</artifactId>
 	<version>${project.parent.version}</version>
 	<packaging>eclipse-plugin</packaging>
+
+	<dependencies>
+	  <dependency>
+		  <groupId>org</groupId>
+		  <artifactId>jgrapht</artifactId>
+		  <version>1.6</version>
+	  </dependency>
+	
+	  <dependency>
+	    <groupId>ramses</groupId>
+	    <artifactId>fr.tpt.aadl.ramses.util.properties</artifactId>
+	    <version>${project.parent.version}</version>
+	  </dependency>
+	</dependencies>
 	
 </project>
