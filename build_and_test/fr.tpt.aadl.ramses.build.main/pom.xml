@@ -30,7 +30,6 @@
     <module>../../model2text/fr.tpt.aadl.ramses.generation.ada.ravenscar</module>
     <module>../../model2text/fr.tpt.aadl.ramses.generation.osek</module>
     <module>../../model2text/fr.tpt.aadl.ramses.generation.pok</module>
-    <module>../../model2text/fr.tpt.aadl.ramses.generation.integrity</module>
     <module>../../model2text/fr.tpt.aadl.ramses.generation.arinc653.xml</module>
     <module>../../model2text/fr.tpt.aadl.ramses.generation.target.specific</module>
     <module>../../model2text/fr.tpt.aadl.ramses.generation.utils</module>
