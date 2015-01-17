@@ -89,6 +89,8 @@ public class PatternMatchingTransformationLauncher extends Aadl2XEMFTVMLauncher 
 	{
 	  
 	  Resource outputResource = super.doTransformation(inputResource, outputDirPathName, resourceSuffix, monitor);
+	  if(outputResource==null)
+	    return null;
 	  for(Module m : getModuleList())
 	  {
 	    for(Rule r:m.getRules())
