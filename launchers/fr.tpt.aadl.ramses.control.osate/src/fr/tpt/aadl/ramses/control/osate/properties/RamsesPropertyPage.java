@@ -60,6 +60,7 @@ import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.generation.arinc653.xml.XMLARINC653StdGeneratorFactory ;
 import fr.tpt.aadl.ramses.generation.osek.OSEKGeneratorFactory ;
 import fr.tpt.aadl.ramses.generation.pok.c.PokGeneratorFactory ;
 
@@ -271,9 +272,9 @@ public class RamsesPropertyPage extends PropertyPage {
     ojr.setText("Java - OJR");
     ojr.setData(_OJR_PLATFORM);
 
-    Button arincIntegrity = new Button(composite, SWT.RADIO);
-    arincIntegrity.setText("ARINC653 - Integrity");
-    arincIntegrity.setData("integrity");
+    Button xmlarinc653 = new Button(composite, SWT.RADIO);
+    xmlarinc653.setText("ARINC653 - Standard");
+    xmlarinc653.setData(XMLARINC653StdGeneratorFactory.ARINC653_GENERATOR_NAME);
     
     Button osek = new Button(composite, SWT.RADIO);
     osek.setText("OSEX/NXT - nxtOSEK (http://lejos-osek.sourceforge.net/)");
@@ -301,6 +302,11 @@ public class RamsesPropertyPage extends PropertyPage {
       {
           target = osek ;
       }
+      else if(config.getTargetId().
+          equals(XMLARINC653StdGeneratorFactory.ARINC653_GENERATOR_NAME))
+      {
+        target = xmlarinc653;
+      }
       target.setSelection(true) ;
     }
     
@@ -322,7 +328,7 @@ public class RamsesPropertyPage extends PropertyPage {
     osek.addListener(SWT.Selection, listener);
     arinc.addListener(SWT.Selection, listener);
     ojr.addListener(SWT.Selection, listener);
-    arincIntegrity.addListener(SWT.Selection, listener);
+    xmlarinc653.addListener(SWT.Selection, listener);
     
     Button pathButton = new Button(composite, SWT.PUSH);
     pathButton.setText("Choose the target platform path");

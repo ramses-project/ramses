@@ -441,6 +441,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
         (trc,
          this.currentImplResource.getResourceSet(),
          config,
+         monitor,
          this,
          prop,
          loop.getTransformations(),

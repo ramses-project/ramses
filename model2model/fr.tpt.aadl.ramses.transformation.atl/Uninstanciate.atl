@@ -154,7 +154,7 @@ abstract rule m_Component_Instance {
 	to
 		sub: AADLBA!Subcomponent(
 				name <- c.name.debug('subcomponent created'),
-				ownedPropertyAssociation  <- c.collectSelfPropertyAssociationImg(),
+				ownedPropertyAssociation  <- c.collectSelfPropertyAssociationImg()->excluding(OclUndefined),
 				ownedModeBinding <- c.inMode->collect(e|
 										thisModule.createModeBinding(thisModule.resolveTemp(e, 'mode'))
 									)

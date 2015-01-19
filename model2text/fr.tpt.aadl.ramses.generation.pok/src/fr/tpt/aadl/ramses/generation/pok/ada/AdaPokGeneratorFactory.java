@@ -28,7 +28,7 @@ import fr.tpt.aadl.ramses.control.support.generator.GeneratorFactory ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser ;
-import fr.tpt.aadl.ramses.generation.pok.AadlArinc653Transformation ;
+import fr.tpt.aadl.ramses.generation.arinc653.xml.AadlArinc653Transformation ;
 import fr.tpt.aadl.ramses.generation.pok.AadlArinc653Validation ;
 import fr.tpt.aadl.ramses.generation.pok.makefile.AadlToPokMakefileUnparser ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificCodeGenerator ;

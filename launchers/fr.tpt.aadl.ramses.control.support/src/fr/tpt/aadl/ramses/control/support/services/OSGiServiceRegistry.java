@@ -112,19 +112,25 @@ public class OSGiServiceRegistry extends AbstractServiceRegistry implements Serv
     		{
     			if(extensionId==Names.GENERATOR_EXT_ID)
     			{
+    			  GeneratorFactory factory = null;
+    			  Generator gen = null;
     				try
     				{
-    				  GeneratorFactory factory = (GeneratorFactory) configElems[j]
+    				  factory = (GeneratorFactory) configElems[j]
                     .createExecutableExtension(Names.ATT_CLASS) ;
-    				  Generator gen = factory.createGenerator(modelInstantiatior,
+    				  String toto = configElems[j].getValue();
+    				  gen = factory.createGenerator(modelInstantiatior,
                                                       predefinedAadlModels);
     				  registry.put(gen.getRegistryName(), gen) ;
     				}
     				catch (CoreException e)
     				{
-    				  ConfigStatus.NOT_FOUND.msg = "generator factory \'" + 
-    				                               configElems[j].getName() +
-    				                               "\' is not found" ;
+    				  ConfigStatus.NOT_FOUND.msg = "generator factory " + 
+    				                               " is not found" ;
+    				  if(factory == null)
+    				    ConfigStatus.NOT_FOUND.msg+=": factory is null;";
+    				  else if(gen == null)
+    				    ConfigStatus.NOT_FOUND.msg+=": generator is null;";
     				  throw new ConfigurationException(ConfigStatus.NOT_FOUND) ;
     				}
     			}

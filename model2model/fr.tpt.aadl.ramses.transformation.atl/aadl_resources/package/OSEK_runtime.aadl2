@@ -7,31 +7,31 @@ with Generation_Properties, Base_Types;
 data StatusType
 properties
   Programming_Properties::Source_Name => "StatusType";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end StatusType;
 
 data TaskType
 properties
   Programming_Properties::Source_Name => "TaskType";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end TaskType;
 
 data TaskRefType
 properties
   Programming_Properties::Source_Name => "TaskRefType";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end TaskRefType;
 
 data TaskStateType
 properties
   Programming_Properties::Source_Name => "TaskStateType";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end TaskStateType;
 
 data TaskStateRefType
 properties
   Programming_Properties::Source_Name => "TaskStateRefType";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end TaskStateRefType;
 
 subprogram ActivateTask
@@ -40,13 +40,13 @@ features
   STATUS: out parameter StatusType;
 properties
   Programming_Properties::Source_Name => "ActivateTask";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end ActivateTask;
 
 subprogram TerminateTask
 properties
   Programming_Properties::Source_Name => "TerminateTask";
-  Programming_properties::Source_Text => ("kernel.h");
+  Programming_properties::Source_Text => ("toppers_osek/include/kernel.h");
   Compute_Execution_Time => 2 ms .. 3 ms; 
 end TerminateTask;
 
@@ -60,7 +60,7 @@ end TerminateTask;
 data ResourceType
 properties
   Programming_Properties::Source_Name => "ResourceType";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end ResourceType;
 
 subprogram GetResource
@@ -69,7 +69,7 @@ features
   STATUS: out parameter StatusType;
 properties
   Programming_Properties::Source_Name => "GetResource";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end GetResource;
 
 subprogram ReleaseResource
@@ -78,20 +78,20 @@ features
   STATUS: out parameter StatusType;
 properties
   Programming_Properties::Source_Name => "ReleaseResource";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end ReleaseResource;
 
 -- Event control
 data EventMaskType
 properties
   Programming_Properties::Source_Name => "EventMaskType";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end EventMaskType;
 
 data EventMaskRefType
 properties
   Programming_Properties::Source_Name => "EventMaskRefType";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end EventMaskRefType;
 
 subprogram SetEvent
@@ -101,7 +101,7 @@ features
   STATUS: out parameter StatusType;
 properties
   Programming_Properties::Source_Name => "SetEvent";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end SetEvent;
 
 subprogram ClearEvent
@@ -110,7 +110,7 @@ features
   STATUS: out parameter StatusType;
 properties
   Programming_Properties::Source_Name => "ClearEvent";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end ClearEvent;
 
 subprogram GetEvent
@@ -120,7 +120,7 @@ features
   STATUS: out parameter StatusType;
 properties
   Programming_Properties::Source_Name => "GetEvent";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end GetEvent;
 
 subprogram WaitEvent
@@ -129,14 +129,14 @@ features
   STATUS: out parameter StatusType;
 properties
   Programming_Properties::Source_Name => "WaitEvent";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end WaitEvent;
 
 -- Operating system
 data AppModeType
 properties
   Programming_Properties::Source_Name => "AppModeType";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end AppModeType;
 
 subprogram StartOS
@@ -144,7 +144,7 @@ features
   APP_MODE: requires data access AppModeType {Access_Right=>read_only;};
 properties
   Programming_Properties::Source_Name => "StartOS";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end StartOS;
 
 subprogram GetActiveApplicationMode
@@ -152,7 +152,7 @@ features
   APP_MODE: out parameter AppModeType {Generation_Properties::Return_Parameter => true;};
 properties
   Programming_Properties::Source_Name => "GetActiveApplicationMode";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end GetActiveApplicationMode;
 
 subprogram ShutdownOS
@@ -160,7 +160,7 @@ features
   STATUS: in parameter StatusType;
 properties
   Programming_Properties::Source_Name => "ShutdownOS";
-  Programming_Properties::Source_Text => ("kernel.h");
+  Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
 end ShutdownOS;
 
 -- Hooks
