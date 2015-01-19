@@ -55,8 +55,9 @@ rule no_timedThread
 rule thread_priority_must_be_set
 {
 	from 
-		obj: AADLI!ComponentInstance
-		(not obj.hasProperty('Priority'))
+		obj: AADLI!ComponentInstance,
+		p: AADLI!Property in THREAD_PROPERTIES
+		(p.name='Priority' and not obj.hasProperty('Priority'))
 	to	
 		err: CV!Error
 		(
