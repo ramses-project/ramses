@@ -162,7 +162,6 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
       int outputPathHeaderIndex = workspaceLocation.length() ;
       String outputAbsolutePath = outputFile.getAbsolutePath().toString() ;
       String outputPlatformRelativePath = "" ;
-      String finalResourcePath = "";
       String projectName=null;
       if(outputPathHeaderIndex > 0)
       {
@@ -175,6 +174,7 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
             outputAbsolutePath.substring(outputPathHeaderIndex) ;
       }
 
+
       if (Platform.getOS().equalsIgnoreCase(Platform.OS_WIN32))
       {
         workspaceLocation = workspaceLocation.substring(1, workspaceLocation.length());
@@ -185,13 +185,10 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
       }
       else
       {
-        finalResourcePath =
-            outputAbsolutePath.replace(workspaceLocation + Path.SEPARATOR, "") ;
+    	outputPlatformRelativePath =
+    	    outputAbsolutePath.replace(workspaceLocation + Path.SEPARATOR, "") ;
       }
-      if(finalResourcePath.charAt(0) == Path.SEPARATOR)
-        uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true);
-      else
-        uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true) ;
+      uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true) ;
 
       OsateResourceUtil.refreshResourceSet();
       ResourceSet rs = OsateResourceUtil.getResourceSet() ;
