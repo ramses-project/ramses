@@ -35,6 +35,8 @@ import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.emf.ecore.util.Diagnostician ;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
 
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+
 /**
  * This class is an implementation of the WorkflowPilot for workflows
  * described in an Ecore resource.
@@ -248,6 +250,14 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 		} else if (currentWorkflowElement instanceof Loop) {
 		  
 		  Loop l = (Loop) currentWorkflowElement;
+		  if(l.getFoundOption()==null
+		      || l.getNotFoundOption()==null)
+		  {
+		    String message = "No options found to continue workflow after the loop";
+		    _LOGGER.error(message);
+		    ServiceProvider.SYS_ERR_REP.error(message, true);
+		    currentWorkflowElement = null;
+		  }
 		  if (analysisResult) {
 		    currentWorkflowElement = l.getFoundOption().getElement();
 		  } else {
