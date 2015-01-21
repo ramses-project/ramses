@@ -258,7 +258,7 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 		    ServiceProvider.SYS_ERR_REP.error(message, true);
 		    currentWorkflowElement = null;
 		  }
-		  if (analysisResult) {
+		  else if (analysisResult) {
 		    currentWorkflowElement = l.getFoundOption().getElement();
 		  } else {
 		    currentWorkflowElement = l.getNotFoundOption().getElement();
