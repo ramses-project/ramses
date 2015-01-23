@@ -182,11 +182,7 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
             outputAbsolutePath.replace(workspaceLocation, "") ;
         outputPlatformRelativePath = outputPlatformRelativePath.replace("\\", "/");
       }
-      else
-      {
-        outputPlatformRelativePath =
-            outputAbsolutePath.replace(workspaceLocation + Path.SEPARATOR, "") ;
-      }
+
       uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true) ;
 
       OsateResourceUtil.refreshResourceSet();
