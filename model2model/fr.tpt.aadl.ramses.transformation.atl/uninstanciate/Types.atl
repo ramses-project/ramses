@@ -66,6 +66,10 @@ abstract rule m_Component_Type {
 	(
  		name <- type.name
  	)
+  do
+  {
+ 	thisModule.addImportedUnitFromInputModel(thisModule.public(), type);
+  }
 }
 
 -- @extends m_Component_Type
