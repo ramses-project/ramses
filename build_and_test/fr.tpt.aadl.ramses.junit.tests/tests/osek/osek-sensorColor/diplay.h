@@ -11,8 +11,7 @@
 
 #include "ecrobot_interface.h"
 
-void myDisplay(U16 currentColor);
-void plop();
+void myDisplay(int currentColor);
 
 void ecrobot_device_initialize(void);
 void ecrobot_device_terminate(void);
