@@ -1,6 +1,6 @@
 package cbtc_refined_model
 public
-with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thread_Properties,Programming_Properties,Deployment_Properties,ARINC653,COAL,POK,Generation_Properties,cbtc_refined_model,cbtc,arinc653_runtime,PeriodicDelayed_runtime;
+with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thread_Properties,Programming_Properties,Deployment_Properties,ARINC653,COAL,POK,Generation_Properties,cbtc,cbtc_refined_model,arinc653_runtime,PeriodicDelayed_runtime;
   process implementation train.impl
     subcomponents
       TrainPpu_odometerAcquisitionParent_BA_currentState: data train_inst_TrainPpu_odometerAcquisition_currentState;
