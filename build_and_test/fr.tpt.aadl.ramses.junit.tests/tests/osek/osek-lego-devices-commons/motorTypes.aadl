@@ -8,7 +8,7 @@ data speed
     Data_Model::Data_Representation => Integer;
     Data_Model::Integer_Range => -100 .. 100;
     Source_text => ("nxt_motors.h");
-    Source_name => "nxt_motor_set_speed";
+    Source_name => "int";
 end speed;
 
 data brake
@@ -16,7 +16,7 @@ data brake
     Data_Model::Data_Representation => Integer;
     Data_Model::Integer_Range => -100 .. 100;
     Source_text => ("nxt_motors.h");
-    Source_name => "nxt_motor_set_speed";
+    Source_name => "int";
 end brake;
     
 end motorTypes;
