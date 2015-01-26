@@ -1,0 +1,104 @@
+package readColor
+public
+    
+with Data_Model, Osek;
+with nxtTypes,colorTypes, colorSensor;
+with plateform;    
+
+system read
+end read;
+
+system implementation read.impl
+    subcomponents
+        cpu : processor arm.impl;
+        mem   : memory mem.impl;
+        proces : process proc.impl;
+        ColorSensor : device colorSensor::ColorSensor;    
+    properties
+        Actual_Processor_Binding => (reference (cpu)) applies to proces;
+        Actual_Memory_Binding => (reference (mem)) applies to proces;
+        Actual_Processor_Binding => (reference (cpu)) applies to ColorSensor;                     
+end read.impl;    
+    
+
+process implementation proc.impl
+    subcomponents
+        th : thread identifyColors.impl;
+        bg : thread bg.impl;
+end proc.impl;
+----------------------------------------------------------------------------
+
+
+thread implementation identifyColors.impl
+    subcomponents
+        colorPortNb: data nxtTypes::nxt_sensor_port  {Data_Model::Initial_Value => ("NXT_PORT_S2");};
+    calls
+        color:{
+            call1 : subprogram getColor;
+            call2: subprogram displayColor;
+        };
+    connections
+        cc0: parameter call1.portId -> colorPortNb; 
+        cc1 : parameter call1.color -> call2.currentColor ;         
+    properties
+        Dispatch_protocol => periodic;
+        Period            => 100 ms;
+        Compute_Execution_time   => 0 ms .. 100 ms;
+        Deadline                           => 50 ms;
+        Priority                           => 2;
+        stack_size  => 512 Bytes;
+        
+        POSIX_Scheduling_Policy => SCHED_FIFO;
+        Compute_Entrypoint_Call_Sequence => reference (color);
+end    identifyColors.impl; 
+
+thread implementation bg.impl
+    calls
+        background: {
+            bg1 : subprogram colorSensor::bgColorSensor;
+        };
+    properties
+        Dispatch_protocol => periodic;
+        Period            => 10 ms;
+        Compute_Execution_time   => 0 ms .. 25 ms;
+        Deadline                           => 50 ms;
+        Priority                           => 1;
+        stack_size  => 512 Bytes;
+        Compute_Entrypoint_Call_Sequence => reference (background); 
+end bg.impl;    
+----------------------------------------------------------------------------
+subprogram displayColor
+    features
+        currentColor : in parameter colorTypes::color_id;
+    properties        
+        Source_language =>(C);
+        Source_text => ("diplay.h","diplay.c");
+        Source_name => "myDisplay";
+end displayColor;
+----------------------------------------------------------------------------
+thread identifyColors
+    features
+       getColor: requires subprogram access colorSensor::ecrobotGetColorId;
+end identifyColors;
+
+thread bg
+end bg;
+
+process proc
+ features
+  getColor: requires subprogram access colorSensor::ecrobotGetColorId;
+end proc;
+
+processor arm extends plateform::arm
+end arm;
+
+processor implementation arm.impl extends plateform::arm.impl
+end arm.impl;
+
+memory mem extends plateform::nxt_mem 
+end mem;  
+
+memory implementation mem.impl extends plateform::nxt_mem.impl 
+end mem.impl;
+    
+end readColor;
