@@ -1,0 +1,49 @@
+package colorTypes
+public
+
+with nxtTypes,Data_Model;
+
+data rgb 
+properties
+  Data_Model::Data_Representation => Array;
+  Data_Model::MyDimension => 3;
+  Source_name => "S16";
+  Source_Text => ("ecrobot/c/ecrobot_interface.h");
+end rgb;
+    
+data color_id
+properties
+  Data_Model::Data_Representation => Enum;
+  Data_Model::Enumerators => (
+    "NXT_COLOR_BLACK", 
+    "NXT_COLOR_BLUE",
+    "NXT_COLOR_GREEN",
+    "NXT_COLOR_YELLOW",
+    "NXT_COLOR_ORANGE",
+    "NXT_COLOR_RED",
+    "NXT_COLOR_WHITE",
+    "NXT_COLOR_UNKNOWN"
+    );
+  Source_name => "U16";
+  Source_Text => ("ecrobot/c/ecrobot_interface.h");
+end color_id;
+
+data sensor_mode
+properties
+  Data_Model::Data_Representation => Enum;
+  Data_Model::Enumerators => (
+    "NXT_COLORSENSOR",
+    "NXT_LIGHTSENSOR_RED",
+    "NXT_LIGHTSENSOR_GREEN",
+    "NXT_LIGHTSENSOR_BLUE",
+    "NXT_LIGHTSENSOR_WHITE",    
+    "NXT_COLORSENSOR_DEACTIVATE",
+    "NUM_OF_NXT_COLORSENSOR_MODES",
+    "NXT_LIGHTSENSOR_NONE" 
+    );
+  Source_name => "U8";
+  Source_Text => ("ecrobot/c/ecrobot_interface.h");
+end sensor_mode;
+
+    
+end colorTypes;

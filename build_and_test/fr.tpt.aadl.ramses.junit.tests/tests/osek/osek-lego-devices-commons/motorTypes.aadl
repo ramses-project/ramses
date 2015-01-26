@@ -1,0 +1,22 @@
+package motorTypes
+public
+    
+with Data_Model,nxtTypes;
+
+data speed
+    properties
+    Data_Model::Data_Representation => Integer;
+    Data_Model::Integer_Range => -100 .. 100;
+    Source_text => ("nxt_motors.h");
+    Source_name => "nxt_motor_set_speed";
+end speed;
+
+data brake
+    properties
+    Data_Model::Data_Representation => Integer;
+    Data_Model::Integer_Range => -100 .. 100;
+    Source_text => ("nxt_motors.h");
+    Source_name => "nxt_motor_set_speed";
+end brake;
+    
+end motorTypes;

@@ -1,0 +1,46 @@
+package motor
+public
+    
+with motorTypes,nxtTypes;
+with Generation_Properties;
+    
+device Motor
+features
+  setSpeed: provides subprogram access nxtMotorSetSpeedLib;
+  setCount: provides subprogram access nxtMotorSetCountLib;
+  getCount: provides subprogram access nxtMotorGetCountLib;
+end Motor;
+
+subprogram nxtMotorSetSpeedLib
+features
+  portNb: in parameter nxtTypes::nxt_motor_port;
+  speed : in parameter motorTypes::speed;
+  brake : in parameter motorTypes::brake;
+properties
+  Source_language => (C);
+  Source_text => ("nxt_motors.h");
+  Source_name => "nxt_motor_set_speed";
+  Compute_Execution_Time => 1 ms .. 2 ms;
+end nxtMotorSetSpeedLib;
+
+subprogram nxtMotorGetCountLib
+features
+  portNb: in parameter nxtTypes::nxt_motor_port;
+  count : out parameter nxtTypes::int {Generation_Properties::Return_Parameter => true;};
+properties
+  Source_language => (C);
+  Source_text => ("nxt_motors.h");
+  Source_name => "nxt_motor_get_count";
+end nxtMotorGetCountLib;
+
+subprogram nxtMotorSetCountLib
+features
+  portNb: in parameter nxtTypes::nxt_motor_port;
+  count : in parameter nxtTypes::int;
+properties
+  Source_language => (C);
+  Source_text => ("nxt_motors.h");
+  Source_name => "nxt_motor_set_count";
+end nxtMotorSetCountLib;
+    
+end motor;
