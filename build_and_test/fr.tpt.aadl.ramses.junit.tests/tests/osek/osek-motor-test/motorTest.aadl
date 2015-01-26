@@ -1,0 +1,80 @@
+package motorTest
+public
+    
+with Data_Model, Osek;
+with nxtTypes,motor,motorTypes;
+with plateform; 
+
+
+system engineN9
+end engineN9;
+
+system implementation engineN9.impl
+    subcomponents
+        cpu : processor arm.impl;
+        mem   : memory mem.impl;
+        proces : process proc.impl;
+        engine: device motor::Motor;
+    properties
+        Actual_Processor_Binding => (reference (cpu)) applies to proces;
+        Actual_Memory_Binding => (reference (mem)) applies to proces;
+        Actual_Processor_Binding => (reference (cpu)) applies to engine;                     
+end engineN9.impl;          
+
+process implementation Proc.Impl
+    subcomponents 
+        th : thread motor.Impl;
+    connections
+        cp : subprogram access setSpeed -> th.setSpeed;  
+end Proc.Impl;
+
+
+thread implementation motor.Impl 
+    subcomponents
+        engPort: data nxtTypes::nxt_motor_port {Data_Model::Initial_Value => ("NXT_PORT_C");};
+        brake: data motorTypes::brake {Data_Model::Initial_Value => ("0");};
+        speed: data motorTypes::speed {Data_Model::Initial_Value => ("100");};
+  calls 
+    call1:
+    {
+      eng  : subprogram setSpeed;
+    };
+connections
+  cc5 : parameter eng.portNb -> engPort;
+  cc6 : parameter eng.brake -> brake; 
+  cc7 : parameter eng.speed -> speed;
+properties
+  Dispatch_Protocol                  => periodic;
+  Period                             => 100 ms;
+  Compute_Execution_time             => 0 ms .. 100 ms;  
+  Deadline                           => 50 ms;
+  Priority                           => 2;
+  Compute_Entrypoint_Call_Sequence => reference (call1);
+  POSIX_Scheduling_Policy => SCHED_FIFO;
+end motor.Impl;    
+
+
+thread motor
+features
+  setSpeed : requires subprogram access motor::nxtMotorSetSpeed;  
+end motor;
+
+process proc
+    features
+        setSpeed : requires subprogram access motor::nxtMotorSetSpeed;
+end proc;
+
+processor arm extends plateform::arm
+end arm;
+
+processor implementation arm.impl extends plateform::arm.impl
+end arm.impl;
+
+memory mem extends plateform::nxt_mem 
+end mem;  
+
+memory implementation mem.impl extends plateform::nxt_mem.impl 
+end mem.impl;
+
+    
+end motorTest;
