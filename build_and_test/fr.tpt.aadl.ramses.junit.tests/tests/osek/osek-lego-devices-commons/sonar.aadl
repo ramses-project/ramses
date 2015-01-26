@@ -6,41 +6,38 @@ with Generation_Properties;
     
 device Sonar
 features
-  getDistance: provides subprogram access ecrobotGetSonarSensorLib;
---properties
---  Initialize_Entrypoint => classifier (ecrobotInitSonarSensorLib);
---  Finalize_Entrypoint => classifier (ecrobotTermSonarSensorLib);
+  getDistance: provides subprogram access ecrobotGetSonarSensor;
 end Sonar;
 
-subprogram ecrobotGetSonarSensorLib
+subprogram ecrobotGetSonarSensor
 features
   portNb: in parameter nxtTypes::nxt_sensor_port;
   distance : out parameter nxtTypes::S32 {Generation_Properties::Return_Parameter => true;};
 properties
   Source_language => (C);
-  Source_text => ("ecrobot_interface.h");
+  Source_text => ("ecrobot/c/ecrobot_interface.h");
   Source_name => "ecrobot_get_sonar_sensor";
   Compute_Execution_Time => 0 ms .. 1 ms;
-end ecrobotGetSonarSensorLib;
+end ecrobotGetSonarSensor;
 
-subprogram ecrobotInitSonarSensorLib
+subprogram ecrobotInitSonarSensor
 features
   portNb: in parameter nxtTypes::nxt_sensor_port;
 properties
   Source_language => (C);
-  Source_text => ("ecrobot_interface.h");
+  Source_text => ("ecrobot/c/ecrobot_interface.h");
   Source_name => "ecrobot_init_sonar_sensor";
   Compute_Execution_Time => 1 ms .. 2 ms;
-end ecrobotInitSonarSensorLib;
+end ecrobotInitSonarSensor;
 
-subprogram ecrobotTermSonarSensorLib
+subprogram ecrobotTermSonarSensor
 features
   portNb: in parameter nxtTypes::nxt_sensor_port ;
 properties
   Source_language => (C);
-  Source_text => ("ecrobot_interface.h");
+  Source_text => ("ecrobot/c/ecrobot_interface.h");
   Source_name => "ecrobot_term_sonar_sensor";
   Compute_Execution_Time => 2 ms .. 3 ms;
-end ecrobotTermSonarSensorLib;
+end ecrobotTermSonarSensor;
     
 end sonar;
