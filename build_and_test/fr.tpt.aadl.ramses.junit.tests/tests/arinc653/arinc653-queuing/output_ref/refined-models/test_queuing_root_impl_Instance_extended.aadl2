@@ -1,6 +1,6 @@
 package test_queuing_refined_model
 public
-with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc653_runtime;
+with POK,Data_Model,ARINC653,common_pkg,test_queuing,Base_Types,PeriodicDelayed_runtime,arinc653_runtime;
   process implementation proc1.impl
     subcomponents
       the_proc1_p_out_globalVariable: data arinc653_runtime::Queuing_Port_Id_Type;

@@ -1,6 +1,6 @@
 package test_buffer_delayed_refined_model
 public
-with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime,PeriodicDelayedMutex_runtime;
+with Base_Types,Data_Model,POK,ARINC653,common_pkg,test_buffer_delayed,PeriodicDelayed_runtime,arinc653_runtime,PeriodicDelayedMutex_runtime;
   process implementation proc.impl
     subcomponents
       the_receiver_p_in_Buffer: data bufferArrayImpl_the_receiver_p_in.impl;

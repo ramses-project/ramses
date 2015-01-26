@@ -1,6 +1,6 @@
 package test_events_refined_model
 public
-with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc653_runtime;
+with POK,Data_Model,ARINC653,common_pkg,test_events,Base_Types,PeriodicDelayed_runtime,arinc653_runtime;
   process implementation proc.impl
     subcomponents
       the_receiver_p_in_globalVariable: data arinc653_runtime::Buffer_Id_Type;
