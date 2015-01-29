@@ -31,6 +31,9 @@ import java.util.Map ;
 import java.util.Set ;
 
 import org.apache.log4j.Logger ;
+import org.eclipse.core.resources.IProject ;
+import org.eclipse.core.resources.IWorkspaceRoot ;
+import org.eclipse.core.resources.ResourcesPlugin ;
 import org.eclipse.emf.common.util.BasicEList ;
 import org.eclipse.emf.common.util.EList ;
 import org.eclipse.emf.common.util.URI ;
@@ -520,13 +523,26 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
     List<String> res = new BasicEList<String>();
     ListValue lv = (ListValue) pa.getOwnedValues().get(0).getOwnedValue();
     URI dirURI = pa.eResource().getURI();
-    String path = "";
-    if(dirURI.isFile())
-      path = dirURI.toFileString();
-    else
-      path = dirURI.toString();
-    int index = path.lastIndexOf(File.separator);
-    path = path.substring(0, index+1);
+    
+    IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+    String projectName = dirURI.toPlatformString(true).substring(1);
+    projectName = projectName.substring(0, projectName.indexOf("/"));
+    
+
+    IProject project = workspaceRoot.getProject(projectName);
+
+    String path = project.getLocation().toOSString();
+    path = path.substring(0, path.lastIndexOf("/"));
+    path = path + dirURI.toPlatformString(true) ;
+    path = path.substring(0, path.lastIndexOf("/")+1);
+    
+//    String path = "";
+//    if(dirURI.isFile())
+//      path = dirURI.toFileString();
+//    else
+//      path = dirURI.toString();
+//    int index = path.lastIndexOf(File.separator);
+//    path = path.substring(0, index+1);
     
     for(PropertyExpression pe: lv.getOwnedListElements())
     {

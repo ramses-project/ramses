@@ -271,7 +271,11 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance_Mode
 		mode: AADLI!Mode
 	to
 		f: AADLBA!DataAccess,
-		f_entrypoint: AADLBA!DataAccess
+		f_entrypoint: AADLBA!DataAccess,
+		globalVariableValue: AADLBA!DataSubcomponent
+		(
+			name <- fi.getComponentInstance().name+'_'+fi.name+'_'+mode.name+'_value'
+		)
 }
 
 -- @extends m_Not_PeriodicDelayed_Port,m_Thread_DataOrEventDataPort_Input_Instance,m_Thread_IntraProcess_Input_Port_Instance

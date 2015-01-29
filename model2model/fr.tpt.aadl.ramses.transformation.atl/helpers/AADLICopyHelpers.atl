@@ -368,8 +368,8 @@ helper context AADLI!DataClassifier def : mapDataClassifier() : AADLBA!DataClass
 
 
 helper context AADLI!NamedElement def : mapSpgPropertyAssociationList() : Sequence (AADLBA!PropertyAssociation) =
-	let result : Sequence (AADLBA!PropertyAssociation) = self.ownedPropertyAssociation->
-		select(e|not (e.property.name.toLower() = 'source_text'))
+	let result : Sequence (AADLBA!PropertyAssociation) = self.ownedPropertyAssociation
+		->select(e|not (e.property.name.toLower() = 'source_text'))
 		->collect (e|thisModule.PropertyAssociation (e,false))->select(e| not e.oclIsUndefined())
 	in
 	let sourceTextPA: AADLBA!PropertyAssociation = self.ownedPropertyAssociation-> any(e| e.property.name.toLower() = 'source_text')
