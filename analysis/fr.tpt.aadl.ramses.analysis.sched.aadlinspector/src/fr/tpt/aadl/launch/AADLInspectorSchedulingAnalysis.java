@@ -34,6 +34,8 @@ import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.core.runtime.OperationCanceledException ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
 import org.eclipse.m2m.atl.emftvm.util.VMException ;
 import org.eclipse.xtext.EcoreUtil2 ;
 import org.osate.aadl2.AadlPackage ;
@@ -78,7 +80,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 	private String outputModelIdentifier;
 	private Logger _logger = Logger.getLogger(AADLInspectorSchedulingAnalysis.class) ;
 	private Map<ComponentInstance, List<ResponseTimeResult>> responseTimeResultList = new HashMap<ComponentInstance, List<ResponseTimeResult>>();
-	
+	private ResourceSet resourceSet = new ResourceSetImpl();
 	public AADLInspectorSchedulingAnalysis(AadlModelInstantiatior instantiator,
 			PredefinedAadlModelManager predefinedResourcesManager)
 	{
@@ -186,7 +188,6 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		final Thread[] aadlInspectorThreads = new Thread[size] ;
 		
 		final AADLInspectorSchedulingAnalysis app = this ;
-		
 		for(List<EGNode> egNodeList: res)
 		{
 		  String outputPath;
@@ -204,6 +205,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		
 		Command cmd = new Command()
 		{
+		  int status=Command.UNSET;
       @Override
       public int run() throws Exception
       {
@@ -214,7 +216,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
         
         // Wait all the thread end.
         synchronized (app) {app.wait();}
-        
+        status = Command.OK ;
         return Command.OK ;
       }
 
@@ -233,8 +235,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
       @Override
       public int getStatus()
       {
-        // TODO Auto-generated method stub
-        return 0 ;
+        return status ;
       }
 
       @Override
@@ -416,7 +417,8 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		}
 	}
 	
-	private Resource produceAnalysisAADLModel(AnalysisModel m, File outputDir,
+	private Resource produceAnalysisAADLModel(ResourceSet rs,
+	                                          AnalysisModel m, File outputDir,
 			                                      SystemInstance systemInstance,
 			                                      String outputModelId,
 			                                      List<ComponentInstance> cpuList,
@@ -429,7 +431,8 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
     launcher.setOutputPackageName(outputModelId);
     File aadlWithWcetFile = new File(outputDir.getAbsolutePath()+File.separator+outputModelIdentifier+".aadl2");
     Resource rootResource = systemInstance.eResource();
-    Resource aadlModelWithWcet = launcher.doTransformation(rootResource,
+    Resource aadlModelWithWcet = launcher.doTransformation(rs,
+                                                           rootResource,
         outputDir.getAbsolutePath(),
         "_"+outputModelId,
         monitor);
@@ -455,9 +458,9 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
     
     private static Logger _LOGGER = Logger.getLogger(AADLInspectorAnalysisThread.class) ;
 		
-		public AADLInspectorAnalysisThread(AADLInspectorSchedulingAnalysis aadlInspectorSchedulingAnalysis, List<EGNode> egNodeList,
+		public AADLInspectorAnalysisThread(AADLInspectorSchedulingAnalysis aadlInspectorSchedulingAnalysis,
+		                                   List<EGNode> egNodeList,
 				File outputDir, ComponentInstance cpu, String outputModelId, String mode) {
-      
 		  this.initiator = aadlInspectorSchedulingAnalysis;
 			this.egNodeList = egNodeList;
 			this.outputDir = outputDir;
@@ -506,7 +509,8 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
         }
 
         Resource aadlModel =
-                             initiator.produceAnalysisAADLModel(result,
+                             initiator.produceAnalysisAADLModel(initiator.resourceSet,
+                                                                result,
                                                                 outputDir,
                                                                 root,
                                                                 outputModelId,

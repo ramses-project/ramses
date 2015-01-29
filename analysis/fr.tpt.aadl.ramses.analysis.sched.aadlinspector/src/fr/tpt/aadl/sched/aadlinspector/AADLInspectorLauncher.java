@@ -259,8 +259,16 @@ public class AADLInspectorLauncher
 			String path = uri.toFileString();
 			if(path==null)
 			{
-			  path = Platform.getLocation().toOSString();
-			  path = path + uri.toPlatformString(true) ;
+			  IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+	      String projectName = uri.toPlatformString(true).substring(1);
+	      projectName = projectName.substring(0, projectName.indexOf("/"));
+	      
+
+	      IProject project = workspaceRoot.getProject(projectName);
+
+	      String filePath = project.getLocation().toOSString();
+	      filePath = filePath.substring(0, filePath.lastIndexOf("/"));
+			  path = filePath + uri.toPlatformString(true) ;
 			}
 			if (! pathList.contains(path))
 			{

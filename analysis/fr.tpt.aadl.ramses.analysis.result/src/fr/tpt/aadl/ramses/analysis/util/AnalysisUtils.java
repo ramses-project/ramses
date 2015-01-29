@@ -178,7 +178,7 @@ public class AnalysisUtils {
         AnalysisSource newAs = newQar.getSource();
         if(newAs.getIterationId() == 
             existingAs.getIterationId()
-            && 
+            &&
             newAs.getMethodName().equals(existingAs.getMethodName())
             &&
             newAs.getScope().equals(existingAs.getScope())

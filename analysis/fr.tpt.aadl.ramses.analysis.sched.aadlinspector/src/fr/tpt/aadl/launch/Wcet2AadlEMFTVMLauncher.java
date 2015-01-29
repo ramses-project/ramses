@@ -21,21 +21,30 @@
 
 package fr.tpt.aadl.launch;
 
-import java.util.List ;
+import java.io.IOException ;
+import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor ;
-import org.eclipse.emf.common.util.URI ;
-import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.m2m.atl.emftvm.EmftvmFactory ;
-import org.eclipse.m2m.atl.emftvm.Model ;
-import org.eclipse.m2m.atl.emftvm.util.ExecEnvPool ;
-import org.osate.aadl2.instance.ComponentInstance ;
+import org.eclipse.core.resources.IProject ;
+import org.eclipse.core.resources.IWorkspaceRoot ;
+import org.eclipse.core.resources.ResourcesPlugin ;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.emf.ecore.util.EcoreUtil ;
+import org.eclipse.m2m.atl.emftvm.EmftvmFactory;
+import org.eclipse.m2m.atl.emftvm.Model;
+import org.eclipse.m2m.atl.emftvm.util.ExecEnvPool;
+import org.eclipse.xtext.EcoreUtil2;
+import org.osate.aadl2.SubcomponentType ;
+import org.osate.aadl2.instance.ComponentInstance;
 
-import fr.tpt.aadl.ramses.control.atl.Aadl2AadlEMFTVMLauncher ;
-import fr.tpt.aadl.ramses.control.atl.AtlTransfoLauncher ;
-import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
-import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
-import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel ;
+import fr.tpt.aadl.ramses.control.atl.Aadl2AadlEMFTVMLauncher;
+import fr.tpt.aadl.ramses.control.atl.AtlTransfoLauncher;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager;
+import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel;
+import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA ;
 
 public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 	
@@ -58,18 +67,33 @@ public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 		this.cpuList = cpuList;
 	}
 	
-	public Resource doTransformation(Resource inputResource, String outputDirPathName,
+	public Resource doTransformation(ResourceSet rs, Resource inputResource, String outputDirPathName,
 			String resourceSuffix,
 			IProgressMonitor monitor)
 			{
-		
+	  if(rs.getResources().isEmpty())
+	    rs.getResources().addAll(inputResource.getResourceSet().getResources());
 		Resource wcetResource = wcetModel.eResource();
 		if(wcetResource==null)
 		{
-			wcetResource = rs.createResource(URI.createURI(outputDirPathName+"/reducerBA.xmi"));
-			wcetResource.getContents().add(wcetModel);
-		}
+		  URI uri = inputResource.getURI();
+		  if(uri.isPlatform())
+		  {
+		    URI inputResourceURI = inputResource.getURI();
+		    String UriName = inputResourceURI.toString();
+		    URI reducedBAURI = URI.createURI(UriName.substring(0,UriName.lastIndexOf(".")-1)+"_reducerBA.xmi");
+	      wcetResource = rs.createResource(rs.getURIConverter().normalize(reducedBAURI));
+		  }
+		  else
+		  {
+	      URI reducedBAURI = URI.createFileURI(outputDirPathName+"/reducerBA.xmi");
+	      wcetResource = rs.createResource(rs.getURIConverter().normalize(reducedBAURI));
+		  }
 
+		}
+		wcetResource.getContents().add(wcetModel);
+		EcoreUtil2.resolveAll(rs);
+		
 		
 		// Load models
 		Model inModel = EmftvmFactory.eINSTANCE.createModel();

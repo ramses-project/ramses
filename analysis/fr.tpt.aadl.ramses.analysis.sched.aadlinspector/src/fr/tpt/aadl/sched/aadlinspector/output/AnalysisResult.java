@@ -97,37 +97,37 @@ public class AnalysisResult
 	
 	public void normalize(AnalysisArtifact aaResults)
 	{
-	  QualitativeAnalysisResult schedulable=null;
-	  for(Object obj: aaResults.getResults())
-	  {
-	    fr.tpt.aadl.ramses.analysis.AnalysisResult ar  = 
-	        (fr.tpt.aadl.ramses.analysis.AnalysisResult) obj;
-	    if(ar instanceof QualitativeAnalysisResult)
-	    {
-	      QualitativeAnalysisResult qar = (QualitativeAnalysisResult) ar;
-	      if(qar.getSource().getMethodName().equals(AADLInspectorSchedulingAnalysis.PLUGIN_NAME))
-	      {
-	        schedulable = qar;
-	        if(!isSchedulable())    
-	          schedulable.setValidated(false);
-	      }
-	    }
-	  }
-	  AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;
-	  if(schedulable==null)
-	  {
-	    schedulable = f.createQualitativeAnalysisResult();
-	    AnalysisSource schedulable_s = f.createAnalysisSource();
-	    schedulable_s.setMethodName(AADLInspectorSchedulingAnalysis.PLUGIN_NAME);
-	    schedulable_s.setIterationId(this.iterationNb);
-	    schedulable.setValidated(isSchedulable());
-	    schedulable.setSource(schedulable_s);
-	    aaResults.getResults().add(schedulable);
-	  }
-	  
 	  
 	  for(String cpuName : responseTimeResults.keySet())
     {
+	    QualitativeAnalysisResult schedulable=null;
+	    for(Object obj: aaResults.getResults())
+	    {
+	      fr.tpt.aadl.ramses.analysis.AnalysisResult ar  = 
+	          (fr.tpt.aadl.ramses.analysis.AnalysisResult) obj;
+	      if(ar instanceof QualitativeAnalysisResult)
+	      {
+	        QualitativeAnalysisResult qar = (QualitativeAnalysisResult) ar;
+	        if(qar.getSource().getMethodName().equals(AADLInspectorSchedulingAnalysis.PLUGIN_NAME))
+	        {
+	          schedulable = qar;
+	          if(!isSchedulable())    
+	            schedulable.setValidated(false);
+	        }
+	      }
+	    }
+	    AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;
+	    if(schedulable==null)
+	    {
+	      schedulable = f.createQualitativeAnalysisResult();
+	      AnalysisSource schedulable_s = f.createAnalysisSource();
+	      schedulable_s.setMethodName(AADLInspectorSchedulingAnalysis.PLUGIN_NAME);
+	      schedulable_s.setIterationId(this.iterationNb);
+	      schedulable_s.setScope(cpuName.substring(cpuName.lastIndexOf(".")+1));
+	      schedulable.setValidated(isSchedulable());
+	      schedulable.setSource(schedulable_s);
+	      aaResults.getResults().add(schedulable);
+	    }
       ResponseTimeResult rtrs = getResponseTimeResults(cpuName);
       Map<String,TaskResponseTimeResult> rtr = rtrs.getResponseTimes();
       for(String taskName : rtr.keySet())
@@ -136,7 +136,7 @@ public class AnalysisResult
         
         double deadline = getDeadline(taskName);
         double wcrt = rtr.get(taskName).worst;
-        double margin = 100*(deadline - wcrt)/deadline;
+        double margin = (deadline - wcrt)/deadline;
         
         for(Object obj: aaResults.getResults())
         {
@@ -161,6 +161,7 @@ public class AnalysisResult
         {
           AnalysisSource responseMargin_s = f.createAnalysisSource();
           responseMargin_s.setMethodName(AADLInspectorSchedulingAnalysis.PLUGIN_NAME);
+          taskName = taskName.substring(taskName.lastIndexOf(".")+1);
           responseMargin_s.setScope(taskName);
           responseMargin_s.setIterationId(this.iterationNb);
           responseMargin = f.createQuantitativeAnalysisResult();

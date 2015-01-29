@@ -89,11 +89,14 @@ public class BehaviorUtil {
         //wcet = (int) PropertyUtils.getMaxRangeValue(e, WCET_PROPERTY).getScaledValue();
         return new DoubleRange(wcet, wcet);
       }
-      else
+      else if(e instanceof Classifier)
 			{
-				return null;
+        Classifier c = (Classifier) e;
+        if(c.getExtended() != null)
+          return getComputeExecutionTimeInMs(c.getExtended());
 			}
 		}
+		return null;
 	}
 	
 	public static SubprogramClassifier getSubprogramClassifier (
