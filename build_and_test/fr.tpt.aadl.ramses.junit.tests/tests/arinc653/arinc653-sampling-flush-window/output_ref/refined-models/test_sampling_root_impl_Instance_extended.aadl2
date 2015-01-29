@@ -1,6 +1,6 @@
 package test_sampling_refined_model
 public
-with POK,ARINC653,Data_Model,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc653_runtime;
+with POK,ARINC653,Data_Model,common_pkg,test_sampling,Base_Types,PeriodicDelayed_runtime,arinc653_runtime;
   process implementation proc1.impl
     subcomponents
       the_proc1_p_out_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;

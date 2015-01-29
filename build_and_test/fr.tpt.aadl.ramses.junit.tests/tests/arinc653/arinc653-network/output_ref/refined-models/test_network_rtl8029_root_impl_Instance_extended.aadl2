@@ -1,6 +1,6 @@
 package test_network_rtl8029_remote_communications
 public
-with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_driver;
+with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,test_network_rtl8029,rtl8029_driver;
   processor implementation connected_cpu.with_system_partition
     subcomponents
       the_part: virtual processor part {

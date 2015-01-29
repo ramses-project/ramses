@@ -168,9 +168,9 @@ helper context AADLI!FeatureInstance def: isDefinedDelayedPort() : Boolean =
 ;
 
 helper context AADLI!FeatureInstance def: isPeriodicDelayedPort(): Boolean =
+	self.category=#eventDataPort and
 	self.isIntraProcessFeatureInstance() and
 	if(self.direction = #out) then
-		self.category=#eventDataPort and
 		self.isPeriodicThreadPort() and
 		self.srcConnectionInstance->forAll(e|e.destination.isPeriodicThreadPort()) and
 		(self.isDelayedPort() or self.isTimeBasedOutputPort() ) and
@@ -179,7 +179,6 @@ helper context AADLI!FeatureInstance def: isPeriodicDelayedPort(): Boolean =
 		self.isOnePerDispatchOutputRate() -- Value_Range = '1.0 .. 1.0' and Rate_Unit = 'PerDispatch' and Rate_Distribution = 'Fixed'
 	else
 		self.direction.getName()='in' and
-		self.category=#eventDataPort and
 		self.isPeriodicThreadPort() and
 		self.dstConnectionInstance->forAll(e|e.source.isPeriodicThreadPort()) and
 		(self.isDelayedPort() or self.isTimeBasedInputPort())  and

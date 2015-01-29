@@ -223,6 +223,8 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		}
 		catch(Exception e)
 		{
+		  if(e.getCause() instanceof OperationCanceledException)
+		    return null;
 		  String msg = "EMFTVM transformation failed";
 		  _LOGGER.fatal(msg, e);
 		  ServiceProvider.SYS_ERR_REP.fatal(msg, e);

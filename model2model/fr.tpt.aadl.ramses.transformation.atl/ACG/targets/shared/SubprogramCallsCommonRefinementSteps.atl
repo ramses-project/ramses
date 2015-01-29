@@ -277,6 +277,10 @@ abstract rule m_Component_Implementation {
 		ownedParameterConnection 	<- impl.getConnectionsInstancesImg('parameterConnection'),
 		ownedRealization 			<- thisModule.Realization(impl.type.resolve())
  	)
+ do
+ {
+ 	thisModule.addImportedUnitFromInputModel(thisModule.public(), impl);
+ }
 }
 
 -- @extends m_create_Thread_BA

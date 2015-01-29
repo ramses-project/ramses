@@ -1,0 +1,68 @@
+package nxtTypes
+public
+    
+    
+with Data_Model;
+
+data int
+properties
+    Data_Model::Data_Representation => integer;
+end int;
+
+    
+data U8
+properties
+  source_name => "U8";
+  source_text => ("ecrobot/c/ecrobot_interface.h");
+end U8;
+
+data U32
+properties
+  source_name => "U32";
+  source_text => ("ecrobot/c/ecrobot_interface.h");
+end U32;
+
+data S32
+properties
+  source_name => "S32";
+  source_text => ("ecrobot/c/ecrobot_interface.h");
+end S32;
+
+data S8
+properties
+  source_name => "S8";
+  source_text => ("ecrobot/c/ecrobot_interface.h");
+end S8;
+
+data U16
+properties
+  source_name => "U16";
+  source_text => ("ecrobot/c/ecrobot_interface.h");
+end U16;
+
+data nxt_motor_port
+properties
+      Data_Model::Data_Representation => Enum;
+  Data_Model::Enumerators => (
+    "NXT_PORT_A", 
+    "NXT_PORT_B",
+    "NXT_PORT_C"
+    );
+  source_name => "int";
+  source_text => ("ecrobot/c/ecrobot_interface.h"); 
+end nxt_motor_port;
+
+data nxt_sensor_port
+properties
+  Data_Model::Data_Representation => Enum;
+  Data_Model::Enumerators => (
+    "NXT_PORT_S1", 
+    "NXT_PORT_S2",
+    "NXT_PORT_S3",
+    "NXT_PORT_S4"
+    );
+  source_name => "int";
+  source_text => ("ecrobot/c/ecrobot_interface.h");    
+end nxt_sensor_port;
+    
+end nxtTypes;

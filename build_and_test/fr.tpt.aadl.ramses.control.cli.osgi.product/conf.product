@@ -30,12 +30,12 @@
       <plugin id="com.google.guava"/>
       <plugin id="com.google.inject"/>
       <plugin id="com.ibm.icu"/>
-      <plugin id="fr.tpt.aadl.analysis.sched.wcrtanalysis.results"/>
-      <plugin id="fr.tpt.aadl.ramses.analysis.asg"/>
       <plugin id="fr.tpt.aadl.ramses.analysis.maintainability"/>
       <plugin id="fr.tpt.aadl.ramses.analysis.memoryfootprint"/>
       <plugin id="fr.tpt.aadl.ramses.analysis.result"/>
       <plugin id="fr.tpt.aadl.ramses.analysis.sched.aadlinspector"/>
+      <plugin id="fr.tpt.aadl.ramses.analysis.sched.ba.reduced"/>
+      <plugin id="fr.tpt.aadl.ramses.analysis.sched.execution.graph"/>
       <plugin id="fr.tpt.aadl.ramses.communication.periodic.delayed"/>
       <plugin id="fr.tpt.aadl.ramses.constraints.reporter.metamodel"/>
       <plugin id="fr.tpt.aadl.ramses.control.atl.launch"/>
@@ -50,7 +50,6 @@
       <plugin id="fr.tpt.aadl.ramses.generation.ada.ravenscar"/>
       <plugin id="fr.tpt.aadl.ramses.generation.arinc653.xml"/>
       <plugin id="fr.tpt.aadl.ramses.generation.c"/>
-      <plugin id="fr.tpt.aadl.ramses.generation.integrity"/>
       <plugin id="fr.tpt.aadl.ramses.generation.osek"/>
       <plugin id="fr.tpt.aadl.ramses.generation.pok"/>
       <plugin id="fr.tpt.aadl.ramses.generation.target.specific"/>

@@ -15,6 +15,7 @@ import java.util.Map.Entry ;
 import java.util.Properties ;
 
 import org.apache.log4j.Logger ;
+import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.core.runtime.NullProgressMonitor ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EObject ;
@@ -67,7 +68,7 @@ import fr.tpt.atl.patternmatching.util.PatternMatchingUtils ;
 public class ArchitectureRefinementProcessLauncher {
 
   
-  private NullProgressMonitor monitor = new NullProgressMonitor();
+  private IProgressMonitor monitor;
 
   private static Logger _LOGGER = Logger.getLogger(ArchitectureRefinementProcessLauncher.class) ;
   
@@ -101,6 +102,7 @@ public class ArchitectureRefinementProcessLauncher {
   public ArchitectureRefinementProcessLauncher(TrcSpecification trcSpec,
                                                 ResourceSet resourceSet,
                                                 RamsesConfiguration config,
+                                                IProgressMonitor monitor,
                                                 ITransformationSelection selection,
                                                 Properties configProperties,
                                                 List<Transformation> transformations,
@@ -112,6 +114,7 @@ public class ArchitectureRefinementProcessLauncher {
     this.resourceSet = resourceSet;
     this.transformationSelection = selection;
     this.config = config;
+    this.monitor = monitor;
     this.modelInstantiator = modelInstantiator;
     this.predefinedResourcesManager = predefinedResourcesManager;
     this.transformations = transformations;
@@ -399,6 +402,10 @@ public class ArchitectureRefinementProcessLauncher {
     try
     {
       exitStatus = wm.waitAndCheck(500) ;
+      if(exitStatus == Command.CANCEL)
+      {
+        killThreads(rulesSelectionThreads) ;
+      }
     }
     catch(Exception e)
     {
@@ -409,8 +416,7 @@ public class ArchitectureRefinementProcessLauncher {
     }
     finally
     {
-      ResourceSet existingRs = sinst.eResource().getResourceSet();
-      existingRs.getResources().addAll(intermediateRs.getResources());
+      resourceSet.getResources().addAll(intermediateRs.getResources());
     }
 
 
@@ -427,9 +433,18 @@ public class ArchitectureRefinementProcessLauncher {
     if(outputResource==null)
       outputResource = resourceSet.createResource(uri);
     
+    
+    
     for(PatternMatchingTransformationThread t : rulesSelectionThreads)
     {
       Resource identification = t.getIdentificationResult();
+      if(identification==null)
+      {
+        String message = "Identification of alternatives failed";
+        _LOGGER.error(message);
+        ServiceProvider.SYS_ERR_REP.error(message, true);
+        return null;
+      }
       outputResource.getContents().addAll(identification.getContents());
       identification.delete(null);
     }
@@ -470,7 +485,12 @@ public class ArchitectureRefinementProcessLauncher {
     this.transformationSelection.selectTransformation(patternMatchingMap, tuplesToApply);
     
     if(tuplesToApply.isEmpty())
+    {
+      String message = "Selection of alternatives failed";
+      _LOGGER.error(message);
+      ServiceProvider.SYS_ERR_REP.error(message, true);
       return null;
+    }
     
     // store the result of the selection: generate TIP
     String tipPath = outputPathSave+"/"+getTipId();
@@ -622,6 +642,9 @@ public class ArchitectureRefinementProcessLauncher {
       e.printStackTrace(pw);
       _LOGGER.fatal(sw.toString());
     }
+    String message = "Execution of specialized transformations failed";
+    _LOGGER.error(message);
+    ServiceProvider.SYS_ERR_REP.error(message, true);
     return null ;
 
 
@@ -743,7 +766,6 @@ public class ArchitectureRefinementProcessLauncher {
     {
       if(initiator.cpt==initiator.size)
       {
-        existingRs.getResources().addAll(intermediateRs.getResources());
         synchronized (initiator) {
           initiator.notify();
           initiator.cpt=0;

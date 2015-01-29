@@ -1,6 +1,6 @@
 package test_network_rtl8029_remote_communications_refined_model
 public
-with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_driver,test_network_rtl8029_remote_communications,PeriodicDelayed_runtime,arinc653_runtime;
+with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,test_network_rtl8029,rtl8029_driver,test_network_rtl8029_remote_communications,PeriodicDelayed_runtime,arinc653_runtime;
   process implementation the_cpu1_system_part_comProcess.impl
     subcomponents
       the_cpu1_system_part_comProcess_the_proc1_p_outglobalVariable: data arinc653_runtime::Queuing_Port_Id_Type;

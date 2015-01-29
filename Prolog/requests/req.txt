@@ -1,1 +1,0 @@
-computeAllAffectations(Solutions,[1, 2, 3, 11, 12, 21, 22, 31, 32],[t1,t2,t11,t12,t21,t22]), computeAffectationsSubset(SolutionsSubset, Solutions, 1, 'the_result.txt').

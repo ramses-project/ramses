@@ -1,0 +1,16 @@
+package nxtBrick
+public
+    
+processor arm
+end arm;
+
+processor implementation arm.impl 
+end arm.impl;
+
+memory nxt_mem
+end nxt_mem;  
+
+memory implementation nxt_mem.impl
+end nxt_mem.impl;      
+    
+end nxtBrick;

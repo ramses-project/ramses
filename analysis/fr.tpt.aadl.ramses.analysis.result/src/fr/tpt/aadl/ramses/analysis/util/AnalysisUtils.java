@@ -21,28 +21,21 @@
 
 package fr.tpt.aadl.ramses.analysis.util;
 
-import java.io.File ;
 import java.io.IOException ;
 import java.util.HashSet ;
 import java.util.List ;
 import java.util.Set ;
 
 import org.apache.log4j.Logger ;
-import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.emf.ecore.resource.ResourceSet ;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
 import org.osate.aadl2.NamedElement ;
 
 import fr.tpt.aadl.ramses.analysis.AnalysisResult ;
-import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory ;
-import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage ;
 import fr.tpt.aadl.ramses.analysis.AnalysisSource ;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
 public class AnalysisUtils {

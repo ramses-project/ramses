@@ -30,7 +30,6 @@
     <module>../../model2text/fr.tpt.aadl.ramses.generation.ada.ravenscar</module>
     <module>../../model2text/fr.tpt.aadl.ramses.generation.osek</module>
     <module>../../model2text/fr.tpt.aadl.ramses.generation.pok</module>
-    <module>../../model2text/fr.tpt.aadl.ramses.generation.integrity</module>
     <module>../../model2text/fr.tpt.aadl.ramses.generation.arinc653.xml</module>
     <module>../../model2text/fr.tpt.aadl.ramses.generation.target.specific</module>
     <module>../../model2text/fr.tpt.aadl.ramses.generation.utils</module>
@@ -54,8 +53,8 @@
     <module>../../analysis/fr.tpt.aadl.ramses.analysis.sched.aadlinspector</module>
     <module>../../analysis/fr.tpt.aadl.ramses.analysis.memoryfootprint</module>
     <module>../../analysis/fr.tpt.aadl.ramses.analysis.maintainability</module>
-    <module>../../analysis/fr.tpt.aadl.ramses.analysis.asg</module>
-    <module>../../analysis/fr.tpt.aadl.analysis.sched.wcrtanalysis.results</module>
+    <module>../../analysis/fr.tpt.aadl.ramses.analysis.sched.execution.graph</module>
+    <module>../../analysis/fr.tpt.aadl.ramses.analysis.sched.ba.reduced</module>
     <module>../../analysis/fr.tpt.aadl.ramses.analysis.result</module>
     <module>../../analysis/fr.tpt.aadl.ramses.constraints.reporter.metamodel</module>
     <module>../fr.tpt.aadl.ramses.build.feature</module>

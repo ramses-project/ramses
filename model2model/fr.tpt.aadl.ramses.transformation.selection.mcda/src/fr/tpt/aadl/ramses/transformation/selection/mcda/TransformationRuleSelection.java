@@ -84,8 +84,12 @@ public class TransformationRuleSelection
   {
     
     // 1 - order potential results
+    SortedMap<List<ExcelPositionnedRuleApplicationTuple>, Float> solutions =
+        orderPotentialSolutions();
+    if(solutions==null)
+      return null;
     Set<List<ExcelPositionnedRuleApplicationTuple>> orderedPotentialResults =
-      orderPotentialSolutions().keySet();
+        solutions.keySet();
     
     List<ExcelPositionnedRuleApplicationTuple> result=null;
     int solution = 0;
@@ -229,8 +233,17 @@ public class TransformationRuleSelection
     }
     
     // 2 - cartesian product of the sets of tuples.
-    
-    unsortedSolutions = Sets.cartesianProduct(sets) ;
+    try
+    {
+      unsortedSolutions = Sets.cartesianProduct(sets) ;
+    }
+    catch(IllegalArgumentException e)
+    {
+      String msg = "Solutions identification failed: too many alternatives";
+      _LOGGER.error(msg);
+      ServiceProvider.SYS_ERR_REP.error(msg, false);
+      return null;
+    }
     
     // 3 - order the solution according to their performance.
     

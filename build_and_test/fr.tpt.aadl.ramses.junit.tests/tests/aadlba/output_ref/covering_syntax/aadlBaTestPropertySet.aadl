@@ -16,7 +16,7 @@ property set AadlBaTestPropertySet is
   ;
   );
   aValue: aadlinteger  => 28 applies to (data,subprogram,thread,system);
-  aSimpleValue: aadlinteger  applies to (data,subprogram,thread,system);
+  aSimpleValue: aadlinteger  applies to (data,data port,subprogram,thread,system);
   aSimpleValueDefined: aadlinteger  => 20 applies to (data,subprogram,thread,system);
   aRange: AadlBaTestPropertySet::rangeType applies to (data,subprogram,thread,system);
   aRangeDefined: AadlBaTestPropertySet::rangeType => 0 sec .. 99 sec applies to (data,subprogram,thread,system);

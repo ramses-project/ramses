@@ -1,1 +1,0 @@
-computeAllAffectations(Solutions,[cnx1,cnx2,cnx3,cnx4,cnx5,cnx6,cnx7,cnx8,cnx9,cnx10,bus_A,bus_B,bus_gwt,p1_A,p2_A,p3_A,p1_B,p2_B,p3_B,p1_sw,p2_sw,p3_sw,p4_sw,p5_sw,p1_gwt,p2_gwt,p3_gwt],[t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16]), computeAffectationsSubset(SolutionsSubset, Solutions, 1, 'the_result_KooN.txt').

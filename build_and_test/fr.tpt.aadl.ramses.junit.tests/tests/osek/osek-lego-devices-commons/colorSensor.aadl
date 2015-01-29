@@ -1,0 +1,49 @@
+package colorSensor
+public
+
+With nxtTypes, colorTypes;    
+with Generation_Properties;
+
+device ColorSensor
+features
+  getColor: provides subprogram access ecrobotGetColorId;    
+end ColorSensor;
+
+subprogram ecrobotGetColorId
+features
+  portId: in parameter nxtTypes::nxt_sensor_port;
+  color : out parameter colorTypes::color_id {Generation_Properties::Return_Parameter => true;};
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot/c/ecrobot_interface.h");
+  Source_name => "ecrobot_get_nxtcolorsensor_id";
+end ecrobotGetColorId;
+
+subprogram ecrobotInitColorSensor
+features
+  portNb: in parameter nxtTypes::nxt_sensor_port;
+  sensorMode: in parameter colorTypes::sensor_mode;
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot/c/ecrobot_interface.h");
+  Source_name => "ecrobot_init_nxtcolorsensor";
+end ecrobotInitColorSensor;
+
+subprogram ecrobotSetLightSensorInactiveLib
+features
+  portNb: in parameter nxtTypes::nxt_sensor_port;
+  sensorMode: in parameter colorTypes::sensor_mode;
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot/c/ecrobot_interface.h");
+  Source_name => "ecrobot_init_nxtcolorsensor";
+end ecrobotSetLightSensorInactiveLib;
+
+subprogram bgColorSensor
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot/c/ecrobot_interface.h");
+  Source_name => "ecrobot_process_bg_nxtcolorsensor";
+end bgColorSensor;
+   
+end colorSensor;

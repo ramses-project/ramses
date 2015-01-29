@@ -65,6 +65,10 @@ abstract rule m_Component_Implementation {
 		ownedMode                   <- impl.getModesInstancesImg(),
 		ownedModeTransition         <- impl.getModesTransitionInstancesImg()
  	)
+ do
+ {
+ 	thisModule.addImportedUnitFromInputModel(thisModule.public(), impl);
+ }
 }
 
 --@extends m_Component_Implementation
