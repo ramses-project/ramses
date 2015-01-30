@@ -524,17 +524,31 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
     ListValue lv = (ListValue) pa.getOwnedValues().get(0).getOwnedValue();
     URI dirURI = pa.eResource().getURI();
     
-    IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-    String projectName = dirURI.toPlatformString(true).substring(1);
-    projectName = projectName.substring(0, projectName.indexOf("/"));
     
+    String path = "";
+    if(OsateResourceUtil.USES_GUI)
+    {
+      IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+      String projectName = dirURI.toPlatformString(true).substring(1);
+      projectName = projectName.substring(0, projectName.indexOf("/"));
+      
+      IProject project = workspaceRoot.getProject(projectName);
 
-    IProject project = workspaceRoot.getProject(projectName);
-
-    String path = project.getLocation().toOSString();
-    path = path.substring(0, path.lastIndexOf("/"));
-    path = path + dirURI.toPlatformString(true) ;
-    path = path.substring(0, path.lastIndexOf("/")+1);
+      path = project.getLocation().toOSString();
+      path = path.substring(0, path.lastIndexOf(File.separator));
+      path = path + dirURI.toPlatformString(true) ;
+    }
+    else
+    {
+      if(dirURI.isFile())
+        path = dirURI.toFileString();
+      else
+        path = dirURI.toString();
+    }
+    
+    int index = path.lastIndexOf(File.separator);
+    path = path.substring(0, index+1);
+    
     
 //    String path = "";
 //    if(dirURI.isFile())
