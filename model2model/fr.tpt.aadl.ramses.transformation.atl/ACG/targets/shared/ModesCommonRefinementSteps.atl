@@ -265,6 +265,7 @@ rule m_ProcessInstance_ModeTransition
 		)
 }
 
+
 rule m_ProcessInstance_Mode
 {
 	from
@@ -309,8 +310,8 @@ rule m_ProcessInstance_Mode
 		),
 		modeSwitchPeriod: AADLBA!IntegerLiteral
 		(
-			value <- thisModule.getHyperperiodFromThreads(p.getThreadsInMode(m)),
-		 	unit <- thisModule.UnitLiteral(p.getThreadsInMode(m)->first().getPeriodUnit())
+			value <- thisModule.getHyperperiodFromThreads(threadsInM),
+		 	unit <- thisModule.UnitLiteral(threadsInM->first().getPeriodUnit())
 		),
 		modeSwitchPrio: AADLBA!IntegerLiteral
 		(
