@@ -1,6 +1,6 @@
 package test_buffer_delayed_refined_model
 public
-with Base_Types,Data_Model,POK,ARINC653,common_pkg,test_buffer_delayed,PeriodicDelayed_runtime,arinc653_runtime,PeriodicDelayedMutex_runtime;
+with PeriodicDelayedMutex_runtime,Base_Types,Data_Model,POK,ARINC653,common_pkg,test_buffer_delayed,PeriodicDelayed_runtime,arinc653_runtime;
   process implementation proc.impl
     subcomponents
       the_receiver_p_in_globalVariable: data SharedStructType_the_receiver_p_in.impl;
@@ -167,45 +167,6 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,test_buffer_delayed,PeriodicD
     (t_data => data common_pkg::Integer,t_buffer => data SharedStructType_the_receiver_p_in.impl)
   end Put_Value_the_sender_p_out;
   
-  subprogram implementation Next_Value_the_receiver_p_in.impl
-    extends PeriodicDelayedMutex_runtime::Next_Value.impl
-  end Next_Value_the_receiver_p_in.impl;
-  
-  subprogram implementation Receive_Input_mutex_the_receiver_p_in.impl
-    extends PeriodicDelayedMutex_runtime::Receive_Input.impl
-  end Receive_Input_mutex_the_receiver_p_in.impl;
-  
-  data SharedStructType_the_receiver_p_in
-    extends PeriodicDelayedMutex_runtime::SharedStructure
-  end SharedStructType_the_receiver_p_in;
-  
-  data implementation SharedStructType_the_receiver_p_in.impl
-    extends PeriodicDelayedMutex_runtime::SharedStructure.impl
-    (t_buffer => data QueueType_the_receiver_p_in)
-  end SharedStructType_the_receiver_p_in.impl;
-  
-  data QueueType_the_receiver_p_in
-    extends PeriodicDelayedMutex_runtime::BufferPrototype
-    properties
-      Data_Model::Base_Type => (classifier(Integer_Msg.impl));
-      Data_Model::Dimension => (10);
-  end QueueType_the_receiver_p_in;
-  
-  subprogram Receive_Input_mutex_the_receiver_p_in
-    extends PeriodicDelayedMutex_runtime::Receive_Input
-    (t_buffer => data SharedStructType_the_receiver_p_in.impl)
-  end Receive_Input_mutex_the_receiver_p_in;
-  
-  subprogram Next_Value_the_receiver_p_in
-    extends PeriodicDelayedMutex_runtime::Next_Value
-    (t_data => data common_pkg::Integer,t_buffer => data SharedStructType_the_receiver_p_in.impl)
-  end Next_Value_the_receiver_p_in;
-  
-  subprogram root_impl_Instance_the_proc_the_receiver_p_in_Init_Spg
-    extends PeriodicDelayedMutex_runtime::Init_Prototype
-    (t_buffer => data SharedStructType_the_receiver_p_in.impl)
-  end root_impl_Instance_the_proc_the_receiver_p_in_Init_Spg;
-  
   subprogram the_proc_the_sender_entrypoint
     features
       cnx_p_out: requires data access SharedStructType_the_receiver_p_in.impl;
@@ -365,6 +326,45 @@ PeriodicDelayedMutex_runtime::Send_Output ! (PeriodValue, DeadlineValue, Current
       p_in: requires data access SharedStructType_the_receiver_p_in.impl;
       p_in_semAccess: requires data access arinc653_runtime::Semaphore_Id_Type;
   end the_proc_the_receiver;
+  
+  subprogram implementation Next_Value_the_receiver_p_in.impl
+    extends PeriodicDelayedMutex_runtime::Next_Value.impl
+  end Next_Value_the_receiver_p_in.impl;
+  
+  subprogram implementation Receive_Input_mutex_the_receiver_p_in.impl
+    extends PeriodicDelayedMutex_runtime::Receive_Input.impl
+  end Receive_Input_mutex_the_receiver_p_in.impl;
+  
+  data SharedStructType_the_receiver_p_in
+    extends PeriodicDelayedMutex_runtime::SharedStructure
+  end SharedStructType_the_receiver_p_in;
+  
+  data implementation SharedStructType_the_receiver_p_in.impl
+    extends PeriodicDelayedMutex_runtime::SharedStructure.impl
+    (t_buffer => data QueueType_the_receiver_p_in)
+  end SharedStructType_the_receiver_p_in.impl;
+  
+  data QueueType_the_receiver_p_in
+    extends PeriodicDelayedMutex_runtime::BufferPrototype
+    properties
+      Data_Model::Base_Type => (classifier(Integer_Msg.impl));
+      Data_Model::Dimension => (10);
+  end QueueType_the_receiver_p_in;
+  
+  subprogram Receive_Input_mutex_the_receiver_p_in
+    extends PeriodicDelayedMutex_runtime::Receive_Input
+    (t_buffer => data SharedStructType_the_receiver_p_in.impl)
+  end Receive_Input_mutex_the_receiver_p_in;
+  
+  subprogram Next_Value_the_receiver_p_in
+    extends PeriodicDelayedMutex_runtime::Next_Value
+    (t_data => data common_pkg::Integer,t_buffer => data SharedStructType_the_receiver_p_in.impl)
+  end Next_Value_the_receiver_p_in;
+  
+  subprogram root_impl_Instance_the_proc_the_receiver_p_in_Init_Spg
+    extends PeriodicDelayedMutex_runtime::Init_Prototype
+    (t_buffer => data SharedStructType_the_receiver_p_in.impl)
+  end root_impl_Instance_the_proc_the_receiver_p_in_Init_Spg;
   
   data implementation Integer_Msg.impl
     extends PeriodicDelayedMutex_runtime::MsgPrototype.impl
