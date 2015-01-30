@@ -1544,7 +1544,7 @@ rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
 		if (thisModule.Unique_Send_Output_Per_Thread)
 		{
 			intermediateCallActionSequence <- intermediateCallActionSequence.append(
-				thisModule.resolveMatchedSingleIfExists(c,'callSendOutput'));
+				thisModule.resolveLazySingleIfExists(c, 'createPDPLocalVariables_Mutex', 'callSendOutput').debug(' !!!!!!!!!! '));
 		}
 		else
 		{
