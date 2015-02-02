@@ -265,22 +265,12 @@ rule m_ProcessInstance_ModeTransition
 		)
 }
 
-
-rule m_ProcessInstance_Mode
+abstract rule m_ProcessInstance_Mode
 {
 	from
 		m: AADLI!ModeInstance,
 		p: AADLI!ComponentInstance
-		(
-			m.isModeInstanceOf(p)
-			and
-			not p.getThreadsInMode(m)->isEmpty()
-		)
-	using
-	{
-		threadsInM: Sequence(AADLI!ComponentInstance)
-			= p.getThreadsInMode(m);
-	}
+		(m.isModeInstanceOf(p))
 	to
 		modeThreadSub: AADLBA!ThreadSubcomponent
 		(
@@ -308,11 +298,7 @@ rule m_ProcessInstance_Mode
 				thisModule.CreatePropertyAssociation ('Priority', 'THREAD_PROPERTIES', modeSwitchPrio)
 			}
 		),
-		modeSwitchPeriod: AADLBA!IntegerLiteral
-		(
-			value <- thisModule.getHyperperiodFromThreads(threadsInM),
-		 	unit <- thisModule.UnitLiteral(threadsInM->first().getPeriodUnit())
-		),
+		modeSwitchPeriod: AADLBA!IntegerLiteral,
 		modeSwitchPrio: AADLBA!IntegerLiteral
 		(
 			value <- (p.getMaxPriority()-1).longValue()
@@ -367,4 +353,47 @@ rule m_ProcessInstance_Mode
 								e|thisModule.modeTransitionInstanceToBehaviorTransition(e, p)
 						);
 	}
+}
+
+
+-- @extends m_ProcessInstance_Mode
+rule m_ProcessInstance_Mode_without_threadsInMode
+{
+	from
+		m: AADLI!ModeInstance,
+		p: AADLI!ComponentInstance
+		(p.getThreadsInMode(m)->isEmpty())
+	using
+	{
+		threadsInM: Sequence(AADLI!ComponentInstance)
+			= p.getThreads();
+	}
+	to
+		modeThreadSub: AADLBA!ThreadSubcomponent,
+		modeSwitchPeriod: AADLBA!IntegerLiteral
+		(
+			value <- thisModule.getHyperperiodFromThreads(threadsInM.debug('plop::')),
+		 	unit <- thisModule.UnitLiteral(threadsInM->first().getPeriodUnit())
+		)
+}
+
+-- @extends m_ProcessInstance_Mode
+rule m_ProcessInstance_Mode_with_threadsInMode 
+{
+	from
+		m: AADLI!ModeInstance,
+		p: AADLI!ComponentInstance
+		(not p.getThreadsInMode(m)->isEmpty())
+	using
+	{
+		threadsInM: Sequence(AADLI!ComponentInstance)
+			= p.getThreadsInMode(m);
+	}
+	to
+		modeThreadSub: AADLBA!ThreadSubcomponent,
+		modeSwitchPeriod: AADLBA!IntegerLiteral
+		(
+			value <- thisModule.getHyperperiodFromThreads(threadsInM.debug('plap::')),
+		 	unit <- thisModule.UnitLiteral(threadsInM->first().getPeriodUnit())
+		)
 }
