@@ -372,7 +372,7 @@ rule m_ProcessInstance_Mode_without_threadsInMode
 		modeThreadSub: AADLBA!ThreadSubcomponent,
 		modeSwitchPeriod: AADLBA!IntegerLiteral
 		(
-			value <- thisModule.getHyperperiodFromThreads(threadsInM.debug('plop::')),
+			value <- thisModule.getHyperperiodFromThreads(threadsInM),
 		 	unit <- thisModule.UnitLiteral(threadsInM->first().getPeriodUnit())
 		)
 }
@@ -393,7 +393,7 @@ rule m_ProcessInstance_Mode_with_threadsInMode
 		modeThreadSub: AADLBA!ThreadSubcomponent,
 		modeSwitchPeriod: AADLBA!IntegerLiteral
 		(
-			value <- thisModule.getHyperperiodFromThreads(threadsInM.debug('plap::')),
+			value <- thisModule.getHyperperiodFromThreads(threadsInM),
 		 	unit <- thisModule.UnitLiteral(threadsInM->first().getPeriodUnit())
 		)
 }
