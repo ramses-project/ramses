@@ -75,7 +75,22 @@ public abstract class OSEKScenario
 	  {
 		    init() ;
 		    initAdditionalParameters();
-		    this.cleanOutputDirectory(new File(output)) ;
+		    File dir = new File(output);
+		    if (!dir.exists()) {
+		        System.out.println("creating directory: " + output);
+		        boolean result = false;
+		        try{
+		            dir.mkdir();
+		            result = true;
+		         } catch(SecurityException se){
+		            //handle it
+		         }        
+		         if(result) {    
+		           System.out.println(output+" created");  
+		         }
+		      }    
+		    
+		    this.cleanOutputDirectory(dir) ;
 		    Process executeProcess = null ;  
 		    generate_and_compile();
 		    exec_gen_code(executeProcess);
