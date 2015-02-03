@@ -1,0 +1,193 @@
+package test_osek_dataports_refined_model
+public
+with OSEK,Data_Model,test_osek_dataports,arinc653_runtime,PeriodicDelayed_runtime,Base_Types,OSEK_runtime;
+  process implementation proc.impl
+    subcomponents
+      the_receiver_p_value: data test_osek_dataports::Integer;
+      the_receiver_p_globalVariable: data OSEK_runtime::DataPortType {
+        Data_Model::Initial_Value => ("{&the_receiver_p_globalVariable_rez, &the_receiver_p_value, sizeof(test_osek_dataports__Integer)}");
+        };
+      the_sender: thread the_proc_the_sender.impl {
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 2000 ms;
+        Priority => 5;
+        Data_Size => 40000 Bytes;
+        Stack_Size => 512 Bytes;
+        Code_Size => 40 Bytes;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+      the_receiver: thread the_proc_the_receiver.impl {
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 1000 ms;
+        Priority => 10;
+        Data_Size => 40000 Bytes;
+        Stack_Size => 512 Bytes;
+        Code_Size => 40 Bytes;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+    connections
+      cnx_p_to_globalVariable: data access the_receiver_p_globalVariable -> the_sender.cnx_p;
+      Id_instance_to_the_receiver_p: data access the_receiver_p_globalVariable -> the_receiver.p;
+  end proc.impl;
+  
+  processor implementation cpu.impl
+  end cpu.impl;
+  
+  memory implementation mem.impl
+  end mem.impl;
+  
+  system implementation refined_model.impl
+    subcomponents
+      the_mem: memory mem.impl {
+        Byte_Count => 200000;
+        };
+      the_proc: process proc.impl;
+      the_cpu: processor cpu.impl {
+        Scheduling_Protocol => (RMS);
+        OSEK::SystemCounter_MaxAllowedValue => 2000;
+        OSEK::SystemCounter_TicksPerBase => 1;
+        OSEK::SystemCounter_MinCycle => 1;
+        };
+    properties
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc;
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc.the_sender;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_sender;
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc.the_receiver;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_receiver;
+  end refined_model.impl;
+  
+  processor cpu
+  end cpu;
+  
+  memory mem
+  end mem;
+  
+  process proc
+  end proc;
+  
+  system refined_model
+  end refined_model;
+  
+  subprogram the_proc_the_sender_entrypoint
+    features
+      cnx_p: requires data access OSEK_runtime::DataPortType;
+  end the_proc_the_sender_entrypoint;
+  
+  subprogram implementation the_proc_the_sender_entrypoint.impl
+    subcomponents
+      the_proc_the_sender_runtime_call_ret: data OSEK_runtime::StatusType;
+      p_localVariable: data test_osek_dataports::Integer;
+      p_Length: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("sizeof(test_osek_dataports__Integer)");
+        };
+    annex behavior_specification {**
+      variables
+  whichPortActivated : test_osek_dataports_refined_model::the_proc_the_sender_behaviorIdentifier_enum ;
+states
+  BA_entrypoint_init_state : initial state ;
+  BA_entrypoint_wait_dispatch_state : state ;
+  BA_entrypoint_exec_state : state ;
+  BA_entrypoint_final_state : final state ;
+transitions
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc_the_sender_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {test_osek_dataports::sender_spg ! (p_localVariable) ;
+PutValueDataPort_Integer ! (cnx_p, p_localVariable, the_proc_the_sender_runtime_call_ret)} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc_the_sender_behaviorIdentifier_enum#Enumerators.default_behavior} ;
+  dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {OSEK_runtime::TerminateTask !} ;
+**};
+  end the_proc_the_sender_entrypoint.impl;
+  
+  data the_proc_the_sender_behaviorIdentifier_enum
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("default_behavior");
+      Data_Model::Initial_Value => ("test_osek_dataports_refined_model__the_proc_the_sender_behaviorIdentifier_enum_default_behavior");
+  end the_proc_the_sender_behaviorIdentifier_enum;
+  
+  thread implementation the_proc_the_sender.impl
+    calls
+      main_call:  {
+        call_entrypoint: subprogram the_proc_the_sender_entrypoint.impl;
+        } 
+      ;
+    connections
+      p_accessCnx_call_cnx: data access cnx_p -> call_entrypoint.cnx_p;
+  end the_proc_the_sender.impl;
+  
+  thread the_proc_the_sender
+    features
+      cnx_p: requires data access OSEK_runtime::DataPortType {
+        Data_Model::Data_Representation => Integer;
+        };
+  end the_proc_the_sender;
+  
+  subprogram the_proc_the_receiver_entrypoint
+    features
+      p: requires data access OSEK_runtime::DataPortType;
+  end the_proc_the_receiver_entrypoint;
+  
+  subprogram implementation the_proc_the_receiver_entrypoint.impl
+    subcomponents
+      the_proc_the_receiver_runtime_call_ret: data OSEK_runtime::StatusType;
+      p_localVariable: data test_osek_dataports::Integer;
+      p_Length: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("sizeof(test_osek_dataports__Integer)");
+        };
+      p_ErrorCode: data OSEK_runtime::StatusType {
+        Data_Model::Initial_Value => ("0");
+        };
+    annex behavior_specification {**
+      variables
+  whichPortActivated : test_osek_dataports_refined_model::the_proc_the_receiver_behaviorIdentifier_enum ;
+states
+  BA_entrypoint_init_state : initial state ;
+  BA_entrypoint_wait_dispatch_state : state ;
+  BA_entrypoint_exec_state : state ;
+  BA_entrypoint_final_state : final state ;
+transitions
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc_the_receiver_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {GetValueDataPort_Integer ! (p, p_localVariable, p_ErrorCode) ;
+if (p_ErrorCode = 0) test_osek_dataports::receiver_spg ! (p_localVariable) end if
+  } ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc_the_receiver_behaviorIdentifier_enum#Enumerators.default_behavior} ;
+  dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {OSEK_runtime::TerminateTask !} ;
+**};
+  end the_proc_the_receiver_entrypoint.impl;
+  
+  data the_proc_the_receiver_behaviorIdentifier_enum
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("default_behavior", "p");
+      Data_Model::Initial_Value => ("test_osek_dataports_refined_model__the_proc_the_receiver_behaviorIdentifier_enum_default_behavior");
+  end the_proc_the_receiver_behaviorIdentifier_enum;
+  
+  thread implementation the_proc_the_receiver.impl
+    calls
+      main_call:  {
+        call_entrypoint: subprogram the_proc_the_receiver_entrypoint.impl;
+        } 
+      ;
+    connections
+      p_accessCnx_call: data access p -> call_entrypoint.p;
+  end the_proc_the_receiver.impl;
+  
+  thread the_proc_the_receiver
+    features
+      p: requires data access OSEK_runtime::DataPortType {
+        Data_Model::Data_Representation => Integer;
+        };
+  end the_proc_the_receiver;
+  
+  subprogram GetValueDataPort_Integer
+    extends OSEK_runtime::GetValueDataPort
+    features
+      MESSAGE_ADDR: refined to in parameter test_osek_dataports::Integer;
+  end GetValueDataPort_Integer;
+  
+  subprogram PutValueDataPort_Integer
+    extends OSEK_runtime::PutValueDataPort
+    features
+      MESSAGE_ADDR: refined to in out parameter test_osek_dataports::Integer;
+  end PutValueDataPort_Integer;
+end test_osek_dataports_refined_model;
