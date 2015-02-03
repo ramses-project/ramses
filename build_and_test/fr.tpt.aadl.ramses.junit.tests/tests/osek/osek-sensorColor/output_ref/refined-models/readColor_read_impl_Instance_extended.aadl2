@@ -1,0 +1,162 @@
+package readColor_refined_model
+public
+with Data_Model,OSEK,nxtTypes,colorTypes,colorSensor,plateform,readColor,arinc653_runtime,PeriodicDelayed_runtime,OSEK_runtime;
+  process implementation proc.impl
+    subcomponents
+      th: thread proces_th.impl {
+        Dispatch_Protocol => Periodic;
+        Period => 100 ms;
+        Compute_Execution_Time => 0 ms .. 100 ms;
+        Deadline => 50 ms;
+        Priority => 2;
+        Stack_Size => 512 Bytes;
+        POSIX_Scheduling_Policy => SCHED_FIFO;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+      bg: thread proces_bg.impl {
+        Dispatch_Protocol => Periodic;
+        Period => 10 ms;
+        Compute_Execution_Time => 0 ms .. 25 ms;
+        Deadline => 50 ms;
+        Priority => 1;
+        Stack_Size => 512 Bytes;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+  end proc.impl;
+  
+  processor implementation arm.impl
+  end arm.impl;
+  
+  memory implementation mem.impl
+  end mem.impl;
+  
+  system implementation refined_model.impl
+    subcomponents
+      ColorSensor: device ColorSensor;
+      mem: memory mem.impl;
+      proces: process proc.impl;
+      cpu: processor arm.impl {
+        Scheduling_Protocol => (RMS);
+        OSEK::SystemCounter_MaxAllowedValue => 2000;
+        OSEK::SystemCounter_TicksPerBase => 1;
+        OSEK::SystemCounter_MinCycle => 1;
+        };
+    properties
+      Actual_Processor_Binding => (reference(cpu)) applies to ColorSensor;
+      Actual_Processor_Binding => (reference(cpu)) applies to proces;
+      Actual_Memory_Binding => (reference(mem)) applies to proces;
+      Actual_Processor_Binding => (reference(cpu)) applies to proces.th;
+      Actual_Memory_Binding => (reference(mem)) applies to proces.th;
+      Actual_Processor_Binding => (reference(cpu)) applies to proces.bg;
+      Actual_Memory_Binding => (reference(mem)) applies to proces.bg;
+      Actual_Memory_Binding => (reference(mem)) applies to proces.th.colorPortNb;
+  end refined_model.impl;
+  
+  device ColorSensor
+  end ColorSensor;
+  
+  processor arm
+  end arm;
+  
+  memory mem
+  end mem;
+  
+  process proc
+  end proc;
+  
+  system refined_model
+  end refined_model;
+  
+  subprogram proces_th_entrypoint
+    features
+      cc0_portId: in out parameter nxtTypes::nxt_sensor_port;
+  end proces_th_entrypoint;
+  
+  subprogram implementation proces_th_entrypoint.impl
+    subcomponents
+      proces_th_runtime_call_ret: data OSEK_runtime::StatusType;
+      cc1_localVariable: data colorTypes::color_id;
+    annex behavior_specification {**
+      variables
+  whichPortActivated : readColor_refined_model::proces_th_behaviorIdentifier_enum ;
+states
+  BA_entrypoint_init_state : initial state ;
+  BA_entrypoint_wait_dispatch_state : state ;
+  BA_entrypoint_exec_state : state ;
+  BA_entrypoint_final_state : final state ;
+transitions
+  color [0] : BA_entrypoint_exec_state -[whichPortActivated = proces_th_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {colorSensor::ecrobotGetColorId ! (cc0_portId, cc1_localVariable) ;
+readColor::displayColor ! (cc1_localVariable)} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := proces_th_behaviorIdentifier_enum#Enumerators.default_behavior} ;
+  dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {OSEK_runtime::TerminateTask !} ;
+**};
+  end proces_th_entrypoint.impl;
+  
+  data proces_th_behaviorIdentifier_enum
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("default_behavior");
+      Data_Model::Initial_Value => ("readColor_refined_model__proces_th_behaviorIdentifier_enum_default_behavior");
+  end proces_th_behaviorIdentifier_enum;
+  
+  thread implementation proces_th.impl
+    subcomponents
+      colorPortNb: data nxtTypes::nxt_sensor_port {
+        Source_Text => ("ecrobot/c/ecrobot_interface.h");
+        Source_Name => "int";
+        Priority => 2;
+        Data_Model::Initial_Value => ("NXT_PORT_S2");
+        Data_Model::Data_Representation => Enum;
+        Data_Model::Enumerators => ("NXT_PORT_S1", "NXT_PORT_S2", "NXT_PORT_S3", "NXT_PORT_S4");
+        };
+    calls
+      main_call:  {
+        call_entrypoint: subprogram proces_th_entrypoint.impl;
+        } 
+      ;
+    connections
+      cc0: parameter call_entrypoint.cc0_portId -> colorPortNb;
+  end proces_th.impl;
+  
+  thread proces_th
+  end proces_th;
+  
+  subprogram proces_bg_entrypoint
+  end proces_bg_entrypoint;
+  
+  subprogram implementation proces_bg_entrypoint.impl
+    subcomponents
+      proces_bg_runtime_call_ret: data OSEK_runtime::StatusType;
+    annex behavior_specification {**
+      variables
+  whichPortActivated : readColor_refined_model::proces_bg_behaviorIdentifier_enum ;
+states
+  BA_entrypoint_init_state : initial state ;
+  BA_entrypoint_wait_dispatch_state : state ;
+  BA_entrypoint_exec_state : state ;
+  BA_entrypoint_final_state : final state ;
+transitions
+  background [0] : BA_entrypoint_exec_state -[whichPortActivated = proces_bg_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {colorSensor::bgColorSensor !} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := proces_bg_behaviorIdentifier_enum#Enumerators.default_behavior} ;
+  dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {OSEK_runtime::TerminateTask !} ;
+**};
+  end proces_bg_entrypoint.impl;
+  
+  data proces_bg_behaviorIdentifier_enum
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("default_behavior");
+      Data_Model::Initial_Value => ("readColor_refined_model__proces_bg_behaviorIdentifier_enum_default_behavior");
+  end proces_bg_behaviorIdentifier_enum;
+  
+  thread implementation proces_bg.impl
+    calls
+      main_call:  {
+        call_entrypoint: subprogram proces_bg_entrypoint.impl;
+        } 
+      ;
+  end proces_bg.impl;
+  
+  thread proces_bg
+  end proces_bg;
+end readColor_refined_model;
