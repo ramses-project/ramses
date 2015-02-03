@@ -1,0 +1,46 @@
+#include "implementation.oil"
+
+CPU proces {
+  OS config {
+    STATUS = EXTENDED;
+    STARTUPHOOK = FALSE;
+    SHUTDOWNHOOK = FALSE;
+    ERRORHOOK = FALSE;
+    PRETASKHOOK = FALSE;
+    POSTTASKHOOK = FALSE;
+    USEGETSERVICEID = FALSE;
+    USEPARAMETERACCESS = FALSE;
+    USERESSCHEDULER = FALSE;
+  };
+  
+  APPMODE default_mode {
+  };
+  COUNTER cpu_SystemCounter{
+    MAXALLOWEDVALUE = 2000;
+    TICKSPERBASE = 1;
+    MINCYCLE = 1;
+  };
+  
+  TASK th {
+    PRIORITY = 2;
+    AUTOSTART = FALSE;
+    ACTIVATION = 1;
+    SCHEDULE = FULL;
+    STACKSIZE = 512;
+  };
+  
+  ALARM wakeUpth_default_mode{
+    COUNTER = cpu_SystemCounter;
+    ACTION = ACTIVATETASK {
+      TASK = th;
+    };
+    AUTOSTART = TRUE {
+      ALARMTIME = 1;
+      CYCLETIME = 100;
+      APPMODE = default_mode;
+    };
+  };
+  
+};
+
+
