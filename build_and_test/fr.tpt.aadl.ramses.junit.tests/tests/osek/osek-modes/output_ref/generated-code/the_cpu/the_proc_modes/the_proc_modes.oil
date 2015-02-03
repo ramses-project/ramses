@@ -1,0 +1,214 @@
+#include "implementation.oil"
+
+CPU the_proc_modes {
+  OS config {
+    STATUS = EXTENDED;
+    STARTUPHOOK = FALSE;
+    SHUTDOWNHOOK = FALSE;
+    ERRORHOOK = FALSE;
+    PRETASKHOOK = FALSE;
+    POSTTASKHOOK = FALSE;
+    USEGETSERVICEID = FALSE;
+    USEPARAMETERACCESS = FALSE;
+    USERESSCHEDULER = FALSE;
+  };
+  
+  APPMODE m1 {
+  };
+  APPMODE m2 {
+  };
+  COUNTER the_cpu_SystemCounter{
+    MAXALLOWEDVALUE = 2000;
+    TICKSPERBASE = 1;
+    MINCYCLE = 1;
+  };
+  
+  RESOURCE the_proc_modes_mode_m1_globalQueue_rez
+  {
+    RESOURCEPROPERTY = STANDARD;
+  };
+  EVENT the_proc_modes_mode_m1_globalQueue_evt {
+    MASK = AUTO;
+  };
+  RESOURCE the_proc_modes_mode_m2_globalQueue_rez
+  {
+    RESOURCEPROPERTY = STANDARD;
+  };
+  EVENT the_proc_modes_mode_m2_globalQueue_evt {
+    MASK = AUTO;
+  };
+  RESOURCE the_receiver_input_data_globalVariable_m1_rez
+  {
+    RESOURCEPROPERTY = STANDARD;
+  };
+  RESOURCE the_receiver_input_data_globalVariable_m2_rez
+  {
+    RESOURCEPROPERTY = STANDARD;
+  };
+  RESOURCE the_receiver_m1_input_data_globalVariable_rez
+  {
+    RESOURCEPROPERTY = STANDARD;
+  };
+  RESOURCE the_receiver_m2_input_data_globalVariable_rez
+  {
+    RESOURCEPROPERTY = STANDARD;
+  };
+  TASK the_sender {
+    PRIORITY = 10;
+    AUTOSTART = FALSE;
+    ACTIVATION = 1;
+    SCHEDULE = FULL;
+    STACKSIZE = 512;
+  RESOURCE = the_proc_modes_mode_m1_globalQueue_rez;
+  RESOURCE = the_proc_modes_mode_m2_globalQueue_rez;
+  EVENT = the_proc_modes_mode_m1_globalQueue_evt;
+  EVENT = the_proc_modes_mode_m2_globalQueue_evt;
+  };
+  
+  ALARM wakeUpthe_sender_m1{
+    COUNTER = the_cpu_SystemCounter;
+    ACTION = ACTIVATETASK {
+      TASK = the_sender;
+    };
+    AUTOSTART = TRUE {
+      ALARMTIME = 1;
+      CYCLETIME = 1000;
+      APPMODE = m1;
+    };
+  };
+  
+  ALARM wakeUpthe_sender_m2{
+    COUNTER = the_cpu_SystemCounter;
+    ACTION = ACTIVATETASK {
+      TASK = the_sender;
+    };
+    AUTOSTART = TRUE {
+      ALARMTIME = 1;
+      CYCLETIME = 1000;
+      APPMODE = m2;
+    };
+  };
+  
+  TASK the_receiver {
+    PRIORITY = 5;
+    AUTOSTART = FALSE;
+    ACTIVATION = 1;
+    SCHEDULE = FULL;
+    STACKSIZE = 512;
+  RESOURCE = the_receiver_input_data_globalVariable_m1_rez;
+  RESOURCE = the_receiver_input_data_globalVariable_m2_rez;
+  };
+  
+  ALARM wakeUpthe_receiver_m1{
+    COUNTER = the_cpu_SystemCounter;
+    ACTION = ACTIVATETASK {
+      TASK = the_receiver;
+    };
+    AUTOSTART = TRUE {
+      ALARMTIME = 1;
+      CYCLETIME = 2000;
+      APPMODE = m1;
+    };
+  };
+  
+  ALARM wakeUpthe_receiver_m2{
+    COUNTER = the_cpu_SystemCounter;
+    ACTION = ACTIVATETASK {
+      TASK = the_receiver;
+    };
+    AUTOSTART = TRUE {
+      ALARMTIME = 1;
+      CYCLETIME = 2000;
+      APPMODE = m2;
+    };
+  };
+  
+  TASK the_receiver_m1 {
+    PRIORITY = 5;
+    AUTOSTART = FALSE;
+    ACTIVATION = 1;
+    SCHEDULE = FULL;
+    STACKSIZE = 512;
+  RESOURCE = the_receiver_m1_input_data_globalVariable_rez;
+  };
+  
+  ALARM wakeUpthe_receiver_m1_m1{
+    COUNTER = the_cpu_SystemCounter;
+    ACTION = ACTIVATETASK {
+      TASK = the_receiver_m1;
+    };
+    AUTOSTART = TRUE {
+      ALARMTIME = 1;
+      CYCLETIME = 2000;
+      APPMODE = m1;
+    };
+  };
+  
+  TASK the_receiver_m2 {
+    PRIORITY = 5;
+    AUTOSTART = FALSE;
+    ACTIVATION = 1;
+    SCHEDULE = FULL;
+    STACKSIZE = 512;
+  RESOURCE = the_receiver_m2_input_data_globalVariable_rez;
+  };
+  
+  ALARM wakeUpthe_receiver_m2_m2{
+    COUNTER = the_cpu_SystemCounter;
+    ACTION = ACTIVATETASK {
+      TASK = the_receiver_m2;
+    };
+    AUTOSTART = TRUE {
+      ALARMTIME = 1;
+      CYCLETIME = 2000;
+      APPMODE = m2;
+    };
+  };
+  
+  TASK the_proc_modes_mode_m1 {
+    PRIORITY = 9;
+    AUTOSTART = FALSE;
+    ACTIVATION = 1;
+    SCHEDULE = FULL;
+    STACKSIZE = 512;
+  RESOURCE = the_proc_modes_mode_m1_globalQueue_rez;
+  EVENT = the_proc_modes_mode_m1_globalQueue_evt;
+  };
+  
+  ALARM wakeUpthe_proc_modes_mode_m1_m1{
+    COUNTER = the_cpu_SystemCounter;
+    ACTION = ACTIVATETASK {
+      TASK = the_proc_modes_mode_m1;
+    };
+    AUTOSTART = TRUE {
+      ALARMTIME = 1;
+      CYCLETIME = 2000;
+      APPMODE = m1;
+    };
+  };
+  
+  TASK the_proc_modes_mode_m2 {
+    PRIORITY = 9;
+    AUTOSTART = FALSE;
+    ACTIVATION = 1;
+    SCHEDULE = FULL;
+    STACKSIZE = 512;
+  RESOURCE = the_proc_modes_mode_m2_globalQueue_rez;
+  EVENT = the_proc_modes_mode_m2_globalQueue_evt;
+  };
+  
+  ALARM wakeUpthe_proc_modes_mode_m2_m2{
+    COUNTER = the_cpu_SystemCounter;
+    ACTION = ACTIVATETASK {
+      TASK = the_proc_modes_mode_m2;
+    };
+    AUTOSTART = TRUE {
+      ALARMTIME = 1;
+      CYCLETIME = 2000;
+      APPMODE = m2;
+    };
+  };
+  
+};
+
+
