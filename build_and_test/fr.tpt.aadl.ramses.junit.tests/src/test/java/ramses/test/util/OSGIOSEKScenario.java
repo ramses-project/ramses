@@ -4,7 +4,7 @@ import java.io.IOException;
 
 public class OSGIOSEKScenario extends OSGIScenario {
 
-//	private static final String DEFAULT_RUNTIME_PATH = "" ;
+	private static final String DEFAULT_RUNTIME_PATH = "" ;
 	
 	@Override
 	protected Process executeGeneratedCode() throws IOException, InterruptedException
