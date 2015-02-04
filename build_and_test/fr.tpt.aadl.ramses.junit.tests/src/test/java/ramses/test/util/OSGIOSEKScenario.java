@@ -9,11 +9,12 @@ public class OSGIOSEKScenario extends OSGIScenario {
 	@Override
 	protected Process executeGeneratedCode() throws IOException, InterruptedException
 	{
-		Runtime runtime = Runtime.getRuntime();
-		  String[] testCommandArray = {"make","-C"+ output + "/generated-code", "test"};
-		  Process generatedCodeExecProcess = runtime.exec(testCommandArray);
-		  Thread.sleep(45000);
-		  return generatedCodeExecProcess ;
+//		Runtime runtime = Runtime.getRuntime();
+//		  String[] testCommandArray = {"make","-C"+ output + "/generated-code", "test"};
+//		  Process generatedCodeExecProcess = runtime.exec(testCommandArray);
+		  Thread.sleep(4000);
+//		  return generatedCodeExecProcess ;
+		  return null;
 	}
 
 	@Override
