@@ -1,11 +1,9 @@
 package ramses.test.cli.osek;
 
-import static org.junit.Assert.*;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ramses.test.util.OSEKScenario;
+
 import ramses.test.util.OSGIOSEKScenario;
 
 public class Test_JUnit_dataport extends OSGIOSEKScenario{
