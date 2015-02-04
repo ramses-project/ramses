@@ -30,7 +30,7 @@ public abstract class Scenario
   protected String runtimePath="";
   protected String workflowPath="";
   protected String aadlInspectorPath="";
-  protected String target="";
+  protected String target="pok";
   protected String includeList="";
   protected Map<String, Object> parameters = new HashMap<String, Object>();
   
@@ -114,7 +114,8 @@ public abstract class Scenario
         args.append(" -m ") ;
         args.append(input) ;
 
-        args.append(" -g pok") ;
+        args.append(" -g ") ;
+        args.append(target) ;
 
         args.append(" -s ") ;
         args.append(system_impl) ;
