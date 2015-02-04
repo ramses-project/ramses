@@ -1,8 +1,9 @@
 package ramses.test.cli.osek;
 
+import java.io.File;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 
 import ramses.test.util.OSGIOSEKScenario;
 
@@ -22,6 +23,21 @@ public class Test_JUnit_dataport extends OSGIOSEKScenario{
 		output = "tests/osek/osek-dataport/output";
 		output_ref = "tests/osek/osek-dataport/output_ref";
 		system_impl = "root.impl";
+		
+	    File dir = new File(output);
+	    if (!dir.exists()) {
+	        System.out.println("creating directory: " + output);
+	        boolean result = false;
+	        try{
+	            dir.mkdir();
+	            result = true;
+	         } catch(SecurityException se){
+	        	 se.printStackTrace();
+	         }        
+	         if(result) {    
+	           System.out.println(output+" created");  
+	         }
+	      }
 		this.exec();
 	}
 
