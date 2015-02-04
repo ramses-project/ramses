@@ -119,12 +119,14 @@ public abstract class Scenario
 
         args.append(" -s ") ;
         args.append(system_impl) ;
-
+        
         args.append(" -o ") ;
         args.append(output) ;
-
-        args.append(" -r ") ;
-        args.append(runtimePath) ;
+        
+        if (runtimePath != null && runtimePath != ""){
+        	args.append(" -r ") ;
+        	args.append(runtimePath) ;
+        }
 
         if(includeList != null && includeList!="")
         {
