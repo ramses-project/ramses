@@ -293,29 +293,30 @@ public abstract class Scenario
 	    System.out.println(Calendar.getInstance().getTime()) ;
 	    System.out.println("") ;
 //	    displayMessages(process, step, false) ;
+	}else{
+		if(process.exitValue() == 0)
+		{
+			System.out.println("") ;
+			System.out.println("*************************************************************") ;
+			System.out.println("******************* FINISH step " + step + " normally ******************") ;
+			System.out.println("*************************************************************") ;
+			System.out.println(Calendar.getInstance().getTime()) ;
+			System.out.println("") ;
+
+			displayMessages(process, step, false) ;
+		}
+		else
+		{
+			System.out.println("") ;
+			System.out.println("***************************************************************") ;
+			System.out.println("******************* FINISH step " + step + " abnormally ******************") ;
+			System.out.println("***************************************************************") ;
+			System.out.println(Calendar.getInstance().getTime()) ;
+			System.out.println("") ;
+
+			displayMessages(process, step, true) ;
+		}
 	}
-    if(process.exitValue() == 0)
-    {
-      System.out.println("") ;
-      System.out.println("*************************************************************") ;
-      System.out.println("******************* FINISH step " + step + " normally ******************") ;
-      System.out.println("*************************************************************") ;
-      System.out.println(Calendar.getInstance().getTime()) ;
-      System.out.println("") ;
-      
-      displayMessages(process, step, false) ;
-    }
-    else
-    {
-      System.out.println("") ;
-      System.out.println("***************************************************************") ;
-      System.out.println("******************* FINISH step " + step + " abnormally ******************") ;
-      System.out.println("***************************************************************") ;
-      System.out.println(Calendar.getInstance().getTime()) ;
-      System.out.println("") ;
-      
-      displayMessages(process, step, true) ;
-    }
   }
   
   protected void displayMessages(Process process, int step,
