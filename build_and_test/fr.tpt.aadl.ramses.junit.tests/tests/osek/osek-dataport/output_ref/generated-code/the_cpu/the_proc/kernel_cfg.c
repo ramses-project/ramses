@@ -1,8 +1,8 @@
 /*
  *  kernel_cfg.c
- *  Tue Feb 03 12:11:15 2015
+ *  Thu Feb 05 17:05:34 2015
  *  SG Version 2.00
- *  sg.exe ./the_proc.oil -os=ECC2 -I/opt/sandbox/nxtOSEK-ramses/ecrobot/../toppers_osek/sg/impl_oil -template=/opt/sandbox/nxtOSEK-ramses/ecrobot/../toppers_osek/sg/lego_nxt.sgt
+ *  sg.exe ./the_proc.oil -os=ECC2 -I/data/packages/nxtOSEK/ecrobot/../toppers_osek/sg/impl_oil -template=/data/packages/nxtOSEK/ecrobot/../toppers_osek/sg/lego_nxt.sgt
  */
 #include "osek_kernel.h"
 #include "kernel_id.h"

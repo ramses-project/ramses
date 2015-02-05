@@ -1,29 +1,11 @@
-build/ecrobot_bluetooth.o: \
- /data/packages/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_bluetooth.c \
- /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/include/stddef.h \
- /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/string.h \
- /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/_ansi.h \
- /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/newlib.h \
- /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/config.h \
- /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/machine/ieeefp.h \
- /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/reent.h \
- /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/_ansi.h \
- /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/_types.h \
- /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/machine/_types.h \
- /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/machine/_default_types.h \
- /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/lock.h \
- /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/string.h \
- /data/packages/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_base.h \
- /data/packages/nxtOSEK/ecrobot/../ecrobot/bios/bios.h \
- /data/packages/nxtOSEK/ecrobot/../ecrobot/bios/flash_loader.h \
- /data/packages/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/flashprog.h \
- /data/packages/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/mytypes.h \
- /data/packages/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_types.h \
- /data/packages/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/mytypes.h \
- /data/packages/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_private.h \
+build//data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/osek/osek-dataport/input/user_code.o: \
+ /data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/osek/osek-dataport/input/user_code.c \
+ /data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/osek/osek-dataport/input/user_code.h \
  /data/packages/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_interface.h \
+ /data/packages/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/mytypes.h \
  /data/packages/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/interrupts.h \
  /data/packages/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/aic.h \
+ /data/packages/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/mytypes.h \
  /data/packages/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/AT91SAM7.h \
  /data/packages/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/uart.h \
  /data/packages/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/systick.h \
@@ -50,6 +32,7 @@ build/ecrobot_bluetooth.o: \
  /data/packages/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/sound.h \
  /data/packages/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/udp.h \
  /data/packages/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/hs.h \
+ /data/packages/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_types.h \
  /data/packages/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_bluetooth.h \
  /data/packages/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_usb.h \
  /data/packages/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_rs485.h \

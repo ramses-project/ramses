@@ -1,2 +1,2 @@
 echo Executing ramboot to upload the_proc_OSEK_ram.bin...
-wineconsole /opt/sandbox/nxtOSEK-ramses/ecrobot/../bin/ramboot.exe ./the_proc_OSEK_ram.bin
+wineconsole /data/packages/nxtOSEK/ecrobot/../bin/ramboot.exe ./the_proc_OSEK_ram.bin
