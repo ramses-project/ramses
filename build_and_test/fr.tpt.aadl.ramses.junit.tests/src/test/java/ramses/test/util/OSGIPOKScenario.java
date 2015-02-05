@@ -25,10 +25,6 @@ public abstract class OSGIPOKScenario extends OSGIScenario
 		if(aadlInspectorPath == null || aadlInspectorPath.equals(""))
 			aadlInspectorPath = System.getProperty("AADLINSPECTOR_PATH");
 		
-		aadlInspectorPath = System.getenv("AADLINSPECTOR_PATH");
-		if(aadlInspectorPath == null || aadlInspectorPath.equals(""))
-			aadlInspectorPath = System.getProperty("AADLINSPECTOR_PATH");
-		
 	}
 	
 	@Override
