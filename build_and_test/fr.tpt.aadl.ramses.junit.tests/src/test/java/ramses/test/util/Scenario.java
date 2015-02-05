@@ -285,6 +285,15 @@ public abstract class Scenario
   
   protected void displayProcessMessages(Process process, int step) throws IOException
   {
+	if(process == null){
+		System.out.println("") ;
+	    System.out.println("*************************************************************") ;
+	    System.out.println("******************* FINISH step " + step + " normally with no execution ******************") ;
+	    System.out.println("*************************************************************") ;
+	    System.out.println(Calendar.getInstance().getTime()) ;
+	    System.out.println("") ;
+	    displayMessages(process, step, false) ;
+	}
     if(process.exitValue() == 0)
     {
       System.out.println("") ;
