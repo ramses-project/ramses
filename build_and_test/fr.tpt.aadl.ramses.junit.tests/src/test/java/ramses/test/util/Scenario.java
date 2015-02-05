@@ -292,7 +292,7 @@ public abstract class Scenario
 	    System.out.println("*************************************************************") ;
 	    System.out.println(Calendar.getInstance().getTime()) ;
 	    System.out.println("") ;
-	    displayMessages(process, step, false) ;
+//	    displayMessages(process, step, false) ;
 	}
     if(process.exitValue() == 0)
     {
