@@ -18,7 +18,6 @@ public abstract class OSGIOSEKScenario extends OSGIScenario {
 		  Thread.sleep(45000);
 		  clean();
 		  return generatedCodeExecProcess ;
-//		  return null;
 	}
 
 	@Override
