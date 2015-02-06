@@ -66,8 +66,9 @@ public class Test_JUnit_dataport extends OSGIOSEKScenario{
 //		System.out.println("Cleaning of "+f.getAbsolutePath());
 //		deleteFile(f);	
 //	}
+		System.out.println("Cleaning...");
 		Runtime runtime = Runtime.getRuntime();
-		String[] testCommandArray = {"pwd"};
+		String[] testCommandArray = {"clean"};
 		try {
 			Process generatedCodeExecProcess = runtime.exec(testCommandArray);
 			Thread.sleep(4000);
