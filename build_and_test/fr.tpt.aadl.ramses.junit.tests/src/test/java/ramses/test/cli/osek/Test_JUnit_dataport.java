@@ -1,6 +1,8 @@
 package ramses.test.cli.osek;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.util.ArrayList;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -44,6 +46,24 @@ public class Test_JUnit_dataport extends OSGIOSEKScenario{
 	@Override
 	protected void initAdditionalParameters() {
 		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void clean() {
+	ArrayList<String> list = new ArrayList<String>();
+	list.add("generated-code/the_cpu/kernel");
+	list.add("generated-code/the_cpu/the_proc/the_proc_OSEK_rxe.map");
+	list.add("generated-code/the_cpu/the_proc/the_proc_OSEK_rom.map");
+	list.add("generated-code/the_cpu/the_proc/build/data");
+	list.add("generated-code/the_cpu/the_proc/kernel_cfg.c");
+	list.add("generated-code/the_cpu/the_proc/kernel_id.h");
+	list.add("generated-code/the_cpu/the_proc/the_proc_OSEK_ram.map");
+	
+	for (String path : list ){
+		File f = new File(output+path);
+		deleteFile(f);	
+	}
 		
 	}
 
