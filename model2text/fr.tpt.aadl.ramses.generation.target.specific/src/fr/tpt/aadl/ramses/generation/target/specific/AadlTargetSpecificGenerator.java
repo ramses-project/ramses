@@ -61,7 +61,6 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService ;
 
 import fr.tpt.aadl.ramses.analysis.AnalysisResult ;
-import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory ;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.util.AnalysisParser ;
 import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils ;
@@ -88,7 +87,6 @@ import fr.tpt.aadl.ramses.control.support.utils.Names ;
 import fr.tpt.aadl.ramses.control.workflow.AbstractLoop ;
 import fr.tpt.aadl.ramses.control.workflow.ResolutionMethod ;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowPilot ;
-import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 
 
 public class AadlTargetSpecificGenerator implements Generator
@@ -524,41 +522,31 @@ public class AadlTargetSpecificGenerator implements Generator
     if(analysisModelOutputIdentifier != null)
       analysisParam.put("OutputModelIdentifier", analysisModelOutputIdentifier) ;
     
-    if(a == null)
+    a.setParameters(analysisParam) ;
+    a.performAnalysis(currentInstance, config, errManager, monitor) ;
+    a.setParameters(analysisParam) ;
+    Resource result = (Resource) analysisParam.get("OutputResource") ;
+    if(result != null)
     {
-      String errMsg = "Unknown analysis: " + analysisName ;
-      _LOGGER.error(msg);
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+      systemToInstantiate = analysisModelOutputIdentifier + ".impl" ;
+      SystemImplementation si =
+          (SystemImplementation) pls
+          .findNamedElementInsideAadlPackage(systemToInstantiate,
+                                             ((AadlPackage) result
+                                                 .getContents()
+                                                 .get(0))
+                                                 .getOwnedPublicSection()) ;
+
+      SystemInstance sinst = _modelInstantiator.instantiate(si) ;
+      modelsMap.put(analysisModelOutputIdentifier, sinst.eResource()) ;
     }
-    else
+
+    AnalysisArtifact aa = (AnalysisArtifact) analysisParam.get("AnalysisResult");
+    if(aa!=null)
     {
-
-      a.setParameters(analysisParam) ;
-      a.performAnalysis(currentInstance, config, errManager, monitor) ;
-      a.setParameters(analysisParam) ;
-      Resource result = (Resource) analysisParam.get("OutputResource") ;
-      if(result != null)
+      for(Object r: aa.getResults())
       {
-        systemToInstantiate = analysisModelOutputIdentifier + ".impl" ;
-        SystemImplementation si =
-              (SystemImplementation) pls
-                    .findNamedElementInsideAadlPackage(systemToInstantiate,
-                                                       ((AadlPackage) result
-                                                             .getContents()
-                                                             .get(0))
-                                                             .getOwnedPublicSection()) ;
-
-        SystemInstance sinst = _modelInstantiator.instantiate(si) ;
-        modelsMap.put(analysisModelOutputIdentifier, sinst.eResource()) ;
-      }
-      
-      AnalysisArtifact aa = (AnalysisArtifact) analysisParam.get("AnalysisResult");
-      if(aa!=null)
-      {
-        for(Object r: aa.getResults())
-        {
-          analysis_results.add((AnalysisResult) r);
-        }
+        analysis_results.add((AnalysisResult) r);
       }
     }
     
@@ -567,8 +555,6 @@ public class AadlTargetSpecificGenerator implements Generator
 
     if(analysisMode.equals("automatic"))
     {
-      AnalysisArtifact aa =
-            (AnalysisArtifact) analysisParam.get("AnalysisResult") ;
       if(aa==null)
       {
         workflowPilot.setAnalysisResult(false) ;
@@ -591,7 +577,7 @@ public class AadlTargetSpecificGenerator implements Generator
       {
         _LOGGER.error("could not save analysis result resource");
       }
-      QualitativeAnalysisResult result = null ;
+      QualitativeAnalysisResult qaResult = null ;
       for(int j = aa.getResults().size() - 1 ; j >= 0 ; j--)
       {
         AnalysisResult r = (AnalysisResult) aa.getResults().get(j) ;
@@ -600,8 +586,8 @@ public class AadlTargetSpecificGenerator implements Generator
         {
           if(aa.getResults().get(j) instanceof QualitativeAnalysisResult)
           {
-            result = (QualitativeAnalysisResult) aa.getResults().get(j) ;
-            workflowPilot.setAnalysisResult(result.isValidated()) ;
+            qaResult = (QualitativeAnalysisResult) aa.getResults().get(j) ;
+            workflowPilot.setAnalysisResult(qaResult.isValidated()) ;
           }
         }
       }
@@ -614,7 +600,7 @@ public class AadlTargetSpecificGenerator implements Generator
       if(result != null)
       {
         msg = ">> " + analysisName + " result set at " +
-              result.isValidated() ;
+            qaResult.isValidated() ;
         _LOGGER.trace(msg);
       }
     }
@@ -755,18 +741,6 @@ public class AadlTargetSpecificGenerator implements Generator
         }
       }
     }
-  }
-
-  
-  private void doLoopGeneticMerge(AbstractLoop l,
-                                  AnalysisErrorReporterManager errManager,
-                                  WorkflowPilot workflowPilot,
-                                  RamsesConfiguration config,
-                                  IProgressMonitor monitor)
-  {
-    TrcSpecification trc = (TrcSpecification) l.getTransformations().get(0).eResource().getContents().get(0);
-    
-    
   }
 
   private void doLoopTryEach(AbstractLoop l,
