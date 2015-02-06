@@ -49,6 +49,7 @@ import org.eclipse.m2m.atl.emftvm.Metamodel ;
 import org.eclipse.m2m.atl.emftvm.Model ;
 import org.eclipse.m2m.atl.emftvm.Module ;
 import org.eclipse.m2m.atl.emftvm.impl.resource.EMFTVMResourceImpl ;
+import org.eclipse.m2m.atl.emftvm.profiler.Profiler ;
 import org.eclipse.m2m.atl.emftvm.util.ModuleNotFoundException ;
 import org.eclipse.m2m.atl.emftvm.util.ModuleResolver ;
 import org.eclipse.m2m.atl.emftvm.util.StackFrame ;
@@ -152,6 +153,12 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	protected Resource doTransformation(Resource inputResource,
 			String outputDirPathName, String resourceSuffix, final IProgressMonitor monitor) {
 		
+	  Profiler profiler = new Profiler();
+    if(RamsesConfiguration.IS_DEBUG_MODE)
+    {
+      env.setMonitor(profiler);
+    }
+	  
 		Resource outputResource = initTransformationOutput(inputResource, 
 				outputDirPathName, resourceSuffix);
 		
@@ -219,6 +226,11 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		try
 		{
 		  env.run(td);
+		  if(RamsesConfiguration.IS_DEBUG_MODE)
+	    {
+	      String profilingResult = profiler.toString();
+	      _LOGGER.trace(profilingResult);
+	    }
 		  td.finish();
 		}
 		catch(Exception e)
@@ -263,7 +275,9 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		
 		registerAdditionalTransformationsEMFTVM(transformationFileList, _moduleResolver);
 		
-		return doTransformation(inputResource, outputDirPathName, resourceSuffix, monitor);	
+		Resource result = doTransformation(inputResource, outputDirPathName, resourceSuffix, monitor);
+		
+		return result;
 	}
 	
 	
