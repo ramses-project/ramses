@@ -37,7 +37,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 ---               QUEUING                ---
 --------------------------------------------
 
--- @extends m_Not_PeriodicDelayed_Port
+-- @extends m_EventOrEnvetDataPort_Filter,m_Not_PeriodicDelayed_Port
 abstract rule m_QueueingSubprogramCall
 {
 	from
@@ -45,8 +45,6 @@ abstract rule m_QueueingSubprogramCall
 		behavior: AADLI!SubprogramCallSequence,
 		paramCnx: AADLI!ParameterConnection
 		(
-			fi.isEventOrEventDataPort()
-			and
 			behavior.isComputeEntryPointOf(fi.getComponentInstance())
 			and
 			not fi.isIntraProcessFeatureInstance()

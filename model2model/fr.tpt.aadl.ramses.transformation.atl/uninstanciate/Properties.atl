@@ -632,7 +632,7 @@ rule ListValue (l : AADLI!ListValue, elts: Sequence(AADLBA!PropertyExpression))
 	to
 	l2 : AADLBA!ListValue (
 		ownedListElement <- elts->select(e|e.isSimpleValueType())->collect(e|e.PropertyExpression().debug(' ListValue Element '))
-		->union(elts->select(e|not e.isSimpleValueType().debug(' ListValue Elements '))).debug(' !!!!!!!! ')
+		->union(elts->select(e|not e.isSimpleValueType().debug(' ListValue Elements ')))
 		->excluding(OclUndefined)	
 	)
 	do { l2; }

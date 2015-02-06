@@ -36,22 +36,13 @@ create OUT : AADLBA 	from 		IN : AADLI,
 ---               SAMPLING               ---
 --------------------------------------------
 
--- @extends m_Not_PeriodicDelayed_Port
+-- @extends m_DataPort_Filter,m_Not_PeriodicDelayed_Port
 abstract rule m_Sampling
 {
 	from
-		fi: AADLI!FeatureInstance,
-		behavior: AADLI!Element
+		fi: AADLI!FeatureInstance
 		(
-			fi.isDataPort()
-			and
 			not fi.isIntraProcessFeatureInstance()
-			and
-			(
-				behavior.oclIsKindOf(AADLBA!SubprogramCallSequence)
-				or
-				behavior.oclIsKindOf(AADLBA!BehaviorAnnex)
-			)
 		)
 }
 
@@ -59,8 +50,7 @@ abstract rule m_Sampling
 abstract rule m_Input_Sampling
 {
 	from
-		fi: AADLI!FeatureInstance,
-		behavior: AADLI!Element
+		fi: AADLI!FeatureInstance
 		(
 			fi.isInputFeature()
 		)
@@ -114,6 +104,7 @@ rule m_Input_Sampling_ComputeEntrypointCallSequence
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.CreateReturnSubcomponentFromPort(fi);
 	}
 	to
+		call: AADLBA!SubprogramCallAction,
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 		(
 			element <- RETURN_CODE
@@ -131,6 +122,7 @@ rule m_Input_Sampling_BehaviorAnnex
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
 	}
 	to
+		call: AADLBA!SubprogramCallAction,
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 		(
 			element <- RETURN_CODE
@@ -142,7 +134,6 @@ abstract rule m_Output_Sampling
 {
 	from
 		fi: AADLI!FeatureInstance,
-		behavior: AADLI!Element,
 		cnxRef: AADLI!PortConnection
 		(
 			fi.isOutputFeature()
@@ -176,7 +167,7 @@ abstract rule m_Output_Sampling
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 }
 
--- @extends m_Output_Sampling,m_Output_DataPort_ComputeEntrypointCallSequence
+-- @extends m_Output_DataPort_ComputeEntrypointCallSequence,m_Output_Sampling
 rule m_Output_Sampling_ComputeEntrypointCallSequence
 {
 	from
@@ -191,6 +182,8 @@ rule m_Output_Sampling_ComputeEntrypointCallSequence
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
 	}
 	to
+		call: AADLBA!SubprogramCallAction,
+		f_connection: AADLBA!AccessConnection,
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 		(
 			element <- RETURN_CODE
@@ -198,7 +191,7 @@ rule m_Output_Sampling_ComputeEntrypointCallSequence
 }
 
 
--- @extends m_Output_Sampling,m_Output_Port_BehaviorAnnex
+-- @extends m_Output_Port_BehaviorAnnex,m_Output_Sampling
 rule m_Output_Sampling_BehaviorAnnex
 {
 	from
@@ -210,6 +203,8 @@ rule m_Output_Sampling_BehaviorAnnex
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
 	}
 	to
+		call: AADLBA!SubprogramCallAction,
+		f_connection: AADLBA!AccessConnection,
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 		(
 			element <- RETURN_CODE

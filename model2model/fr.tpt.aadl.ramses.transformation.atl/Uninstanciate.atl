@@ -273,12 +273,47 @@ rule m_Data_Instance {
 		(
 			dataSubcomponentType <- c.subcomponent.subcomponentType
 		)
+}	
+
+------------------------------------------------------------------------------------
+--- Filters
+------------------------------------------------------------------------------------
+		
+abstract rule m_Thread_Instance_Filter {
+	from 
+    	c : AADLI!ComponentInstance
+		(c.category=#thread)
 }
 
-helper def : getContainingImplementation(cnx: AADLI!Connection) : AADLBA!ComponentImplementation =
-	if(thisModule.resolveMatchedSingleIfExists(cnx.context, 'sub').oclIsUndefined()) then
-		thisModule.resolveMatchedSingleIfExists(cnx.context, 'impl').debug('Retreived System Implementation')
-	else
-		thisModule.resolveMatchedSingleIfExists(cnx.context, 'sub').subcomponentType.debug('Retreived Component Implementation')
-	endif
-;
+abstract rule m_BA_Filter {
+	from 
+    	behavior: AADLI!AnnexSubclause
+		(behavior.oclIsTypeOf(AADLBA!BehaviorAnnex))
+}
+		
+abstract rule m_DataPort_Filter {
+	from
+		fi: AADLI!FeatureInstance
+		(fi.isDataPort())
+}
+
+abstract rule m_EventOrEnvetDataPort_Filter
+{
+	from
+		fi: AADLI!FeatureInstance
+		(fi.isEventOrEventDataPort())
+}
+
+abstract rule m_ThreadPort_Filter
+{
+	from
+		fi: AADLI!FeatureInstance
+		(fi.isThreadPort())
+}
+
+abstract rule m_OutputFeature_Filter
+{
+	from
+		fi: AADLI!FeatureInstance
+		(fi.isOutputFeature())
+}

@@ -35,6 +35,16 @@ from
 	SCHEDULER_REALIZATIONS : AADLBA,
 	SCHEDULER_RUNTIME	   : AADLBA;
 
+abstract rule m_DataPort
+{
+	from
+		fi: AADLI!FeatureInstance
+        (
+        	fi.isDataPort()
+		)
+}
+
+
 helper def : Unique_Send_Output_Per_Thread : Boolean = false;
 
 helper def: collectDataNextValueCalls(fi: AADLI!FeatureInstance, behavior:AADLI!SubprogramCallSequence): Sequence(AADLBA!SubprogramCall) =
@@ -876,8 +886,7 @@ helper def: collectBehaviorVariable(c: AADLI!ComponentInstance): Sequence(AADLBA
 abstract rule m_ThreadBehavior
 {
 	from
-		c: AADLI!ComponentInstance,
-		behavior: AADLI!Element
+		c: AADLI!ComponentInstance
 		(
 			c.category=#thread 
 		)
@@ -888,7 +897,6 @@ abstract rule m_ThreadBehavior
 	to
 		computeEntryPointTransition: AADLBA!BehaviorTransition
 		(
-			name <- behavior.name,
 			sourceState <- thisModule.resolveMatchedSingleIfExists(c, 'execState'),
 			destinationState <- thisModule.resolveMatchedSingleIfExists(c, 'waitDispatchState'), --- TODO: add 'if(c.modeInstance->isEmpty()) ... else ... endif
 			actionBlock <- computeEntryPointActionBlock,
@@ -1309,7 +1317,11 @@ rule m_ComputeEntrypointCallSequence {
 		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
 	}
 	to
-		computeEntryPointActions: AADLBA!BehaviorActionSequence
+		computeEntryPointActions: AADLBA!BehaviorActionSequence,
+		computeEntryPointTransition: AADLBA!BehaviorTransition
+		(
+			name <- behavior.name
+		)
 	do
 	{
 		computeEntryPointActions.actions <- thisModule.populateComputeEntryPointActions(c, behavior)->excluding(OclUndefined);
@@ -1544,7 +1556,7 @@ rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
 		if (thisModule.Unique_Send_Output_Per_Thread)
 		{
 			intermediateCallActionSequence <- intermediateCallActionSequence.append(
-				thisModule.resolveLazySingleIfExists(c, 'createPDPLocalVariables_Mutex', 'callSendOutput').debug(' !!!!!!!!!! '));
+				thisModule.resolveLazySingleIfExists(c, 'createPDPLocalVariables_Mutex', 'callSendOutput'));
 		}
 		else
 		{
@@ -1921,6 +1933,7 @@ rule m_Parameter_to_PortInstance_Connection
 		)
 }
 
+-- @extends m_Thread_Instance_Filter
 abstract rule m_Parameter_to_DataInstance_Connection
 {
 	from
@@ -2252,7 +2265,7 @@ abstract rule m_Input_DataPort_ComputeEntrypointCallSequence
 --  			and
 --  			feature instance is the source of the connection instance
 
--- @extends m_Port_ComputeEntrypointCallSequence
+-- @extends m_Port_ComputeEntrypointCallSequence,m_OutputFeature_Filter
 rule m_Output_Port_ComputeEntrypointCallSequence
 {
 	from
@@ -2260,8 +2273,6 @@ rule m_Output_Port_ComputeEntrypointCallSequence
 		behavior: AADLI!SubprogramCallSequence,
 		cnxRef: AADLI!PortConnection
 		(
-			fi.isOutputFeature()
-			and
 			fi.srcConnectionInstance->exists(e|e.connectionReference->exists(cnx| cnx.connection = cnxRef))
 		)
 	to
@@ -2319,7 +2330,7 @@ rule m_Output_Port_ComputeEntrypointCallSequence_Mode
 --  			(ii) a connection from image f of feature instance to parameter of putValue
 --  			(iii) a connection from image localVariable of feature instance to parameter of putValue
 
--- @extends m_Port_ComputeEntrypointCallSequence
+-- @extends m_Port_ComputeEntrypointCallSequence,m_OutputFeature_Filter
 abstract rule m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
 {
 	from
@@ -2328,8 +2339,6 @@ abstract rule m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
 		paramCnx: AADLI!ParameterConnection,
 		cnxRef: AADLI!PortConnection		
 		(
-			fi.isOutputFeature()
-			and
 			(fi.isEventPort() or fi.isEventDataPort())
 			and
 			(cnxRef.source.connectionEnd = fi.feature)
@@ -2355,6 +2364,7 @@ abstract rule m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
 --  			(ii) a connection from image f of feature instance to parameter of putValue
 --  			(iii) a connection from image localVariable of feature instance to parameter of putValue
 
+-- @extends m_OutputFeature_Filter
 abstract rule m_Output_EventPort
 {
 	from
@@ -2363,7 +2373,7 @@ abstract rule m_Output_EventPort
 		portCnx: AADLI!PortConnection,
 		cnxRef: AADLI!PortConnection		
 		(
-			fi.isOutputFeature() and fi.isEventPort()
+			fi.isEventPort()
 			and
 			(cnxRef.source.connectionEnd = fi.feature)
 			and
@@ -2375,6 +2385,7 @@ abstract rule m_Output_EventPort
 		call: AADLBA!SubprogramCallAction
 }
 
+-- @extends m_OutputFeature_Filter
 abstract rule m_Output_EventDataPort
 {
 	from
@@ -2383,7 +2394,7 @@ abstract rule m_Output_EventDataPort
 		portCnx: AADLI!PortConnection,
 		cnxRef: AADLI!PortConnection		
 		(
-			fi.isOutputFeature() and fi.isEventDataPort()
+			fi.isEventDataPort()
 			and
 			(cnxRef.source.connectionEnd = fi.feature)
 			and
@@ -2440,223 +2451,6 @@ unique lazy rule createSubprogramCallSequence {
 			name <- 'callSeq_Default'
 		)
 }
-
-
-
---rule mapInputParameterConnection(s2 : AADLBA!SubprogramCallSequence,
---								 impl : AADLI!ComponentImplementation,
---								 implImg : AADLBA!ComponentImplementation,
---								 call : AADLI!SubprogramCall,
---								 calledSubprogram: AADLBA!SubprogramClassifier,
---								 c : AADLI!ComponentInstance)
---{
---	do
---	{
---		for(paramCnx in impl.ownedParameterConnection)
---		{
---			if(paramCnx.destination.getContext() = call 
---					and calledSubprogram.ownedParameter.contains(paramCnx.destination.connectionEnd)
---					and paramCnx.destination.connectionEnd.isInputFeature())
---			{
---				thisModule.mapEachInputParameterConnection(paramCnx, s2, impl, implImg, c);
---			}
---		}
---	}	
---}
---
---rule mapEachInputParameterConnection(paramCnx: AADLBA!ParameterConnection,
---									  s2 : AADLBA!SubprogramCallSequence,
---								  	  impl : AADLI!ComponentImplementation,
---								      implImg : AADLBA!ComponentImplementation,
---								      c : AADLI!ComponentInstance)
---{
---	using
---	{
---		fi: AADLI!FeatureInstance = c.featureInstance->any(e|e.name = paramCnx.source.connectionEnd.name);
---	}
---	do
---	{
---		if(not fi.oclIsUndefined())
---		{
---			if(fi.feature.oclIsKindOf(AADLI!Port))
---			{
---				thisModule.addNextValueSubprogramCall(s2, impl, implImg, fi);
---			}
---	 	}
---	}
---}
---
---rule mapOutputParameterConnection(s2 : AADLBA!SubprogramCallSequence,
---								 impl : AADLI!ComponentImplementation,
---								 implImg : AADLBA!ComponentImplementation,
---								 call : AADLI!SubprogramCall,
---								 calledSubprogram: AADLBA!SubprogramClassifier,
---								 c : AADLI!ComponentInstance)
---{
---	do
---	{
---		for(paramCnx in impl.ownedParameterConnection)
---		{
---			if(paramCnx.source.getContext() = call 
---					and calledSubprogram.ownedParameter.contains(paramCnx.source.connectionEnd)
---					and paramCnx.source.connectionEnd.isOutputFeature())
---			{
---				thisModule.mapEachOutputParameterConnection(paramCnx, s2, impl, implImg, c);
---			}
---		}
---	}
---}
---
---rule mapEachOutputParameterConnection(paramCnx: AADLBA!ParameterConnection,
---									  s2 : AADLBA!SubprogramCallSequence,
---								  	  impl : AADLI!ComponentImplementation,
---								      implImg : AADLBA!ComponentImplementation,
---								      c : AADLI!ComponentInstance)
---{
---	using
---	{
---		fi: AADLI!FeatureInstance = c.featureInstance->any(e|e.name = paramCnx.destination.connectionEnd.name);
---	}
---	do
---	{
---		if(not fi.oclIsUndefined())
---		{
---			if(fi.feature.oclIsKindOf(AADLI!Port))
---			{
---				thisModule.addPutValueSubprogramCall(s2, impl, implImg, fi);
---			}
---		}
---	}
---}
-
---unique lazy rule mapCallSequence
---{
---	from
---		implImg : AADLBA!ComponentImplementation,
---		c : AADLI!ComponentInstance,
---		impl : AADLI!ComponentImplementation
---	to
---		s2 : AADLBA!SubprogramCallSequence (
---			name <- impl.behaviorFromImpl().name,
---			ownedSubprogramCall <- impl.behaviorFromImpl().ownedSubprogramCall
---										->collect(e| thisModule.SubprogramCall(c, e, impl, implImg))
---		)
---		
---	do
---	{
---		impl.behaviorFromImpl().debug('  copy call sequence');
---		thisModule.ThreadSubprogramCallSequence <- s2;
---		for(call in thisModule.getThreadSubprogramCallSequence().ownedSubprogramCall)
---		{
---			
---			-- if an in parameter is connected to an input port
---			-- we must call next_value here
---			
---			thisModule.mapInputParameterConnection(thisModule.ThreadSubprogramCallSequence, impl, implImg, call, thisModule.getCalledSubprogram(call), c);
---			
---			thisModule.ThreadSubprogramCallSequence <- thisModule.ThreadSubprogramCallSequence->including(call);
---			-- if an ou parameter is connected to an in data port or event data port
---			-- we must call put_value here
---			
---			thisModule.mapOutputParameterConnection(thisModule.ThreadSubprogramCallSequence, impl, implImg, call, thisModule.getCalledSubprogram(call), c);
---			
---			call.debug('  copy subprogram call');
---		}
---		s2.ownedSubprogramCall <- thisModule.getThreadSubprogramCallSequence().ownedSubprogramCall;
---		s2;
---	}
---}
-
-helper def:getCalledSubprogram(call: AADLBA!SubprogramCall) : AADLBA!SubprogramClassifier =
-	if(call.calledSubprogram.oclIsKindOf(AADLBA!SubprogramAccess)) then
-		call.calledSubprogram.subprogramFeatureClassifier
-	else
-		call.calledSubprogram
-	endif
-;
-
-helper def: ports_constantValue: Sequence(AADLBA!StringLiteral) = OclUndefined;
-helper def: ports_constantValueParameters: Sequence(AADLBA!StringLiteral) = OclUndefined;
-helper def: ports_parameterConstantValue: String = '';
-
-
---rule SubprogramCall (c: AADLI!ComponentInstance,
---					 s : AADLI!SubprogramCall, 
---					 impl : AADLI!ComponentImplementation, 
---					 implImg : AADLBA!ComponentImplementation) {
---	to
---		s2 : AADLBA!SubprogramCall (
---			name <- s.name,
---			calledSubprogram <- s.calledSubprogram
---		)
---	do
---	{
---		thisModule.addImportedUnitFromInputModel(thisModule.public(), s.calledSubprogram);		
---		if(not s.calledSubprogram.getPropertyAssociation('Source_Name').oclIsUndefined()
---					and not s.calledSubprogram.getPropertyAssociation('Source_Text').oclIsUndefined())
---		{
---			s2.calledSubprogram <- s.calledSubprogram.resolve();
---		}
---		else
---		{
---			if (s.calledSubprogram.oclIsKindOf(AADLI!SubprogramType))
---				s2.calledSubprogram <- thisModule.Type(OclUndefined,s.calledSubprogram);
---			else if(s.calledSubprogram.oclIsKindOf(AADLI!SubprogramImplementation))
---				s2.calledSubprogram <- thisModule.Implementation(OclUndefined,s.calledSubprogram, thisModule.Type(OclUndefined,s.calledSubprogram.getOwnedRealization().implemented));
---			else if (s.calledSubprogram.oclIsKindOf(AADLI!SubprogramAccess))
---				if(s.calledSubprogram.subprogramFeatureClassifier.oclIsKindOf(AADLI!SubprogramType))
---					s2.calledSubprogram <-  thisModule.Type(OclUndefined,s.calledSubprogram.subprogramFeatureClassifier);
---				else if (s.calledSubprogram.subprogramFeatureClassifier.oclIsKindOf(AADLI!SubprogramType))
---					s2.calledSubprogram <-  thisModule.Implementation(OclUndefined,s.calledSubprogram.subprogramFeatureClassifier, thisModule.Type(OclUndefined,s.calledSubprogram.subprogramFeatureClassifier.getOwnedRealization().implemented));
---		
---			if(not s.calledSubprogram.getModalPropertyValue('Constant_Value_Parameters').oclIsUndefined()
---				and not s.calledSubprogram.getModalPropertyValue('Constant_Value').oclIsUndefined())
---			{
---				thisModule.ports_constantValue <- s.calledSubprogram.getModalPropertyValue('Constant_Value').ownedValue;
---				thisModule.ports_constantValueParameters <- s.calledSubprogram.getModalPropertyValue('Constant_Value_Parameters').ownedValue;
---				-- WARNING : We use both s (from input model) and s2 (from output model)
---				-- in this code
---				-- It is ok if: 
---					-- 1) parameter constant values ('Constant_Value') and 
---					-- parameters ('Constant_Value_Parameters') are identified 
---					-- by strings in the property set
---					-- 2) properties are copied from source to target model
---					-- 3) parameters have the same name in the source and target model
---				for(p in s2.calledSubprogram.getSubprogramParameters())
---				{
---					for(constantParamString in thisModule.ports_constantValueParameters.ownedListElement)
---					{
---						if(constantParamString.value=p.name)
---						{
---							thisModule.ports_parameterConstantValue <- thisModule.ports_constantValue.ownedListElement->at(thisModule.ports_constantValueParameters.ownedListElement->indexOf(constantParamString)).value;
---							thisModule.mapConstantParameter(p, thisModule.ports_parameterConstantValue, s2, implImg);
---						}
---					}	
---				}
---			} else
---			{
---				if(not s2.calledSubprogram.getModalPropertyValue('Constant_Value_Parameters').oclIsUndefined()
---					and not s2.calledSubprogram.getModalPropertyValue('Constant_Value').oclIsUndefined())
---				{
---					thisModule.ports_constantValue <- s2.calledSubprogram.getModalPropertyValue('Constant_Value').ownedValue;
---					thisModule.ports_constantValueParameters <- s2.calledSubprogram.getModalPropertyValue('Constant_Value_Parameters').ownedValue;
---					for(p in s2.calledSubprogram.getSubprogramParameters())
---					{
---						for(constantParamString in thisModule.ports_constantValueParameters.ownedListElement)
---						{
---							if(constantParamString.value=p.name)
---							{
---								thisModule.ports_parameterConstantValue <- thisModule.ports_constantValue.ownedListElement->at(thisModule.ports_constantValueParameters.ownedListElement->indexOf(constantParamString)).value;
---								thisModule.mapConstantParameter(p, thisModule.ports_parameterConstantValue, s2, implImg);
---							}
---						}	
---					}
---				}
---			}
---		}
---		s2;
---	}
---}
 
 
 helper context AADLBA!ThreadImplementation def : createBAVariablesForSpgParameters() : Sequence(AADLBA!BehaviorVariable) =

@@ -31,14 +31,15 @@ from
 
 
 helper context AADLI!ComponentImplementation def: needsCopy(): Boolean =
-	self.isInstanciated()
-	or self.type.needsCopy()
+	self.type.needsCopy()
 ;
 
 helper context AADLI!ComponentType def: needsCopy(): Boolean =
-	self.isInstanciated()
-	or 
-	self.subprogramNeedsCopy()
+	if(self.oclIsKindOf(AADLI!SubprogramType)) then
+		self.subprogramNeedsCopy()
+	else
+		true
+	endif
 ;
 
 helper context AADLI!ComponentType def: subprogramNeedsCopy(): Boolean =

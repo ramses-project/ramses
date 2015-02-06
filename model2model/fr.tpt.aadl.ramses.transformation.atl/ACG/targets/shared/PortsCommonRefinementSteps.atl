@@ -109,15 +109,13 @@ abstract rule m_Thread_Port_Instance_Mode
 		)
 }
 
--- @extends m_Thread_Port_Instance
+-- @extends m_Thread_Port_Instance,m_OutputFeature_Filter
 rule m_Thread_Output_Port_Instance
 {
 	from
 		fi: AADLI!FeatureInstance,
 		cnxRef: AADLI!PortConnection
 		(
-			fi.isOutputFeature()
-			and
 			fi.srcConnectionInstance->exists(e| e.connectionReference->exists(f|f.connection = cnxRef))
 		)
 	to
@@ -169,15 +167,13 @@ rule m_Thread_Output_Port_Instance_Mode
 		)
 }
 
-
+-- @extends m_OutputFeature_Filter
 rule m_Process_Output_Port_Instance
 {
 	from
 		fi:AADLI!FeatureInstance
 		(
 			fi.isProcessPort()
-			and
-			fi.isOutputFeature()
 		)
 	to
 		globalVariable: AADLBA!DataSubcomponent
@@ -367,17 +363,13 @@ rule m_Thread_EventPort_Input_Instance
 		)
 }
 
--- @extends m_Thread_Port_Instance
+-- @extends m_Thread_Port_Instance,m_OutputFeature_Filter
 rule m_Thread_DataOrEventDataPort_Output_Instance
 {
   	from
 		fi: AADLI!FeatureInstance
 		(
 			fi.isDataOrEventDataPort()
-			and
-			fi.isThreadPort()
-			and
-			fi.isOutputFeature()
 		)
 	using
 	{
@@ -404,17 +396,13 @@ rule m_Thread_DataOrEventDataPort_Output_Instance
 	}
 }
 
--- @extends m_Thread_Port_Instance
+-- @extends m_Thread_Port_Instance,m_OutputFeature_Filter
 rule m_Thread_EventPort_Output_Instance
 {
   	from
 		fi: AADLI!FeatureInstance
 		(
 			fi.isEventPort()
-			and
-			fi.isThreadPort()
-			and
-			fi.isOutputFeature()
 		)
   	to
   		localVariable: AADLBA!DataSubcomponent

@@ -51,13 +51,13 @@ rule m_Data_Implementation {
 }
 
 
-helper context AADLI!ComponentImplementation def: needsCopy(): Boolean =
-	self.isInstanciated() or self.oclIsKindOf(AADLI!SystemImplementation)
-;
-
-helper context AADLI!ComponentType def: needsCopy(): Boolean =
-	self.isInstanciated() or self.oclIsKindOf(AADLI!SystemType)
-;
+--helper context AADLI!ComponentImplementation def: needsCopy(): Boolean =
+--	self.isInstanciated() or self.oclIsKindOf(AADLI!SystemImplementation)
+--;
+--
+--helper context AADLI!ComponentType def: needsCopy(): Boolean =
+--	self.isInstanciated() or self.oclIsKindOf(AADLI!SystemType)
+--;
 
 helper context AADLI!ComponentType def : isInstanciated() : Boolean =
 	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|not e.subcomponent.oclIsUndefined())

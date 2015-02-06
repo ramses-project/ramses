@@ -153,12 +153,11 @@ rule m_Process_EventPort_Remote_Connection
     f_mirror: AADLBA!EventPort
 }
 
--- @extends m_Process_Port_Remote_Connection
+-- @extends m_Process_Port_Remote_Connection,m_OutputFeature_Filter
 abstract rule m_Process_OutputPort_Remote_Connection
 {
   from
     fi: AADLI!FeatureInstance
-	(fi.isOutputFeature())
   to
     f_mirror: AADLBA!Port,
 	call_comm: AADLBA!SubprogramCall
