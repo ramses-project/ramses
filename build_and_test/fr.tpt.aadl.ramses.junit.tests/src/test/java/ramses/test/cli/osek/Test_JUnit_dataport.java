@@ -62,6 +62,7 @@ public class Test_JUnit_dataport extends OSGIOSEKScenario{
 	
 	for (String path : list ){
 		File f = new File(output+path);
+		System.out.println("Cleaning of "+f.getAbsolutePath());
 		deleteFile(f);	
 	}
 		
