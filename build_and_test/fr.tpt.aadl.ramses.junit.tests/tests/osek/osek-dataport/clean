@@ -1,0 +1,23 @@
+#/bin/bash
+
+echo "cleaning"
+
+opt="-rf"
+cmd="rm"
+base=output/generated-code/the_cpu
+
+echo $(pwd)
+echo "$cmd $opt $base/kernel"
+echo "$($cmd $opt $base/kernel)"
+echo "$cmd $opt $base/the_proc/the_proc_OSEK_rxe.map"
+echo "$($cmd $opt $base/the_proc/the_proc_OSEK_rxe.map)"
+echo "$cmd $opt $base/the_proc/the_proc_OSEK_rom.map"
+echo "$($cmd $opt $base/the_proc/the_proc_OSEK_rom.map)"
+echo "$cmd $opt $base/the_proc/build/data"
+echo "$($cmd $opt $base/the_proc/build/data)"
+echo "$cmd $opt $base/the_proc/kernel_cfg.c"
+echo "$($cmd $opt $base/the_proc/kernel_cfg.c)"
+echo "$cmd $opt $base/the_proc/kernel_id.h"
+echo "$($cmd $opt $base/the_proc/kernel_id.h)"
+echo "$cmd $opt $base/the_proc/the_proc_OSEK_ram.map"
+echo "$($cmd $opt $base/the_proc/the_proc_OSEK_ram.map)"
