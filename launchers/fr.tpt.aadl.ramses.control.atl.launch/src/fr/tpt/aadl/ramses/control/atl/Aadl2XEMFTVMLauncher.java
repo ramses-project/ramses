@@ -58,6 +58,7 @@ import org.eclipse.m2m.atl.emftvm.util.VMMonitor ;
 import org.osate.aadl2.AadlPackage ;
 import org.osate.aadl2.PropertySet ;
 import org.osate.aadl2.instance.InstancePackage ;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.ba.aadlba.AadlBaPackage ;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksFactory ;
@@ -231,6 +232,10 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	      String profilingResult = profiler.toString();
 	      _LOGGER.trace(profilingResult);
 	    }
+		  
+		  if(OsateResourceUtil.USES_GUI)
+	      monitor.subTask("Finished transformation.");
+		  
 		  td.finish();
 		}
 		catch(Exception e)

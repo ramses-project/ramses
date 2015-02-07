@@ -133,7 +133,10 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
 		  outputModelDir.mkdir();
 	  String outputFilePath=outputModelDir.getAbsolutePath()+File.separator+aadlGeneratedFileName;
 	  File outputFile = new File(outputFilePath);
-
+	  
+	  if(OsateResourceUtil.USES_GUI)
+      monitor.subTask("Producing aadl file...");
+	  
 	  _modelInstantiator.serialize(expandedResult, outputFilePath);
 
 	  try
@@ -157,6 +160,7 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
     final Resource xtextResource ;
     if(OsateResourceUtil.USES_GUI)
     {
+      monitor.subTask("Refresh project...");
       String workspaceLocation =
             ResourcesPlugin.getWorkspace().getRoot().getLocationURI().getPath() ;
       int outputPathHeaderIndex = workspaceLocation.length() ;
