@@ -52,29 +52,22 @@ public class Test_JUnit_dataport extends OSGIOSEKScenario{
 
 	@Override
 	protected void clean() {
-//	ArrayList<String> list = new ArrayList<String>();
-//	list.add("generated-code/the_cpu/kernel");
-//	list.add("generated-code/the_cpu/the_proc/the_proc_OSEK_rxe.map");
-//	list.add("generated-code/the_cpu/the_proc/the_proc_OSEK_rom.map");
-//	list.add("generated-code/the_cpu/the_proc/build/data");
-//	list.add("generated-code/the_cpu/the_proc/kernel_cfg.c");
-//	list.add("generated-code/the_cpu/the_proc/kernel_id.h");
-//	list.add("generated-code/the_cpu/the_proc/the_proc_OSEK_ram.map");
-//	
+
+	
 //	for (String path : list ){
 //		File f = new File(output+path);
 //		System.out.println("Cleaning of "+f.getAbsolutePath());
 //		deleteFile(f);	
 //	}
-		System.out.println("Cleaning...");
-		Runtime runtime = Runtime.getRuntime();
-		String[] testCommandArray = {"clean"};
-		try {
-			Process generatedCodeExecProcess = runtime.exec(testCommandArray);
-			Thread.sleep(4000);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		System.out.println("Cleaning...");
+//		Runtime runtime = Runtime.getRuntime();
+//		String[] testCommandArray = {"clean"};
+//		try {
+//			Process generatedCodeExecProcess = runtime.exec(testCommandArray);
+//			Thread.sleep(4000);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 
 
 	}

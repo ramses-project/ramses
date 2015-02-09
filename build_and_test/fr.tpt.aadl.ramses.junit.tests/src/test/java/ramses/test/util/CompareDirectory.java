@@ -180,7 +180,8 @@ public class CompareDirectory {
         File subDir = subdirs[i];
         iterateOnDirectories(subDir, depth + 1, maxDepth, list);
       }
-    } else if (dir.isFile() && !dir.getName().contains("~")
+    } else if (dir.isFile() 
+    		&& !dir.getName().contains("~")
     		&& ! dir.getName().endsWith(".aaxl2")
     		&& ! dir.getName().endsWith(".o")
     		&& ! dir.getName().endsWith(".pid")
@@ -188,7 +189,10 @@ public class CompareDirectory {
     		&& ! dir.getName().endsWith(".elf.map")
     		&& ! dir.getName().endsWith(".lo")
     		&& ! dir.getName().endsWith(".bin")
-    		&& ! dir.getName().equals("sizes.c")) {
+    		&& ! dir.getName().equals("sizes.c")
+    		&& ! dir.getName().endsWith(".map")
+    		&& ! dir.getName().contains("build/data")
+    		) {
       // System.out.println("        fichier : " + dir.toString());
       list.add(dir);
     }
