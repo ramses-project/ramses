@@ -27,6 +27,8 @@ public class CompareDirectory {
    *            : Path folder of the code server generated
    * @throws IOException
    */
+  
+  //old constructor
 //  public CompareDirectory(String ref, String Gen) throws IOException {
 //    // Initialisation
 //    this.listRef = new ArrayList<File>();
@@ -212,15 +214,9 @@ public class CompareDirectory {
       }
     } else if (dir.isFile() 
     		&& !dir.getName().contains("~")
-    		&& isIgnoredFile(dir)
-//    		&& ! dir.getName().endsWith(".aaxl2")
-//    		&& ! dir.getName().endsWith(".o")
-//    		&& ! dir.getName().endsWith(".elf")
-//    		&& ! dir.getName().endsWith(".elf.map")    		
-//    		&& ! dir.getName().equals("sizes.c")
-    		
+    		&& isIgnoredFile(dir)    		
     		) {
-       System.out.println("        fichier : " + dir.toString());
+//       System.out.println("        fichier : " + dir.toString());
       list.add(dir);
     }
   }

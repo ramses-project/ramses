@@ -1,8 +1,6 @@
 package ramses.test.util;
 
 import java.io.IOException ;
-import java.util.ArrayList;
-
 import fr.tpt.aadl.ramses.control.support.utils.EnvUtils ;
 
 public abstract class OSGIPOKScenario extends OSGIScenario

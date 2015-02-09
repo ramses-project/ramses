@@ -1,7 +1,5 @@
 package ramses.test.util;
 
-import java.util.ArrayList;
-
 
 public abstract class OSGIScenario extends Scenario
 {

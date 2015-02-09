@@ -1,18 +1,12 @@
 package ramses.test.cli.osek;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ramses.test.util.OSGIOSEKScenario;
 
 public class Test_JUnit_dataport extends OSGIOSEKScenario{
-	private static ArrayList<String> IGNORE_FILE = new ArrayList<String>() ;
-	private static ArrayList<String> IGNORE_DIR = new ArrayList<String>() ;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -51,27 +45,4 @@ public class Test_JUnit_dataport extends OSGIOSEKScenario{
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	protected void clean() {
-
-	
-//	for (String path : list ){
-//		File f = new File(output+path);
-//		System.out.println("Cleaning of "+f.getAbsolutePath());
-//		deleteFile(f);	
-//	}
-//		System.out.println("Cleaning...");
-//		Runtime runtime = Runtime.getRuntime();
-//		String[] testCommandArray = {"clean"};
-//		try {
-//			Process generatedCodeExecProcess = runtime.exec(testCommandArray);
-//			Thread.sleep(4000);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-
-
-	}
-
 }
