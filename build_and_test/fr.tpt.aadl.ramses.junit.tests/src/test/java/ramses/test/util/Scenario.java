@@ -4,6 +4,7 @@ import static org.junit.Assert.fail ;
 
 import java.io.File ;
 import java.io.IOException ;
+import java.util.ArrayList;
 import java.util.Calendar ;
 import java.util.HashMap ;
 import java.util.Iterator ;
@@ -21,7 +22,10 @@ import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
 public abstract class Scenario
 {
-
+  protected static ArrayList<String> IGNORE_FILES = new ArrayList<String>() ;
+  protected static ArrayList<String> IGNORE_DIR = new ArrayList<String>() ;
+  
+  
   protected String input;
   protected String ramses_dir;
   protected String output;
@@ -161,6 +165,7 @@ public abstract class Scenario
         ramsesProcess = runtime.exec(line) ;
         new Thread(ft).start() ;
         ft.get(codeGenerationTimeout, TimeUnit.MINUTES) ;
+       
         displayProcessMessages(ramsesProcess, 1) ;
       }
       catch(TimeoutException ee)
@@ -220,7 +225,10 @@ public abstract class Scenario
         Boolean same = false ;
         ramses.test.util.CompareDirectory cm = new ramses.test.util.
                                                     CompareDirectory(output_ref,
-                                                                     output) ;
+                                                                     output,
+                                                                     IGNORE_FILES,
+                                                                     IGNORE_DIR
+                                                                     ) ;
         same = cm.evaluate() ;
 
         String emph ;

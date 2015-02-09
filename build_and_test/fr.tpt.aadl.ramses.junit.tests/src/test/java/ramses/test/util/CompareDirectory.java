@@ -14,7 +14,8 @@ public class CompareDirectory {
   private int maxPath = 20;
   private ArrayList<File> listRef;
   private ArrayList<File> listGen;
-  
+  private static ArrayList<String> ignored_files;
+  private static ArrayList<String> ignored_dir;
   File rootRef;
   File rootGen;
   
@@ -26,22 +27,49 @@ public class CompareDirectory {
    *            : Path folder of the code server generated
    * @throws IOException
    */
-  public CompareDirectory(String ref, String Gen) throws IOException {
-    // Initialisation
-    this.listRef = new ArrayList<File>();
-    this.listGen = new ArrayList<File>();
-    rootRef = new File(ref);
-    rootGen = new File(Gen);
-    try {
-      this.setMaxPath(20);
-      iterateOnDirectories(ref, maxPath, this.listRef);
+//  public CompareDirectory(String ref, String Gen) throws IOException {
+//    // Initialisation
+//    this.listRef = new ArrayList<File>();
+//    this.listGen = new ArrayList<File>();    
+//    rootRef = new File(ref);
+//    rootGen = new File(Gen);	
+//    try {
+//      this.setMaxPath(20);
+//      iterateOnDirectories(ref, maxPath, this.listRef);
+//
+//      this.setMaxPath(20);
+//      iterateOnDirectories(Gen,maxPath , this.listGen);
+//    } catch (Exception e) {
+//      System.out.println(e.toString());
+//    }
+//  }
+  
+  public CompareDirectory(String ref, String Gen, ArrayList<String> ig_f,ArrayList<String> ig_d) throws IOException {
+	    // Initialisation
+	    this.listRef = new ArrayList<File>();
+	    this.listGen = new ArrayList<File>();
+	    rootRef = new File(ref);
+	    rootGen = new File(Gen);
+	    ignored_files = ig_f;
+	    ignored_dir =ig_d;
+	    
+	    ignored_files.add(".aaxl2");
+	    ignored_files.add(".o");
+		ignored_files.add(".elf");
+		ignored_files.add(".elf.map");
+		ignored_files.add(".lo");
+		ignored_files.add(".bin");
+		
+	    try {
+	      this.setMaxPath(20);
+	      iterateOnDirectories(ref, maxPath, this.listRef);
 
-      this.setMaxPath(20);
-      iterateOnDirectories(Gen,maxPath , this.listGen);
-    } catch (Exception e) {
-      System.out.println(e.toString());
-    }
-  }
+	      this.setMaxPath(20);
+	      iterateOnDirectories(Gen,maxPath , this.listGen);
+	    } catch (Exception e) {
+	      System.out.println(e.toString());
+	    }
+	  }
 
   /**
    * 
@@ -173,8 +201,7 @@ public class CompareDirectory {
       return;
     }
     if (dir.isDirectory()
-    	&& ! dir.getName().endsWith("kernel")
-    	&& ! dir.getName().contains("build/data/hudson")	
+    	&& 	isIgnoredDir(dir)
     		) {
       // System.out.println("Dossier : " + dir.toString());
       list.add(dir);
@@ -185,23 +212,32 @@ public class CompareDirectory {
       }
     } else if (dir.isFile() 
     		&& !dir.getName().contains("~")
-    		&& ! dir.getName().endsWith(".aaxl2")
-    		&& ! dir.getName().endsWith(".o")
-    		&& ! dir.getName().endsWith(".pid")
-    		&& ! dir.getName().endsWith(".elf")
-    		&& ! dir.getName().endsWith(".elf.map")
-    		&& ! dir.getName().endsWith(".lo")
-    		&& ! dir.getName().endsWith(".bin")
-    		&& ! dir.getName().equals("sizes.c")
-    		&& ! dir.getName().endsWith(".map")
-    		&& ! dir.getName().endsWith("kernel_cfg.c")
-    		&& ! dir.getName().endsWith("kernel_id.h")
+    		&& isIgnoredFile(dir)
+//    		&& ! dir.getName().endsWith(".aaxl2")
+//    		&& ! dir.getName().endsWith(".o")
+//    		&& ! dir.getName().endsWith(".elf")
+//    		&& ! dir.getName().endsWith(".elf.map")    		
+//    		&& ! dir.getName().equals("sizes.c")
+    		
     		) {
-      // System.out.println("        fichier : " + dir.toString());
+       System.out.println("        fichier : " + dir.toString());
       list.add(dir);
     }
   }
 
+  private static  Boolean isIgnoredFile (File f){
+	  Boolean res = false;
+	  for ( String i : ignored_files)
+		  res = res || f.getName().endsWith(i);	  
+	  return res;
+  }
+  
+  private static Boolean isIgnoredDir (File f){
+	  Boolean res = false;
+	  for ( String i : ignored_dir)
+		  res = res || f.getName().endsWith(i);	  
+	  return res;
+  }
   /**
    * 
    * @return

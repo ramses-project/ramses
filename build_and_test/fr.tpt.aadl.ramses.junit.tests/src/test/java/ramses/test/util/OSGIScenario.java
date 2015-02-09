@@ -1,9 +1,12 @@
 package ramses.test.util;
 
+import java.util.ArrayList;
+
 
 public abstract class OSGIScenario extends Scenario
 {
- 
+
+	
   protected void setupCommandLineArgsPrefix(StringBuilder args)
   {
     String debug = "true";
