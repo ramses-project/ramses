@@ -172,7 +172,10 @@ public class CompareDirectory {
     if (depth > maxDepth || dir.getName().contains(".svn")) {
       return;
     }
-    if (dir.isDirectory()) {
+    if (dir.isDirectory()
+    	&& ! dir.getName().endsWith("kernel")
+    	&& ! dir.getName().contains("build/data/hudson")	
+    		) {
       // System.out.println("Dossier : " + dir.toString());
       list.add(dir);
       File[] subdirs = dir.listFiles();
@@ -191,7 +194,8 @@ public class CompareDirectory {
     		&& ! dir.getName().endsWith(".bin")
     		&& ! dir.getName().equals("sizes.c")
     		&& ! dir.getName().endsWith(".map")
-    		&& ! dir.getName().contains("build/data")
+    		&& ! dir.getName().endsWith("kernel_cfg.c")
+    		&& ! dir.getName().endsWith("kernel_id.h")
     		) {
       // System.out.println("        fichier : " + dir.toString());
       list.add(dir);
