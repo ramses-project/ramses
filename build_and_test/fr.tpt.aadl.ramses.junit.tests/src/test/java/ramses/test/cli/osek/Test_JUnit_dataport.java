@@ -11,7 +11,9 @@ import org.junit.Test;
 import ramses.test.util.OSGIOSEKScenario;
 
 public class Test_JUnit_dataport extends OSGIOSEKScenario{
-
+	private static ArrayList<String> IGNORE_FILE = new ArrayList<String>() ;
+	private static ArrayList<String> IGNORE_DIR = new ArrayList<String>() ;
+	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		
