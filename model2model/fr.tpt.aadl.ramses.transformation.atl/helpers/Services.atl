@@ -270,6 +270,24 @@ helper context AADLI!FeatureInstance def : connectedDataComponent(): AADLI!Compo
 	endif
 ;
 
+helper context AADLI!FeatureInstance def : getConnectedDataComponent() : Sequence(AADLI!ComponentInstance) =
+	if(not self.srcConnectionInstance->isEmpty()) then
+		self.srcConnectionInstance->select(e|e.destination.oclIsTypeOf(AADLI!ComponentInstance))
+	else
+		if(not self.dstConnectionInstance->isEmpty()) then
+			self.dstConnectionInstance->select(e|e.source.oclIsTypeOf(AADLI!ComponentInstance))
+		else
+			Sequence{}
+		endif
+	endif
+;
+
+helper context AADLI!FeatureInstance def : isConnectedToDataComponent(data: AADLI!ComponentInstance) : Boolean =
+	(not self.srcConnectionInstance->isEmpty() and self.srcConnectionInstance->exists(e|e.destination = data))
+	or
+	(not self.dstConnectionInstance->isEmpty() and self.dstConnectionInstance->exists(e|e.source = data))
+;
+
 helper context AADLI!FeatureInstance def : connectedInMode(mode: AADLI!Mode) : Boolean =
 	let remainingModes: Sequence(AADLI!Mode) = self.getComponentInstance().inMode->select(e|not (e.mode=mode)) in
 	if(self.getComponentInstance().inMode->isEmpty()
