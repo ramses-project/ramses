@@ -289,6 +289,7 @@ helper context AADLI!FeatureInstance def : isIntraProcessFeatureInstance(): Bool
 	not self.dstConnectionInstance->exists(e| not (e.source.getProcess() = self.getProcess()))
 ;
 
+
 helper context AADLI!InstanceObject def : getProcess(): AADLI!ComponentInstance =
 	if(self.getComponentInstance().category=#process) then
 		self.getComponentInstance()
@@ -547,6 +548,9 @@ helper context AADLI!ComponentInstance def: getOSMaxPriority() : Integer =
 helper context AADLI!ComponentInstance def: getThreadsInMode(m: AADLI!ModeInstance) : Sequence(AADLI!ComponentInstance) =
 	self.componentInstance->select(e | e.category = #thread)
 		->select(e|e.inMode->includes(m))
+;
+helper context AADLI!ComponentInstance def: getThreads() : Sequence(AADLI!ComponentInstance) =
+	self.componentInstance->select(e | e.category = #thread)
 ;
 
 helper context OclAny def:minus(i: OclAny) : OclAny =
