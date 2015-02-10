@@ -1,6 +1,6 @@
 package test_osek_dataports_refined_model
 public
-with OSEK,Data_Model,test_osek_dataports,arinc653_runtime,PeriodicDelayed_runtime,Base_Types,OSEK_runtime;
+with OSEK,Data_Model,test_osek_dataports,PeriodicDelayed_runtime,arinc653_runtime,Base_Types,OSEK_runtime;
   process implementation proc.impl
     subcomponents
       the_receiver_p_value: data test_osek_dataports::Integer;
@@ -118,9 +118,7 @@ PutValueDataPort_Integer ! (cnx_p, p_localVariable, the_proc_the_sender_runtime_
   
   thread the_proc_the_sender
     features
-      cnx_p: requires data access OSEK_runtime::DataPortType {
-        Data_Model::Data_Representation => Integer;
-        };
+      cnx_p: requires data access OSEK_runtime::DataPortType;
   end the_proc_the_sender;
   
   subprogram the_proc_the_receiver_entrypoint
@@ -174,9 +172,7 @@ if (p_ErrorCode = 0) test_osek_dataports::receiver_spg ! (p_localVariable) end i
   
   thread the_proc_the_receiver
     features
-      p: requires data access OSEK_runtime::DataPortType {
-        Data_Model::Data_Representation => Integer;
-        };
+      p: requires data access OSEK_runtime::DataPortType;
   end the_proc_the_receiver;
   
   subprogram GetValueDataPort_Integer

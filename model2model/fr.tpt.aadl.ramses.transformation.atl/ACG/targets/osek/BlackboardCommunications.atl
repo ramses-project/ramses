@@ -63,7 +63,7 @@ abstract rule m_Input_BlackBoard
 		behavior: AADLI!Element
 	using
 	{
-		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress().debug( ' !!!!!!!! ');
 		LENGTH_HOLDER: AADLBA!ElementHolder = thisModule.GetOrCreateLengthDataSubcomponentHolder(fi);
 		spg: AADLBA!SubprogramType = 'GetValueDataPort'.asSubprogramType('OSEK_RUNTIME');
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);

@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import ramses.test.util.OSGIOSEKScenario;
 
-public class Test_JUnit_dataport extends OSGIOSEKScenario{
+public class Test_JUnit_modes extends OSGIOSEKScenario{
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -15,12 +15,13 @@ public class Test_JUnit_dataport extends OSGIOSEKScenario{
 	}
 
 	@Test
-	public void Test_JUnit_dataport_exec() {
-		input = "osek-dataport/input/test_osek_dataports.aadl2,";
+	public void Test_JUnit_modes_exec() {
+		String root_path = "tests/osek/osek-modes";
+		input = "osek-modes/input/test_osek_modes.aadl2,";
 		includeList = "tests/osek/";
 		ramses_dir = System.getProperty("RAMSES_DIR");
-		output = "tests/osek/osek-dataport/output";
-		output_ref = "tests/osek/osek-dataport/output_ref";
+		output = root_path+"/output";
+		output_ref = root_path+"/output_ref";
 		system_impl = "root.impl";
 		
 	    File dir = new File(output);

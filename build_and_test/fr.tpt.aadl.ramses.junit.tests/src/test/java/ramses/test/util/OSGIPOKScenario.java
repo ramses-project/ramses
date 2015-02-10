@@ -1,14 +1,13 @@
 package ramses.test.util;
 
 import java.io.IOException ;
-
 import fr.tpt.aadl.ramses.control.support.utils.EnvUtils ;
 
 public abstract class OSGIPOKScenario extends OSGIScenario
 {
   private static final String DEFAULT_RUNTIME_PATH = "/usr/share/pok" ;
   
-	protected void init()
+  	protected void init()
 	{
 		target="pok";
 		
@@ -24,6 +23,9 @@ public abstract class OSGIPOKScenario extends OSGIScenario
 		aadlInspectorPath = System.getenv("AADLINSPECTOR_PATH");
 		if(aadlInspectorPath == null || aadlInspectorPath.equals(""))
 			aadlInspectorPath = System.getProperty("AADLINSPECTOR_PATH");
+		
+		IGNORE_FILES.add(".pid");
+		IGNORE_FILES.add("sizes.c");
 		
 	}
 	

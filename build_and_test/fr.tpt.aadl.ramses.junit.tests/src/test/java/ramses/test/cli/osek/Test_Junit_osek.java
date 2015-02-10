@@ -1,29 +1,30 @@
 package ramses.test.cli.osek;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ramses.test.util.OSGIOSEKScenario;
 
-public class Test_JUnit_dataport extends OSGIOSEKScenario{
-	
+public class Test_Junit_osek extends OSGIOSEKScenario {
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		
-		
 	}
 
 	@Test
-	public void Test_JUnit_dataport_exec() {
-		input = "osek-dataport/input/test_osek_dataports.aadl2,";
+	public void Test_JUnit_osek_exec() {
+		input = "osek/input/usecase.aadl,";
 		includeList = "tests/osek/";
 		ramses_dir = System.getProperty("RAMSES_DIR");
-		output = "tests/osek/osek-dataport/output";
-		output_ref = "tests/osek/osek-dataport/output_ref";
-		system_impl = "root.impl";
+		output = "tests/osek/osek/output";
+		output_ref = "tests/osek/osek/output_ref";
+		system_impl = "nxt.Impl";
 		
-	    File dir = new File(output);
+		File dir = new File(output);
 	    if (!dir.exists()) {
 	        System.out.println("creating directory: " + output);
 	        boolean result = false;
@@ -40,9 +41,4 @@ public class Test_JUnit_dataport extends OSGIOSEKScenario{
 		this.exec();
 	}
 
-	@Override
-	protected void initAdditionalParameters() {
-		// TODO Auto-generated method stub
-		
-	}
 }

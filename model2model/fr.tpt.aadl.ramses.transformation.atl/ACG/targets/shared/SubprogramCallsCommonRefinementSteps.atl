@@ -689,7 +689,7 @@ unique lazy rule createSubprogramCallContext
 		callContext: AADLBA!DataSubcomponent
 		(
 			name <- sc.name+'_context',
-			dataSubcomponentType <- thisModule.resolveTemp(spgClassifier.getType(), 'ctxt'),
+--			dataSubcomponentType <- thisModule.resolveTemp(spgClassifier.getType(), 'ctxt'),
 			ownedPropertyAssociation <- Sequence {thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',lv)}
 			
 		),
@@ -698,7 +698,8 @@ unique lazy rule createSubprogramCallContext
 			ownedListElement <- Sequence{initValuePE}
 		)
 	do
-	{
+	{	
+		callContext.dataSubcomponentType <- thisModule.resolveTemp(spgClassifier.getType(), 'ctxt');
 		callContext;
 	}
 }
@@ -1651,17 +1652,18 @@ lazy rule populateParameterLabels
 		thisModule.addImportedUnitFromInputModel(thisModule.public(), subprogramCall.calledSubprogram);
   		if(subprogramCall.calledSubprogram.oclIsKindOf(AADLI!SubprogramClassifier))
   		{
-  			spgClassifier <- subprogramCall.calledSubprogram;
+  			spgClassifier <:= subprogramCall.calledSubprogram;
   			orderedFeatures <- spgClassifier.getOrderedFeature();
   		}
 	  	else if(subprogramCall.calledSubprogram.oclIsTypeOf(AADLI!SubprogramAccess))
   		{
-	  		spgClassifier <- subprogramCall.calledSubprogram.subprogramFeatureClassifier;
+	  		spgClassifier <:= subprogramCall.calledSubprogram.subprogramFeatureClassifier;
   			orderedFeatures <- spgClassifier.getOrderedFeature();
   		}
 	  	
 	  	for(sc in behavior.ownedSubprogramCall)
 	  	{
+	  		-- if context is needed we reuse the context
 	  		if(sc.getSubprogramClassifier().needsContext())
 	  		{
 	  			intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateDataSubcomponentHolder(thisModule.createSubprogramCallContext(sc,c)));
