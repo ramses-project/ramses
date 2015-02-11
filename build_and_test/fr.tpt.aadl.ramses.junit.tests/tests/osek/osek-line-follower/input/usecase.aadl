@@ -2,7 +2,7 @@ package nxt_use_case
 public
 
 with Data_Model;
-with OSEK, Generation_Properties, OSEKNXT;
+with OSEK, Generation_Properties;
 
 ----------
 -- Data --
