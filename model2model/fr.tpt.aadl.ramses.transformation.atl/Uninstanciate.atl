@@ -150,7 +150,7 @@ rule m_ModeTransition_Instance {
 
 abstract rule m_Component_Instance {
 	from
-		c : AADLI!ComponentInstance
+		c : AADLI!ComponentInstance in IN
 	to
 		sub: AADLBA!Subcomponent(
 				name <- c.name.debug('subcomponent created'),

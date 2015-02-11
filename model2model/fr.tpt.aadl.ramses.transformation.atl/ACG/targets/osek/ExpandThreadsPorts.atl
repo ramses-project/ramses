@@ -190,22 +190,18 @@ helper context AADLI!FeatureInstance def: collectPortGlobalVariableImg() : Seque
 	endif
 ;
 
--- @extends m_Not_PeriodicDelayed_Port
+-- @extends m_Thread_IntraProcess_Input_DataPort_Instance
 rule m_Thread_IntraProcess_Input_DataPort_Instance_to_DataSubcomponent
 {
   	from
-		fi: AADLI!FeatureInstance,
-		data: AADLI!ComponentInstance
+		fi: AADLI!FeatureInstance
 		(
-			fi.isInputFeature()
-			and fi.isThreadPort()
-			and fi.isDataPort()
-			and
 			fi.connectedToDataComponent()
-			and
-			fi.isConnectedToDataComponent(data)
 		)
   	to
+		f: AADLBA!DataAccess,
+		f_entrypoint: AADLBA!DataAccess,
+		localVariable:AADLBA!DataSubcomponent,
 		globalVariable:AADLBA!DataSubcomponent
 		(
 			dataSubcomponentType <- 'DataPortType'.asDataType('OSEK_RUNTIME'),
@@ -224,19 +220,21 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance_to_DataSubcomponent
 								globalVariable.name+'_rez, &'+
 								fi.connectedDataComponent().name+', '+ thisModule.getSizeOfType(fi.getLengthInitialValue())+
 								thisModule.structInitTerminator		
-							).debug('')
+							)
 						};
 	}
 }
 
--- @extends m_Thread_IntraProcess_Input_DataPort_Instance,m_Thread_DataOrEventDataPort_Input_Instance,m_Not_PeriodicDelayed_Port
-rule m_Thread_IntraProcess_Input_DataPort_Instanceto_DataPort
+-- @extends m_Thread_IntraProcess_Input_DataPort_Instance
+rule m_Thread_IntraProcess_Input_DataPort_Instance_not_to_DataSubcomponent
 {
   	from
 		fi: AADLI!FeatureInstance
-		(not fi.connectedToDataComponent())
-	to
-	    f: AADLBA!DataAccess,
+		(
+			not fi.connectedToDataComponent()
+		)
+  	to
+		f: AADLBA!DataAccess,
 		f_entrypoint: AADLBA!DataAccess,
 		localVariable:AADLBA!DataSubcomponent,
 		globalVariable:AADLBA!DataSubcomponent
@@ -267,20 +265,52 @@ rule m_Thread_IntraProcess_Input_DataPort_Instanceto_DataPort
 	}
 }
 
--- @extends m_Thread_IntraProcess_Input_Port_Instance,m_Thread_DataOrEventDataPort_Input_Instance,m_Not_PeriodicDelayed_Port
+-- @extends m_Thread_DataOrEventDataPort_Input_Instance,m_Thread_IntraProcess_Input_Port_Instance,m_Not_PeriodicDelayed_Port
 rule m_Thread_IntraProcess_Input_DataPort_Instance
 {
   	from
 		fi: AADLI!FeatureInstance
-		(
-			fi.isDataPort().debug(' HERE 2!')
-		)
-  	to
-  		f: AADLBA!DataAccess
+	to
+		f: AADLBA!DataAccess
 		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
 		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
-		localVariable:AADLBA!DataSubcomponent
+		localVariable:AADLBA!DataSubcomponent,
+	    globalVariable:AADLBA!DataSubcomponent
+
+}
+
+-- @extends m_Thread_IntraProcess_Input_Port_Instance_Mode,m_Thread_IntraProcess_Input_DataPort_Instance
+rule m_Thread_IntraProcess_Input_DataPort_Instance_Mode_To_DataComponent
+{
+	from
+		fi: AADLI!FeatureInstance,
+		mode: AADLI!Mode
+		(
+			fi.connectedToDataComponentInMode(mode)
+		)
+	to
+		globalVariable:AADLBA!DataSubcomponent
+		(
+			dataSubcomponentType <- 'DataPortType'.asDataType('OSEK_RUNTIME'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													GvInit
+												)
+									    }
+		),
+		GvInit: AADLBA!ListValue
+	do
+	{
+		GvInit.ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
+								thisModule.structInitInitiator+'&'+
+								globalVariable.name+'_rez, &'+
+								fi.getConnectionEndInMode(mode)->first().name+', '+ thisModule.getSizeOfType(fi.getLengthInitialValue())+
+								thisModule.structInitTerminator		
+							)
+						};
+	}
 }
 
 -- @extends m_Thread_IntraProcess_Input_Port_Instance_Mode,m_Thread_IntraProcess_Input_DataPort_Instance
@@ -289,13 +319,37 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance_Mode
 	from
 		fi: AADLI!FeatureInstance,
 		mode: AADLI!Mode
+		(
+			not fi.connectedToDataComponentInMode(mode)
+		)
 	to
 		f: AADLBA!DataAccess,
 		f_entrypoint: AADLBA!DataAccess,
+		globalVariable:AADLBA!DataSubcomponent
+		(
+			dataSubcomponentType <- 'DataPortType'.asDataType('OSEK_RUNTIME'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													GvInit
+												)
+									    }
+		),
 		globalVariableValue: AADLBA!DataSubcomponent
 		(
 			name <- fi.getComponentInstance().name+'_'+fi.name+'_'+mode.name+'_value'
-		)
+		),
+		GvInit: AADLBA!ListValue
+	do
+	{
+		GvInit.ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
+								thisModule.structInitInitiator+'&'+
+								globalVariable.name+'_rez, &'+
+								globalVariableValue.name+', '+ thisModule.getSizeOfType(fi.getLengthInitialValue())+
+								thisModule.structInitTerminator		
+							)
+						};
+	}
 }
 
 -- @extends m_Not_PeriodicDelayed_Port,m_Thread_DataOrEventDataPort_Input_Instance,m_Thread_IntraProcess_Input_Port_Instance

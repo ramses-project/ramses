@@ -36,6 +36,7 @@ import org.eclipse.core.resources.IWorkspaceRoot ;
 import org.eclipse.core.resources.ResourcesPlugin ;
 import org.eclipse.emf.common.util.BasicEList ;
 import org.eclipse.emf.common.util.EList ;
+import org.eclipse.emf.common.util.TreeIterator ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EClass ;
 import org.eclipse.emf.ecore.EObject ;
@@ -639,5 +640,18 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   public PropertyAssociation getEnumerators(Classifier classifier)
   {
     return PropertyUtils.findPropertyAssociation(_ENUMERATORS, classifier);
+  }
+  
+  public List<EObject> allInstances(EObject ele, EClass type)
+  {
+    List<EObject> res = new ArrayList<EObject>();
+    TreeIterator<Element> treeIter = EcoreUtil2.getAllContents(ele, false);
+    while(treeIter.hasNext())
+    {
+      Element el = treeIter.next();
+      if(EcoreUtil2.isAssignableFrom(type, el.eClass()))
+        res.add(el);
+    }
+    return res;
   }
 } //HookAccessImpl

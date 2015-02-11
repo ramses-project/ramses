@@ -138,7 +138,7 @@ helper context AADLI!ConnectionInstanceEnd def:getGlobalVariableImg(): AADLBA!Da
 	endif
 ;
 
--- @extends m_PeriodicThread
+-- @extends m_PeriodicThread,m_ThreadEntrypoint
 rule m_PeriodicThread_with_InputPort
 {
 	from
@@ -147,6 +147,7 @@ rule m_PeriodicThread_with_InputPort
 			c.needsGlobalQueue()
 		)
 	to
+		sub: AADLBA!ThreadSubcomponent,
 		globalQueue: AADLBA!DataSubcomponent
 		(
 			name <- c.name+'_globalQueue',

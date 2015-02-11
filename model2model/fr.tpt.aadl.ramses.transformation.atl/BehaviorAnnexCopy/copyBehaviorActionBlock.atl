@@ -268,23 +268,23 @@ rule m_Factor {
 abstract rule m_CommunicationAction
 {
 	from
-		src_communicationAction: AADLBA!CommunicationAction
-		(src_communicationAction.isThreadBehaviorElement())
+		src_BehaviorElement: AADLBA!CommunicationAction
+		(src_BehaviorElement.isThreadBehaviorElement())
 	to
-		target_communicationAction: AADLBA!CommunicationAction
+		target_BehaviorElement: AADLBA!CommunicationAction
 }
 
 -- @extends m_CommunicationAction
 rule m_SubprogramCallAction
 {
 	from
-		src_communicationAction: AADLBA!SubprogramCallAction
+		src_BehaviorElement: AADLBA!SubprogramCallAction
 	to
-		target_communicationAction: AADLBA!SubprogramCallAction
+		target_BehaviorElement: AADLBA!SubprogramCallAction
 		(
-			subprogram <- src_communicationAction.subprogram,
-			parameterLabels <- src_communicationAction.parameterLabels,
-			proxy <- src_communicationAction.proxy
+			subprogram <- src_BehaviorElement.subprogram,
+			parameterLabels <- src_BehaviorElement.parameterLabels,
+			proxy <- src_BehaviorElement.proxy
 		)
 }
 
@@ -292,12 +292,12 @@ rule m_SubprogramCallAction
 rule m_PortDequeueAction
 {
 	from
-		src_communicationAction: AADLBA!PortDequeueAction
+		src_BehaviorElement: AADLBA!PortDequeueAction
 	to
-		target_communicationAction: AADLBA!PortDequeueAction
+		target_BehaviorElement: AADLBA!PortDequeueAction
 		(
-			port   <- src_communicationAction.port,
-			target <- src_communicationAction.target
+			port   <- src_BehaviorElement.port,
+			target <- src_BehaviorElement.target
 		)
 }
 
@@ -305,11 +305,11 @@ rule m_PortDequeueAction
 rule m_PortSendAction
 {
 	from
-		src_communicationAction: AADLBA!PortSendAction
+		src_BehaviorElement: AADLBA!PortSendAction
 	to
-		target_communicationAction: AADLBA!PortSendAction
+		target_BehaviorElement: AADLBA!PortSendAction
 		(
-			port   			<- src_communicationAction.port,
-			valueExpression <- src_communicationAction.valueExpression
+			port   			<- src_BehaviorElement.port,
+			valueExpression <- src_BehaviorElement.valueExpression
 		)
 }

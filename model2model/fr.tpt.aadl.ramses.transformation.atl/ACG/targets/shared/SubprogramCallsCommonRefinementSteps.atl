@@ -294,11 +294,12 @@ abstract rule m_Component_Implementation {
 }
 
 -- @extends m_create_Thread_BA
-rule m_Thread_Instance {
+abstract rule m_Thread_Instance {
 	from
 		c : AADLI!ComponentInstance (
 			c.category = #thread 
-			and c.subcomponent.subcomponentType.oclIsKindOf(AADLI!ComponentImplementation)
+			and 
+			c.subcomponent.subcomponentType.oclIsKindOf(AADLI!ComponentImplementation)
 		)
 	using
  	{
@@ -309,7 +310,6 @@ rule m_Thread_Instance {
 		implImg : AADLBA!ThreadImplementation,
 		typeImg : AADLBA!ThreadType	
 }
-
 
 -- @extends m_Thread_Instance
 rule m_ThreadEntrypoint { 
@@ -366,7 +366,7 @@ rule m_ThreadEntrypoint {
 									(
 										if(callSequences->isEmpty()) then
 											c.componentInstance->select(e|e.category=#data and AADLBA!DataSubcomponentHolder.allInstances()->exists(f|f.element = e.subcomponent))
-											->collect(access | thisModule.resolveMatchedTupleIfExists(Sequence{c,impl.getBA(),access}, 'dataAccess'))
+											->collect(access | thisModule.resolveMatchedTupleIfExists(Sequence{c,access}, 'dataAccess'))
 										else
 											Sequence{}
 										endif

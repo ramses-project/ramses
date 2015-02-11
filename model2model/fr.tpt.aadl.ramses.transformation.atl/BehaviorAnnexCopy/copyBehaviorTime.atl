@@ -29,12 +29,12 @@ create OUT : AADLBA 	from 	IN : AADLBA,
 rule m_BehaviorTime
 {
 	from
-		src_BehaviorTime: AADLBA!BehaviorTime
-		(src_BehaviorTime.isThreadBehaviorElement())
+		src_BehaviorElement: AADLBA!BehaviorTime
+		(src_BehaviorElement.isThreadBehaviorElement())
 	to
-		target_BehaviorTime: AADLBA!BehaviorTime
+		target_BehaviorElement: AADLBA!BehaviorTime
 		(
-			integerValue <- src_BehaviorTime.integerValue,
-			unit <- src_BehaviorTime.unit
+			integerValue <- src_BehaviorElement.integerValue,
+			unit <- src_BehaviorElement.unit
 		)
 }

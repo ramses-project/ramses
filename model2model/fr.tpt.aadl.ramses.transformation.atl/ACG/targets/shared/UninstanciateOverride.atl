@@ -38,7 +38,12 @@ helper context AADLI!ComponentType def: needsCopy(): Boolean =
 	if(self.oclIsKindOf(AADLI!SubprogramType)) then
 		self.subprogramNeedsCopy()
 	else
-		true
+		if(self.oclIsKindOf(AADLI!SystemType)
+		and self.isRoot()) then
+			true
+		else
+			false
+		endif
 	endif
 ;
 
@@ -162,8 +167,6 @@ rule m_System_Implementation {
 rule m_Process_Type {
  from
  	type : AADLI!ProcessType
- to 
- 	typeImg : AADLBA!ProcessType
 }
 
 -- @extends m_Connection_Reference
@@ -374,6 +377,12 @@ rule m_Process_Instance {
 		sub : AADLBA!ProcessSubcomponent
 		(
 			processSubcomponentType <- implImg
+		),
+		implType : AADLBA!ProcessType(
+			name <- if c.subcomponent.processSubcomponentType.oclIsKindOf(AADLBA!ComponentType)  then
+				c.subcomponent.processSubcomponentType.name
+			else c.subcomponent.processSubcomponentType.type.name
+			endif
 		),
 		implImg : AADLBA!ProcessImplementation (
  			name 							<- if c.subcomponent.processSubcomponentType.oclIsKindOf(AADLBA!ComponentType)  then

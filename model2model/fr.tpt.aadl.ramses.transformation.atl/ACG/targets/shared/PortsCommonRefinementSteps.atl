@@ -337,7 +337,7 @@ rule m_Thread_DataOrEventDataPort_Input_Instance
   	to
   		localVariable: AADLBA!DataSubcomponent
 		(
-			name <- fi.name+'_localVariable'.debug(' HERE !'),
+			name <- fi.name+'_localVariable',
 			dataSubcomponentType <- dataClass
 		)
 	do
