@@ -55,6 +55,7 @@ import org.osate.aadl2.Subcomponent ;
 import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.ThreadSubcomponent ;
+import org.osate.aadl2.VirtualProcessorImplementation;
 import org.osate.aadl2.VirtualProcessorSubcomponent ;
 import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.ConnectionInstance ;
@@ -1207,7 +1208,27 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
     {
       additionalFeatures =
           PropertyUtils.getStringListValue(vps, "Additional_Features") ;
-      if(additionalFeatures != null)
+      if(additionalFeatures==null)
+      {
+    	additionalFeatures =
+    	  PropertyUtils.getStringListValue(vps.getSubcomponentType(), "Additional_Features") ;
+    	if(additionalFeatures==null && 
+    			vps.getSubcomponentType() instanceof VirtualProcessorImplementation)
+    	{
+    	  VirtualProcessorImplementation vpi = 
+    			  (VirtualProcessorImplementation) vps.getSubcomponentType();
+    	  additionalFeatures =
+    	    	  PropertyUtils.getStringListValue(vpi, "Additional_Features") ;
+    	  if(additionalFeatures==null)
+    	  {
+    	    String errMsg = "cannot fecth Additional_Features for \'" +
+    				  vps.getName() + '\'' ;
+    	    _LOGGER.error(errMsg) ;
+    	    ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
+    	  }
+    	}
+      }
+      else
       {
         for(String s : additionalFeatures)
         {
@@ -1237,13 +1258,6 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
             break ;
           }
         }
-      }
-      else
-      {
-        String errMsg = "cannot fecth Additional_Features for \'" +
-                                                vps.getName() + '\'' ;
-        _LOGGER.error(errMsg) ;
-        ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
       }
     }
 

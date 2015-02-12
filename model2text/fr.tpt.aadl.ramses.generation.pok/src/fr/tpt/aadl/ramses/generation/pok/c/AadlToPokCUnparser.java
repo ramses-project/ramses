@@ -66,6 +66,7 @@ import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.SystemSubcomponent ;
 import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.ThreadSubcomponent ;
+import org.osate.aadl2.VirtualProcessorImplementation;
 import org.osate.aadl2.VirtualProcessorSubcomponent ;
 import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.ConnectionInstance ;
@@ -1235,49 +1236,61 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     // Try to fetch POK properties: Additional_Features.
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
-      additionalFeatures = PropertyUtils.getStringListValue(vps,
-                                                            "Additional_Features") ;
-      if(additionalFeatures != null)
-      {
-        for(String s : additionalFeatures)
-        {
-          if(s.equalsIgnoreCase("console"))
-          {
-            // POK_NEEDS_CONSOLE has to be in both kernel's deployment.h
-            deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_CONSOLE 1") ;
-            _processorProp.consoleFound = true ;
-            break ;
-          }
-        }
+    	additionalFeatures =
+    			PropertyUtils.getStringListValue(vps, "Additional_Features") ;
+    	if(additionalFeatures==null)
+    	{
+    		additionalFeatures =
+    				PropertyUtils.getStringListValue(vps.getSubcomponentType(), "Additional_Features") ;
+    		if(additionalFeatures==null && 
+    				vps.getSubcomponentType() instanceof VirtualProcessorImplementation)
+    		{
+    			VirtualProcessorImplementation vpi = 
+    					(VirtualProcessorImplementation) vps.getSubcomponentType();
+    			additionalFeatures =
+    					PropertyUtils.getStringListValue(vpi, "Additional_Features") ;
+    			if(additionalFeatures==null)
+    			{
+    				String errMsg = "cannot fecth Additional_Features for \'" +
+    						vps.getName() + '\'' ;
+    				_LOGGER.error(errMsg) ;
+    				ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
+    			}
+    		}
+    	}
+    	else
+    	{
+    		for(String s : additionalFeatures)
+    		{
+    			if(s.equalsIgnoreCase("console"))
+    			{
+    				// POK_NEEDS_CONSOLE has to be in both kernel's deployment.h
+    				deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_CONSOLE 1") ;
+    				_processorProp.consoleFound = true ;
+    				break ;
+    			}
+    		}
 
-        for(String s : additionalFeatures)
-        {
-          if(s.equalsIgnoreCase("libc_stdio"))
-          {
-            _processorProp.stdioFound = true ;
-            break ;
-          }
-        }
+    		for(String s : additionalFeatures)
+    		{
+    			if(s.equalsIgnoreCase("libc_stdio"))
+    			{
+    				_processorProp.stdioFound = true ;
+    				break ;
+    			}
+    		}
 
-        for(String s : additionalFeatures)
-        {
-          if(s.equalsIgnoreCase("libc_stdlib"))
-          {
-            _processorProp.stdlibFound = true ;
-            break ;
-          }
-        }
-      }
-      else
-      {
-        String errMsg = "cannot fetch the Additional_Features for \'" +
-                                                        vps.getName() + '\'' ;
-        _LOGGER.warn(errMsg) ;
-        ServiceProvider.SYS_ERR_REP.warning(errMsg, true) ;
-        // Nothing to do
-      }
+    		for(String s : additionalFeatures)
+    		{
+    			if(s.equalsIgnoreCase("libc_stdlib"))
+    			{
+    				_processorProp.stdlibFound = true ;
+    				break ;
+    			}
+    		}
+    	}
     }
-    
+
     String hwAddr = PropertyUtils.getStringValue(processor, "Address");
     if(hwAddr!=null && false==hwAddr.isEmpty())
       _processorProp.hwAdress = hwAddr;
