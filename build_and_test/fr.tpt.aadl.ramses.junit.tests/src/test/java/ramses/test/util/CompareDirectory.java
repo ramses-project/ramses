@@ -47,7 +47,7 @@ public class CompareDirectory {
 //  }
   
   public CompareDirectory(String ref, String Gen, ArrayList<String> ig_f,ArrayList<String> ig_d) throws IOException {
-	    // Initialisation
+	    // Initialization
 	    this.listRef = new ArrayList<File>();
 	    this.listGen = new ArrayList<File>();
 	    rootRef = new File(ref);
@@ -170,8 +170,7 @@ public class CompareDirectory {
    * @param list
    * @throws IOException 
    */
-  private static void iterateOnDirectories(String repertoire, int j,
-      ArrayList<File> list) throws IOException {
+  private static void iterateOnDirectories(String repertoire, int j, ArrayList<File> list) throws IOException {
 
     File rep = new File(repertoire);
     if (!rep.exists())
@@ -202,9 +201,7 @@ public class CompareDirectory {
     if (depth > maxDepth || dir.getName().contains(".svn")) {
       return;
     }
-    if (dir.isDirectory()
-    	&& 	isIgnoredDir(dir)
-    		) {
+    if (dir.isDirectory() && !isIgnoredDir(dir)) {
       // System.out.println("Dossier : " + dir.toString());
       list.add(dir);
       File[] subdirs = dir.listFiles();
@@ -214,7 +211,7 @@ public class CompareDirectory {
       }
     } else if (dir.isFile() 
     		&& !dir.getName().contains("~")
-    		&& isIgnoredFile(dir)    		
+    		&& !isIgnoredFile(dir)    		
     		) {
 //       System.out.println("        fichier : " + dir.toString());
       list.add(dir);
