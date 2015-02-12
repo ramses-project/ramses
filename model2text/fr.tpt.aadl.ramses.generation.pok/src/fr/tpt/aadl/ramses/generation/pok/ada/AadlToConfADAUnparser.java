@@ -1228,7 +1228,7 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
     	  }
     	}
       }
-      else
+      if(additionalFeatures!=null)
       {
         for(String s : additionalFeatures)
         {

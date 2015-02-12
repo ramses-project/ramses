@@ -1258,7 +1258,7 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     			}
     		}
     	}
-    	else
+    	if(additionalFeatures!=null)
     	{
     		for(String s : additionalFeatures)
     		{
