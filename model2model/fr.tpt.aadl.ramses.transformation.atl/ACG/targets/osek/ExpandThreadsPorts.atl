@@ -175,18 +175,12 @@ rule m_Process_Output_EventPort_Instance
 helper context AADLI!FeatureInstance def: collectPortGlobalVariableImg() : Sequence(AADLBA!DataSubcomponent) =
 	if(self.getProcess().modeInstance->exists(mi| self.connectedInMode(mi.mode))) then
 		self.getProcess().modeInstance->collect(mi |
-			Sequence{
+		Sequence{
 			thisModule.resolveMatchedTupleIfExists(Sequence{self, mi.mode}, 'globalVariableValue'), 
 			thisModule.resolveMatchedTupleIfExists(Sequence{self, mi.mode}, 'globalVariable')
 		})->flatten()
 	else
-		if(self.connectedToDataComponent()) then
-			self.getConnectedDataComponent()->collect(e|
-				Sequence{thisModule.resolveMatchedSingleIfExists(Sequence{self,e}, 'globalVariableValue'), thisModule.resolveMatchedSingleIfExists(Sequence{self,e}, 'globalVariable')}
-			)->flatten()
-		else
-			Sequence{thisModule.resolveMatchedSingleIfExists(self, 'globalVariableValue'), thisModule.resolveMatchedSingleIfExists(self, 'globalVariable')}
-		endif
+		Sequence{thisModule.resolveMatchedSingleIfExists(self, 'globalVariableValue'), thisModule.resolveMatchedSingleIfExists(self, 'globalVariable')}
 	endif
 ;
 
@@ -196,6 +190,10 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance_to_DataSubcomponent
   	from
 		fi: AADLI!FeatureInstance
 		(
+			fi.dstConnectionInstance->size()=1
+			and
+			not fi.dstConnectionInstance->exists(e|e.connectionReference->exists(f|f.connection.inModeOrTransition.size()>0))
+			and
 			fi.connectedToDataComponent()
 		)
   	to
@@ -231,6 +229,10 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance_not_to_DataSubcomponent
   	from
 		fi: AADLI!FeatureInstance
 		(
+			fi.dstConnectionInstance->size()=1
+			and
+			not fi.dstConnectionInstance->exists(e|e.connectionReference->exists(f|f.connection.inModeOrTransition.size()>0))
+			and
 			not fi.connectedToDataComponent()
 		)
   	to
@@ -280,7 +282,7 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance
 
 }
 
--- @extends m_Thread_IntraProcess_Input_Port_Instance_Mode,m_Thread_IntraProcess_Input_DataPort_Instance
+-- @extends m_Thread_IntraProcess_Input_Port_Instance_Mode
 rule m_Thread_IntraProcess_Input_DataPort_Instance_Mode_To_DataComponent
 {
 	from
@@ -290,6 +292,10 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance_Mode_To_DataComponent
 			fi.connectedToDataComponentInMode(mode)
 		)
 	to
+		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
+		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
 		globalVariable:AADLBA!DataSubcomponent
 		(
 			dataSubcomponentType <- 'DataPortType'.asDataType('OSEK_RUNTIME'),
@@ -313,18 +319,22 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance_Mode_To_DataComponent
 	}
 }
 
--- @extends m_Thread_IntraProcess_Input_Port_Instance_Mode,m_Thread_IntraProcess_Input_DataPort_Instance
+-- @extends m_Thread_IntraProcess_Input_Port_Instance_Mode
 rule m_Thread_IntraProcess_Input_DataPort_Instance_Mode
 {
 	from
 		fi: AADLI!FeatureInstance,
 		mode: AADLI!Mode
 		(
+			fi.connectedInMode(mode)
+			and
 			not fi.connectedToDataComponentInMode(mode)
 		)
 	to
-		f: AADLBA!DataAccess,
-		f_entrypoint: AADLBA!DataAccess,
+		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
+		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
 		globalVariable:AADLBA!DataSubcomponent
 		(
 			dataSubcomponentType <- 'DataPortType'.asDataType('OSEK_RUNTIME'),

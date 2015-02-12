@@ -310,16 +310,16 @@ helper context AADLI!FeatureInstance def : isConnectedToDataComponent(data: AADL
 ;
 
 helper context AADLI!FeatureInstance def : connectedInMode(mode: AADLI!Mode) : Boolean =
-	let remainingModes: Sequence(AADLI!Mode) = self.getComponentInstance().inMode->select(e|not (e.mode=mode)) in
-	if(self.getComponentInstance().inMode->isEmpty()
-			or not remainingModes->isEmpty())
-	then
+--	let remainingModes: Sequence(AADLI!Mode) = self.getComponentInstance().inMode->select(e|not (e.mode=mode)) in
+--	if(self.getComponentInstance().inMode->isEmpty()
+--			or not remainingModes->isEmpty())
+--	then
 		self.srcConnectionInstance->exists(e|e.connectionReference->exists(f|f.connection.inModeOrTransition->includes(mode)))
 		or
 		self.dstConnectionInstance->exists(e|e.connectionReference->exists(f|f.connection.inModeOrTransition->includes(mode)))
-	else
-		false
-	endif
+--	else
+--		false
+--	endif
 ;
 
 helper context AADLI!FeatureInstance def : isIntraProcessFeatureInstance(): Boolean =
