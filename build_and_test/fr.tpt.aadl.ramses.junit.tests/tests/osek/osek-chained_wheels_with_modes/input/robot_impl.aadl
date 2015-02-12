@@ -1,0 +1,234 @@
+package robot_impl
+public
+    
+--with Data_Model; --aadl libraries
+--with nxtTypes, motorTypes; --lego libraries
+--with tasks;
+
+
+with Data_Model; 
+--aadl libraries
+--with motor; --lego libraries,motorTypes, nxtTypes,
+--with plateform, robot_impl;
+
+with OSEK;
+
+data speed
+    properties
+    Data_Model::Data_Representation => Integer;
+    Data_Model::Integer_Range => -100 .. 100;
+    Source_text => ("nxt_motors.h");
+    Source_name => "int";
+end speed;
+
+data brake
+    properties
+    Data_Model::Data_Representation => Integer;
+    Data_Model::Integer_Range => -100 .. 100;
+    Source_text => ("nxt_motors.h");
+    Source_name => "int";
+end brake;
+
+device Motor
+end Motor;
+
+system implementation line_follower.impl
+subcomponents
+    nxt_cpu      :  processor arm.impl;
+    nxt_mem   :   memory nxt_mem.impl;
+    movement     :  process movement.Impl; 
+    LeftEngine: device Motor;
+    RightEngine: device Motor;          
+properties
+  Actual_Processor_Binding => (reference (nxt_cpu)) applies to movement;
+  Actual_Memory_Binding => (reference (nxt_mem)) applies to movement;
+end line_follower.impl ;
+
+system line_follower  
+end line_follower ;
+
+processor arm 
+end arm;
+
+processor implementation arm.impl 
+properties
+  Scheduling_Protocol => (RMS) ;
+  OSEK::SystemCounter_MaxAllowedValue => 2000;
+  OSEK::SystemCounter_TicksPerBase => 1;
+  OSEK::SystemCounter_MinCycle => 1;
+end arm.impl;
+
+memory nxt_mem  
+end nxt_mem;  
+
+memory implementation nxt_mem.impl  
+end nxt_mem.impl;    
+--------------------------------------------------------------------------------
+process implementation  movement.impl
+    subcomponents
+        wheels : thread engines.impl;
+        leftEnginePort: data nxt_motor_port {Data_Model::Initial_Value => ("NXT_PORT_B");};
+        rightEnginePort: data nxt_motor_port {Data_Model::Initial_Value => ("NXT_PORT_C");};
+        sp: data speed{Data_Model::Initial_Value => ("100");};  
+        fwd: data command{Data_Model::Initial_Value => ("FORWARD");};       
+--        stp: data command{Data_Model::Initial_Value => ("STOP");};          
+        bwd: data command{Data_Model::Initial_Value => ("BACKWARD");};
+--        lft: data command{Data_Model::Initial_Value => ("LEFT");};
+--        llft: data command{Data_Model::Initial_Value => ("LLEFT");};
+--        rgt: data command{Data_Model::Initial_Value => ("RIGHT");};
+--        rrgt: data command{Data_Model::Initial_Value => ("RRIGHT");};
+    connections
+        transfimt_sp : port sp -> wheels.speed;
+        
+        transmit_fwd :  port fwd -> wheels.cmd in modes (forward);
+        transmit_bwd :  port bwd -> wheels.cmd in modes (backward);
+--        transmit_stp :  port stp -> wheels.cmd in modes (stop);
+--        transmit_rgt :  port rgt -> wheels.cmd in modes (right);
+--        transmit_lft :  port lft -> wheels.cmd in modes (left);
+--        transmit_rrgt :  port rrgt -> wheels.cmd in modes (rright);
+--        transmit_llft :  port llft -> wheels.cmd in modes (lleft);
+    modes
+        forward : initial mode;
+        backward : mode;
+--        stop : mode;
+--        right : mode;
+--        rright : mode;
+--        left : mode;
+--        lleft : mode;
+    
+        forward -[wheels.done]-> backward;
+        backward -[wheels.done]-> forward;
+--        backward -[wheels.done]-> stop;
+--        stop -[wheels.done]-> right;
+--        right -[wheels.done]-> left;
+--        left -[wheels.done]-> rright;
+--        rright -[wheels.done]-> lleft;
+--        lleft -[wheels.done]-> forward;
+end movement.impl;
+
+thread implementation engines.impl
+    calls
+        call1: {
+            movement : subprogram move;
+        };        
+    connections
+        cnx_speed : parameter movement.speed -> speed ;                
+        cnx_cmd : parameter movement.commande -> cmd  ;
+        done_cnx : port movement.done -> done;
+
+    properties
+        Dispatch_Protocol                  => periodic;
+        Period                             => 1000 ms;
+        Compute_Execution_time             => 0 ms .. 500 ms; 
+        Deadline                           => 500 ms;
+        Priority                           => 2;
+        Compute_Entrypoint_Call_Sequence => reference (call1);
+        POSIX_Scheduling_Policy => SCHED_FIFO;        
+end engines.impl;
+
+
+thread engines
+    features
+        move : requires subprogram access move;
+        speed : in data port speed;
+        cmd : in data port command;
+        done : out event port;
+end engines;
+    
+process movement
+--    features
+--        done : out event port;
+end movement;
+--------------------------------------------------------------------------------
+
+data command
+    properties
+    Data_Model::Data_Representation => Enum;
+    Data_Model::Enumerators => (
+    "STOP",  
+    "FORWARD",
+    "BACKWARD",
+    "LEFT",
+    "RIGHT",
+    "LLEFT",
+    "RRIGHT"
+    );
+    Source_text => ("robot.h");
+    Source_name => "move_order";
+end command;    
+    
+subprogram move
+    features
+        done : out event port;    
+        commande : in parameter command;
+        speed : in parameter speed;        
+    properties
+        Source_language => (C);
+        Source_text => ("robot.h");
+        Source_name => "move_robot";
+        OSEK::Source_Location => "robot.c";    
+end move;
+--------------------------------------------------------------------------------
+
+data int
+properties
+    Data_Model::Data_Representation => integer;
+end int;
+
+    
+data U8
+properties
+  source_name => "U8";
+  source_text => ("ecrobot/c/ecrobot_interface.h");
+end U8;
+
+data U32
+properties
+  source_name => "U32";
+  source_text => ("ecrobot/c/ecrobot_interface.h");
+end U32;
+
+data S32
+properties
+  source_name => "S32";
+  source_text => ("ecrobot/c/ecrobot_interface.h");
+end S32;
+
+data S8
+properties
+  source_name => "S8";
+  source_text => ("ecrobot/c/ecrobot_interface.h");
+end S8;
+
+data U16
+properties
+  source_name => "U16";
+  source_text => ("ecrobot/c/ecrobot_interface.h");
+end U16;
+
+data nxt_motor_port
+properties
+      Data_Model::Data_Representation => Enum;
+  Data_Model::Enumerators => (
+    "NXT_PORT_A", 
+    "NXT_PORT_B",
+    "NXT_PORT_C"
+    );
+  source_name => "int";
+  source_text => ("ecrobot/c/ecrobot_interface.h"); 
+end nxt_motor_port;
+
+data nxt_sensor_port
+properties
+  Data_Model::Data_Representation => Enum;
+  Data_Model::Enumerators => (
+    "NXT_PORT_S1", 
+    "NXT_PORT_S2",
+    "NXT_PORT_S3",
+    "NXT_PORT_S4"
+    );
+  source_name => "int";
+  source_text => ("ecrobot/c/ecrobot_interface.h");    
+end nxt_sensor_port;
+   
+end robot_impl;
