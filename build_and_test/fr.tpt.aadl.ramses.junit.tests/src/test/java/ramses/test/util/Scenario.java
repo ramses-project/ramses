@@ -22,8 +22,8 @@ import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
 public abstract class Scenario
 {
-  protected static ArrayList<String> IGNORE_FILES = new ArrayList<String>() ;
-  protected static ArrayList<String> IGNORE_DIR = new ArrayList<String>() ;
+  protected ArrayList<String> IGNORE_FILES = new ArrayList<String>() ;
+  protected ArrayList<String> IGNORE_DIR = new ArrayList<String>() ;
   
   
   protected String input;
