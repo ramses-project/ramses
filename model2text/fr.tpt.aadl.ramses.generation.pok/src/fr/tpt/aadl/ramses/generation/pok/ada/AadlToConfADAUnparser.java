@@ -1360,6 +1360,28 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
       String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduling_Protocol") ;
+      
+      if(requiredScheduler==null)
+      {
+        requiredScheduler = PropertyUtils.
+            getEnumValue(vps.getSubcomponentType(), "Scheduling_Protocol");
+        if(requiredScheduler==null
+            && vps.getSubcomponentType() instanceof VirtualProcessorImplementation)
+        {
+          VirtualProcessorImplementation vpi = 
+              (VirtualProcessorImplementation) vps.getSubcomponentType(); 
+          requiredScheduler = PropertyUtils.
+              getEnumValue(vpi.getType(), "Scheduling_Protocol");
+          if(requiredScheduler==null)
+          {
+            String errMsg = "cannot fecth Scheduling_Protocol for \'" +
+                vps.getName() + '\'' ;
+            _LOGGER.error(errMsg) ;
+            ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
+          }
+        }
+      }
+      
       if(requiredScheduler != null)
       {
         if(requiredScheduler.equalsIgnoreCase("Round_Robin_Protocol"))

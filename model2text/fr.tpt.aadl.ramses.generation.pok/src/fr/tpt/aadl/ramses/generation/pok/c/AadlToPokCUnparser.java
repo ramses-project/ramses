@@ -1236,28 +1236,28 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     // Try to fetch POK properties: Additional_Features.
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
-    	additionalFeatures =
-    			PropertyUtils.getStringListValue(vps, "Additional_Features") ;
-    	if(additionalFeatures==null)
-    	{
-    		additionalFeatures =
-    				PropertyUtils.getStringListValue(vps.getSubcomponentType(), "Additional_Features") ;
-    		if(additionalFeatures==null && 
-    				vps.getSubcomponentType() instanceof VirtualProcessorImplementation)
-    		{
-    			VirtualProcessorImplementation vpi = 
-    					(VirtualProcessorImplementation) vps.getSubcomponentType();
-    			additionalFeatures =
-    					PropertyUtils.getStringListValue(vpi, "Additional_Features") ;
-    			if(additionalFeatures==null)
-    			{
-    				String errMsg = "cannot fecth Additional_Features for \'" +
-    						vps.getName() + '\'' ;
-    				_LOGGER.error(errMsg) ;
-    				ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
-    			}
-    		}
-    	}
+      additionalFeatures =
+          PropertyUtils.getStringListValue(vps, "Additional_Features") ;
+      if(additionalFeatures==null)
+      {
+        additionalFeatures =
+            PropertyUtils.getStringListValue(vps.getSubcomponentType(), "Additional_Features") ;
+        if(additionalFeatures==null && 
+            vps.getSubcomponentType() instanceof VirtualProcessorImplementation)
+        {
+          VirtualProcessorImplementation vpi = 
+              (VirtualProcessorImplementation) vps.getSubcomponentType();
+          additionalFeatures =
+              PropertyUtils.getStringListValue(vpi.getType(), "Additional_Features") ;
+          if(additionalFeatures==null)
+          {
+            String errMsg = "cannot fecth Additional_Features for \'" +
+                vps.getName() + '\'' ;
+            _LOGGER.error(errMsg) ;
+            ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
+          }
+        }
+      }
     	if(additionalFeatures!=null)
     	{
     		for(String s : additionalFeatures)
@@ -1435,6 +1435,27 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     {
       PropertyAssociation pa = PropertyUtils.findPropertyAssociation(
                                                     "Scheduling_Protocol", vps);
+      if(pa==null)
+      {
+        pa = PropertyUtils.
+          findPropertyAssociation("Scheduling_Protocol", vps.getSubcomponentType());
+        if(pa==null
+            && vps.getSubcomponentType() instanceof VirtualProcessorImplementation)
+        {
+          VirtualProcessorImplementation vpi = 
+              (VirtualProcessorImplementation) vps.getSubcomponentType(); 
+          pa = PropertyUtils.
+              findPropertyAssociation("Scheduling_Protocol", vpi.getType());
+          if(pa==null)
+          {
+            String errMsg = "cannot fecth Scheduling_Protocol for \'" +
+                vps.getName() + '\'' ;
+            _LOGGER.error(errMsg) ;
+            ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
+          }
+        }
+      }
+      
       if(pa!=null)
       {
         ModalPropertyValue v = pa.getOwnedValues().get(0);
