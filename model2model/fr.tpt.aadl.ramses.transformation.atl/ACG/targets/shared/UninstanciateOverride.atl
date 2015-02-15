@@ -169,18 +169,14 @@ rule m_Processor_Instance {
 			processorSubcomponentType <- implImg
 		),
 		typeImg : AADLBA!ProcessorType(
-			name <- if c.subcomponent.processorSubcomponentType.oclIsKindOf(AADLBA!ComponentType)  then
-						c.subcomponent.processorSubcomponentType.name
-					else c.subcomponent.processorSubcomponentType.type.name endif,
+			name <- c.uniqueName(),
 			ownedEventDataPort <- c.featureInstance->select(e| e.category.getName()='eventDataPort')->excluding(OclUndefined),
 	 		ownedDataPort <- c.featureInstance->select(e| e.category.getName()='dataPort')->excluding(OclUndefined),
 			ownedEventPort <- c.featureInstance->select(e| e.category.getName()='eventPort')->excluding(OclUndefined),
 			ownedBusAccess <- c.featureInstance->select(e| e.category.getName()='busAccess')->excluding(OclUndefined)
 		),
 		implImg : AADLBA!ProcessorImplementation (
-			name <- if c.subcomponent.processorSubcomponentType.oclIsKindOf(AADLBA!ComponentType)  then
-						c.subcomponent.processorSubcomponentType.name+'impl'
-					else c.subcomponent.processorSubcomponentType.name endif,
+			name <- c.uniqueName().concat('.impl'),
 			ownedRealization 			<- thisModule.Realization(typeImg),
 			ownedVirtualProcessorSubcomponent 	<- c.componentInstance->select(e|e.category.getName()='virtual processor')->excluding(OclUndefined),
 			ownedBusSubcomponent 				<- c.componentInstance->select(e|e.category.getName()='bus')->excluding(OclUndefined),
@@ -198,17 +194,13 @@ rule m_Memory_Instance {
 			memorySubcomponentType <- implImg
 		),
 		implImg : AADLBA!MemoryImplementation (
-			name <- if c.subcomponent.memorySubcomponentType.oclIsKindOf(AADLBA!ComponentType)  then
-						c.subcomponent.memorySubcomponentType.name+'impl'
-					else c.subcomponent.memorySubcomponentType.name endif,
+			name <- c.uniqueName().concat('.impl'),
 			ownedRealization 			<- thisModule.Realization(typeImg),
 			ownedMemorySubcomponent <- c.componentInstance->select(e|e.category.getName()='memory')->excluding(OclUndefined)
 		),
 		typeImg : AADLBA!MemoryType
 		(
-			name <- if c.subcomponent.memorySubcomponentType.oclIsKindOf(AADLBA!ComponentType)  then
-						c.subcomponent.memorySubcomponentType.name
-					else c.subcomponent.memorySubcomponentType.type.name endif
+			name <- c.uniqueName()
 		)
 }
 
@@ -226,16 +218,10 @@ rule m_Process_Instance {
 			processSubcomponentType <- implImg
 		),
 		implType : AADLBA!ProcessType(
-			name <- if c.subcomponent.processSubcomponentType.oclIsKindOf(AADLBA!ComponentType)  then
-				c.subcomponent.processSubcomponentType.name
-			else c.subcomponent.processSubcomponentType.type.name
-			endif
+			name <- c.uniqueName()
 		),
 		implImg : AADLBA!ProcessImplementation (
- 			name 							<- if c.subcomponent.processSubcomponentType.oclIsKindOf(AADLBA!ComponentType)  then
-												c.subcomponent.processSubcomponentType.name+'.impl'
-											else c.subcomponent.processSubcomponentType.name
-											endif,
+ 			name 							<- c.uniqueName().concat('.impl'),
 			ownedRealization 				<- thisModule.Realization(
 											if c.subcomponent.processSubcomponentType.oclIsKindOf(AADLBA!ComponentType)  then c.processSubcomponentType.resolve()
 											else c.subcomponent.processSubcomponentType.type.resolve()
@@ -249,7 +235,6 @@ rule m_Process_Instance {
 													->collect( e|
 														thisModule.resolveMatchedTupleIfExists(Sequence{e,e.subcomponent.subcomponentType.getBA()},'currentState')
 													)
-													
 												)
 												-- intraprocess input thread port
 												-- process output port
