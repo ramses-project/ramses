@@ -220,7 +220,7 @@ rule m_Output_Port_BehaviorAnnex
 	}
 }
 
--- @extends m_Thread_Instance_Filter
+-- @extends m_Thread_Instance_Filter, m_BehavioredInstance
 rule m_Compute_EntryPoint_from_BA_dataAccess {
  from 
     c : AADLI!ComponentInstance,
@@ -245,7 +245,7 @@ rule m_Compute_EntryPoint_from_BA_dataAccess {
   }
 }
 
--- @extends m_ThreadBehavior
+-- @extends m_ThreadBehavior, m_BehavioredInstance
 rule m_Compute_EntryPoint_from_BA {
  from 
     c : AADLI!ComponentInstance,
@@ -538,6 +538,7 @@ lazy rule createPortCountValueUpdate
 		fi: AADLI!FeatureInstance
 }
 
+-- @extends m_BehavioredInstance
 rule m_BehaviorActionsFromThread
 {
   from
@@ -849,6 +850,7 @@ abstract rule m_BehaviorElement
 		target_BehaviorElement: AADLBA!BehaviorElement
 }
 
+-- @extends m_BehavioredInstance
 rule m_IfStatement
 {
 	from
@@ -879,6 +881,7 @@ rule m_IfStatement
 		)
 }
 
+-- @extends m_BehavioredInstance
 rule m_BehaviorActionBlock
 {
 	from
@@ -891,6 +894,7 @@ rule m_BehaviorActionBlock
 		)
 }
 
+-- @extends m_BehavioredInstance
 rule m_BehaviorActionSequence
 {
 	from
@@ -908,7 +912,7 @@ rule m_BehaviorActionSequence
 		)
 }
 
-
+-- @extends m_BehavioredInstance
 rule m_EventPortHolder
 {
 	from
@@ -925,6 +929,7 @@ rule m_EventPortHolder
 		)
 }
 
+-- @extends m_BehavioredInstance
 rule m_EventDataPortHolder
 {
 	from
@@ -941,6 +946,7 @@ rule m_EventDataPortHolder
 		)
 }
 
+-- @extends m_BehavioredInstance
 rule m_DataSubcomponentHolder
 {
 	from
@@ -961,6 +967,7 @@ rule m_DataSubcomponentHolder
 		)
 }
 
+-- @extends m_BehavioredInstance
 rule m_BehaviorVariableHolder
 {
 	from
@@ -973,6 +980,7 @@ rule m_BehaviorVariableHolder
 		)
 }
 
+-- @extends m_BehavioredInstance
 rule m_SubprogramHolder
 {
 	from
@@ -989,6 +997,7 @@ rule m_SubprogramHolder
 	}
 }
 
+-- @extends m_BehavioredInstance
 rule m_DataPortHolder_withFresh
 {
 	from
@@ -1056,6 +1065,7 @@ rule m_PortCountValue
 		)
 }
 
+-- @extends m_BehavioredInstance
 abstract rule m_PropertyReference
 {
 	from
@@ -1097,6 +1107,7 @@ rule m_PropertySetPropertyReference
 		)
 }
 
+-- @extends m_BehavioredInstance
 rule m_PropertyNameHolder
 {
 	from
@@ -1115,6 +1126,7 @@ rule m_PropertyNameHolder
 		)
 }
 
+-- @extends m_BehavioredInstance
 abstract rule m_PropertyElementHolder
 {
 	from
@@ -1160,6 +1172,7 @@ rule m_PropertyAssociationHolder
 		target_BehaviorElement: AADLBA!PropertyAssociationHolder
 }
 
+-- @extends m_BehavioredInstance
 rule m_UpperBound
 {
 	from
@@ -1169,6 +1182,7 @@ rule m_UpperBound
 		target_BehaviorElement: AADLBA!UpperBound
 }
 
+-- @extends m_BehavioredInstance
 rule m_LowerBound
 {
 	from
@@ -1178,7 +1192,7 @@ rule m_LowerBound
 		target_BehaviorElement: AADLBA!LowerBound
 }
 
--- @extends m_CommunicationAction
+-- @extends m_CommunicationAction, m_BehavioredInstance
 rule m_SubprogramCallAction
 {
 	from
@@ -1197,6 +1211,7 @@ rule m_SubprogramCallAction
 		)
 }
 
+-- @extends m_BehavioredInstance
 rule m_AssignmentAction
 {
 	from
@@ -1215,7 +1230,7 @@ rule m_AssignmentAction
 		)
 }
 
-
+-- @extends m_BehavioredInstance
 rule m_Term {
 	from
 		src_BehaviorElement: AADLBA!Term,
@@ -1233,6 +1248,7 @@ rule m_Term {
 		)
 }
 
+-- @extends m_BehavioredInstance
 rule m_Factor {
 	from
 		src_BehaviorElement: AADLBA!Factor,
@@ -1253,6 +1269,7 @@ rule m_Factor {
 		)
 }
 
+-- @extends m_BehavioredInstance
 rule m_BehaviorIntegerLiteral
 {
 	from
@@ -1271,6 +1288,7 @@ rule m_BehaviorIntegerLiteral
 		)
 }
 
+-- @extends m_BehavioredInstance
 rule m_ValueExpression
 {
 	from
@@ -1289,6 +1307,7 @@ rule m_ValueExpression
 		)
 }
 
+-- @extends m_BehavioredInstance
 rule m_Relation
 {
 	from
@@ -1308,6 +1327,7 @@ rule m_Relation
 		)
 }
 
+-- @extends m_BehavioredInstance
 rule m_SimpleExpression {
 	from
 		src_BehaviorElement : AADLBA!SimpleExpression,
@@ -1326,6 +1346,7 @@ rule m_SimpleExpression {
 		)
 }
 
+-- @extends m_BehavioredInstance
 rule m_DataAccessHolder
 {
 	from
@@ -1341,7 +1362,7 @@ rule m_DataAccessHolder
 		)
 }
 
-
+-- @extends m_BehavioredInstance
 rule m_ParameterHolder
 {
 	from
@@ -1357,7 +1378,7 @@ rule m_ParameterHolder
 		)
 }
 
-
+-- @extends m_BehavioredInstance
 rule m_PortFreshValue
 {
 	from
