@@ -1572,10 +1572,8 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
 
     deploymentHeaderCode.addOutputNewline("}") ;
     
-    NamedElement rootSystem = getRootSystem((AadlPackage)
-                                            processor.getContainingClassifier().eContainer().eContainer());
     PropertyAssociation moduleSchedulePA = PropertyUtils.findPropertyAssociation
-                                                ("Module_Schedule", rootSystem);
+                                                ("Module_Schedule", processor);
     if(moduleSchedulePA == null)
     {
       String errMsg =  "cannot fetch Module_Schedule for \'"+
@@ -1623,7 +1621,8 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
         {
           ReferenceValue sAllocation = (ReferenceValue) bpa.getValue();
           int index = sAllocation.getContainmentPathElements().size()-1; 
-          int referencedComponentId = bindedVPS.indexOf(sAllocation.getContainmentPathElements().get(index).getNamedElement()) ;
+          NamedElement ne = sAllocation.getContainmentPathElements().get(index).getNamedElement();
+          int referencedComponentId = bindedVPS.indexOf(ne) ;
           
           deploymentHeaderCode.addOutput(Integer.toString(referencedComponentId)) ;
           if(idx != lv.getOwnedListElements().size() - 1)

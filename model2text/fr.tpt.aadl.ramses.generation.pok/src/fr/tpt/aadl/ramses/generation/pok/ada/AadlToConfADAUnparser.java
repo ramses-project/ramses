@@ -1491,9 +1491,9 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
     }
 
     deploymentHeaderCode.addOutputNewline("}") ;
-    NamedElement ne = processor.getContainingClassifier();
+    
     PropertyAssociation moduleSchedulePA = PropertyUtils.
-                                 findPropertyAssociation("Module_Schedule", ne);
+                                 findPropertyAssociation("Module_Schedule", processor);
     if(moduleSchedulePA == null)
     {
       String errMsg =  "cannot fetch Module_Schedule for \'"+
