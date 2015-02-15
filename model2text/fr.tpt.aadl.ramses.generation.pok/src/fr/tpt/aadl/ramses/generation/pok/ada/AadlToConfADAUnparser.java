@@ -55,7 +55,6 @@ import org.osate.aadl2.Subcomponent ;
 import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.ThreadSubcomponent ;
-import org.osate.aadl2.VirtualProcessorImplementation;
 import org.osate.aadl2.VirtualProcessorSubcomponent ;
 import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.ConnectionInstance ;
@@ -1208,26 +1207,6 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
     {
       additionalFeatures =
           PropertyUtils.getStringListValue(vps, "Additional_Features") ;
-      if(additionalFeatures==null)
-      {
-    	additionalFeatures =
-    	  PropertyUtils.getStringListValue(vps.getSubcomponentType(), "Additional_Features") ;
-    	if(additionalFeatures==null && 
-    			vps.getSubcomponentType() instanceof VirtualProcessorImplementation)
-    	{
-    	  VirtualProcessorImplementation vpi = 
-    			  (VirtualProcessorImplementation) vps.getSubcomponentType();
-    	  additionalFeatures =
-    	    	  PropertyUtils.getStringListValue(vpi, "Additional_Features") ;
-    	  if(additionalFeatures==null)
-    	  {
-    	    String errMsg = "cannot fecth Additional_Features for \'" +
-    				  vps.getName() + '\'' ;
-    	    _LOGGER.error(errMsg) ;
-    	    ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
-    	  }
-    	}
-      }
       if(additionalFeatures!=null)
       {
         for(String s : additionalFeatures)
@@ -1258,6 +1237,13 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
             break ;
           }
         }
+      }
+      else
+      {
+        String errMsg = "cannot fecth Additional_Features for \'" +
+            vps.getName() + '\'' ;
+        _LOGGER.error(errMsg) ;
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
       }
     }
 
@@ -1336,7 +1322,7 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
     {
       boolean foundRR = false ;
 
-     String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduling_Protocol") ;
+      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduling_Protocol") ;
       if(requiredScheduler != null)
       {
         if(requiredScheduler.equalsIgnoreCase("Round_Robin_Protocol") && foundRR == false)
@@ -1360,27 +1346,6 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
       String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduling_Protocol") ;
-      
-      if(requiredScheduler==null)
-      {
-        requiredScheduler = PropertyUtils.
-            getEnumValue(vps.getSubcomponentType(), "Scheduling_Protocol");
-        if(requiredScheduler==null
-            && vps.getSubcomponentType() instanceof VirtualProcessorImplementation)
-        {
-          VirtualProcessorImplementation vpi = 
-              (VirtualProcessorImplementation) vps.getSubcomponentType(); 
-          requiredScheduler = PropertyUtils.
-              getEnumValue(vpi.getType(), "Scheduling_Protocol");
-          if(requiredScheduler==null)
-          {
-            String errMsg = "cannot fecth Scheduling_Protocol for \'" +
-                vps.getName() + '\'' ;
-            _LOGGER.error(errMsg) ;
-            ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
-          }
-        }
-      }
       
       if(requiredScheduler != null)
       {

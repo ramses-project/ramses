@@ -66,7 +66,6 @@ import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.SystemSubcomponent ;
 import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.ThreadSubcomponent ;
-import org.osate.aadl2.VirtualProcessorImplementation;
 import org.osate.aadl2.VirtualProcessorSubcomponent ;
 import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.ConnectionInstance ;
@@ -694,14 +693,14 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     {
       for(PropertyAssociation pa: ts.getOwnedPropertyAssociations())
       {
-    	if(pa.getProperty().getName().equalsIgnoreCase("Error_Handling"))
-    	{
-    	  BooleanLiteral bl = (BooleanLiteral) pa.
-    			  getOwnedValues().get(0).getOwnedValue();
-    	  foundHM = bl.getValue();
-    	  if(foundHM)
-    		break;
-    	}
+        if(pa.getProperty().getName().equalsIgnoreCase("Error_Handling"))
+        {
+          BooleanLiteral bl = (BooleanLiteral) pa.
+              getOwnedValues().get(0).getOwnedValue();
+          foundHM = bl.getValue();
+          if(foundHM)
+            break;
+        }
       }
       if(foundHM)
   		break;
@@ -1238,26 +1237,6 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     {
       additionalFeatures =
           PropertyUtils.getStringListValue(vps, "Additional_Features") ;
-      if(additionalFeatures==null)
-      {
-        additionalFeatures =
-            PropertyUtils.getStringListValue(vps.getSubcomponentType(), "Additional_Features") ;
-        if(additionalFeatures==null && 
-            vps.getSubcomponentType() instanceof VirtualProcessorImplementation)
-        {
-          VirtualProcessorImplementation vpi = 
-              (VirtualProcessorImplementation) vps.getSubcomponentType();
-          additionalFeatures =
-              PropertyUtils.getStringListValue(vpi.getType(), "Additional_Features") ;
-          if(additionalFeatures==null)
-          {
-            String errMsg = "cannot fecth Additional_Features for \'" +
-                vps.getName() + '\'' ;
-            _LOGGER.error(errMsg) ;
-            ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
-          }
-        }
-      }
     	if(additionalFeatures!=null)
     	{
     		for(String s : additionalFeatures)
@@ -1288,6 +1267,13 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     				break ;
     			}
     		}
+    	}
+    	else
+    	{
+    	  String errMsg = "cannot fecth Additional_Features for \'" +
+    	      vps.getName() + '\'' ;
+    	  _LOGGER.error(errMsg) ;
+    	  ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
     	}
     }
 
@@ -1403,11 +1389,11 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
       if(pa!=null)
       {
         ModalPropertyValue v = pa.getOwnedValues().get(0);
-		ListValue lv = (ListValue) v.getOwnedValue();
-		NamedValue nv = (NamedValue) lv.getOwnedListElements().get(0);
-		EnumerationLiteral el = (EnumerationLiteral) nv.getNamedValue();
-		String requiredScheduler = el.getName();
-		if(requiredScheduler.equalsIgnoreCase("RMS") && foundSched == false)
+        ListValue lv = (ListValue) v.getOwnedValue();
+        NamedValue nv = (NamedValue) lv.getOwnedListElements().get(0);
+        EnumerationLiteral el = (EnumerationLiteral) nv.getNamedValue();
+        String requiredScheduler = el.getName();
+        if(requiredScheduler.equalsIgnoreCase("RMS") && foundSched == false)
         {
           foundSched = true ;
           deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_SCHED_RMS 1") ;
@@ -1435,27 +1421,6 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     {
       PropertyAssociation pa = PropertyUtils.findPropertyAssociation(
                                                     "Scheduling_Protocol", vps);
-      if(pa==null)
-      {
-        pa = PropertyUtils.
-          findPropertyAssociation("Scheduling_Protocol", vps.getSubcomponentType());
-        if(pa==null
-            && vps.getSubcomponentType() instanceof VirtualProcessorImplementation)
-        {
-          VirtualProcessorImplementation vpi = 
-              (VirtualProcessorImplementation) vps.getSubcomponentType(); 
-          pa = PropertyUtils.
-              findPropertyAssociation("Scheduling_Protocol", vpi.getType());
-          if(pa==null)
-          {
-            String errMsg = "cannot fecth Scheduling_Protocol for \'" +
-                vps.getName() + '\'' ;
-            _LOGGER.error(errMsg) ;
-            ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
-          }
-        }
-      }
-      
       if(pa!=null)
       {
         ModalPropertyValue v = pa.getOwnedValues().get(0);
