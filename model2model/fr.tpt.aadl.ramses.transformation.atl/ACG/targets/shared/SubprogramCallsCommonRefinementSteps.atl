@@ -518,7 +518,7 @@ rule m_ThreadEntrypoint {
 										->append(whichPortActionBlock)
 									),
 			variables   <- if(not c.subcomponent.classifier.getBA().oclIsUndefined()) then
-								c.subcomponent.classifier.getBA().variables
+								c.subcomponent.classifier.getBA().variables->collect(e|e.resolve(c).debug('LLLLL'))
 							else
 								Sequence{}
 							endif

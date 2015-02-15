@@ -291,7 +291,7 @@ rule m_Process_Instance {
 													)
 													->flatten()->excluding(OclUndefined),
 		ownedAccessConnection			<- c.connectionInstance->select(e| e.kind.getName()='accessConnection')
-												->collect(e | e.connectionReference.getConnectionsReferencesImg())
+												->collect(e | e.connectionReference.getConnectionsReferencesImg())->flatten()
 												->union(c.componentInstance->select(e|e.category.getName()='thread')
 													->collect(c| c.featureInstance
 														->select (fi | fi.isOutputFeature())
