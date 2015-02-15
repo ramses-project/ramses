@@ -1935,7 +1935,7 @@ rule m_Parameter_to_PortInstance_Connection
 		)
 }
 
--- @extends m_Thread_Instance_Filter
+
 abstract rule m_Parameter_to_DataInstance_Connection
 {
 	from
