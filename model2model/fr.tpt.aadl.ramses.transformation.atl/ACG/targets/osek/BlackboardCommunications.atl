@@ -225,7 +225,7 @@ abstract rule m_Output_BlackBoard
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 }
 
--- @extends m_Output_BlackBoard,m_Output_DataPort_ComputeEntrypointCallSequence
+-- @extends m_Output_DataPort_ComputeEntrypointCallSequence,m_Output_BlackBoard
 rule m_Output_BlackBoard_ComputeEntrypointCallSequence
 {
 	from
