@@ -1,120 +1,14 @@
 package test_sampling_refined_model
 public
-with POK,ARINC653,Data_Model,common_pkg,test_sampling,Base_Types,PeriodicDelayed_runtime,arinc653_runtime;
-  process implementation proc1.impl
-    subcomponents
-      the_proc1_p_out_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
-      the_sender: thread the_proc1_the_sender.impl {
-        Data_Size => 40000 Bytes;
-        Dispatch_Protocol => Periodic;
-        Compute_Execution_Time => 0 ms .. 1 ms;
-        Period => 2000 ms;
-        Priority => 5;
-        Stack_Size => 40000 Bytes;
-        Code_Size => 40 Bytes;
-        ARINC653::HM_Error_ID_Actions => ([
-          ErrorIdentifier=> 5;
-          Description=> "Restart process";
-          Action=> "Process_Restart";
-        ], [
-          ErrorIdentifier=> 6;
-          Description=> "Warm partition restart";
-          Action=> "Warm_Restart";
-        ]);
-        Compute_Entrypoint_Call_Sequence => reference(main_call);
-        };
-    connections
-      cnx_p_out_to_globalVariable: data access the_proc1_p_out_globalVariable -> the_sender.cnx_p_out;
-  end proc1.impl;
-  
-  process implementation proc2.impl
-    subcomponents
-      the_proc2_p_inglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
-      the_receiver: thread the_proc2_the_receiver.impl {
-        Data_Size => 40000 Bytes;
-        Dispatch_Protocol => Periodic;
-        Compute_Execution_Time => 0 ms .. 1 ms;
-        Period => 1000 ms;
-        Priority => 10;
-        Stack_Size => 40000 Bytes;
-        Code_Size => 40 Bytes;
-        ARINC653::HM_Error_ID_Actions => ([
-          ErrorIdentifier=> 3;
-          Description=> "Restart process";
-          Action=> "Process_Restart";
-        ], [
-          ErrorIdentifier=> 4;
-          Description=> "Warm partition restart";
-          Action=> "Warm_Restart";
-        ]);
-        Compute_Entrypoint_Call_Sequence => reference(main_call);
-        };
-    connections
-      Id_instance_to_the_receiver_p_in: data access the_proc2_p_inglobalVariable -> the_receiver.p_in;
-  end proc2.impl;
-  
-  processor implementation cpu.single_partition
-  end cpu.single_partition;
-  
-  processor implementation cpu.two_partitions
-    subcomponents
-      the_part1: virtual processor part {
-        Period => 1000 ms;
-        ARINC653::HM_Error_ID_Actions => ([
-          ErrorIdentifier=> 3;
-          Description=> "Restart process";
-          Action=> "Cold_Restart";
-        ], [
-          ErrorIdentifier=> 4;
-          Description=> "Warm partition restart";
-          Action=> "Warm_Restart";
-        ]);
-        Scheduling_Protocol => (Round_Robin_Protocol);
-        ARINC653::Partition_Identifier => 1;
-        POK::Additional_Features => (libc_stdio, console);
-        };
-      the_part2: virtual processor part {
-        Period => 1000 ms;
-        ARINC653::HM_Error_ID_Actions => ([
-          ErrorIdentifier=> 3;
-          Description=> "Restart process";
-          Action=> "Cold_Restart";
-        ], [
-          ErrorIdentifier=> 4;
-          Description=> "Warm partition restart";
-          Action=> "Warm_Restart";
-        ]);
-        Scheduling_Protocol => (Round_Robin_Protocol);
-        ARINC653::Partition_Identifier => 1;
-        POK::Additional_Features => (libc_stdio, console);
-        };
-  end cpu.two_partitions;
-  
-  memory implementation mem.impl
-  end mem.impl;
-  
-  memory implementation mem.two_partitions
-    subcomponents
-      part1_mem: memory part_mem {
-        Memory_Size => 150000 Bytes;
-        Memory_Protocol => read_write;
-        ARINC653::Memory_Type => (Data_Memory);
-        };
-      part2_mem: memory part_mem {
-        Memory_Size => 150000 Bytes;
-        Memory_Protocol => read_write;
-        ARINC653::Memory_Type => (Data_Memory);
-        };
-  end mem.two_partitions;
-  
+with POK,ARINC653,Data_Model,common_pkg,Base_Types,arinc653_runtime;
   system implementation refined_model.impl
     subcomponents
-      the_mem: memory mem.two_partitions {
+      the_mem: memory the_mem.impl {
         Memory_Size => 200000 Bytes;
         };
-      the_proc1: process proc1.impl;
-      the_proc2: process proc2.impl;
-      the_cpu: processor cpu.two_partitions {
+      the_proc1: process the_proc1.impl;
+      the_proc2: process the_proc2.impl;
+      the_cpu: processor the_cpu.impl {
         ARINC653::HM_Error_ID_Actions => ([
           ErrorIdentifier=> 1;
           Description=> "Restart partition";
@@ -185,23 +79,132 @@ with POK,ARINC653,Data_Model,common_pkg,test_sampling,Base_Types,PeriodicDelayed
       Actual_Memory_Binding => (reference(the_mem.part2_mem)) applies to the_proc2.the_receiver;
   end refined_model.impl;
   
-  processor cpu
-  end cpu;
+  system refined_model
+  end refined_model;
   
-  virtual processor part
-  end part;
+  memory implementation the_mem.impl
+    subcomponents
+      part1_mem: memory the_mem_part1_mem.impl {
+        Memory_Size => 150000 Bytes;
+        Memory_Protocol => read_write;
+        ARINC653::Memory_Type => (Data_Memory);
+        };
+      part2_mem: memory the_mem_part2_mem.impl {
+        Memory_Size => 150000 Bytes;
+        Memory_Protocol => read_write;
+        ARINC653::Memory_Type => (Data_Memory);
+        };
+  end the_mem.impl;
   
-  memory mem
-  end mem;
+  memory the_mem
+  end the_mem;
   
-  memory part_mem
-  end part_mem;
+  memory implementation the_mem_part1_mem.impl
+  end the_mem_part1_mem.impl;
   
-  process proc1
-  end proc1;
+  memory the_mem_part1_mem
+  end the_mem_part1_mem;
   
-  process proc2
-  end proc2;
+  memory implementation the_mem_part2_mem.impl
+  end the_mem_part2_mem.impl;
+  
+  memory the_mem_part2_mem
+  end the_mem_part2_mem;
+  
+  processor the_cpu
+  end the_cpu;
+  
+  processor implementation the_cpu.impl
+    subcomponents
+      the_part1: virtual processor common_pkg::part {
+        Period => 1000 ms;
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 3;
+          Description=> "Restart process";
+          Action=> "Cold_Restart";
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Warm partition restart";
+          Action=> "Warm_Restart";
+        ]);
+        Scheduling_Protocol => (Round_Robin_Protocol);
+        ARINC653::Partition_Identifier => 1;
+        POK::Additional_Features => (libc_stdio, console);
+        };
+      the_part2: virtual processor common_pkg::part {
+        Period => 1000 ms;
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 3;
+          Description=> "Restart process";
+          Action=> "Cold_Restart";
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Warm partition restart";
+          Action=> "Warm_Restart";
+        ]);
+        Scheduling_Protocol => (Round_Robin_Protocol);
+        ARINC653::Partition_Identifier => 1;
+        POK::Additional_Features => (libc_stdio, console);
+        };
+  end the_cpu.impl;
+  
+  process the_proc1
+  end the_proc1;
+  
+  process implementation the_proc1.impl
+    subcomponents
+      the_proc1_p_out_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
+      the_sender: thread the_proc1_the_sender.impl {
+        Data_Size => 40000 Bytes;
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 2000 ms;
+        Priority => 5;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 5;
+          Description=> "Restart process";
+          Action=> "Process_Restart";
+        ], [
+          ErrorIdentifier=> 6;
+          Description=> "Warm partition restart";
+          Action=> "Warm_Restart";
+        ]);
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+    connections
+      cnx_p_out_to_globalVariable: data access the_proc1_p_out_globalVariable -> the_sender.cnx_p_out;
+  end the_proc1.impl;
+  
+  process the_proc2
+  end the_proc2;
+  
+  process implementation the_proc2.impl
+    subcomponents
+      the_proc2_p_inglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
+      the_receiver: thread the_proc2_the_receiver.impl {
+        Data_Size => 40000 Bytes;
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 1000 ms;
+        Priority => 10;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 3;
+          Description=> "Restart process";
+          Action=> "Process_Restart";
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Warm partition restart";
+          Action=> "Warm_Restart";
+        ]);
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+    connections
+      Id_instance_to_the_receiver_p_in: data access the_proc2_p_inglobalVariable -> the_receiver.p_in;
+  end the_proc2.impl;
   
   subprogram event_sender_spg
     features
@@ -219,9 +222,6 @@ with POK,ARINC653,Data_Model,common_pkg,test_sampling,Base_Types,PeriodicDelayed
       Data_Model::Base_Type => (classifier(Base_Types::Unsigned_8));
       Source_Name => "__event_sender_spg_context";
   end event_sender_spg_context;
-  
-  system refined_model
-  end refined_model;
   
   subprogram the_proc1_the_sender_entrypoint
     features
