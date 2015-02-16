@@ -28,12 +28,15 @@ import java.util.List ;
 import java.util.Map ;
 
 import org.apache.log4j.Logger ;
+import org.eclipse.core.runtime.IPath ;
+import org.osate.ba.wizards.AadlBaAbstractWizard ;
 import org.osate.ba.wizards.AadlBaExamplesWizard ;
 import org.osate.utils.Aadl2Utils ;
+import org.osate.utils.FileUtils ;
 
 import fr.tpt.aadl.ramses.control.osate.Activator ;
 
-public class RamsesExamplesWizard extends AadlBaExamplesWizard
+public class RamsesExamplesWizard extends AadlBaAbstractWizard
 {
   private static Logger _LOGGER = Logger.getLogger(RamsesExamplesWizard.class) ;
   
@@ -56,7 +59,7 @@ public class RamsesExamplesWizard extends AadlBaExamplesWizard
       {
         rootExamplePath = Aadl2Utils.getPluginFile(Activator.PLUGIN_ID,
                                                           _EXAMPLE_ROOT_PATH) ;
-        String[][] items = new String[][]{{"arinc653", "common-components"}} ;
+        String[][] items = new String[][]{{"arinc653", "common-components", "osek"}} ;
         
         super.setSelectedItems(items, rootExamplePath);
       }
@@ -129,5 +132,40 @@ public class RamsesExamplesWizard extends AadlBaExamplesWizard
         throw new Exception(msg) ;
       }
     }
+  }
+  
+  @Override
+  public boolean performFinish()
+  {
+    boolean result = super.performFinish() ;
+    
+    if(result)
+    {
+      try
+      {
+        List<File> selectedExamples =
+                      this.fetchSelectedExamples(_SelectedExamplesTreeContent) ;
+        if(!selectedExamples.isEmpty())
+        {
+          IPath projectPath = this.newProject.getLocation() ;
+
+          File destFolder =
+                new File(projectPath.toString()) ;
+          destFolder.mkdir() ;
+          
+          FileUtils.copyFiles(selectedExamples, destFolder,
+                              _EXCLUDED_DIRECTORIES) ;
+          
+          this.newProject.refreshLocal(2, null) ;
+        }
+      }
+      catch (Exception e)
+      {
+        result = false ;
+        reportError("Save examples problem", e) ;
+      }
+    }
+    
+    return result ;
   }
 }
