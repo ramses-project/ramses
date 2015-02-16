@@ -1,14 +1,13 @@
 #include "robot.h"
 #include <math.h>
 
-
-
+extern int leftEnginePort;
+extern int rightEnginePort;
 int value=0;
 
 void move_robot(__move_context ctx, move_order order, int speed){
 	int brake = 100;
-	extern int leftEnginePort;
-	extern int rightEnginePort;
+
 
 	display_clear(0);
 	display_goto_xy(0,0);
@@ -39,8 +38,8 @@ void move_robot(__move_context ctx, move_order order, int speed){
 		break;
 	case RIGHT :
 		display_string("right");
-		nxt_motor_set_speed(leftEnginePort, 0, brake);
-		nxt_motor_set_speed(rightEnginePort, speed, 0);
+		nxt_motor_set_speed(leftEnginePort, speed, 0);
+		nxt_motor_set_speed(rightEnginePort, 0, brake);
 		break;
 	case LLEFT :
 		display_string("lleft");
