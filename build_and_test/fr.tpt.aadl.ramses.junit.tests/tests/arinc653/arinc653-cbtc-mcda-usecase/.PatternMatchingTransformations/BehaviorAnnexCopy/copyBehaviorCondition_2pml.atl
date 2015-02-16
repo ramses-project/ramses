@@ -1,0 +1,114 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @atlcompiler emftvm
+module CopyBehaviorCondition;
+create OUT : MM_ATL2PM from IN : AADLBA, HOOKS : ATLHOOKS;
+
+rule m_ExecutionTimeoutCatch {
+ from
+  src_behaviorCondition : AADLBA!ExecutionTimeoutCatch
+  (
+   src_behaviorCondition.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_behaviorCondition},
+   value <- 'CopyBehaviorCondition.m_ExecutionTimeoutCatch'
+  )
+}
+
+rule m_Otherwise {
+ from
+  src_behaviorCondition : AADLBA!Otherwise
+  (
+   src_behaviorCondition.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_behaviorCondition},
+   value <- 'CopyBehaviorCondition.m_Otherwise'
+  )
+}
+
+rule m_DispatchCondition {
+ from
+  src_DispatchCondition : AADLBA!DispatchCondition
+  (
+   src_DispatchCondition.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_DispatchCondition},
+   value <- 'CopyBehaviorCondition.m_DispatchCondition'
+  )
+}
+
+rule m_DispatchTriggerConditionStop {
+ from
+  src_DispatchTriggerConditionStop : AADLBA!DispatchTriggerConditionStop
+  (
+   src_DispatchTriggerConditionStop.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_DispatchTriggerConditionStop},
+   value <- 'CopyBehaviorCondition.m_DispatchTriggerConditionStop'
+  )
+}
+
+rule m_DispatchRelativeTimeout {
+ from
+  src_DispatchRelativeTimeout : AADLBA!DispatchRelativeTimeout
+  (
+   src_DispatchRelativeTimeout.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_DispatchRelativeTimeout},
+   value <- 'CopyBehaviorCondition.m_DispatchRelativeTimeout'
+  )
+}
+
+rule m_DispatchTriggerLogicalExpression {
+ from
+  src_DispatchTriggerLogicalExpression : AADLBA!DispatchTriggerLogicalExpression
+  (
+   src_DispatchTriggerLogicalExpression.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_DispatchTriggerLogicalExpression},
+   value <- 'CopyBehaviorCondition.m_DispatchTriggerLogicalExpression'
+  )
+}
+
+rule m_DispatchConjunction {
+ from
+  src_DispatchConjunction : AADLBA!DispatchConjunction
+  (
+   src_DispatchConjunction.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_DispatchConjunction},
+   value <- 'CopyBehaviorCondition.m_DispatchConjunction'
+  )
+}

@@ -1,0 +1,150 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- nsURI AADLBA=http:///AADLBA
+-- @atlcompiler emftvm
+module ExpandThreadsDispatchProtocol;
+create OUT : MM_ATL2PM from IN : AADLI, AADL_RUNTIME : AADLBA, DATA_MODEL : AADLBA, PROGRAMMING_PROPERTIES : AADLBA, HOOKS : ATLHOOKS, ARINC653_RUNTIME : AADLBA;
+
+helper context AADLI!FeatureInstance def: isLastFeatureInstance() : Boolean =
+ let c : AADLI!ComponentInstance = self.getComponentInstance() in
+ c.featureInstance->last() = self;
+
+helper def: getLoadedAADLRuntime : String =
+ 'ARINC653_RUNTIME';
+
+helper def: getRuntimeName : String =
+ 'arinc653_runtime';
+
+helper def: getRuntimeTimeType : AADLBA!DataType =
+ 'System_Time_Type'.asDataType('ARINC653_RUNTIME');
+
+helper def: getWaitPeriodSubprogram : AADLBA!SubprogramType =
+ 'Periodic_Wait'.asSubprogramType('ARINC653_RUNTIME');
+
+helper def: getRuntimeEventType : AADLBA!DataType =
+ 'Event_Id_Type'.asDataType('ARINC653_RUNTIME');
+
+helper def: getWaitEventSubprogram : AADLBA!SubprogramType =
+ 'Wait_Event'.asSubprogramType('ARINC653_RUNTIME');
+
+helper def: getTimedWaitSubprogram : AADLBA!SubprogramType =
+ 'Timed_Wait'.asSubprogramType('ARINC653_RUNTIME');
+
+helper def: collectSporadicGlobalVariables(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+ Sequence {thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID')};
+
+helper def: collectTimedGlobalVariables(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+ Sequence {thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID')};
+
+helper def: collectSporadicThreadVariables(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+ Sequence {thisModule.resolveMatchedSingleIfExists(c, 'DELAY'), thisModule.CreateInfiniteTimeOutSubcomponentFromCpt(c)};
+
+helper def: collectTimedThreadVariables(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+ Sequence {thisModule.CreateTimeOutSubcomponentFromCptPeriod(c)};
+
+helper def: collectSporadicGlobalVariablesAccesses(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
+ Sequence {thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID_ACCESS')};
+
+helper def: collectTimedGlobalVariablesAccesses(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
+ Sequence {thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID_ACCESS')};
+
+helper def: collectSporadicThreadVariablesAccesses(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
+ Sequence {thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID_LOCAL_ACCESS')};
+
+helper def: collectTimedThreadVariablesAccesses(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
+ Sequence {thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID_LOCAL_ACCESS')};
+
+helper def: collectSporadicThreadVariablesAccessConnections(c : AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnections) =
+ Sequence {thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID_LOCAL_ACCESSCONNECTION')};
+
+helper def: collectTimedThreadVariablesAccessConnections(c : AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnections) =
+ Sequence {thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID_LOCAL_ACCESSCONNECTION')};
+
+helper def: collectSporadicGlobalVariablesAccessConnections(c : AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnections) =
+ Sequence {thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID_ACCESSCONNECTION')};
+
+helper def: collectTimedGlobalVariablesAccessConnections(c : AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnections) =
+ Sequence {thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID_ACCESSCONNECTION')};
+
+helper def: collectSporadicBehaviorActions(c : AADLI!ComponentInstance) : Sequence(AADLBA!BehaviorAction) =
+ Sequence {thisModule.resolveMatchedSingleIfExists(c, 'timedWaitCall'), thisModule.resolveMatchedSingleIfExists(c, 'waitDispatchCall'), thisModule.resolveMatchedSingleIfExists(c, 'resetEventCall')};
+
+helper def: getDispatchTrigger(c : AADLI!ComponentInstance) : Sequence(AADLI!FeatureInstance) =
+ if c.ownedPropertyAssociation->exists(e |
+  e.property.name.equalsIgnoreCase('dispatch_trigger')
+ ) then
+  let dispatch_trigger_property_value : Sequence(AADLI!Feature) = c.ownedPropertyAssociation->any(e |
+   e.property.name.equalsIgnoreCase('dispatch_trigger')
+  ).ownedValue in
+  c.featureInstance->select(e |
+   dispatch_trigger_property_value->exists(f |
+    f.name = e.name
+   )
+  )
+ else
+  c.featureInstance->select(e |
+   e.feature.oclIsTypeOf(AADLI!EventPort) or e.feature.oclIsTypeOf(AADLI!EventDataPort) and e.isInputFeature()
+  )
+ endif; -- @extends m_ThreadEntrypoint
+-- @extends m_ThreadEntrypoint
+abstract rule m_SporadicOrTimedThread {
+ from
+  c : AADLI!ComponentInstance
+  (
+   let portsForDispatch : Sequence(AADLI!FeatureInstance) = thisModule.getDispatchTrigger(c) in
+   portsForDispatch->select(e |
+    e.dstConnectionInstance->exists(f |
+     f.connectionReference->last().connection.source.connectionEnd.isProcessPort()
+    )
+   )->isEmpty() and not c.isPeriodicThread()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'ExpandThreadsDispatchProtocol.m_SporadicOrTimedThread'
+  )
+} -- @extends m_SporadicOrTimedThread
+-- @extends m_SporadicOrTimedThread
+rule m_TimedThread {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.isTimedThread()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'ExpandThreadsDispatchProtocol.m_TimedThread'
+  )
+} -- @extends m_ThreadEntrypoint,m_SporadicOrTimedThread
+-- @extends m_ThreadEntrypoint,m_SporadicOrTimedThread
+rule m_SporadicThread {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.isSporadicThread()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'ExpandThreadsDispatchProtocol.m_SporadicThread'
+  )
+}

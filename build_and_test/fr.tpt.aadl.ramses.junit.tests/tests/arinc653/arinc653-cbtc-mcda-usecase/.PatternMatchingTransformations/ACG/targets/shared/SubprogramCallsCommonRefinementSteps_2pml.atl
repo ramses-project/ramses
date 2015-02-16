@@ -1,0 +1,964 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @nsURI AADLI=http:///AADL2/instance
+-- @atlcompiler emftvm
+module SubprogramCallsCommonRefinementSteps;
+create OUT : MM_ATL2PM from IN : AADLI, BASE_TYPES : AADLBA, AADL_RUNTIME : AADLBA, DATA_MODEL : AADLBA, SCHEDULER_CONSTANTS : AADLBA, SCHEDULER_REALIZATIONS : AADLBA, SCHEDULER_RUNTIME : AADLBA;
+
+abstract rule m_DataPort {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isDataPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_DataPort'
+  )
+}
+
+helper def: Unique_Send_Output_Per_Thread : Boolean =
+ false;
+
+helper def: collectDataNextValueCalls(fi : AADLI!FeatureInstance, behavior : AADLI!SubprogramCallSequence) : Sequence(AADLBA!SubprogramCall) =
+ let modeInstanceList : Sequence(AADLI!ModeInstance) = AADLI!ModeInstance.allInstancesFrom('IN')->select(mi |
+  fi.connectedInMode(mi.mode)
+ ) in
+ if not modeInstanceList.isEmpty() then
+  modeInstanceList->collect(modeInstance |
+   thisModule.resolveMatchedTupleIfExists(Sequence {fi, behavior, modeInstance.mode}, 'ifActiveMode')
+  )
+ else
+  Sequence {thisModule.resolveMatchedTupleIfExists(Sequence {fi, behavior}, 'call')}
+ endif;
+
+helper def: collectEventDataNextValueCalls(fi : AADLI!FeatureInstance, behavior : AADLI!SubprogramCallSequence, paramCnx : AADLBA!ParameterConnection) : Sequence(AADLBA!SubprogramCall) =
+ Sequence {thisModule.resolveMatchedTupleIfExists(Sequence {fi, behavior, paramCnx}, 'call')};
+
+helper def: collectDataPutValueCalls(fi : AADLI!FeatureInstance, behavior : AADLI!SubprogramCallSequence, cnxInst : AADLI!ConnectionInstance) : Sequence(AADLBA!SubprogramCall) =
+ Sequence {thisModule.resolveMatchedTupleIfExists(Sequence {fi, behavior, cnxInst.connectionReference->first().connection}, 'call')};
+
+helper def: collectEventDataPutValueCalls(fi : AADLI!FeatureInstance, behavior : AADLI!SubprogramCallSequence, paramCnx : AADLBA!Connection, cnxInst : AADLI!ConnectionInstance) : Sequence(AADLBA!SubprogramCall) =
+ Sequence {thisModule.resolveMatchedTupleIfExists(Sequence {fi, behavior, paramCnx, cnxInst.connectionReference->first().connection}, 'call'), thisModule.resolveMatchedTupleIfExists(Sequence {fi, behavior, paramCnx, cnxInst.connectionReference->first().connection}, 'callSetEvent')};
+
+helper def: collectReceiveInputsCalls(fi : AADLI!FeatureInstance, behavior : AADLI!SubprogramCallSequence) : Sequence(AADLBA!SubprogramCall) =
+ Sequence {thisModule.resolveMatchedTupleIfExists(Sequence {fi, behavior}, 'callReceiveInputs')};
+
+helper def: collectCommunicationsLocalVariables(c : AADLI!ComponentInstance, callSequences : Sequence(AADLI!SubprogramCallSequence)) : Sequence(AADLBA!DataSubcomponent) =
+ Sequence {};
+
+helper def: collectThreadInitActions(c : AADLI!ComponentInstance) : Sequence(AADLBA!BehaviorAction) =
+ Sequence {};
+
+helper def: collectComputeEntryPointTransitions(c : AADLI!ComponentInstance) : Sequence(AADLBA!BehaviorTransition) =
+ c.featureInstance->select(fi |
+  not fi.getComputeEntryPoints().oclIsUndefined()
+ )->collect(fi |
+  fi.getComputeEntryPoints()->collect(cep |
+   thisModule.resolveMatchedTupleIfExists(Sequence {fi, cep}, 'computeEntryPointTransition')
+  )
+ )->union(c.getComputeEntryPoints()->collect(cep |
+  thisModule.resolveMatchedTupleIfExists(Sequence {c, cep}, 'computeEntryPointTransition')
+ ))->flatten()->excluding(OclUndefined);
+
+helper def: collectBAEntryPointTransitions(c : AADLI!ComponentInstance) : Sequence(AADLBA!BehaviorTransition) =
+ Sequence {thisModule.resolveMatchedTupleIfExists(Sequence {c, c.subcomponent.classifier.getBA()}, 'computeEntryPointTransition')};
+
+helper def: collectBAEntryPointActionBlocks(c : AADLI!ComponentInstance) : Sequence(AADLBA!BehaviorActionBlock) =
+ Sequence {thisModule.resolveMatchedTupleIfExists(Sequence {c, c.subcomponent.classifier.getBA()}, 'computeEntryPointActionBlock')};
+
+helper def: collectComputeEntryPointActionBlocks(c : AADLI!ComponentInstance) : Sequence(AADLBA!BehaviorActionBlock) =
+ c.featureInstance->select(fi |
+  not fi.getComputeEntryPoints()->isEmpty()
+ )->collect(fi |
+  fi.getComputeEntryPoints()->collect(cep |
+   thisModule.resolveMatchedTupleIfExists(Sequence {fi, cep}, 'computeEntryPointActionBlock')
+  )
+ )->union(c.getComputeEntryPoints()->collect(cep |
+  thisModule.resolveMatchedTupleIfExists(Sequence {c, cep}, 'computeEntryPointActionBlock')
+ )) -->append(thisModule.resolveMatchedSingleIfExists(c, 'whichPortActionBlock'))
+ ->flatten();
+
+helper context AADLI!InstanceObject def: collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
+ self.ownedPropertyAssociation->select(e |
+  not e.property.name.equalsIgnoreCase('Compute_Entrypoint_Call_Sequence')
+ )->select(e |
+  e.isApplicableTo(self.resolve())
+ )->collectSelfPropertyAssociationImg()->union(if self.oclIsTypeOf(AADLI!ComponentInstance) and self.category = #thread then
+  Sequence {thisModule.collectComputeEntryPoint_rule(self), thisModule.collectInitializationEntryPoint(self)}->excluding(OclUndefined)
+ else
+  Sequence {}
+ endif);
+
+helper context AADLI!ConnectionReference def: needsCopy() : Boolean =
+ if self.source.isThreadPort() and not self.destination.context.oclIsUndefined() then
+  not self.destination.context.eContainer().isComputeEntryPointOf(self.source.eContainer())
+ else
+  if self.destination.isThreadPort() and not self.source.context.oclIsUndefined() then
+   not self.source.context.eContainer().isComputeEntryPointOf(self.destination.eContainer())
+  else
+   false
+  endif
+ endif;
+
+rule m_PortConnection_Reference {
+ from
+  cnxRef : AADLI!ConnectionReference
+  (
+   cnxRef.eContainer().kind = #portConnection
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {cnxRef},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_PortConnection_Reference'
+  )
+} -- @extends m_Feature_Instance
+-- @extends m_Feature_Instance
+rule m_DataPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.category = #dataPort and not(fi.eContainer().category = #thread) and not(fi.eContainer().category = #process)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_DataPort_Instance'
+  )
+} -- @extends m_Feature_Instance
+-- @extends m_Feature_Instance
+rule m_EventPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.category = #eventPort and not(fi.eContainer().category = #thread) and not(fi.eContainer().category = #process)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_EventPort_Instance'
+  )
+} -- @extends m_Feature_Instance
+-- @extends m_Feature_Instance
+rule m_EventDataPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.category = #eventDataPort and not(fi.eContainer().category = #thread) and not(fi.eContainer().category = #process)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_EventDataPort_Instance'
+  )
+}
+
+abstract rule m_Component_Implementation {
+ from
+  impl : AADLI!ComponentImplementation
+  (
+   impl.needsCopy()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {impl},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Component_Implementation'
+  )
+} -- @extends m_create_Thread_BA
+-- @extends m_create_Thread_BA
+abstract rule m_Thread_Instance {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.category = #thread and c.subcomponent.subcomponentType.oclIsKindOf(AADLI!ComponentImplementation)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Thread_Instance'
+  )
+} -- @extends m_Thread_Instance
+-- @extends m_Thread_Instance
+rule m_ThreadEntrypoint {
+ from
+  c : AADLI!ComponentInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_ThreadEntrypoint'
+  )
+}
+
+helper context AADLI!ComponentInstance def: collectDispatchActions() : Sequence(AADLBA!BehaviorAction) =
+ if self.isSporadicThread() then
+  thisModule.collectSporadicBehaviorActions(self)
+ else
+  Sequence {thisModule.resolveMatchedSingleIfExists(self, 'waitDispatchCall'), thisModule.resolveMatchedSingleIfExists(self, 'resetEventCall')}
+ endif->union(thisModule.collectTransitionChoiceActions(self))->excluding(OclUndefined);
+
+helper context AADLI!SubprogramCall def: getContextInitValue(c : AADLI!ComponentInstance) : String =
+ -- retreive connections
+ let impl : AADLI!ThreadImplementation = c.subcomponent.classifier in
+ let eventPortConnectionSequence : Sequence(AADLI!Connection) = self.getSubprogramClassifier().getType().ownedEventPort->collect(e |
+  impl.ownedConnection->select(f |
+   f.destination.connectionEnd.oclIsKindOf(AADLI!EventPort) and f.source.context = self and f.source.connectionEnd = e
+  )
+ )->flatten() in
+ --		
+ --		impl.ownedConnection->select(e|e.destination.connectionEnd.oclIsKindOf(AADLI!EventPort)
+ --															and e.source.context = self)
+ --															->sortedBy(e | self.getSubprogramType().ownedEventPort->indexOf(
+ --																e.source.connectionEnd)
+ --															)
+ --															in
+ let eventDataPortConnectionSequence : Sequence(AADLI!Connection) = self.getSubprogramClassifier().getType().ownedEventDataPort->collect(e |
+  impl.ownedConnection->select(f |
+   f.destination.connectionEnd.oclIsKindOf(AADLI!EventDataPort) and f.source.context = self and f.source.connectionEnd = e
+  )
+ )->flatten() in
+ --		impl.ownedConnection->select(e|e.destination.connectionEnd.oclIsKindOf(AADLI!EventDataPort)
+ --															and e.source.context = self)
+ --															
+ --															->sortedBy(e| self.getSubprogramType().ownedEventDataPort->indexOf(
+ --																e.source.connectionEnd)
+ --															)
+ --															in
+ -- retreive event ports connection end of thread
+ let eventPortSequence : Sequence(AADLI!EventPort) = eventPortConnectionSequence->select(e |
+  e.source.connectionEnd.oclIsKindOf(AADLI!EventPort)
+ )->collect(e |
+  e.destination.connectionEnd
+ ) in
+ -- retreive event data ports connection end of thread
+ let eventDataPortSequence : Sequence(AADLI!EventPort) = eventDataPortConnectionSequence->select(e |
+  e.source.connectionEnd.oclIsKindOf(AADLI!EventDataPort)
+ )->collect(e |
+  e.destination.connectionEnd
+ ) in
+ -- get port id of thread port
+ -- get port id of thread port
+ thisModule.concatToString(eventPortSequence->collect(e |
+  c.featureInstance->any(f |
+   f.feature = e
+  ).getOutputPortId(c.getProcess())
+ )->union(eventDataPortSequence->collect(e |
+  c.featureInstance->any(f |
+   f.feature = e
+  ).getOutputPortId(c.getProcess())
+ )));
+
+--helper def: collectTransitionChoiceActions(c: AADLI!ComponentInstance) : Sequence(AADLBA!BehaviorActions)=
+--	let orderedPorts : Sequence(AADLI!FeatureInstance) = thisModule.theHOOK.getFeaturesOrderedByCriticality(c) in
+--	if(orderedPorts->select(port | c.subcomponent.classifier.ownedSubprogramCallSequence->exists(b | b.isComputeEntryPointOf(port) ) )->isEmpty()) then
+--		Sequence{thisModule.resolveMatchedSingleIfExists(c, 'updateDefaultBehaviorAction')}
+--	else
+--		orderedPorts->select(port | c.subcomponent.classifier.ownedSubprogramCallSequence->exists(b | b.isComputeEntryPointOf(port)))
+--				->collect(port | 
+--					c.subcomponent.classifier.ownedSubprogramCallSequence->select(b | b.isComputeEntryPointOf(port))
+--					->collect(
+--						b|
+--							Sequence{
+--								thisModule.resolveMatchedTupleIfExists(Sequence{port, b}, 'getCountAction'),
+--								thisModule.resolveMatchedTupleIfExists(Sequence{port, b}, 'count_assignement'),
+--								thisModule.resolveMatchedTupleIfExists(Sequence{port, b}, 'checkforMessageAction')
+--							}
+--					)
+--				)
+--				->flatten()
+--	endif
+--;
+helper def: collectBehaviorVariable(c : AADLI!ComponentInstance) : Sequence(AADLBA!BehaviorVariable) =
+ let orderedPorts : Sequence(AADLI!FeatureInstance) = thisModule.theHOOK.getFeaturesOrderedByCriticality(c) in
+ orderedPorts->select(port |
+  c.subcomponent.classifier.ownedSubprogramCallSequence->exists(b |
+   b.isComputeEntryPointOf(port)
+  )
+ )->collect(port |
+  c.subcomponent.classifier.ownedSubprogramCallSequence->select(b |
+   b.isComputeEntryPointOf(port)
+  )->collect(b |
+   Sequence {thisModule.resolveMatchedTupleIfExists(Sequence {port, b}, 'count_variable'), thisModule.resolveMatchedTupleIfExists(Sequence {port, b}, 'status_variable')}
+  )
+ )->flatten();
+
+abstract rule m_ThreadBehavior {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.category = #thread
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_ThreadBehavior'
+  )
+}
+
+rule m_PortBehavior {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence
+  (
+   fi.getComponentInstance().category = #thread and behavior.isComputeEntryPointOf(fi) and behavior.modesIsComputeEntryPointOf(fi)->isEmpty()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_PortBehavior'
+  )
+} -- @extends m_PortBehavior
+-- @extends m_PortBehavior
+rule m_PortBehavior_Mode {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  mode : AADLI!Mode
+  (
+   fi.connectedInMode(mode)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, mode},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_PortBehavior_Mode'
+  )
+}
+
+-- @extends m_ThreadBehavior
+rule m_ComputeEntrypointCallSequence {
+ from
+  c : AADLI!ComponentInstance,
+  behavior : AADLI!SubprogramCallSequence
+  (
+   c.category = #thread and behavior.isComputeEntryPointOf(c) and not c.subcomponent.subcomponentType.needsToMapBehaviorAnnex()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c, behavior},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_ComputeEntrypointCallSequence'
+  )
+}
+
+helper def: getPortsInvoledInCall(c : AADLI!ComponentInstance, call : AADLI!SubprogramCall) : Sequence(AADLI!FeatureInstance) =
+ c.featureInstance->select(e |
+  e.isInputFeature() and c.subcomponent.classifier.getAllConnections()->select(e |
+   e.oclIsKindOf(AADLI!ParameterConnection)
+  )->exists(paramCnxIter |
+   paramCnxIter.source.context = call and paramCnxIter.destination.connectionEnd = e.feature
+  )
+ )->union(c.featureInstance->select(e |
+  e.isInputFeature() and c.subcomponent.classifier.getAllConnections()->select(e |
+   e.oclIsKindOf(AADLI!ParameterConnection)
+  )->exists(paramCnxIter |
+   paramCnxIter.destination.context = call and paramCnxIter.source.connectionEnd = e.feature
+  )
+ ));
+
+helper context AADLI!SubprogramCall def: getSubprogramClassifier() : AADLI!SubprogramClassifier =
+ if self.calledSubprogram.oclIsKindOf(AADLI!SubprogramClassifier) then
+  self.calledSubprogram
+ else
+  if self.calledSubprogram.oclIsTypeOf(AADLI!SubprogramAccess) then
+   self.calledSubprogram.subprogramFeatureClassifier
+  else
+   if self.calledSubprogram.oclIsTypeOf(AADLI!SubprogramSubcomponent) then
+    self.calledSubprogram.subcomponentType
+   else
+    OclUndefined
+   endif
+  endif
+ endif;
+
+rule m_PortSubprogramCall {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  subprogramCall : AADLI!SubprogramCall
+  (
+   behavior.isComputeEntryPointOf(fi)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, subprogramCall},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_PortSubprogramCall'
+  )
+}
+
+rule m_ComponentSubprogramCall {
+ from
+  c : AADLI!ComponentInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  subprogramCall : AADLI!SubprogramCall
+  (
+   behavior.isComputeEntryPointOf(c)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c, behavior, subprogramCall},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_ComponentSubprogramCall'
+  )
+}
+
+helper context AADLI!ParameterConnection def: isParamToPortConnection() : Boolean =
+ self.source.connectionEnd.oclIsTypeOf(AADLI!Port) or self.destination.oclIsTypeOf(AADLI!Port);
+
+helper context AADLI!ParameterConnection def: isParamToParamConnection() : Boolean =
+ self.source.connectionEnd.oclIsTypeOf(AADLI!Parameter) and self.destination.connectionEnd.oclIsTypeOf(AADLI!Parameter);
+
+helper context AADLI!AccessConnection def: isAccessToParamConnection() : Boolean =
+ self.source.context.oclIsKindOf(AADLI!SubprogramCall) and self.source.connectionEnd.oclIsTypeOf(AADLI!DataAccess) or self.destination.context.oclIsKindOf(AADLI!SubprogramCall) and self.destination.connectionEnd.oclIsTypeOf(AADLI!DataAccess);
+
+helper context AADLI!Connection def: isPartOfCallSequence(behavior : AADLI!Element) : Boolean =
+ if behavior.oclIsKindOf(AADLI!SubprogramCallSequence) then
+  behavior.ownedSubprogramCall->exists(e |
+   self.source.context = e or self.destination.context = e
+  )
+ else
+  false
+ endif;
+
+abstract rule m_Parameter_to_DataAccess_Connection {
+ from
+  c : AADLI!ComponentInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  accessCnx : AADLI!AccessConnection
+  (
+   behavior.isComputeEntryPointOf(c)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c, behavior, accessCnx},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Parameter_to_DataAccess_Connection'
+  )
+} -- @extends m_Parameter_to_DataAccess_Connection
+-- @extends m_Parameter_to_DataAccess_Connection
+rule m_Parameter_to_DataAccess_SourceConnection {
+ from
+  c : AADLI!ComponentInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  accessCnx : AADLI!AccessConnection
+  (
+   behavior.ownedSubprogramCall->exists(e |
+    accessCnx.source.context = e
+   ) and accessCnx.source.connectionEnd.oclIsKindOf(AADLI!DataAccess)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c, behavior, accessCnx},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Parameter_to_DataAccess_SourceConnection'
+  )
+} -- @extends m_Parameter_to_DataAccess_Connection
+-- @extends m_Parameter_to_DataAccess_Connection
+rule m_Parameter_to_DataAccess_DestinationConnection {
+ from
+  c : AADLI!ComponentInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  accessCnx : AADLI!AccessConnection
+  (
+   accessCnx.destination.connectionEnd.oclIsKindOf(AADLI!DataAccess) and behavior.ownedSubprogramCall->exists(e |
+    accessCnx.destination.context = e
+   )
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c, behavior, accessCnx},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Parameter_to_DataAccess_DestinationConnection'
+  )
+}
+
+rule m_Parameter_to_PortInstance_Connection {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  paramCnx : AADLI!ParameterConnection
+  (
+   paramCnx.source.connectionEnd = fi.feature or paramCnx.destination.connectionEnd = fi.feature and paramCnx.isPartOfCallSequence(behavior) and behavior.isComputeEntryPointOf(fi.getComponentInstance()) and fi.feature.oclIsKindOf(AADLI!Port)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, paramCnx},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Parameter_to_PortInstance_Connection'
+  )
+}
+
+abstract rule m_Parameter_to_DataInstance_Connection {
+ from
+  c : AADLI!ComponentInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  paramCnx : AADLI!ParameterConnection
+  (
+   paramCnx.source.connectionEnd = c.subcomponent or paramCnx.destination.connectionEnd = c.subcomponent and paramCnx.isPartOfCallSequence(behavior) and behavior.isComputeEntryPointOf(c.getContainingThread()) and c.subcomponent.subcomponentType.oclIsKindOf(AADLI!DataClassifier)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c, behavior, paramCnx},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Parameter_to_DataInstance_Connection'
+  )
+} -- @extends m_Parameter_to_DataInstance_Connection
+-- @extends m_Parameter_to_DataInstance_Connection
+rule m_Parameter_to_DataInstance_SourceConnection {
+ from
+  c : AADLI!ComponentInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  paramCnx : AADLI!ParameterConnection
+  (
+   paramCnx.source.connectionEnd = c.subcomponent
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c, behavior, paramCnx},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Parameter_to_DataInstance_SourceConnection'
+  )
+} -- @extends m_Parameter_to_DataInstance_Connection
+-- @extends m_Parameter_to_DataInstance_Connection
+rule m_Parameter_to_DataInstance_DestinationConnection {
+ from
+  c : AADLI!ComponentInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  paramCnx : AADLI!ParameterConnection
+  (
+   paramCnx.destination.connectionEnd = c.subcomponent
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c, behavior, paramCnx},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Parameter_to_DataInstance_DestinationConnection'
+  )
+}
+
+rule m_Access_to_DataInstance_Connection {
+ from
+  c : AADLI!ComponentInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  accessCnx : AADLI!AccessConnection
+  (
+   accessCnx.source.connectionEnd = c.subcomponent or accessCnx.destination.connectionEnd = c.subcomponent and accessCnx.isPartOfCallSequence(behavior) and behavior.isComputeEntryPointOf(c.getContainingThread()) and c.subcomponent.subcomponentType.oclIsKindOf(AADLI!DataClassifier)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c, behavior, accessCnx},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Access_to_DataInstance_Connection'
+  )
+}
+
+rule m_Parameter_to_Parameter_Connection {
+ from
+  c : AADLI!ComponentInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  paramCnx : AADLI!ParameterConnection
+  (
+   paramCnx.isParamToParamConnection() and paramCnx.isPartOfCallSequence(behavior) and behavior.isComputeEntryPointOf(c)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c, behavior, paramCnx},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Parameter_to_Parameter_Connection'
+  )
+}
+
+--  	- m_Port_ComputeEntrypointCallSequence: for each pair (call sequence, feature instance)
+--  		such that:
+--  			feature instance is a thread port
+--  			and
+--  			call sequence is a compute entrypoint of the owner of the feature instance
+--  		produce:
+--  			nothing yet
+abstract rule m_Port_ComputeEntrypointCallSequence {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence
+  (
+   fi.isThreadPort() and behavior.isComputeEntryPointOf(fi.getComponentInstance())
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Port_ComputeEntrypointCallSequence'
+  )
+} --  	- m_Input_Port_ComputeEntrypointCallSequence extends m_Port_ComputeEntrypointCallSequence: for each pair (call sequence, feature instance)
+--  		such that:
+--  			feature instance is an input port
+--  		produce:
+--  			nothing yet
+--connexion
+-- @extends m_Port_ComputeEntrypointCallSequence
+--  	- m_Input_Port_ComputeEntrypointCallSequence extends m_Port_ComputeEntrypointCallSequence: for each pair (call sequence, feature instance)
+--  		such that:
+--  			feature instance is an input port
+--  		produce:
+--  			nothing yet
+--connexion
+-- @extends m_Port_ComputeEntrypointCallSequence
+rule m_Input_Port_ComputeEntrypointCallSequence {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence
+  (
+   fi.isInputFeature()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Input_Port_ComputeEntrypointCallSequence'
+  )
+} -- @extends m_Input_Port_ComputeEntrypointCallSequence
+-- @extends m_Input_Port_ComputeEntrypointCallSequence
+rule m_Input_Port_ComputeEntrypointCallSequence_Mode {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  mode : AADLI!Mode
+  (
+   fi.connectedInMode(mode)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, mode},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Input_Port_ComputeEntrypointCallSequence_Mode'
+  )
+} -- @extends m_Input_Port_ComputeEntrypointCallSequence
+-- @extends m_Input_Port_ComputeEntrypointCallSequence
+abstract rule m_Input_EventOrEventDataPort_ComputeEntrypointCallSequence {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  paramCnx : AADLI!ParameterConnection
+  (
+   fi.isInputFeature() and fi.isEventPort() or fi.isEventDataPort() and paramCnx.source.connectionEnd = fi.feature or paramCnx.destination.connectionEnd = fi.feature
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, paramCnx},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Input_EventOrEventDataPort_ComputeEntrypointCallSequence'
+  )
+} --  	- m_Input_EventPort_ComputeEntrypointCallSequence extends m_Input_Port_ComputeEntrypointCallSequence: for each tuple (call sequence, feature instance, parameter connection)
+--  		such that
+--  			feature instance is an event port
+--  			parameter connection source is the feature instance
+--  		produce
+--  			(i) a subprogram call getValue
+--  			(ii) a connection from image f of feature instance to parameter of getValue
+--  			(iii) a connection from image localVariable of feature instance to parameter of getValue
+-- @extends m_Input_EventOrEventDataPort_ComputeEntrypointCallSequence
+--  	- m_Input_EventPort_ComputeEntrypointCallSequence extends m_Input_Port_ComputeEntrypointCallSequence: for each tuple (call sequence, feature instance, parameter connection)
+--  		such that
+--  			feature instance is an event port
+--  			parameter connection source is the feature instance
+--  		produce
+--  			(i) a subprogram call getValue
+--  			(ii) a connection from image f of feature instance to parameter of getValue
+--  			(iii) a connection from image localVariable of feature instance to parameter of getValue
+-- @extends m_Input_EventOrEventDataPort_ComputeEntrypointCallSequence
+abstract rule m_Input_EventPort_ComputeEntrypointCallSequence {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  paramCnx : AADLI!ParameterConnection
+  (
+   fi.isEventPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, paramCnx},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Input_EventPort_ComputeEntrypointCallSequence'
+  )
+} --  	- m_Input_EventDataPort_ComputeEntrypointCallSequence extends m_Input_Port_ComputeEntrypointCallSequence
+--  		such that
+--  			feature instance is an event port
+--  			parameter connection source is the feature instance
+--  		produce
+--  			(i) a subprogram call getValue
+--  			(ii) a connection from image f of feature instance to parameter of getValue
+--  			(iii) a connection from image localVariable of feature instance to parameter of getValue
+-- @extends m_Input_EventOrEventDataPort_ComputeEntrypointCallSequence,m_Parameter_to_PortInstance_Connection
+--  	- m_Input_EventDataPort_ComputeEntrypointCallSequence extends m_Input_Port_ComputeEntrypointCallSequence
+--  		such that
+--  			feature instance is an event port
+--  			parameter connection source is the feature instance
+--  		produce
+--  			(i) a subprogram call getValue
+--  			(ii) a connection from image f of feature instance to parameter of getValue
+--  			(iii) a connection from image localVariable of feature instance to parameter of getValue
+-- @extends m_Input_EventOrEventDataPort_ComputeEntrypointCallSequence,m_Parameter_to_PortInstance_Connection
+rule m_Input_EventDataPort_ComputeEntrypointCallSequence {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  paramCnx : AADLI!ParameterConnection
+  (
+   fi.isEventDataPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, paramCnx},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Input_EventDataPort_ComputeEntrypointCallSequence'
+  )
+} --  	- m_Input_DataPort_ComputeEntrypointCallSequence extends m_Input_Port_ComputeEntrypointCallSequence: for each pair (call sequence, feature instance)
+--  		such that:
+--  			feature instance is a data port
+--  		produce:
+--  			(i) a subprogram call getValue
+--  			(ii) a connection from image f of feature instance to parameter of getValue
+--  			(iii) a connection from image localVariable of feature instance to parameter of getValue
+-- @extends m_Input_Port_ComputeEntrypointCallSequence
+--  	- m_Input_DataPort_ComputeEntrypointCallSequence extends m_Input_Port_ComputeEntrypointCallSequence: for each pair (call sequence, feature instance)
+--  		such that:
+--  			feature instance is a data port
+--  		produce:
+--  			(i) a subprogram call getValue
+--  			(ii) a connection from image f of feature instance to parameter of getValue
+--  			(iii) a connection from image localVariable of feature instance to parameter of getValue
+-- @extends m_Input_Port_ComputeEntrypointCallSequence
+abstract rule m_Input_DataPort_ComputeEntrypointCallSequence {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence
+  (
+   fi.isDataPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Input_DataPort_ComputeEntrypointCallSequence'
+  )
+} --  	- m_Output_Port_ComputeEntrypointCallSequence extends m_Port_ComputeEntrypointCallSequence: for each tuple (call sequence, feature instance, connection instance)
+--  		such that:
+--  			feature instance is an output port
+--  			and
+--  			feature instance is the source of the connection instance
+-- @extends m_Port_ComputeEntrypointCallSequence,m_OutputFeature_Filter
+--  	- m_Output_Port_ComputeEntrypointCallSequence extends m_Port_ComputeEntrypointCallSequence: for each tuple (call sequence, feature instance, connection instance)
+--  		such that:
+--  			feature instance is an output port
+--  			and
+--  			feature instance is the source of the connection instance
+-- @extends m_Port_ComputeEntrypointCallSequence,m_OutputFeature_Filter
+rule m_Output_Port_ComputeEntrypointCallSequence {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  cnxRef : AADLI!PortConnection
+  (
+   fi.srcConnectionInstance->exists(e |
+    e.connectionReference->exists(cnx |
+     cnx.connection = cnxRef
+    )
+   )
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, cnxRef},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Output_Port_ComputeEntrypointCallSequence'
+  )
+} -- @extends m_Output_Port_ComputeEntrypointCallSequence
+-- @extends m_Output_Port_ComputeEntrypointCallSequence
+rule m_Output_Port_ComputeEntrypointCallSequence_Mode {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  cnxRef : AADLI!PortConnection,
+  mode : AADLI!Mode
+  (
+   cnxRef.inModeOrTransition->includes(mode)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, cnxRef, mode},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Output_Port_ComputeEntrypointCallSequence_Mode'
+  )
+} --  	- m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence extends m_Output_Port_ComputeEntrypointCallSequence: for each tuple (call sequence, feature instance, parameter connection, connection instance)
+--  		such that:
+--  			feature instance is the source of connection instance
+--  			feature instance is an event data port
+--  		produce:
+--  			(i) a subprogram call putValue
+--  			(ii) a connection from image f of feature instance to parameter of putValue
+--  			(iii) a connection from image localVariable of feature instance to parameter of putValue
+-- @extends m_Port_ComputeEntrypointCallSequence,m_OutputFeature_Filter
+--  	- m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence extends m_Output_Port_ComputeEntrypointCallSequence: for each tuple (call sequence, feature instance, parameter connection, connection instance)
+--  		such that:
+--  			feature instance is the source of connection instance
+--  			feature instance is an event data port
+--  		produce:
+--  			(i) a subprogram call putValue
+--  			(ii) a connection from image f of feature instance to parameter of putValue
+--  			(iii) a connection from image localVariable of feature instance to parameter of putValue
+-- @extends m_Port_ComputeEntrypointCallSequence,m_OutputFeature_Filter
+abstract rule m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  paramCnx : AADLI!ParameterConnection,
+  cnxRef : AADLI!PortConnection
+  (
+   fi.isEventPort() or fi.isEventDataPort() and cnxRef.source.connectionEnd = fi.feature and paramCnx.source.connectionEnd = fi.feature or paramCnx.destination.connectionEnd = fi.feature and fi.srcConnectionInstance->exists(e |
+    e.connectionReference.first().connection = cnxRef
+   )
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, paramCnx, cnxRef},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence'
+  )
+} --  	- m_Output_EventPort : for each tuple (call sequence, feature instance, port connection, connection instance)
+--  		such that:
+--  			feature instance is the source of a connection instance
+--  			feature instance is an event port
+--				feature instance is the dest of a port connection with a subprogram feature
+--  		produce:
+--  			(i) a subprogram call putValue
+--  			(ii) a connection from image f of feature instance to parameter of putValue
+--  			(iii) a connection from image localVariable of feature instance to parameter of putValue
+-- @extends m_OutputFeature_Filter
+--  	- m_Output_EventPort : for each tuple (call sequence, feature instance, port connection, connection instance)
+--  		such that:
+--  			feature instance is the source of a connection instance
+--  			feature instance is an event port
+--				feature instance is the dest of a port connection with a subprogram feature
+--  		produce:
+--  			(i) a subprogram call putValue
+--  			(ii) a connection from image f of feature instance to parameter of putValue
+--  			(iii) a connection from image localVariable of feature instance to parameter of putValue
+-- @extends m_OutputFeature_Filter
+abstract rule m_Output_EventPort {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  portCnx : AADLI!PortConnection,
+  cnxRef : AADLI!PortConnection
+  (
+   fi.isEventPort() and cnxRef.source.connectionEnd = fi.feature and portCnx.destination.connectionEnd = fi.feature and behavior.ownedSubprogramCall->exists(e |
+    portCnx.source.context = e
+   )
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, portCnx, cnxRef},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Output_EventPort'
+  )
+} -- @extends m_OutputFeature_Filter
+-- @extends m_OutputFeature_Filter
+abstract rule m_Output_EventDataPort {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  portCnx : AADLI!PortConnection,
+  cnxRef : AADLI!PortConnection
+  (
+   fi.isEventDataPort() and cnxRef.source.connectionEnd = fi.feature and portCnx.destination.connectionEnd = fi.feature and behavior.ownedSubprogramCall->exists(e |
+    portCnx.source.context = e
+   )
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, portCnx, cnxRef},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Output_EventDataPort'
+  )
+} --  	- m_Output_DataPort_ComputeEntrypointCallSequence extends m_Output_Port_ComputeEntrypointCallSequence: for each tuple (call sequence, feature instance, connection instance)
+--  	  	such that:
+--  			feature instance is a data port
+--  		produce:
+--  			(i) a subprogram call putValue
+--  			(ii) a connection from image f of feature instance to parameter of putValue
+--  			(iii) a connection from image localVariable of feature instance to parameter of putValue
+-- @extends m_Output_Port_ComputeEntrypointCallSequence
+--  	- m_Output_DataPort_ComputeEntrypointCallSequence extends m_Output_Port_ComputeEntrypointCallSequence: for each tuple (call sequence, feature instance, connection instance)
+--  	  	such that:
+--  			feature instance is a data port
+--  		produce:
+--  			(i) a subprogram call putValue
+--  			(ii) a connection from image f of feature instance to parameter of putValue
+--  			(iii) a connection from image localVariable of feature instance to parameter of putValue
+-- @extends m_Output_Port_ComputeEntrypointCallSequence
+rule m_Output_DataPort_ComputeEntrypointCallSequence {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  cnxRef : AADLI!PortConnection
+  (
+   fi.isDataPort() and cnxRef.source.connectionEnd = fi.feature or cnxRef.destination.connectionEnd = fi.feature
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, cnxRef},
+   value <- 'SubprogramCallsCommonRefinementSteps.m_Output_DataPort_ComputeEntrypointCallSequence'
+  )
+} -----------------------------------------------------------------
+--- End of refactoring
+-----------------------------------------------------------------
+helper context AADLBA!ThreadImplementation def: createBAVariablesForSpgParameters() : Sequence(AADLBA!BehaviorVariable) =
+ self.behavior().getAllOutParameters()->collect(p |
+  thisModule.CreateVariableForParameter(p)
+ );
+
+helper context AADLBA!SubprogramCall def: getConnectedParamDataSubcomponent(p : AADLBA!Parameter) : AADLBA!DataSubcomponent =
+ if not self.eContainer().eContainer().getAllConnections()->select(e |
+  e.oclIsKindOf(AADLI!ParameterConnection)
+ )->any(paramCnx |
+  paramCnx.source.getContext() = self and paramCnx.source.connectionEnd = p
+ ).oclIsUndefined() then
+  self.eContainer().eContainer().getAllConnections()->select(e |
+   e.oclIsKindOf(AADLI!ParameterConnection)
+  )->any(paramCnx |
+   paramCnx.source.getContext() = self and paramCnx.source.connectionEnd = p
+  ).destination.connectionEnd
+ else
+  if not self.eContainer().eContainer().getAllConnections()->select(e |
+   e.oclIsKindOf(AADLI!ParameterConnection)
+  )->any(paramCnx |
+   paramCnx.destination.getContext() = self and paramCnx.destination.connectionEnd = p
+  ).oclIsUndefined() then
+   self.eContainer().eContainer().getAllConnections()->select(e |
+    e.oclIsKindOf(AADLI!ParameterConnection)
+   )->any(paramCnx |
+    paramCnx.destination.getContext() = self and paramCnx.destination.connectionEnd = p
+   ).source.connectionEnd
+  else
+   OclUndefined.debug('ERROR: Could not find Parameter Connection for ' + p.name + ' in ' + self.name)
+  endif
+ endif;
+
+helper context AADLBA!SubprogramCall def: getConnectedAccessDataSubcomponent(p : AADLBA!DataAccess) : AADLBA!DataSubcomponent =
+ if not self.eContainer().eContainer().getAllConnections()->select(e |
+  e.oclIsKindOf(AADLI!AccessConnection)
+ )->any(accessCnx |
+  accessCnx.source.getContext() = self and accessCnx.source.connectionEnd = p
+ ).oclIsUndefined() then
+  self.eContainer().eContainer().getAllConnections()->select(e |
+   e.oclIsKindOf(AADLI!AccessConnection)
+  )->any(accessCnx |
+   accessCnx.source.getContext() = self and accessCnx.source.connectionEnd = p
+  ).destination.connectionEnd
+ else
+  if not self.eContainer().eContainer().getAllConnections()->select(e |
+   e.oclIsKindOf(AADLI!AccessConnection)
+  )->any(accessCnx |
+   accessCnx.destination.getContext() = self and accessCnx.destination.connectionEnd = p
+  ).oclIsUndefined() then
+   self.eContainer().eContainer().getAllConnections()->select(e |
+    e.oclIsKindOf(AADLI!AccessConnection)
+   )->any(accessCnx |
+    accessCnx.destination.getContext() = self and accessCnx.destination.connectionEnd = p
+   ).source.connectionEnd
+  else
+   OclUndefined
+  endif
+ endif;

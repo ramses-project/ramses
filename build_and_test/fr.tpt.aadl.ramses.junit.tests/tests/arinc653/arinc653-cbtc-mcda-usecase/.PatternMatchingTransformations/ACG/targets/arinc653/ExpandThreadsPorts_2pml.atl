@@ -1,0 +1,400 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @nsURI AADLI=http://aadl.info/AADL/2.0/instance
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+module ExpandThreadsPorts;
+create OUT : MM_ATL2PM from IN : AADLI, AADL_RUNTIME : AADLBA, DATA_MODEL : AADLBA, PROGRAMMING_PROPERTIES : AADLBA, HOOKS : ATLHOOKS, ARINC653_RUNTIME : AADLBA;
+
+abstract rule m_Not_PeriodicDelayed_Port {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   not fi.isPeriodicDelayedPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'ExpandThreadsPorts.m_Not_PeriodicDelayed_Port'
+  )
+}
+
+helper def: getRuntimeSizeType : AADLBA!DataType =
+ 'Message_Size_Type'.asDataType('ARINC653_RUNTIME');
+
+helper def: collectCommunicationsLocalVariables(c : AADLI!ComponentInstance, callSequences : Sequence(AADLI!SubprogramCallSequence)) : Sequence(AADLBA!DataSubcomponent) =
+ callSequences->collect(e |
+  thisModule.resolveMatchedSingleIfExists(c, 'returnData')
+ )->union(c.featureInstance->select(e |
+  e.feature.oclIsKindOf(AADLI!Port) and not e.isPeriodicDelayedPort()
+ )->collect(fi |
+  Sequence {fi.retreiveMessageAddress(), thisModule.resolveLazySingleIfExists(fi, 'CreateLengthDataSubcomponent', 'dataSubcomponent')}
+ ))->union(c.featureInstance->select(e |
+  not e.oclIsKindOf(AADLBA!DataAccess) and e.isInputFeature()
+ )->collect(fi |
+  thisModule.CreateReturnSubcomponentFromPort(fi)
+ ))->union(c.featureInstance->select(e |
+  e.isDataPort() and not e.isIntraProcessFeatureInstance() and e.isInputFeature() and not e.isPeriodicDelayedPort()
+ )->collect(fi |
+  Sequence {fi.retreiveMessageAddress(), thisModule.resolveLazySingleIfExists(fi, 'CreateValidityDataSubcomponent', 'dataSubcomponent')}
+ ))->union(c.featureInstance->select(e |
+  e.isInputFeature() or e.isEventOrEventDataPort() and e.isOutputFeature() and not(e.isDataPort() and not e.isIntraProcessFeatureInstance()) and not e.isPeriodicDelayedPort()
+ )->collect(fi |
+  thisModule.resolveLazySingleIfExists(fi, 'CreateTimeOutSubcomponentFromPort', 'dataSubcomponent')
+ ))->union(callSequences->collect(callSequence |
+  c.subcomponent.classifier.getAllConnections()->select(e |
+   e.oclIsKindOf(AADLI!ParameterConnection)
+  )->select(paramCnx |
+   paramCnx.isParamToParamConnection() and paramCnx.isPartOfCallSequence(callSequence) and callSequence.isComputeEntryPointOf(c)
+  )->collect(paramCnx |
+   thisModule.resolveMatchedTupleIfExists(Sequence {c, callSequence, paramCnx}, 'paramCnxVariable')
+  )
+ ))->flatten(); --	- m_Process_Output_DataPort_Instance extends m_Process_Output_Port_Instance: for each port instance
+--		such that
+--			port is a data port
+--		produce
+--			(i) refine globalVariable type to Sampling_Id_Type
+--	- m_Process_Output_EventDataPort_Instance extends m_Process_Output_Port_Instance: for each port instance
+--		such that
+--			port is a data port
+--		produce
+--			(i) refine globalVariable type to Queueing_Id_Type
+--	- m_Process_Output_EventPort_Instance extends m_Process_Output_Port_Instance: for each port instance
+--		such that
+--			port is a event port
+--		produce
+--			(i) refine globalVariable type to Queueing_Id_Type
+-- @extends m_Process_Output_Port_Instance
+--	- m_Process_Output_DataPort_Instance extends m_Process_Output_Port_Instance: for each port instance
+--		such that
+--			port is a data port
+--		produce
+--			(i) refine globalVariable type to Sampling_Id_Type
+--	- m_Process_Output_EventDataPort_Instance extends m_Process_Output_Port_Instance: for each port instance
+--		such that
+--			port is a data port
+--		produce
+--			(i) refine globalVariable type to Queueing_Id_Type
+--	- m_Process_Output_EventPort_Instance extends m_Process_Output_Port_Instance: for each port instance
+--		such that
+--			port is a event port
+--		produce
+--			(i) refine globalVariable type to Queueing_Id_Type
+-- @extends m_Process_Output_Port_Instance
+rule m_Process_Output_EventDataPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isEventDataPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'ExpandThreadsPorts.m_Process_Output_EventDataPort_Instance'
+  )
+} -- @extends m_Process_Output_Port_Instance
+-- @extends m_Process_Output_Port_Instance
+rule m_Process_Output_DataPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isDataPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'ExpandThreadsPorts.m_Process_Output_DataPort_Instance'
+  )
+} -- @extends m_Thread_InterProcess_Input_Port_Instance
+-- @extends m_Thread_InterProcess_Input_Port_Instance
+rule m_Process_Input_EventPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isEventPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'ExpandThreadsPorts.m_Process_Input_EventPort_Instance'
+  )
+} -- @extends m_Process_Input_Port_Instance
+-- @extends m_Process_Input_Port_Instance
+rule m_Process_Input_EventDataPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isEventDataPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'ExpandThreadsPorts.m_Process_Input_EventDataPort_Instance'
+  )
+} -- @extends m_Process_Input_Port_Instance
+-- @extends m_Process_Input_Port_Instance
+rule m_Process_Input_DataPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isDataPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'ExpandThreadsPorts.m_Process_Input_DataPort_Instance'
+  )
+} -- @extends m_Thread_InterProcess_Input_Port_Instance
+-- @extends m_Thread_InterProcess_Input_Port_Instance
+rule m_Process_Output_EventPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isEventPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'ExpandThreadsPorts.m_Process_Output_EventPort_Instance'
+  )
+} -- @extends m_Thread_IntraProcess_Input_Port_Instance,m_Thread_DataOrEventDataPort_Input_Instance,m_Not_PeriodicDelayed_Port
+-- @extends m_Thread_IntraProcess_Input_Port_Instance,m_Thread_DataOrEventDataPort_Input_Instance,m_Not_PeriodicDelayed_Port
+rule m_Thread_IntraProcess_Input_DataPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isDataPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'ExpandThreadsPorts.m_Thread_IntraProcess_Input_DataPort_Instance'
+  )
+} -- @extends m_Not_PeriodicDelayed_Port,m_Thread_DataOrEventDataPort_Input_Instance,m_Thread_IntraProcess_Input_Port_Instance
+-- @extends m_Not_PeriodicDelayed_Port,m_Thread_DataOrEventDataPort_Input_Instance,m_Thread_IntraProcess_Input_Port_Instance
+rule m_Thread_IntraProcess_Input_EventDataPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isEventDataPort() and fi.isIntraProcessFeatureInstance()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'ExpandThreadsPorts.m_Thread_IntraProcess_Input_EventDataPort_Instance'
+  )
+} -- @extends m_Not_PeriodicDelayed_Port,m_Thread_EventPort_Input_Instance,m_Thread_IntraProcess_Input_Port_Instance
+-- @extends m_Not_PeriodicDelayed_Port,m_Thread_EventPort_Input_Instance,m_Thread_IntraProcess_Input_Port_Instance
+rule m_Thread_IntraProcess_Input_EventPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isEventPort() and fi.isIntraProcessFeatureInstance()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'ExpandThreadsPorts.m_Thread_IntraProcess_Input_EventPort_Instance'
+  )
+} -- @extends m_Thread_InterProcess_Input_Port_Instance,m_Thread_DataOrEventDataPort_Input_Instance
+-- @extends m_Thread_InterProcess_Input_Port_Instance,m_Thread_DataOrEventDataPort_Input_Instance
+rule m_Thread_InterProcess_Input_EventDataPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isEventDataPort() and not fi.isIntraProcessFeatureInstance()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'ExpandThreadsPorts.m_Thread_InterProcess_Input_EventDataPort_Instance'
+  )
+} -- @extends m_Thread_Input_Port_Instance
+-- @extends m_Thread_Input_Port_Instance
+rule m_Thread_InterProcess_Input_EventOrEventDataPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isEventPort() and not fi.isIntraProcessFeatureInstance()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'ExpandThreadsPorts.m_Thread_InterProcess_Input_EventOrEventDataPort_Instance'
+  )
+} -- @extends m_Thread_DataOrEventDataPort_Input_Instance,m_Thread_InterProcess_Input_Port_Instance
+-- @extends m_Thread_DataOrEventDataPort_Input_Instance,m_Thread_InterProcess_Input_Port_Instance
+rule m_Thread_InterProcess_Input_DataPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isDataPort() and not fi.isIntraProcessFeatureInstance()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'ExpandThreadsPorts.m_Thread_InterProcess_Input_DataPort_Instance'
+  )
+} --	- m_Thread_Output_IntraProcess_DataPort_Instance extends m_Thread_Output_Port_Instance for each pair of (port instance,connection reference)
+--		such that
+--			destination of the connection reference is the port of a thread
+--			port is a data port
+--		produce
+--			(i) refine data access f type to Blackoard_Id_Type
+--	- m_Thread_Output_InterProcess_EventDataPort_Instance extends m_Thread_Output_Port_Instance
+--  		such that
+--			destination of the connection reference is the port of a thread
+--			port is an event data port
+--		produce
+--			(i) refine data access f type to Buffer_Id_Type
+--  	- m_Thread_Output_IntraProcess_EventPort_Instance extends m_Thread_Output_Port_Instance
+--  		such that
+--			destination of the connection reference is the port of a thread
+--			port is an event port
+--		produce
+--			(i) refine data access f type to Events_Id_Type
+--	- m_Thread_Output_InterProcess_DataPort_Instance extends m_Thread_Output_Port_Instance for each pair of (port instance,connection reference)
+--		such that
+--			destination of the connection reference is the port of a process
+--			port is a data port
+--		produce
+--			(i) refine data access f type to Sampling_Id_Type
+--  	- m_Thread_Output_InterProcess_EventPort_Instance extends m_Thread_Output_Port_Instance
+--  		such that
+--			destination of the connection reference is the port of a process
+--			port is an event port
+--		produce
+--			(i) refine data access f type to Queueing_Id_Type
+--  	- m_Thread_Output_InterProcess_EventDataPort_Instance extends m_Thread_Output_Port_Instance
+--  		such that
+--			destination of the connection reference is the port of a process
+--			port is an event data port
+--		produce
+--			(i) refine data access f type to Queuing_Id_Type
+--	- m_Thread_Output_IntraProcess_DataPort_Instance extends m_Thread_Output_Port_Instance for each pair of (port instance,connection reference)
+--		such that
+--			destination of the connection reference is the port of a thread
+--			port is a data port
+--		produce
+--			(i) refine data access f type to Blackoard_Id_Type
+--	- m_Thread_Output_InterProcess_EventDataPort_Instance extends m_Thread_Output_Port_Instance
+--  		such that
+--			destination of the connection reference is the port of a thread
+--			port is an event data port
+--		produce
+--			(i) refine data access f type to Buffer_Id_Type
+--  	- m_Thread_Output_IntraProcess_EventPort_Instance extends m_Thread_Output_Port_Instance
+--  		such that
+--			destination of the connection reference is the port of a thread
+--			port is an event port
+--		produce
+--			(i) refine data access f type to Events_Id_Type
+--	- m_Thread_Output_InterProcess_DataPort_Instance extends m_Thread_Output_Port_Instance for each pair of (port instance,connection reference)
+--		such that
+--			destination of the connection reference is the port of a process
+--			port is a data port
+--		produce
+--			(i) refine data access f type to Sampling_Id_Type
+--  	- m_Thread_Output_InterProcess_EventPort_Instance extends m_Thread_Output_Port_Instance
+--  		such that
+--			destination of the connection reference is the port of a process
+--			port is an event port
+--		produce
+--			(i) refine data access f type to Queueing_Id_Type
+--  	- m_Thread_Output_InterProcess_EventDataPort_Instance extends m_Thread_Output_Port_Instance
+--  		such that
+--			destination of the connection reference is the port of a process
+--			port is an event data port
+--		produce
+--			(i) refine data access f type to Queuing_Id_Type
+helper context AADLBA!Connection def: otherFeature(feature : AADLBA!Feature) : AADLBA!Feature =
+ if self.source.connectionEnd = feature then
+  self.destination.connectionEnd
+ else
+  self.source.connectionEnd
+ endif; -- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
+-- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
+rule m_Thread_Output_IntraProcess_EventOrEventDataPort_Instance {
+ from
+  fi : AADLI!FeatureInstance,
+  cnxRef : AADLI!PortConnection
+  (
+   fi.isEventOrEventDataPort() and cnxRef.otherFeature(fi.feature).isThreadPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, cnxRef},
+   value <- 'ExpandThreadsPorts.m_Thread_Output_IntraProcess_EventOrEventDataPort_Instance'
+  )
+} -- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
+-- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
+rule m_Thread_Output_IntraProcess_DataPort_Instance {
+ from
+  fi : AADLI!FeatureInstance,
+  cnxRef : AADLI!PortConnection
+  (
+   fi.isDataPort() and cnxRef.otherFeature(fi.feature).isThreadPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, cnxRef},
+   value <- 'ExpandThreadsPorts.m_Thread_Output_IntraProcess_DataPort_Instance'
+  )
+} -- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
+-- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
+rule m_Thread_InterProcess_EventDataPort_Output_Instance {
+ from
+  fi : AADLI!FeatureInstance,
+  cnxRef : AADLI!PortConnection
+  (
+   fi.isEventOrEventDataPort() and cnxRef.destination.connectionEnd.isProcessPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, cnxRef},
+   value <- 'ExpandThreadsPorts.m_Thread_InterProcess_EventDataPort_Output_Instance'
+  )
+} -- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
+-- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
+rule m_Thread_InterProcess_DataPort_Output_Instance {
+ from
+  fi : AADLI!FeatureInstance,
+  cnxRef : AADLI!PortConnection
+  (
+   fi.isDataPort() and cnxRef.otherFeature(fi.feature).isProcessPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, cnxRef},
+   value <- 'ExpandThreadsPorts.m_Thread_InterProcess_DataPort_Output_Instance'
+  )
+}
+
+helper def: getTimeOutInitValue(port : AADLBA!Feature) : AADLBA!PropertyExpression =
+ if port.getModalPropertyValue('Timeout').oclIsUndefined() then
+  thisModule.toStringLiteral('0')
+ else
+  if port.getModalPropertyValue('Timeout').ownedValue.value.oclIsUndefined() then
+   OclUndefined
+  else
+   thisModule.toStringLiteral(port.getModalPropertyValue('Timeout').ownedValue.value.toString())
+  endif
+ endif;

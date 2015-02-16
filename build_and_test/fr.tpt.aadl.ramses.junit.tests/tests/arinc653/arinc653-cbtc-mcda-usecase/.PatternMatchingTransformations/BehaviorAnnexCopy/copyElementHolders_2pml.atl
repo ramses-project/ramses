@@ -1,0 +1,116 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @atlcompiler emftvm
+module CopyElementHolders;
+create OUT : MM_ATL2PM from IN : AADLBA, HOOKS : ATLHOOKS;
+
+abstract rule m_ElementHolder {
+ from
+  src_BehaviorElement : AADLBA!ElementHolder
+  (
+   src_BehaviorElement.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement},
+   value <- 'CopyElementHolders.m_ElementHolder'
+  )
+} -- @extends m_ElementHolder
+-- @extends m_ElementHolder
+rule m_SubprogramAccessHolder {
+ from
+  src_BehaviorElement : AADLBA!SubprogramAccessHolder
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement},
+   value <- 'CopyElementHolders.m_SubprogramAccessHolder'
+  )
+} -- @extends m_ElementHolder
+-- @extends m_ElementHolder
+rule m_EventPortHolder {
+ from
+  src_BehaviorElement : AADLBA!EventPortHolder
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement},
+   value <- 'CopyElementHolders.m_EventPortHolder'
+  )
+} -- @extends m_ElementHolder
+-- @extends m_ElementHolder
+rule m_EventDataPortHolder {
+ from
+  src_BehaviorElement : AADLBA!EventDataPortHolder
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement},
+   value <- 'CopyElementHolders.m_EventDataPortHolder'
+  )
+} -- @extends m_ElementHolder
+-- @extends m_ElementHolder
+rule m_DataPortHolder {
+ from
+  src_BehaviorElement : AADLBA!DataPortHolder
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement},
+   value <- 'CopyElementHolders.m_DataPortHolder'
+  )
+} -- @extends m_ElementHolder
+-- @extends m_ElementHolder
+rule m_CalledSubprogramHolder {
+ from
+  src_BehaviorElement : AADLBA!CalledSubprogramHolder
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement},
+   value <- 'CopyElementHolders.m_CalledSubprogramHolder'
+  )
+} -- @extends m_ElementHolder
+-- @extends m_ElementHolder
+rule m_DataAccessHolder {
+ from
+  src_BehaviorElement : AADLBA!DataAccessHolder
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement},
+   value <- 'CopyElementHolders.m_DataAccessHolder'
+  )
+} -- @extends m_ElementHolder
+-- @extends m_ElementHolder
+rule m_BehaviorVariableHolder {
+ from
+  src_BehaviorElement : AADLBA!BehaviorVariableHolder
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement},
+   value <- 'CopyElementHolders.m_BehaviorVariableHolder'
+  )
+} -- @extends m_ElementHolder
+-- @extends m_ElementHolder
+rule m_PortFreshValue {
+ from
+  src_BehaviorElement : AADLBA!PortFreshValue
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement},
+   value <- 'CopyElementHolders.m_PortFreshValue'
+  )
+}

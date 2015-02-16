@@ -1,0 +1,229 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @nsURI AADLI=http:///AADL2/instance
+-- @atlcompiler emftvm
+module Implementations;
+create OUT : MM_ATL2PM from IN : AADLI;
+
+helper context AADLI!ComponentImplementation def: needsCopy() : Boolean =
+ true;
+
+abstract rule m_Component_Implementation {
+ from
+  impl : AADLI!ComponentImplementation
+  (
+   impl.needsCopy()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {impl},
+   value <- 'Implementations.m_Component_Implementation'
+  )
+} --@extends m_Component_Implementation
+--@extends m_Component_Implementation
+rule m_Bus_Implementation {
+ from
+  impl : AADLI!BusImplementation
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {impl},
+   value <- 'Implementations.m_Bus_Implementation'
+  )
+} --@extends m_Component_Implementation
+--@extends m_Component_Implementation
+rule m_VirtualBus_Implementation {
+ from
+  impl : AADLI!VirtualBusImplementation
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {impl},
+   value <- 'Implementations.m_VirtualBus_Implementation'
+  )
+} --@extends m_Component_Implementation
+--@extends m_Component_Implementation
+rule m_Device_Implementation {
+ from
+  impl : AADLI!DeviceImplementation
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {impl},
+   value <- 'Implementations.m_Device_Implementation'
+  )
+} --@extends m_Component_Implementation
+--@extends m_Component_Implementation
+rule m_Processor_Implementation {
+ from
+  impl : AADLI!ProcessorImplementation
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {impl},
+   value <- 'Implementations.m_Processor_Implementation'
+  )
+} --@extends m_Component_Implementation
+--@extends m_Component_Implementation
+rule m_VirtualProcessor_Implementation {
+ from
+  impl : AADLI!VirtualProcessorImplementation
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {impl},
+   value <- 'Implementations.m_VirtualProcessor_Implementation'
+  )
+} --@extends m_Component_Implementation
+--@extends m_Component_Implementation
+rule m_Memory_Implementation {
+ from
+  impl : AADLI!MemoryImplementation
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {impl},
+   value <- 'Implementations.m_Memory_Implementation'
+  )
+} --@extends m_Component_Implementation
+--@extends m_Component_Implementation
+rule m_Process_Implementation {
+ from
+  impl : AADLI!ProcessImplementation
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {impl},
+   value <- 'Implementations.m_Process_Implementation'
+  )
+}
+
+helper context AADLI!SystemImplementation def: isRoot() : Boolean =
+ AADLI!ComponentInstance.allInstancesFrom('IN')->select(e |
+  e.subcomponent.oclIsUndefined()
+ )->exists(e |
+  e.componentImplementation = self
+ );
+
+helper context AADLI!ComponentInstance def: getSystemSubcomponent() : Sequence(AADLI!ComponentInstance) =
+ self.componentInstance->select(e |
+  e.category = #system
+ )->collect(e |
+  e.getSystemSubcomponent()
+ )->union(Sequence {self}); --@extends m_Component_Implementation
+--@extends m_Component_Implementation
+rule m_System_Implementation {
+ from
+  impl : AADLI!SystemImplementation
+  (
+   impl.isRoot()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {impl},
+   value <- 'Implementations.m_System_Implementation'
+  )
+} --@extends m_Component_Implementation
+--@extends m_Component_Implementation
+rule m_ThreadGroup_Implementation {
+ from
+  impl : AADLI!ThreadGroupImplementation
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {impl},
+   value <- 'Implementations.m_ThreadGroup_Implementation'
+  )
+} --@extends m_Component_Implementation
+--@extends m_Component_Implementation
+rule m_Thread_Implementation {
+ from
+  impl : AADLI!ThreadImplementation
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {impl},
+   value <- 'Implementations.m_Thread_Implementation'
+  )
+} --@extends m_Component_Implementation
+--@extends m_Component_Implementation
+rule m_Subprogram_Implementation {
+ from
+  impl : AADLI!SubprogramImplementation
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {impl},
+   value <- 'Implementations.m_Subprogram_Implementation'
+  )
+}
+
+rule m_SubprogramCallSequence {
+ from
+  seq : AADLI!SubprogramCallSequence
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {seq},
+   value <- 'Implementations.m_SubprogramCallSequence'
+  )
+}
+
+rule m_SubprogramCall {
+ from
+  sc : AADLI!SubprogramCall
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {sc},
+   value <- 'Implementations.m_SubprogramCall'
+  )
+} --helper def : copyCallSequence(c : AADLI!ComponentInstance, impl : AADLI!ComponentImplementation, implImg : AADLBA!ComponentImplementation) : AADLBA!SubprogramCallSequence =
+--	if( impl.behaviorFromImpl().oclIsUndefined() ) then
+--		if(impl.behaviorFromComputeEntryPoint().oclIsUndefined()) then
+--			OclUndefined
+--		else
+--			thisModule.mapComputeEntrypoint(implImg, c, impl)
+--		endif
+--	else
+--		thisModule.mapCallSequence(implImg, c, impl)
+--	endif
+--;
+----@extends m_Component_Implementation
+--rule m_Data_Implementation {
+--  from
+-- 	impl : AADLI!DataImplementation 
+-- to 
+-- 	implImg : AADLBA!DataImplementation (
+--		ownedPropertyAssociation 	<- impl.mapOwnedPropertyAssociationList(),
+--		ownedDataSubcomponent 		<- impl.getSubcomponentsInstances('data')
+--	)
+--}
+
+--helper def : copyCallSequence(c : AADLI!ComponentInstance, impl : AADLI!ComponentImplementation, implImg : AADLBA!ComponentImplementation) : AADLBA!SubprogramCallSequence =
+--	if( impl.behaviorFromImpl().oclIsUndefined() ) then
+--		if(impl.behaviorFromComputeEntryPoint().oclIsUndefined()) then
+--			OclUndefined
+--		else
+--			thisModule.mapComputeEntrypoint(implImg, c, impl)
+--		endif
+--	else
+--		thisModule.mapCallSequence(implImg, c, impl)
+--	endif
+--;
+----@extends m_Component_Implementation
+--rule m_Data_Implementation {
+--  from
+-- 	impl : AADLI!DataImplementation 
+-- to 
+-- 	implImg : AADLBA!DataImplementation (
+--		ownedPropertyAssociation 	<- impl.mapOwnedPropertyAssociationList(),
+--		ownedDataSubcomponent 		<- impl.getSubcomponentsInstances('data')
+--	)
+--}

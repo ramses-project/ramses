@@ -1,0 +1,363 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+module PortsCommonRefinementSteps;
+create OUT : MM_ATL2PM from IN : AADLI, AADL_RUNTIME : AADLBA, DATA_MODEL : AADLBA, PROGRAMMING_PROPERTIES : AADLBA, HOOKS : ATLHOOKS;
+
+--- TO be superimposed in target specific module
+rule m_Thread_IntraProcess_Input_EventPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'PortsCommonRefinementSteps.m_Thread_IntraProcess_Input_EventPort_Instance'
+  )
+}
+
+rule m_Thread_IntraProcess_Input_EventDataPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'PortsCommonRefinementSteps.m_Thread_IntraProcess_Input_EventDataPort_Instance'
+  )
+} ------------------------------------------------------------
+--- Beginning of refactoring
+------------------------------------------------------------
+------------------------------------------------------------
+--- Beginning of refactoring
+------------------------------------------------------------
+helper context AADLI!ConnectionInstanceEnd def: getGlobalVariableImg() : AADLBA!DataSubcomponent =
+ thisModule.resolveMatchedSingleIfExists(self, 'globalVariable');
+
+helper context AADLI!ConnectionInstanceEnd def: getGlobalVariableImg(mode : AADLI!Mode) : AADLBA!DataSubcomponent =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, mode}, 'globalVariable');
+
+helper context AADLI!FeatureInstance def: retreiveMessageAddress() : AADLBA!DataSubcomponent =
+ thisModule.resolveMatchedSingleIfExists(self, 'localVariable');
+
+abstract rule m_Not_PeriodicDelayed_Port {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   not fi.isPeriodicDelayedPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'PortsCommonRefinementSteps.m_Not_PeriodicDelayed_Port'
+  )
+} -- @extends m_Feature_Instance
+-- @extends m_Feature_Instance
+abstract rule m_Thread_Port_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isThreadPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'PortsCommonRefinementSteps.m_Thread_Port_Instance'
+  )
+} -- @extends m_Thread_Port_Instance
+-- @extends m_Thread_Port_Instance
+abstract rule m_Thread_Port_Instance_Mode {
+ from
+  fi : AADLI!FeatureInstance,
+  mode : AADLI!Mode
+  (
+   fi.connectedInMode(mode)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, mode},
+   value <- 'PortsCommonRefinementSteps.m_Thread_Port_Instance_Mode'
+  )
+} -- @extends m_Thread_Port_Instance,m_OutputFeature_Filter
+-- @extends m_Thread_Port_Instance,m_OutputFeature_Filter
+rule m_Thread_Output_Port_Instance {
+ from
+  fi : AADLI!FeatureInstance,
+  cnxRef : AADLI!PortConnection
+  (
+   fi.srcConnectionInstance->exists(e |
+    e.connectionReference->exists(f |
+     f.connection = cnxRef
+    )
+   )
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, cnxRef},
+   value <- 'PortsCommonRefinementSteps.m_Thread_Output_Port_Instance'
+  )
+} -- @extends m_Thread_Output_Port_Instance
+-- @extends m_Thread_Output_Port_Instance
+rule m_Thread_Output_Port_Instance_Mode {
+ from
+  fi : AADLI!FeatureInstance,
+  cnxRef : AADLI!PortConnection,
+  mode : AADLI!Mode
+  (
+   cnxRef.inModeOrTransition->includes(mode)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, cnxRef, mode},
+   value <- 'PortsCommonRefinementSteps.m_Thread_Output_Port_Instance_Mode'
+  )
+} -- @extends m_OutputFeature_Filter
+-- @extends m_OutputFeature_Filter
+rule m_Process_Output_Port_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isProcessPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'PortsCommonRefinementSteps.m_Process_Output_Port_Instance'
+  )
+} -- @extends m_Thread_Port_Instance
+-- @extends m_Thread_Port_Instance
+rule m_Thread_Input_Port_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isInputFeature()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'PortsCommonRefinementSteps.m_Thread_Input_Port_Instance'
+  )
+} -- @extends m_Thread_Port_Instance_Mode,m_Thread_Input_Port_Instance
+-- @extends m_Thread_Port_Instance_Mode,m_Thread_Input_Port_Instance
+rule m_Thread_Input_Port_Instance_Mode {
+ from
+  fi : AADLI!FeatureInstance,
+  mode : AADLI!Mode
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, mode},
+   value <- 'PortsCommonRefinementSteps.m_Thread_Input_Port_Instance_Mode'
+  )
+} -- @extends m_Thread_Input_Port_Instance
+-- @extends m_Thread_Input_Port_Instance
+rule m_Thread_InterProcess_Input_Port_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   not fi.isIntraProcessFeatureInstance()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'PortsCommonRefinementSteps.m_Thread_InterProcess_Input_Port_Instance'
+  )
+} -- @extends m_Thread_InterProcess_Input_Port_Instance,m_Thread_Input_Port_Instance_Mode
+-- @extends m_Thread_InterProcess_Input_Port_Instance,m_Thread_Input_Port_Instance_Mode
+rule m_Thread_InterProcess_Input_Port_Instance_Mode {
+ from
+  fi : AADLI!FeatureInstance,
+  mode : AADLI!Mode
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, mode},
+   value <- 'PortsCommonRefinementSteps.m_Thread_InterProcess_Input_Port_Instance_Mode'
+  )
+} -- @extends m_Thread_Input_Port_Instance
+-- @extends m_Thread_Input_Port_Instance
+rule m_Thread_IntraProcess_Input_Port_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isIntraProcessFeatureInstance()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'PortsCommonRefinementSteps.m_Thread_IntraProcess_Input_Port_Instance'
+  )
+} -- @extends m_Thread_Input_Port_Instance_Mode,m_Thread_IntraProcess_Input_Port_Instance
+-- @extends m_Thread_Input_Port_Instance_Mode,m_Thread_IntraProcess_Input_Port_Instance
+rule m_Thread_IntraProcess_Input_Port_Instance_Mode {
+ from
+  fi : AADLI!FeatureInstance,
+  mode : AADLI!Mode
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, mode},
+   value <- 'PortsCommonRefinementSteps.m_Thread_IntraProcess_Input_Port_Instance_Mode'
+  )
+}
+
+rule m_Process_Input_Port_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isInputFeature() and fi.isProcessPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'PortsCommonRefinementSteps.m_Process_Input_Port_Instance'
+  )
+} -- @extends m_Thread_Input_Port_Instance
+-- @extends m_Thread_Input_Port_Instance
+rule m_Thread_DataOrEventDataPort_Input_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isDataOrEventDataPort() and fi.isInputFeature() and fi.isThreadPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'PortsCommonRefinementSteps.m_Thread_DataOrEventDataPort_Input_Instance'
+  )
+} -- @extends m_Thread_Input_Port_Instance
+-- @extends m_Thread_Input_Port_Instance
+rule m_Thread_EventPort_Input_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isEventPort() and fi.isInputFeature() and fi.isThreadPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'PortsCommonRefinementSteps.m_Thread_EventPort_Input_Instance'
+  )
+} -- @extends m_Thread_Port_Instance,m_OutputFeature_Filter
+-- @extends m_Thread_Port_Instance,m_OutputFeature_Filter
+rule m_Thread_DataOrEventDataPort_Output_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isDataOrEventDataPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'PortsCommonRefinementSteps.m_Thread_DataOrEventDataPort_Output_Instance'
+  )
+} -- @extends m_Thread_Port_Instance,m_OutputFeature_Filter
+-- @extends m_Thread_Port_Instance,m_OutputFeature_Filter
+rule m_Thread_EventPort_Output_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isEventPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'PortsCommonRefinementSteps.m_Thread_EventPort_Output_Instance'
+  )
+}
+
+------------------------------------------------------------
+--- End of refactoring
+------------------------------------------------------------
+helper def: freshness_suffix : String =
+ '_freshness_t';
+
+helper def: impl_suffix : String =
+ '.impl';
+
+helper context AADLI!DataClassifier def: getFreshnessType() : String =
+ self.name + thisModule.freshness_suffix; -------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------
+----	ADDED MATCHED RULES
+-------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------
+----	ADDED MATCHED RULES
+-------------------------------------------------------------------------------------------
+helper def: assignPortVariableType(fi : AADLI!FeatureInstance, fresh_data_impl_wrapper : AADLBA!DataSubcomponentType) : AADLBA!DataSubcomponentType =
+ if fi.isUsedInFresh() then
+  fresh_data_impl_wrapper
+ else
+  fi.feature.dataFeatureClassifier
+ endif;
+
+helper context AADLI!FeatureInstance def: getBehaviorAnnex() : AADLBA!BehaviorAnnex =
+ self.getComponentInstance().subcomponent.classifier.getBA();
+
+helper context AADLI!ComponentInstance def: needsToMapBehaviorAnnex() : Boolean =
+ self.subcomponent.subcomponentType.needsToMapBehaviorAnnex();
+
+helper context AADLBA!Classifier def: needsToMapBehaviorAnnex() : Boolean =
+ self.ownedAnnexSubclause->exists(e |
+  e.name = 'behavior_specification'
+ ) and self.getPropertyAssociation('Source_Name').oclIsUndefined() and self.getPropertyAssociation('Source_Text').oclIsUndefined(); -- @extends m_Feature_Instance,m_Thread_IntraProcess_Input_EventPort_Instance
+-- @extends m_Feature_Instance,m_Thread_IntraProcess_Input_EventPort_Instance
+rule m_EventPort_Instance_with_BA {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.category = #eventPort and fi.getComponentInstance().category = #thread and not fi.isPeriodicDelayedPort() and fi.getComponentInstance().subcomponent.classifier.needsToMapBehaviorAnnex()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'PortsCommonRefinementSteps.m_EventPort_Instance_with_BA'
+  )
+} -- @extends m_Feature_Instance,m_Thread_IntraProcess_Input_EventDataPort_Instance
+-- @extends m_Feature_Instance,m_Thread_IntraProcess_Input_EventDataPort_Instance
+rule m_EventDataPort_Instance_with_BA {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.category = #eventDataPort and fi.getComponentInstance().category = #thread and not fi.isPeriodicDelayedPort() and fi.getComponentInstance().subcomponent.classifier.needsToMapBehaviorAnnex()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'PortsCommonRefinementSteps.m_EventDataPort_Instance_with_BA'
+  )
+} -- @extends m_DataAccess_Instance
+-- @extends m_DataAccess_Instance
+rule m_DataAccess_Instance_with_BA {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.category = #dataAccess and fi.getComponentInstance().category = #thread and fi.getComponentInstance().subcomponent.classifier.needsToMapBehaviorAnnex()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'PortsCommonRefinementSteps.m_DataAccess_Instance_with_BA'
+  )
+}
+
+helper def: GetOrCreateLengthDataSubcomponentHolder(port : AADLI!FeatureInstance) : AADLBA!DataSubcomponent =
+ if port.getModalPropertyValue('length_data_subcomponent').oclIsUndefined() then
+  thisModule.CreateLengthDataSubcomponentHolder(port)
+ else
+  thisModule.CreateLengthParameterHolder(port)
+ endif;

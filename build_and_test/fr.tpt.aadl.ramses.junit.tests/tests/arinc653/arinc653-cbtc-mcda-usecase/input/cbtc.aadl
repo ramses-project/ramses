@@ -1,0 +1,1068 @@
+---------------------------------------------------
+-- AADL2.1
+-- aadlrev2.3
+-- (c)Ellidiss Technologies
+-- 12Feb2013
+---------------------------------------------------
+
+PACKAGE cbtc
+PUBLIC
+
+WITH AADL_Project;
+WITH Data_Model;
+WITH Timing_Properties;
+WITH Memory_Properties;
+WITH Thread_Properties;
+WITH Programming_Properties;
+WITH Deployment_Properties;
+WITH ARINC653;
+WITH COAL;
+WITH POK;
+WITH Generation_Properties;
+WITH Maintainability_Property;
+WITH MCDA;
+
+DATA VobcData
+PROPERTIES
+  Data_Model::Data_Representation => Struct;
+  Data_Model::Enumerators => ("ident","train_position_m","train_position_mm","direction","speed");
+  Data_Model::Element_Names => ("long","long","long","long","long");
+  Source_Language => (C);
+  Source_Name => "VobcData";
+  Source_Text => ("business-code/cbtc_module.h");
+  Data_Size => 20 Bytes;
+END VobcData;
+
+DATA OdometerData
+PROPERTIES
+  Data_Model::Data_Representation => Struct;
+  Data_Model::Enumerators => ("ident","wheel_angle","speed");
+  Data_Model::Element_Names => ("long","long","long");
+  Source_Language => (C);
+  Source_Name => "OdometerData";
+  Source_Text => ("business-code/cbtc_module.h");
+  Data_Size => 12 Bytes;
+END OdometerData;
+
+DATA TractionData
+PROPERTIES
+  Data_Model::Data_Representation => Struct;
+  Data_Model::Enumerators => ("ident","msg_cycle","acceleration","limit_position","maxi_speed","direction");
+  Data_Model::Element_Names => ("long","long","long","long","long","long");
+  Source_Language => (C);
+  Source_Name => "TractionData";
+  Source_Text => ("business-code/cbtc_module.h");
+  Data_Size => 24 Bytes;
+END TractionData;
+
+DATA EndOfAuthority
+PROPERTIES
+  Data_Model::Data_Representation => Struct;
+  Data_Model::Enumerators => ("ident","limit_position");
+  Data_Model::Element_Names => ("long","long");
+  Source_Language => (C);
+  Source_Name => "EndOfAuthority";
+  Source_Text => ("business-code/cbtc_module.h");
+  Data_Size => 8 Bytes;
+END EndOfAuthority;
+
+DATA TrainPosition
+PROPERTIES
+  Data_Model::Data_Representation => Struct;
+  Data_Model::Enumerators => ("train_position","train_direction");
+  Data_Model::Element_Names => ("long","long");
+  Source_Language => (C);
+  Source_Name => "TrainPosition";
+  Source_Text => ("business-code/cbtc_module.h");
+  Data_Size => 8 Bytes;
+END TrainPosition;
+
+DATA ViuData
+PROPERTIES
+  Data_Model::Data_Representation => Struct;
+  Data_Model::Enumerators => ("ident","train_position","direction");
+  Data_Model::Element_Names => ("long","long","long");
+  Source_Language => (C);
+  Source_Name => "ViuData";
+  Source_Text => ("business-code/cbtc_module.h");
+  Data_Size => 12 Bytes;
+END ViuData;
+
+DATA CdvData
+PROPERTIES
+  Data_Model::Data_Representation => Struct;
+  Data_Model::Enumerators => ("ident","train_position");
+  Data_Model::Element_Names => ("long","long");
+  Source_Language => (C);
+  Source_Name => "CdvData";
+  Source_Text => ("business-code/cbtc_module.h");
+  Data_Size => 8 Bytes;
+END CdvData;
+
+DATA TrainData
+PROPERTIES
+  Data_Model::Data_Representation => Struct;
+  Data_Model::Enumerators => ("source_ident","destination_ident","computing_element","msg_cycle","direction","acceleration","limit_position","maxi_speed","speed","distance_m","distance_mm","sim_ctrl_1","sim_ctrl_2","sim_ctrl_3","sim_ctrl_4");
+  Data_Model::Element_Names => ("ulong","ulong","long","long","ulong","long","long","long","long","long","long","long","long","long","long");
+  Source_Language => (C);
+  Source_Name => "TrainData";
+  Source_Text => ("business-code/cbtc_module.h");
+  Data_Size => 15 bytes;
+END TrainData;
+
+DATA TrainPositionOffset
+PROPERTIES
+  Data_Model::Base_Type => (CLASSIFIER(COAL::long));
+  Source_Language => (C);
+  Source_Name => "TrainPositionOffset";
+  Source_Text => ("business-code/cbtc_module.h");
+END TrainPositionOffset;
+
+SYSTEM monoProc
+END monoProc;
+
+SYSTEM IMPLEMENTATION monoProc.impl
+SUBCOMPONENTS
+  root_main_memory_inst : MEMORY root_main_memory.impl;
+  train_inst : PROCESS train.impl;
+  railway_inst : PROCESS railway.impl;
+  root_inst : PROCESSOR root.impl {
+    Thread_Swap_Execution_Time => 0ms..1ms;
+    ARINC653::Module_Major_Frame => 100ms;
+    ARINC653::Module_Schedule => (
+       	[Partition => reference(VP_railway_inst); Duration => 50ms; Periodic_Processing_Start => true;],
+		[Partition => reference(VP_train_inst); Duration => 50ms; Periodic_Processing_Start => true;]
+    );
+    ARINC653::HM_Error_ID_Levels => (
+    	[ErrorIdentifier => 1; Description => "Module configuration error"; ErrorLevel=>Module_Level;ErrorCode=>Module_Config;]
+    );
+    ARINC653::HM_Error_ID_Actions => (
+    	[ErrorIdentifier => 1; Description => "Ignore"; Action => "Ignore";]
+    );
+    ARINC653::Module_Version => "1.0";
+    ARINC653::Module_Identifier => "cbtc.root";
+    Process_Swap_Execution_Time => 5ms..10ms;
+    Scheduling_Protocol => (ARINC653);
+    -- flush on windows
+    -- POK::Module_Minor_Frame => 1ms;
+    POK::Ports_Flush_Time => Partition_Slot_Switch;
+    POK::Architecture => x86;
+    POK::BSP => x86_qemu;
+  };
+CONNECTIONS
+  eoaFromMauToVobc_proc_cnx : PORT railway_inst.EoaSending_inst_eoaForVobcOut -> train_inst.TrainSpeedAccelCompute_inst_eoaIn;
+  trainPositionFromVobcToMau_proc_cnx : PORT train_inst.TrainSpeedAccelCompute_inst_trainPositionForMauOut -> railway_inst.TrainPositionsCorrelation_inst_trainPositionVobcForMauIn;
+  trainDataFromTrainPpuToTrainSim_proc_cnx : PORT train_inst.trainPpu_inst_trainDataOut -> railway_inst.TrainSimu_inst_trainDataIn;
+  trainDataFromTrainSimuToTrainPpu_proc_cnx : PORT railway_inst.TrainSimu_inst_trainDataOut -> train_inst.trainPpu_inst_trainDataIn;
+PROPERTIES
+  Actual_Processor_Binding => (REFERENCE(root_inst.VP_train_inst)) APPLIES TO train_inst;
+  Actual_Processor_Binding => (REFERENCE(root_inst.VP_railway_inst)) APPLIES TO railway_inst;
+  Actual_Memory_Binding => (REFERENCE(root_main_memory_inst)) APPLIES TO train_inst;
+  Actual_Memory_Binding => (REFERENCE(root_main_memory_inst)) APPLIES TO railway_inst;
+  
+  MCDA::Quality_Attributes_Weight => (
+    	[QualityAttribute=>Maintainability; Value=>35;],
+    	[QualityAttribute=>Memory_Footprint; Value=>25;],
+    	[QualityAttribute=>Threads_Response_Time; Value=>40;]
+    );  
+  MCDA::Quality_Impact_Importance => (
+    	[QualityAttribute=>Maintainability; Value=>30;],
+    	[QualityAttribute=>Memory_Footprint; Value=>50;],
+    	[QualityAttribute=>Threads_Response_Time; Value=>20;]
+    ) applies to train_inst.TrainPpu_odometerAcquisition,
+      		     train_inst.TrainPpu_trainTraction,
+      		     train_inst.TrainSpeedAccelCompute_trainSpeedAccelCompute,
+      		     train_inst.VobcTrainPositionEstimation_vobcTrainPositionEstimation;
+  MCDA::Quality_Impact_Importance => (
+    	[QualityAttribute=>Maintainability; Value=>30;],
+    	[QualityAttribute=>Memory_Footprint; Value=>15;],
+    	[QualityAttribute=>Threads_Response_Time; Value=>55;]
+    ) applies to train_inst.TrainPpu_odometerAcquisition ;
+  MCDA::Quality_Impact_Importance => (
+    	[QualityAttribute=>Maintainability; Value=>30;],
+    	[QualityAttribute=>Memory_Footprint; Value=>50;],
+    	[QualityAttribute=>Threads_Response_Time; Value=>20;]
+    ) applies to railway_inst.TrainPositionsCorrelation_trainPositionsCorrelation,
+      		     railway_inst.TrainSimu_delayed_trainDataIn,
+      		     railway_inst.TrainSimu_trainSimulation,
+      		     railway_inst.ViuTrainPositionEstimation_viuTrainPositionEstimation;
+END monoProc.impl;
+
+PROCESSOR root
+END root;
+
+PROCESSOR IMPLEMENTATION root.impl
+SUBCOMPONENTS
+  VP_train_inst : VIRTUAL PROCESSOR VP_train.impl
+  {
+  	Scheduling_Protocol => (RMS);
+  	Period => 100 Ms;
+  };
+  VP_railway_inst : VIRTUAL PROCESSOR VP_railway.impl
+  {
+  	Scheduling_Protocol => (RMS);
+  	Period => 100 Ms;
+  };
+END root.impl;
+
+MEMORY root_main_memory
+PROPERTIES
+  Memory_Size => 250000 Bytes;
+  Base_Address => 16#2200#;
+  Word_Size => 4 Bytes;
+  ARINC653::Memory_Type => (Data_Memory,Code_Memory,IO_Memory);
+--  Write_Time => [Fixed => 5 ns .. 5 ns; PerByte =>  5 ns .. 5 ns; ];
+--  Read_Time => [Fixed => 5 ns .. 5 ns; PerByte =>  5 ns .. 5 ns; ];
+END root_main_memory;
+
+MEMORY IMPLEMENTATION root_main_memory.impl
+END root_main_memory.impl;
+
+VIRTUAL PROCESSOR VP_System_aadlKeywords
+END VP_System_aadlKeywords;
+
+VIRTUAL PROCESSOR IMPLEMENTATION VP_System_aadlKeywords.impl
+PROPERTIES
+  ARINC653::Partition_Identifier => 1;
+  ARINC653::Partition_Name => "System";
+  ARINC653::System_Partition => TRUE;
+  POK::Scheduler => RR;
+  POK::Additional_Features => (libc_stdio,console);
+END VP_System_aadlKeywords.impl;
+
+VIRTUAL PROCESSOR VP_train
+END VP_train;
+
+VIRTUAL PROCESSOR IMPLEMENTATION VP_train.impl
+PROPERTIES
+  ARINC653::Partition_Identifier => 2;
+  ARINC653::Partition_Name => "train";
+  ARINC653::System_Partition => FALSE;
+  POK::Scheduler => RR;
+  POK::Additional_Features => (libc_stdio,console);
+END VP_train.impl;
+
+VIRTUAL PROCESSOR VP_railway
+END VP_railway;
+
+VIRTUAL PROCESSOR IMPLEMENTATION VP_railway.impl
+PROPERTIES
+  ARINC653::Partition_Identifier => 3;
+  ARINC653::Partition_Name => "railway";
+  ARINC653::System_Partition => FALSE;
+  POK::Scheduler => RR;
+  POK::Additional_Features => (libc_stdio,console);
+END VP_railway.impl;
+
+PROCESS System_aadlKeywords
+END System_aadlKeywords;
+
+PROCESS IMPLEMENTATION System_aadlKeywords.impl
+PROPERTIES
+  Data_Size => 200KByte;
+  Code_Size => 200KByte;
+END System_aadlKeywords.impl;
+
+PROCESS train
+FEATURES
+  TrainSpeedAccelCompute_inst_eoaIn : IN EVENT DATA PORT EndOfAuthority {Dequeue_Protocol => AllItems;};
+  TrainSpeedAccelCompute_inst_trainPositionForMauOut : OUT EVENT DATA PORT VobcData;
+  trainPpu_inst_trainDataOut : OUT EVENT DATA PORT TrainData;
+  trainPpu_inst_trainDataIn : IN EVENT DATA PORT TrainData {Dequeue_Protocol => AllItems;};
+END train;
+
+PROCESS IMPLEMENTATION train.impl
+SUBCOMPONENTS
+  TrainPpu_odometerAcquisition : THREAD TrainPpu_odometerAcquisition_Thread.impl;
+  TrainPpu_trainTraction : THREAD TrainPpu_trainTraction_Thread.impl;
+  VobcTrainPositionEstimation_vobcTrainPositionEstimation : THREAD VobcTrainPositionEstimation_vobcTrainPositionEstimation_Thread.impl;
+  TrainSpeedAccelCompute_trainSpeedAccelCompute : THREAD TrainSpeedAccelCompute_trainSpeedAccelCompute_Thread.impl;
+CONNECTIONS
+  PortCnx1 : PORT TrainPpu_odometerAcquisition.wheelAngleOut -> VobcTrainPositionEstimation_vobcTrainPositionEstimation.wheelAngleIn { Timing => Delayed; };
+  PortCnx2 : PORT TrainPpu_trainTraction.additionalTrainPositionOffset -> VobcTrainPositionEstimation_vobcTrainPositionEstimation.additionalTrainPositionOffset { Timing => Delayed; };
+  PortCnx3 : PORT VobcTrainPositionEstimation_vobcTrainPositionEstimation.trainPositionOut_F -> TrainSpeedAccelCompute_trainSpeedAccelCompute.trainPositionIn { Timing => Delayed; };
+  PortCnx4 : PORT TrainSpeedAccelCompute_trainSpeedAccelCompute.tractionOut -> TrainPpu_trainTraction.tractionIn { Timing => Delayed; };
+  PortCnx5 : PORT TrainSpeedAccelCompute_inst_eoaIn -> TrainSpeedAccelCompute_trainSpeedAccelCompute.eoaIn { Timing => Delayed; };
+  PortCnx6 : PORT trainPpu_inst_trainDataIn -> TrainPpu_odometerAcquisition.trainDataIn;
+  PortCnx7 : PORT trainPpu_inst_trainDataIn -> TrainPpu_trainTraction.trainDataIn;
+  PortCnx8 : PORT TrainSpeedAccelCompute_trainSpeedAccelCompute.trainPositionForMauOut -> TrainSpeedAccelCompute_inst_trainPositionForMauOut;
+  PortCnx9 : PORT TrainPpu_trainTraction.trainDataOut -> trainPpu_inst_trainDataOut;
+PROPERTIES
+  Data_Size => 6 KByte;
+  Code_Size => 3 KByte;
+  Maintainability_Property::Maintenance_Budget => 400;
+  Dispatch_Protocol => Periodic APPLIES TO TrainPpu_odometerAcquisition;
+  Priority => 1 APPLIES TO TrainPpu_odometerAcquisition;
+  Period => 200ms APPLIES TO TrainPpu_odometerAcquisition;
+  Data_Size => 65 Bytes APPLIES TO TrainPpu_odometerAcquisition;
+  Stack_Size => 150 Bytes APPLIES TO TrainPpu_odometerAcquisition;
+  Code_Size => 200 Bytes APPLIES TO TrainPpu_odometerAcquisition;
+  Dispatch_Protocol => Periodic APPLIES TO TrainPpu_trainTraction;
+  Priority => 1 APPLIES TO TrainPpu_trainTraction;
+  Period => 200ms APPLIES TO TrainPpu_trainTraction;
+  Data_Size => 4Bytes APPLIES TO TrainPpu_trainTraction;
+  Stack_Size => 50 Bytes APPLIES TO TrainPpu_trainTraction;
+  Code_Size => 200 Bytes  APPLIES TO TrainPpu_trainTraction;
+  Dispatch_Protocol => Periodic APPLIES TO VobcTrainPositionEstimation_vobcTrainPositionEstimation;
+  Priority => 2 APPLIES TO VobcTrainPositionEstimation_vobcTrainPositionEstimation;
+  Period => 100ms APPLIES TO VobcTrainPositionEstimation_vobcTrainPositionEstimation;
+  Data_Size => 150 Bytes APPLIES TO VobcTrainPositionEstimation_vobcTrainPositionEstimation;
+  Stack_Size => 100 Bytes APPLIES TO VobcTrainPositionEstimation_vobcTrainPositionEstimation;
+  Code_Size => 200 Bytes  APPLIES TO VobcTrainPositionEstimation_vobcTrainPositionEstimation;
+  Dispatch_Protocol => Periodic APPLIES TO TrainSpeedAccelCompute_trainSpeedAccelCompute;
+  Priority => 2 APPLIES TO TrainSpeedAccelCompute_trainSpeedAccelCompute;
+  Period => 400ms APPLIES TO TrainSpeedAccelCompute_trainSpeedAccelCompute;
+  Data_Size => 4KByte APPLIES TO TrainSpeedAccelCompute_trainSpeedAccelCompute;
+  Stack_Size => 150 Bytes APPLIES TO TrainSpeedAccelCompute_trainSpeedAccelCompute;
+  Code_Size => 200 Bytes APPLIES TO TrainSpeedAccelCompute_trainSpeedAccelCompute;
+END train.impl;
+
+PROCESS railway
+FEATURES
+  EoaSending_inst_eoaForVobcOut : OUT EVENT DATA PORT EndOfAuthority;
+  TrainPositionsCorrelation_inst_trainPositionVobcForMauIn : IN EVENT DATA PORT VobcData {Dequeue_Protocol => AllItems;};
+  TrainSimu_inst_trainDataIn : IN EVENT DATA PORT TrainData {Dequeue_Protocol => AllItems;};
+  TrainSimu_inst_trainDataOut : OUT EVENT DATA PORT TrainData;
+END railway;
+
+PROCESS IMPLEMENTATION railway.impl
+SUBCOMPONENTS
+  TrainPositionsCorrelation_trainPositionsCorrelation : THREAD TrainPositionsCorrelation_trainPositionsCorrelation_Thread.impl;
+  ViuTrainPositionEstimation_viuTrainPositionEstimation : THREAD ViuTrainPositionEstimation_viuTrainPositionEstimation_Thread.impl;
+  TrainSimu_trainSimulation : THREAD TrainSimu_trainSimulation_Thread.impl;
+  TrainSimu_delayed_trainDataIn : THREAD TrainSimu_delayed_trainDataIn_Thread.impl;
+CONNECTIONS
+  PortCnx1 : PORT ViuTrainPositionEstimation_viuTrainPositionEstimation.trainPositionForMauOut -> TrainPositionsCorrelation_trainPositionsCorrelation.trainPositionViuForMauIn{ Timing => Delayed; };
+  PortCnx2 : PORT TrainSimu_delayed_trainDataIn.delayed_trainDataIn -> TrainSimu_trainSimulation.delayed_trainDataIn{ Timing => Delayed; };
+  PortCnx3 : PORT TrainSimu_trainSimulation.trackOut -> ViuTrainPositionEstimation_viuTrainPositionEstimation.trackIn{ Timing => Delayed; };
+  PortCnx4 : PORT TrainPositionsCorrelation_inst_trainPositionVobcForMauIn -> TrainPositionsCorrelation_trainPositionsCorrelation.trainPositionVobcForMauIn;
+  PortCnx5 : PORT TrainSimu_inst_trainDataIn -> TrainSimu_delayed_trainDataIn.trainDataIn;
+  PortCnx6 : PORT TrainSimu_trainSimulation.trainDataOut -> TrainSimu_inst_trainDataOut;
+  PortCnx7 : PORT TrainPositionsCorrelation_trainPositionsCorrelation.eoAForVobcOut -> EoaSending_inst_eoaForVobcOut;
+PROPERTIES
+  Data_Size => 6 KByte;
+  Code_Size => 2 KByte;
+  Maintainability_Property::Maintenance_Budget => 600;
+  Dispatch_Protocol => Periodic APPLIES TO TrainPositionsCorrelation_trainPositionsCorrelation;
+  Priority => 3 APPLIES TO TrainPositionsCorrelation_trainPositionsCorrelation;
+  Period => 400ms APPLIES TO TrainPositionsCorrelation_trainPositionsCorrelation;
+  Data_Size => 150 Bytes APPLIES TO TrainPositionsCorrelation_trainPositionsCorrelation;
+  Stack_Size => 1000 Bytes APPLIES TO TrainPositionsCorrelation_trainPositionsCorrelation;
+  Code_Size => 200 Bytes APPLIES TO TrainPositionsCorrelation_trainPositionsCorrelation;
+  Dispatch_Protocol => Periodic APPLIES TO ViuTrainPositionEstimation_viuTrainPositionEstimation;
+  Priority => 1 APPLIES TO ViuTrainPositionEstimation_viuTrainPositionEstimation;
+  Period => 200ms APPLIES TO ViuTrainPositionEstimation_viuTrainPositionEstimation;
+  Data_Size => 60 Bytes APPLIES TO ViuTrainPositionEstimation_viuTrainPositionEstimation;
+  Stack_Size => 600 Bytes APPLIES TO ViuTrainPositionEstimation_viuTrainPositionEstimation;
+  Code_Size => 200 Bytes APPLIES TO ViuTrainPositionEstimation_viuTrainPositionEstimation;
+  Dispatch_Protocol => Periodic APPLIES TO TrainSimu_trainSimulation;
+  Priority => 1 APPLIES TO TrainSimu_trainSimulation;
+  Period => 200ms APPLIES TO TrainSimu_trainSimulation;
+  Data_Size => 70 Bytes APPLIES TO TrainSimu_trainSimulation;
+  Stack_Size => 250 Bytes APPLIES TO TrainSimu_trainSimulation;
+  Code_Size => 200 Bytes APPLIES TO TrainSimu_trainSimulation;
+  Dispatch_Protocol => Periodic APPLIES TO TrainSimu_delayed_trainDataIn;
+  Priority => 1 APPLIES TO TrainSimu_delayed_trainDataIn;
+  Period => 200ms APPLIES TO TrainSimu_delayed_trainDataIn;
+  Data_Size => 8 Bytes APPLIES TO TrainSimu_delayed_trainDataIn;
+  Stack_Size => 30 Bytes APPLIES TO TrainSimu_delayed_trainDataIn;
+  Code_Size => 200 Bytes APPLIES TO TrainSimu_delayed_trainDataIn;
+END railway.impl;
+
+SUBPROGRAM TrainPpu_odometerAcquisition
+FEATURES
+  trainDataIn : IN PARAMETER TrainData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  odometerOut : OUT PARAMETER OdometerData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+PROPERTIES
+  Source_Name => "TrainPpu_odometerAcquisition";
+  Source_Language => (C);
+  Source_Text => ("business-code/cbtc_trainPpu_subsystem_Implementations_TrainPpu_impl.h","business-code/cbtc_trainPpu_subsystem_Implementations_TrainPpu_impl.c", "business-code/VobcProcessing.c", "business-code/Tools.c");
+  Stack_Size => 14 Bytes;
+  Code_Size => 30 Bytes;
+  Compute_Execution_Time => 2 ms .. 3 ms;
+  Maintainability_Property::Maintenance_Cost => 25;
+END TrainPpu_odometerAcquisition;
+
+SUBPROGRAM TrainPpu_trainTraction
+FEATURES
+  tractionIn : IN PARAMETER TractionData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  trainDataIn : IN PARAMETER TrainData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  additionalTrainPositionOffset : OUT PARAMETER TrainPositionOffset {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  trainDataOut : OUT PARAMETER TrainData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+PROPERTIES
+  Source_Name => "TrainPpu_trainTraction";
+  Source_Language => (C);
+  Source_Text => ("business-code/cbtc_trainPpu_subsystem_Implementations_TrainPpu_impl.h","business-code/cbtc_trainPpu_subsystem_Implementations_TrainPpu_impl.c");
+  Stack_Size => 35 Bytes;
+  Code_Size => 50 Bytes;
+  Compute_Execution_Time => 5 ms .. 8 ms;
+  Maintainability_Property::Maintenance_Cost => 75;
+END TrainPpu_trainTraction;
+
+SUBPROGRAM TrackPpu_cdvAcquisition
+FEATURES
+  trainDataIn : IN PARAMETER TrainData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  cdvOut : OUT PARAMETER CdvData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+PROPERTIES
+  Source_Name => "TrackPpu_cdvAcquisition";
+  Source_Language => (C);
+  Source_Text => ("business-code/cbtc_trainPpu_subsystem_Implementations_TrackPpu_impl.h","business-code/cbtc_trainPpu_subsystem_Implementations_TrackPpu_impl.c");
+  Stack_Size => 8 Bytes;
+  Code_Size => 30 Bytes;
+  Compute_Execution_Time => 2 ms .. 3 ms;
+  Maintainability_Property::Maintenance_Cost => 25;
+END TrackPpu_cdvAcquisition;
+
+SUBPROGRAM WheelAngleAcquisition_wheelAngleAcquisition
+FEATURES
+  odometerIn : IN PARAMETER OdometerData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  wheelAngleOut : OUT PARAMETER OdometerData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+PROPERTIES
+  Source_Name => "WheelAngleAcquisition_wheelAngleAcquisition";
+  Source_Language => (C);
+  Source_Text => ("business-code/cbtc_vobc_subsystem_Implementations_WheelAngleAcquisition_impl.h","business-code/cbtc_vobc_subsystem_Implementations_WheelAngleAcquisition_impl.c");
+  Stack_Size => 10 Bytes;
+  Code_Size => 25 Bytes;
+  Compute_Execution_Time => 5 ms .. 7 ms;
+  Maintainability_Property::Maintenance_Cost => 25;
+END WheelAngleAcquisition_wheelAngleAcquisition;
+
+SUBPROGRAM VobcTrainPositionEstimation_vobcTrainPositionEstimation
+FEATURES
+  wheelAngleIn : IN PARAMETER OdometerData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  delayed_additionalTrainPositionOffset : IN PARAMETER TrainPositionOffset {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  trainPositionOut : OUT PARAMETER VobcData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+PROPERTIES
+  Source_Name => "VobcTrainPositionEstimation_vobcTrainPositionEstimation";
+  Source_Language => (C);
+  Source_Text => ("business-code/cbtc_vobc_subsystem_Implementations_VobcTrainPositionEstimation_impl.h","business-code/cbtc_vobc_subsystem_Implementations_VobcTrainPositionEstimation_impl.c");
+  Stack_Size => 20 Bytes;
+  Code_Size => 45 Bytes;
+  Compute_Execution_Time => 20 ms .. 22 ms;
+  Maintainability_Property::Maintenance_Cost => 80;
+END VobcTrainPositionEstimation_vobcTrainPositionEstimation;
+
+SUBPROGRAM VobcTrainPositionEstimation_delayed_additionalTrainPositionOffset
+FEATURES
+  additionalTrainPositionOffset : IN PARAMETER TrainPositionOffset {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  delayed_additionalTrainPositionOffset : OUT PARAMETER TrainPositionOffset {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  PROPERTIES
+    Source_Name => "VobcTrainPositionEstimation_delayed_additionalTrainPositionOffset";
+  Source_Language => (C);
+  Source_Text => ("business-code/cbtc_vobc_subsystem_Implementations_VobcTrainPositionEstimation_impl.h","business-code/cbtc_vobc_subsystem_Implementations_VobcTrainPositionEstimation_impl.c");
+    Stack_Size => 10 Bytes;
+    Code_Size => 12 Bytes;
+    Compute_Execution_Time => 3 ms .. 3 ms;
+    Maintainability_Property::Maintenance_Cost => 5;
+END VobcTrainPositionEstimation_delayed_additionalTrainPositionOffset;
+
+SUBPROGRAM VobcTrainPositionSending_vobcTrainPositionSending
+FEATURES
+  trainPositionIn : IN PARAMETER VobcData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  trainPositionOut : OUT PARAMETER VobcData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+PROPERTIES
+  Source_Name => "VobcTrainPositionSending_vobcTrainPositionSending";
+  Source_Language => (C);
+  Source_Text => ("business-code/cbtc_vobc_subsystem_Implementations_VobcTrainPositionSending_impl.h","business-code/cbtc_vobc_subsystem_Implementations_VobcTrainPositionSending_impl.c");
+  Stack_Size => 24 Bytes;
+  Code_Size => 30 Bytes;
+  Compute_Execution_Time => 4 ms .. 5 ms;
+  Maintainability_Property::Maintenance_Cost => 5;
+END VobcTrainPositionSending_vobcTrainPositionSending;
+
+SUBPROGRAM TrainSpeedAccelCompute_trainSpeedAccelCompute
+FEATURES
+  eoaIn : IN PARAMETER EndOfAuthority {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  trainPositionIn : IN PARAMETER VobcData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  trainAccelOut : OUT PARAMETER TractionData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  trainPositionForMauOut : OUT PARAMETER VobcData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+PROPERTIES
+  Source_Name => "TrainSpeedAccelCompute_trainSpeedAccelCompute";
+  Source_Language => (C);
+  Source_Text => ("business-code/cbtc_vobc_subsystem_Implementations_TrainSpeedAccelCompute_impl.h","business-code/cbtc_vobc_subsystem_Implementations_TrainSpeedAccelCompute_impl.c");
+  Stack_Size => 36 Bytes;
+  Code_Size => 54 Bytes;
+  Compute_Execution_Time => 14 ms .. 15 ms;
+  Maintainability_Property::Maintenance_Cost => 100;
+END TrainSpeedAccelCompute_trainSpeedAccelCompute;
+
+SUBPROGRAM AccelerationSending_accelerationSending
+FEATURES
+  trainAccelIn : IN PARAMETER TractionData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  tractionOut : OUT PARAMETER TractionData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+PROPERTIES
+  Source_Name => "AccelerationSending_accelerationSending";
+  Source_Language => (C);
+  Source_Text => ("business-code/cbtc_vobc_subsystem_Implementations_AccelerationSending_impl.h","business-code/cbtc_vobc_subsystem_Implementations_AccelerationSending_impl.c");
+  Stack_Size => 16 Bytes;
+  Code_Size => 30 Bytes;
+  Compute_Execution_Time => 4 ms .. 5 ms;
+  Maintainability_Property::Maintenance_Cost => 25;
+END AccelerationSending_accelerationSending;
+
+SUBPROGRAM TrainPositionsCorrelation_trainPositionsCorrelation
+FEATURES
+  trainPositionVobcForMauIn : IN PARAMETER VobcData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  trainPositionViuForMauIn : IN PARAMETER ViuData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  delayed_trainPositionMauOut : OUT PARAMETER TrainPosition {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+PROPERTIES
+  Source_Name => "TrainPositionsCorrelation_trainPositionsCorrelation";
+  Source_Language => (C);
+  Source_Text => ("business-code/cbtc_mau_subsystem_Implementations_TrainPositionsCorrelation_impl.h","business-code/cbtc_mau_subsystem_Implementations_TrainPositionsCorrelation_impl.c", "business-code/Tools.c");
+  Stack_Size => 14 Bytes;
+  Code_Size => 30 Bytes;
+  Compute_Execution_Time => 15 ms .. 21	 ms;
+  Maintainability_Property::Maintenance_Cost => 65;
+END TrainPositionsCorrelation_trainPositionsCorrelation;
+
+SUBPROGRAM TrainPositionsCorrelation_store_trainPositionMauOut
+FEATURES
+  delayed_trainPositionMauOut : IN PARAMETER TrainPosition {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  trainPositionMauOut : OUT PARAMETER TrainPosition {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+PROPERTIES
+  Stack_Size => 12 Bytes;
+  Code_Size => 30 Bytes;
+  Compute_Execution_Time => 8 ms .. 10 ms;
+  Maintainability_Property::Maintenance_Cost => 25;
+ANNEX behavior_specification {**
+  STATES
+    s : INITIAL FINAL STATE;
+  TRANSITIONS
+    t : s -[  ]-> s {
+    trainPositionMauOut := delayed_trainPositionMauOut
+  };
+**};
+
+END TrainPositionsCorrelation_store_trainPositionMauOut;
+
+SUBPROGRAM EndOfAuthorityComputation_endOfAuthorityComputation
+FEATURES
+  trainPositionIn : IN PARAMETER TrainPosition {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  eoAOutput : OUT PARAMETER EndOfAuthority {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+PROPERTIES
+  Source_Name => "EndOfAuthorityComputation_endOfAuthorityComputation";
+  Source_Language => (C);
+  Source_Text => ("business-code/cbtc_mau_subsystem_Implementations_EndOfAuthorityComputation_impl.h","business-code/cbtc_mau_subsystem_Implementations_EndOfAuthorityComputation_impl.c");
+  Stack_Size => 15 Bytes;
+  Code_Size => 30 Bytes;
+  Compute_Execution_Time => 3 ms .. 3 ms;
+  Maintainability_Property::Maintenance_Cost => 60;
+END EndOfAuthorityComputation_endOfAuthorityComputation;
+
+SUBPROGRAM EoaSending_eoaSending
+FEATURES
+  eoAInput : IN PARAMETER EndOfAuthority {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  eoaForVobcOut : OUT PARAMETER EndOfAuthority {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+PROPERTIES
+  Source_Name => "EoaSending_eoaSending";
+  Source_Language => (C);
+  Source_Text => ("business-code/cbtc_mau_subsystem_Implementations_EoaSending_impl.h","business-code/cbtc_mau_subsystem_Implementations_EoaSending_impl.c");
+  Stack_Size => 12 Bytes;
+  Code_Size => 25 Bytes;
+  Compute_Execution_Time => 1 ms .. 2 ms;
+  Maintainability_Property::Maintenance_Cost => 15;
+END EoaSending_eoaSending;
+
+SUBPROGRAM TrackAcquisition_trackAcquisition
+FEATURES
+  cdvIn : IN PARAMETER CdvData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  trackOut : OUT PARAMETER CdvData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+PROPERTIES
+  Source_Name => "TrackAcquisition_trackAcquisition";
+  Source_Language => (C);
+  Source_Text => ("business-code/cbtc_viu_subsystem_Implementations_TrackAcquisition_impl.h","business-code/cbtc_viu_subsystem_Implementations_TrackAcquisition_impl.c");
+  Stack_Size => 15 Bytes;
+  Code_Size => 30 Bytes;
+  Compute_Execution_Time => 2 ms .. 2 ms;
+  Maintainability_Property::Maintenance_Cost => 40;
+END TrackAcquisition_trackAcquisition;
+
+SUBPROGRAM ViuTrainPositionEstimation_viuTrainPositionEstimation
+FEATURES
+  trackIn : IN PARAMETER CdvData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  trainPositionOut : OUT PARAMETER ViuData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+PROPERTIES
+  Source_Name => "ViuTrainPositionEstimation_viuTrainPositionEstimation";
+  Source_Language => (C);
+  Source_Text => ("business-code/cbtc_viu_subsystem_Implementations_ViuTrainPositionEstimation_impl.h","business-code/cbtc_viu_subsystem_Implementations_ViuTrainPositionEstimation_impl.c");
+  Stack_Size => 20 Bytes;
+  Code_Size => 30 Bytes;
+  Compute_Execution_Time => 18 ms .. 20 ms;
+  Maintainability_Property::Maintenance_Cost => 70;
+END ViuTrainPositionEstimation_viuTrainPositionEstimation;
+
+SUBPROGRAM ViuTrainPositionSending_viuTrainPositionSending
+FEATURES
+  trainPositionIn : IN PARAMETER ViuData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  trainPositionForMauOut : OUT PARAMETER ViuData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+PROPERTIES
+  Source_Name => "ViuTrainPositionSending_viuTrainPositionSending";
+  Source_Language => (C);
+  Source_Text => ("business-code/cbtc_viu_subsystem_Implementations_ViuTrainPositionSending_impl.h","business-code/cbtc_viu_subsystem_Implementations_ViuTrainPositionSending_impl.c");
+  Stack_Size => 16 Bytes;
+  Code_Size => 30 Bytes;
+  Compute_Execution_Time => 4 ms .. 4 ms;
+  Maintainability_Property::Maintenance_Cost => 15;
+END ViuTrainPositionSending_viuTrainPositionSending;
+
+SUBPROGRAM TrainSimu_trainSimulation
+FEATURES
+  delayed_trainDataIn : IN PARAMETER TrainData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  trainDataOut : OUT PARAMETER TrainData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+PROPERTIES
+  Source_Name => "TrainSimu_trainSimulation";
+  Source_Language => (C);
+  Source_Text => ("business-code/cbtc_cbtc_subsystem_Implementations_TrainSimu_impl.h","business-code/cbtc_cbtc_subsystem_Implementations_TrainSimu_impl.c");
+  Stack_Size => 15 Bytes;
+  Code_Size => 12 Bytes;
+  Compute_Execution_Time => 7 ms .. 7 ms;
+  Maintainability_Property::Maintenance_Cost => 60;
+END TrainSimu_trainSimulation;
+
+SUBPROGRAM TrainSimu_delayed_trainDataIn
+FEATURES
+  trainDataIn : IN PARAMETER TrainData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  delayed_trainDataIn : OUT PARAMETER TrainData {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+PROPERTIES
+  Source_Name => "TrainSimu_delayed_trainDataIn";
+  Source_Language => (C);
+  Source_Text => ("business-code/cbtc_cbtc_subsystem_Implementations_TrainSimu_impl.h","business-code/cbtc_cbtc_subsystem_Implementations_TrainSimu_impl.c");
+  Stack_Size => 16 Bytes;
+  Code_Size => 30 Bytes;
+  Compute_Execution_Time => 1 ms .. 3 ms;
+  Maintainability_Property::Maintenance_Cost => 5;
+END TrainSimu_delayed_trainDataIn;
+
+THREAD TrainPpu_odometerAcquisition_Thread
+FEATURES
+  trainDataIn : IN EVENT DATA PORT TrainData {Dequeue_Protocol => AllItems;};
+  wheelAngleOut : OUT EVENT DATA PORT OdometerData;
+END TrainPpu_odometerAcquisition_Thread;
+
+THREAD IMPLEMENTATION TrainPpu_odometerAcquisition_Thread.impl
+SUBCOMPONENTS
+  odometerOut : DATA OdometerData;
+  odometerIn : DATA OdometerData;
+CALLS
+  call:{
+    c1: subprogram TrainPpu_odometerAcquisition;
+    c2: subprogram WheelAngleAcquisition_wheelAngleAcquisition;
+  };
+CONNECTIONS
+    cnx: PARAMETER c1.trainDataIn -> trainDataIn;
+    cnx2: PARAMETER c1.odometerOut -> odometerOut;
+    cnx3: PARAMETER c2.odometerIn -> odometerIn;
+    cnx4: PARAMETER c2.wheelAngleOut -> wheelAngleOut;
+PROPERTIES
+    Compute_Entrypoint_Call_Sequence => reference (call);
+    Maintainability_Property::Maintenance_Budget => 60;
+    Compute_Execution_Time => 7 ms .. 11 ms;
+--ANNEX behavior_specification {**
+--  VARIABLES
+--    odometerOut : OdometerData;
+--    odometerIn : OdometerData;
+--  STATES
+--    switch : INITIAL COMPLETE STATE;
+--  TRANSITIONS
+--    unnamed_B1 : switch -[ ON DISPATCH ]-> switch {
+--    IF ( trainDataIn'FRESH )
+--    TrainPpu_odometerAcquisition ! (trainDataIn,odometerOut);
+--    odometerIn := odometerOut;
+--    WheelAngleAcquisition_wheelAngleAcquisition ! (odometerIn,wheelAngleOut)
+--    END IF
+--  };
+--**};
+END TrainPpu_odometerAcquisition_Thread.impl;
+
+THREAD TrainPpu_trainTraction_Thread
+FEATURES
+  tractionIn : IN EVENT DATA PORT TractionData {Dequeue_Protocol => AllItems;};
+  trainDataIn : IN EVENT DATA PORT TrainData {Dequeue_Protocol => AllItems;};
+  additionalTrainPositionOffset : OUT EVENT DATA PORT TrainPositionOffset;
+  trainDataOut : OUT EVENT DATA PORT TrainData;
+END TrainPpu_trainTraction_Thread;
+
+THREAD IMPLEMENTATION TrainPpu_trainTraction_Thread.impl
+CALLS
+  call:{
+    c1: subprogram TrainPpu_trainTraction;
+  };
+CONNECTIONS
+    cnx: PARAMETER c1.tractionIn -> tractionIn;
+    cnx2: PARAMETER c1.trainDataIn -> trainDataIn;
+    cnx3: PARAMETER c1.additionalTrainPositionOffset -> additionalTrainPositionOffset;
+    cnx4: PARAMETER c1.trainDataOut -> trainDataOut;
+PROPERTIES
+    Compute_Entrypoint_Call_Sequence => reference (call);
+    Maintainability_Property::Maintenance_Budget => 90;
+    Compute_Execution_Time => 5 ms .. 8 ms;
+--ANNEX behavior_specification {**
+--  STATES
+--    switch : INITIAL COMPLETE STATE;
+--  TRANSITIONS
+--    unnamed_B1 : switch -[ ON DISPATCH ]-> switch {
+--    IF ( tractionIn'FRESH AND trainDataIn'FRESH )
+--    TrainPpu_trainTraction ! (tractionIn,trainDataIn,additionalTrainPositionOffset,trainDataOut)
+--    END IF
+--  };
+--**};
+END TrainPpu_trainTraction_Thread.impl;
+
+THREAD VobcTrainPositionEstimation_vobcTrainPositionEstimation_Thread
+FEATURES
+  additionalTrainPositionOffset : IN EVENT DATA PORT TrainPositionOffset {Dequeue_Protocol => AllItems;};
+  wheelAngleIn : IN EVENT DATA PORT OdometerData {Dequeue_Protocol => AllItems;};
+  trainPositionOut_F : OUT EVENT DATA PORT VobcData;
+END VobcTrainPositionEstimation_vobcTrainPositionEstimation_Thread;
+
+THREAD IMPLEMENTATION VobcTrainPositionEstimation_vobcTrainPositionEstimation_Thread.impl
+SUBCOMPONENTS
+  delayed_additionalTrainPositionOffset : DATA TrainPositionOffset;
+  trainPositionOut : DATA VobcData;
+  trainPositionIn : DATA VobcData;
+CALLS
+  call:{
+    c1: subprogram VobcTrainPositionEstimation_delayed_additionalTrainPositionOffset;
+    c2: subprogram VobcTrainPositionEstimation_vobcTrainPositionEstimation;
+    c3: subprogram VobcTrainPositionSending_vobcTrainPositionSending;
+  };
+CONNECTIONS
+    cnx: PARAMETER c1.additionalTrainPositionOffset -> additionalTrainPositionOffset;
+    cnx2: PARAMETER c1.delayed_additionalTrainPositionOffset -> delayed_additionalTrainPositionOffset;
+    cnx3: PARAMETER c2.wheelAngleIn -> wheelAngleIn;
+    cnx4: PARAMETER c2.delayed_additionalTrainPositionOffset -> delayed_additionalTrainPositionOffset;
+    cnx5: PARAMETER c2.trainPositionOut -> trainPositionOut;
+    cnx6: PARAMETER c3.trainPositionIn -> trainPositionIn;
+    cnx7: PARAMETER c3.trainPositionOut -> trainPositionOut_F;
+PROPERTIES
+    Compute_Entrypoint_Call_Sequence => reference (call);
+    Maintainability_Property::Maintenance_Budget => 120;
+    Compute_Execution_Time => 27 ms .. 30 ms;
+--ANNEX behavior_specification {**
+--  VARIABLES
+--    delayed_additionalTrainPositionOffset : TrainPositionOffset;
+--    trainPositionOut : VobcData;
+--    trainPositionIn : VobcData;
+--  STATES
+--    switch : INITIAL COMPLETE STATE;
+--  TRANSITIONS
+--    unnamed_B1 : switch -[ ON DISPATCH ]-> switch {
+--    VobcTrainPositionEstimation_delayed_additionalTrainPositionOffset ! (additionalTrainPositionOffset,delayed_additionalTrainPositionOffset);
+--    IF ( wheelAngleIn'FRESH )
+--    VobcTrainPositionEstimation_vobcTrainPositionEstimation ! (wheelAngleIn,delayed_additionalTrainPositionOffset,trainPositionOut);
+--    trainPositionIn := trainPositionOut;
+--    VobcTrainPositionSending_vobcTrainPositionSending ! (trainPositionIn,trainPositionOut_F)
+--    END IF
+--  };
+--**};
+END VobcTrainPositionEstimation_vobcTrainPositionEstimation_Thread.impl;
+
+THREAD TrainSpeedAccelCompute_trainSpeedAccelCompute_Thread
+FEATURES
+  eoaIn : IN EVENT DATA PORT EndOfAuthority {Dequeue_Protocol => AllItems;};
+  trainPositionIn : IN EVENT DATA PORT VobcData {Dequeue_Protocol => AllItems;};
+  trainPositionForMauOut : OUT EVENT DATA PORT VobcData;
+  tractionOut : OUT EVENT DATA PORT TractionData;
+END TrainSpeedAccelCompute_trainSpeedAccelCompute_Thread;
+
+THREAD IMPLEMENTATION TrainSpeedAccelCompute_trainSpeedAccelCompute_Thread.impl
+SUBCOMPONENTS
+  trainAccelOut : DATA TractionData;
+  trainAccelIn : DATA TractionData;
+CALLS
+  call:{
+    c1: subprogram TrainSpeedAccelCompute_trainSpeedAccelCompute;
+    c2: subprogram AccelerationSending_accelerationSending;
+  };
+CONNECTIONS
+    cnx: PARAMETER c1.eoaIn -> eoaIn;
+    cnx2: PARAMETER c1.trainPositionIn -> trainPositionIn;
+    cnx3: PARAMETER c1.trainAccelOut -> trainAccelOut;
+    cnx4: PARAMETER c1.trainPositionForMauOut -> trainPositionForMauOut;
+    cnx5: PARAMETER c2.trainAccelIn -> trainAccelIn;
+    cnx6: PARAMETER c2.tractionOut -> tractionOut;
+PROPERTIES
+    Compute_Entrypoint_Call_Sequence => reference (call);
+    Maintainability_Property::Maintenance_Budget => 160;
+    Compute_Execution_Time => 18 ms .. 20 ms;
+--ANNEX behavior_specification {**
+--  VARIABLES
+--    trainAccelOut : TractionData;
+--    trainAccelIn : TractionData;
+--  STATES
+--    switch : INITIAL COMPLETE STATE;
+--  TRANSITIONS
+--    unnamed_B1 : switch -[ ON DISPATCH ]-> switch {
+--    IF ( eoaIn'FRESH AND trainPositionIn'FRESH )
+--    TrainSpeedAccelCompute_trainSpeedAccelCompute ! (eoaIn,trainPositionIn,trainAccelOut,trainPositionForMauOut);
+--    trainAccelIn := trainAccelOut;
+--    AccelerationSending_accelerationSending ! (trainAccelIn,tractionOut)
+--    END IF
+--  };
+--**};
+END TrainSpeedAccelCompute_trainSpeedAccelCompute_Thread.impl;
+
+THREAD TrainPositionsCorrelation_trainPositionsCorrelation_Thread
+FEATURES
+  trainPositionVobcForMauIn : IN EVENT DATA PORT VobcData {Dequeue_Protocol => AllItems;};
+  trainPositionViuForMauIn : IN EVENT DATA PORT ViuData {Dequeue_Protocol => AllItems;};
+  eoaForVobcOut : OUT EVENT DATA PORT EndOfAuthority;
+END TrainPositionsCorrelation_trainPositionsCorrelation_Thread;
+
+THREAD IMPLEMENTATION TrainPositionsCorrelation_trainPositionsCorrelation_Thread.impl
+SUBCOMPONENTS
+  delayed_trainPositionMauOut : DATA TrainPosition;
+  trainPositionMauOut : DATA TrainPosition;
+  trainPositionIn : DATA TrainPosition;
+  eoAOutput : DATA EndOfAuthority;
+  eoAInput : DATA EndOfAuthority;
+CALLS
+  call:{
+    c1: subprogram TrainPositionsCorrelation_trainPositionsCorrelation;
+    c2: subprogram TrainPositionsCorrelation_store_trainPositionMauOut;
+    c4: subprogram EndOfAuthorityComputation_endOfAuthorityComputation;
+    c6: subprogram EoaSending_eoaSending;
+  };
+CONNECTIONS
+    cnx: PARAMETER c1.trainPositionVobcForMauIn -> trainPositionVobcForMauIn;
+    cnx2: PARAMETER c1.trainPositionViuForMauIn -> trainPositionViuForMauIn;
+    cnx3: PARAMETER c1.delayed_trainPositionMauOut -> delayed_trainPositionMauOut;
+    cnx4: PARAMETER c2.delayed_trainPositionMauOut -> delayed_trainPositionMauOut;
+    cnx5: PARAMETER c2.trainPositionMauOut -> trainPositionMauOut;
+    cnx8: PARAMETER c4.trainPositionIn -> trainPositionIn;
+    cnx9: PARAMETER c4.eoAOutput -> eoAOutput;
+    cnx12: PARAMETER c6.eoAInput -> eoAInput;
+    cnx13: PARAMETER c6.eoaForVobcOut -> eoaForVobcOut;
+PROPERTIES
+    Compute_Entrypoint_Call_Sequence => reference (call);
+    Maintainability_Property::Maintenance_Budget => 200;
+    Compute_Execution_Time => 28 ms .. 38 ms;
+--ANNEX behavior_specification {**
+--  VARIABLES
+--    delayed_trainPositionMauOut : TrainPosition;
+--    trainPositionMauOut : TrainPosition;
+--    trainPositionIn : TrainPosition;
+--    eoAOutput : EndOfAuthority;
+--    eoAInput : EndOfAuthority;
+--  STATES
+--    switch : INITIAL COMPLETE STATE;
+--  TRANSITIONS
+--    unnamed_B1 : switch -[ ON DISPATCH ]-> switch {
+--    IF ( trainPositionVobcForMauIn'FRESH AND trainPositionViuForMauIn'FRESH )
+--    TrainPositionsCorrelation_trainPositionsCorrelation ! (trainPositionVobcForMauIn,trainPositionViuForMauIn,delayed_trainPositionMauOut);
+--    TrainPositionsCorrelation_store_trainPositionMauOut ! (delayed_trainPositionMauOut,trainPositionMauOut);
+--    trainPositionIn := trainPositionMauOut;
+--    EndOfAuthorityComputation_endOfAuthorityComputation ! (trainPositionIn,eoAOutput);
+--    eoAInput := eoAOutput;
+--    EoaSending_eoaSending ! (eoAInput,eoaForVobcOut)
+--    END IF
+--  };
+--**};
+
+END TrainPositionsCorrelation_trainPositionsCorrelation_Thread.impl;
+
+THREAD ViuTrainPositionEstimation_viuTrainPositionEstimation_Thread
+FEATURES
+  trackIn : IN EVENT DATA PORT CdvData {Dequeue_Protocol => AllItems;};
+  trainPositionForMauOut : OUT EVENT DATA PORT ViuData;
+END ViuTrainPositionEstimation_viuTrainPositionEstimation_Thread;
+
+THREAD IMPLEMENTATION ViuTrainPositionEstimation_viuTrainPositionEstimation_Thread.impl
+SUBCOMPONENTS
+  trainPositionOut : DATA ViuData;
+  trainPositionIn : DATA ViuData;
+CALLS
+  call:{
+    c1: subprogram ViuTrainPositionEstimation_viuTrainPositionEstimation;
+    c3: subprogram ViuTrainPositionSending_viuTrainPositionSending;
+  };
+CONNECTIONS
+    cnx: PARAMETER c1.trackIn -> trackIn;
+    cnx2: PARAMETER c1.trainPositionOut -> trainPositionOut;
+    cnx5: PARAMETER c3.trainPositionIn -> trainPositionIn;
+    cnx6: PARAMETER c3.trainPositionForMauOut -> trainPositionForMauOut;
+PROPERTIES
+    Compute_Entrypoint_Call_Sequence => reference (call);
+    Maintainability_Property::Maintenance_Budget => 120;
+    Compute_Execution_Time => 22 ms .. 25 ms;
+--ANNEX behavior_specification {**
+--  VARIABLES
+--    trainPositionOut : ViuData;
+--    trainPositionIn : ViuData;
+--  STATES
+--    switch : INITIAL COMPLETE STATE;
+--  TRANSITIONS
+--    unnamed_B1 : switch -[ ON DISPATCH ]-> switch {
+--    IF ( trackIn'FRESH )
+--    ViuTrainPositionEstimation_viuTrainPositionEstimation ! (trackIn,trainPositionOut);
+--    trainPositionIn := trainPositionOut;
+--    ViuTrainPositionSending_viuTrainPositionSending ! (trainPositionIn,trainPositionForMauOut)
+--    END IF
+--  };
+--**};
+
+END ViuTrainPositionEstimation_viuTrainPositionEstimation_Thread.impl;
+
+THREAD TrainSimu_trainSimulation_Thread
+FEATURES
+  delayed_trainDataIn : IN EVENT DATA PORT TrainData {Dequeue_Protocol => AllItems;};
+  trainDataOut : OUT EVENT DATA PORT TrainData;
+  trackOut : OUT EVENT DATA PORT CdvData;
+END TrainSimu_trainSimulation_Thread;
+
+THREAD IMPLEMENTATION TrainSimu_trainSimulation_Thread.impl
+SUBCOMPONENTS
+  trainDataIn : DATA TrainData;
+  cdvOut : DATA CdvData;
+  cdvIn : DATA CdvData;
+CALLS
+  call:{
+    c1: subprogram TrainSimu_trainSimulation;
+    c3: subprogram TrackPpu_cdvAcquisition;
+    C5: subprogram TrackAcquisition_trackAcquisition;
+  };
+CONNECTIONS
+    cnx: PARAMETER c1.delayed_trainDataIn -> delayed_trainDataIn;
+    cnx2: PARAMETER c1.trainDataOut -> trainDataOut;
+    cnx5: PARAMETER c3.trainDataIn -> trainDataIn;
+    cnx6: PARAMETER c3.cdvOut -> cdvOut;
+    cnx9: PARAMETER c5.cdvIn -> cdvIn;
+    cnx10: PARAMETER c5.trackOut -> trackOut;
+PROPERTIES
+    Compute_Entrypoint_Call_Sequence => reference (call);
+    Maintainability_Property::Maintenance_Budget => 170;
+    Compute_Execution_Time => 13 ms .. 14 ms;
+--ANNEX behavior_specification {**
+--  VARIABLES
+--    trainDataIn : TrainData;
+--    cdvOut : CdvData;
+--    cdvIn : CdvData;
+--  STATES
+--    switch : INITIAL COMPLETE STATE;
+--  TRANSITIONS
+--    unnamed_B1 : switch -[ ON DISPATCH ]-> switch {
+--    TrainSimu_trainSimulation ! (delayed_trainDataIn,trainDataOut);
+--    trainDataOut := trainDataIn;
+--    TrackPpu_cdvAcquisition ! (trainDataIn,cdvOut);
+--    cdvIn := cdvOut;
+--    TrackAcquisition_trackAcquisition ! (cdvIn,trackOut)
+--  };
+--**};
+
+END TrainSimu_trainSimulation_Thread.impl;
+
+THREAD TrainSimu_delayed_trainDataIn_Thread
+FEATURES
+  trainDataIn : IN EVENT DATA PORT TrainData {Dequeue_Protocol => AllItems;};
+  delayed_trainDataIn : OUT EVENT DATA PORT TrainData;
+END TrainSimu_delayed_trainDataIn_Thread;
+
+THREAD IMPLEMENTATION TrainSimu_delayed_trainDataIn_Thread.impl
+CALLS
+  call:{
+    c1: subprogram TrainSimu_delayed_trainDataIn;
+  };
+CONNECTIONS
+    cnx: PARAMETER c1.delayed_trainDataIn -> delayed_trainDataIn;
+    cnx2: PARAMETER c1.trainDataIn -> trainDataIn;
+PROPERTIES
+    Compute_Entrypoint_Call_Sequence => reference (call);
+    Maintainability_Property::Maintenance_Budget => 15;
+    Compute_Execution_Time => 1 ms .. 3 ms;
+--ANNEX behavior_specification {**
+--  STATES
+--    switch : INITIAL COMPLETE STATE;
+--  TRANSITIONS
+--    unnamed_B1 : switch -[ ON DISPATCH ]-> switch {
+--    TrainSimu_delayed_trainDataIn ! (trainDataIn,delayed_trainDataIn)
+--  };
+--**};
+
+END TrainSimu_delayed_trainDataIn_Thread.impl;
+
+END cbtc;
+

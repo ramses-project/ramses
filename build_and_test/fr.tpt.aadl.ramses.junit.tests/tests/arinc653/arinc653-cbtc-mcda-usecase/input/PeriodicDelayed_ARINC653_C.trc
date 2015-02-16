@@ -1,0 +1,262 @@
+Modules 
+{
+	SharedRules ["ACG/PeriodicDelayedCommunication/SharedRules.atl"]:m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput;
+	SharedRules_No_Mutex ["ACG/PeriodicDelayedCommunication/SharedRules_No_Mutex.atl"];
+	EventDataPorts_LowET ["ACG/PeriodicDelayedCommunication/EventDataPorts_LowET.atl"]:m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_LowET,m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_LowET,m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_ReceiveInputs_LowET,m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_LowET,m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_LowET,m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput_LowET;
+    EventDataPorts_LowMFP ["ACG/PeriodicDelayedCommunication/EventDataPorts_LowMFP.atl"]:m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_LowMFP,m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_LowMFP,m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_ReceiveInputs_LowMFP,m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_LowMFP,m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_LowMFP,m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput_LowMFP;
+    EventDataPorts_Mutex_ARINC653 ["ACG/PeriodicDelayedCommunication/EventDataPorts_Mutex_ARINC653.atl"]:m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_ARINC653,m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_Mutex_ARINC653,m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex,m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_Mutex_ARINC653,m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_Mutex_ARINC;
+    EventDataPorts_Mutex ["ACG/PeriodicDelayedCommunication/EventDataPorts_Mutex.atl"]:m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_ReceiveInputs_Mutex,m_Thread_With_Input_PeriodicDelayed_Port,m_Thread_With_Output_PeriodicDelayed_Port,m_Thread_With_Input_and_Output_PeriodicDelayed_Port;
+    ExpandThreadsDispatchProtocol ["ACG/targets/arinc653/ExpandThreadsDispatchProtocol.atl"];
+    BlackboardCommunications ["ACG/targets/arinc653/BlackboardCommunications.atl"]:m_BlackBoard,m_Input_BlackBoard;
+    BufferCommunications ["ACG/targets/arinc653/BufferCommunications.atl"];
+    EventsCommunications ["ACG/targets/arinc653/EventsCommunications.atl"];
+    QueuingCommunications ["ACG/targets/arinc653/QueuingCommunications.atl"];
+    SamplingCommunications ["ACG/targets/arinc653/SamplingCommunications.atl"];
+    ExpandThreadsPorts ["ACG/targets/arinc653/ExpandThreadsPorts.atl"];
+    BehaviorAnnexCommonRefinementSteps ["ACG/targets/shared/BehaviorAnnexCommonRefinementSteps.atl"];
+    PortsCommonRefinementSteps ["ACG/targets/shared/PortsCommonRefinementSteps.atl"]: m_Thread_DataOrEventDataPort_Output_Instance;
+    DispatchCommonRefinementSteps ["ACG/targets/shared/DispatchCommonRefinementSteps.atl"];
+    PortsCommonRefinementSteps ["ACG/targets/shared/PortsCommonRefinementSteps.atl"];
+    SubprogramCallsCommonRefinementSteps ["ACG/targets/shared/SubprogramCallsCommonRefinementSteps.atl"];
+    ThreadsUninstanciateOverride ["ACG/targets/shared/ThreadsUninstanciateOverride.atl"];
+    SubprogramsUninstanciateOverride ["ACG/targets/shared/SubprogramsUninstanciateOverride.atl"];
+    DataUninstanciateOverride ["ACG/targets/shared/DataUninstanciateOverride.atl"];
+    UninstanciateOverride ["ACG/targets/shared/UninstanciateOverride.atl"];
+    copyBehaviorActionBlock ["BehaviorAnnexCopy/copyBehaviorActionBlock.atl"];
+    copyBehaviorCondition ["BehaviorAnnexCopy/copyBehaviorCondition.atl"];
+    copyBehaviorSpecification ["BehaviorAnnexCopy/copyBehaviorSpecification.atl"];
+    copyBehaviorTime ["BehaviorAnnexCopy/copyBehaviorTime.atl"];
+    copyElementHolders ["BehaviorAnnexCopy/copyElementHolders.atl"];
+    PropertiesTools ["tools/PropertiesTools.atl"];
+    Services ["helpers/Services.atl"];
+    ACGServices ["ACG/targets/shared/ACGServices.atl"];
+    ARINC653ACGServices ["ACG/targets/arinc653/Arinc653ACGServices.atl"];
+    IOHelpers ["helpers/IOHelpers.atl"];
+    BehaviorAnnexServices ["helpers/BehaviorAnnexServices.atl"];
+    LanguageSpecificitiesC ["helpers/LanguageSpecificitiesC.atl"];
+    Types ["uninstanciate/Types.atl"];
+    Features ["uninstanciate/Features.atl"];
+    Connections ["uninstanciate/Connections.atl"];
+    Uninstanciate ["Uninstanciate.atl"];
+    Implementations ["uninstanciate/Implementations.atl"];
+}
+
+Transformations { 
+    lowET {
+        modules : 	Uninstanciate,Connections,Features,Implementations,Types,LanguageSpecificitiesC,BehaviorAnnexServices,IOHelpers,PropertiesTools,
+        			Services,ACGServices,ARINC653ACGServices,copyBehaviorSpecification,copyBehaviorActionBlock,copyBehaviorCondition,copyBehaviorTime,copyElementHolders,
+        			UninstanciateOverride,DataUninstanciateOverride,SubprogramsUninstanciateOverride,ThreadsUninstanciateOverride,
+        			SubprogramCallsCommonRefinementSteps,PortsCommonRefinementSteps,DispatchCommonRefinementSteps,BehaviorAnnexCommonRefinementSteps,
+        			ExpandThreadsPorts,ExpandThreadsDispatchProtocol,
+        			BlackboardCommunications,BufferCommunications,SamplingCommunications,QueuingCommunications,
+        			SharedRules,SharedRules_No_Mutex,EventDataPorts_LowET
+        impacts : ( "Memory_Footprint" , 20), ("Threads_Response_Time", 80), ("Maintainability", 10)
+    },
+    lowMFP {
+    	modules: 	Uninstanciate,Connections,Features,Implementations,Types,LanguageSpecificitiesC,BehaviorAnnexServices,IOHelpers,PropertiesTools,
+        			Services,ACGServices,ARINC653ACGServices,copyBehaviorSpecification,copyBehaviorActionBlock,copyBehaviorCondition,copyBehaviorTime,copyElementHolders,
+        			UninstanciateOverride,DataUninstanciateOverride,SubprogramsUninstanciateOverride,ThreadsUninstanciateOverride,
+        			SubprogramCallsCommonRefinementSteps,PortsCommonRefinementSteps,DispatchCommonRefinementSteps,BehaviorAnnexCommonRefinementSteps,
+        			ExpandThreadsPorts,ExpandThreadsDispatchProtocol,
+        			BlackboardCommunications,BufferCommunications,SamplingCommunications,QueuingCommunications,
+        			SharedRules,SharedRules_No_Mutex,EventDataPorts_LowMFP
+        impacts : ( "Memory_Footprint" , 60), ("Threads_Response_Time", 40), ("Maintainability", 50)
+    },
+    lowMC {
+    	modules: 	Uninstanciate,Connections,Features,Implementations,Types,LanguageSpecificitiesC,BehaviorAnnexServices,IOHelpers,PropertiesTools,
+        			Services,ACGServices,ARINC653ACGServices,copyBehaviorSpecification,copyBehaviorActionBlock,copyBehaviorCondition,copyBehaviorTime,copyElementHolders,
+        			UninstanciateOverride,DataUninstanciateOverride,SubprogramsUninstanciateOverride,ThreadsUninstanciateOverride,
+        			SubprogramCallsCommonRefinementSteps,PortsCommonRefinementSteps,DispatchCommonRefinementSteps,BehaviorAnnexCommonRefinementSteps,
+        			ExpandThreadsPorts,ExpandThreadsDispatchProtocol,
+        			BlackboardCommunications,BufferCommunications,SamplingCommunications,QueuingCommunications,
+        			SharedRules,EventDataPorts_Mutex,EventDataPorts_Mutex_ARINC653
+    	impacts : ( "Memory_Footprint" , 50), ("Threads_Response_Time", 30), ("Maintainability", 80)	
+    }
+}
+
+Dependencies {
+  Apply (lowET.EventDataPorts_LowET.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_LowET,{port})
+  [
+    (// checked, it exists in alternatives
+    requires (lowET.EventDataPorts_LowET.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_LowET, 
+      	{"port"})
+    and 
+    // checked, it exists in alternatives
+     requires (lowET.EventDataPorts_LowET.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_ReceiveInputs_LowET, 
+      {"port"})
+    and
+    // checked, it exists in alternatives
+     requires (lowET.PortsCommonRefinementSteps.m_Thread_DataOrEventDataPort_Output_Instance, {"port.dstConnectionInstance->collect(e|e.source)"})
+      and
+      // checked, it exists in alternatives
+      excludes(lowMC.EventDataPorts_Mutex_ARINC653.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_Mutex_ARINC653,{"port"})
+  	  and
+  	  // checked, it exists in alternatives
+  	  excludes(lowMC.EventDataPorts_Mutex.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_ReceiveInputs_Mutex, {"port"})
+  	  and
+  	  // checked, it exists in alternatives
+//  	  excludes(lowMC.EventDataPorts_Mutex.m_Thread_With_Input_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+//  	  and
+  	  // checked, it exists in alternatives
+  	  excludes(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex, {"port.dstConnectionInstance->collect(e|e.source)"})
+  	  and
+  	  // checked, it exists in alternatives
+  	  excludes(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_Mutex_ARINC653, {"port"})
+   )
+  ];
+  Apply(lowET.EventDataPorts_LowET.m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_LowET, {port})
+  [
+  	(
+  		// checked, it exists in alternatives
+  		requires (lowET.EventDataPorts_LowET.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_LowET, {"port"})
+  		and
+  		// checked, it exists in alternatives
+  		requires (lowET.EventDataPorts_LowET.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput_LowET, {"port"})
+  		and
+  		// checked, it exists in alternatives
+     	requires (lowET.PortsCommonRefinementSteps.m_Thread_DataOrEventDataPort_Output_Instance, {"port"})
+     	and
+     	// checked, it exists in alternatives
+     	excludes (lowMC.EventDataPorts_Mutex_ARINC653.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_ARINC653, {"port.srcConnectionInstance->collect(e|e.destination)"})
+     	and
+     	// checked, it exists in alternatives
+     	excludes(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_Mutex_ARINC653, {"port"})
+  		and
+  		// checked, it exists in alternatives
+  		(
+  			excludes(lowMC.EventDataPorts_Mutex.m_Thread_With_Input_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  			or
+  			excludes (lowMC.EventDataPorts_Mutex.m_Thread_With_Input_and_Output_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  		)
+  		and
+  		// checked, it exists in alternatives
+  		(
+  			excludes (lowMC.EventDataPorts_Mutex.m_Thread_With_Output_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  			or
+  			excludes (lowMC.EventDataPorts_Mutex.m_Thread_With_Input_and_Output_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  		)
+  		and
+  		// checked, it exists in alternatives
+  		excludes(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex, {"port"})
+  	)
+  ];
+  Apply (lowMFP.EventDataPorts_LowMFP.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_LowMFP,{port})
+  [
+    (
+      // checked, it exists in alternatives
+      requires (lowMFP.EventDataPorts_LowMFP.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_LowMFP, {"port"})
+    and
+     // checked, it exists in alternatives
+     requires (lowMFP.EventDataPorts_LowMFP.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_ReceiveInputs_LowMFP, {"port"})
+    and
+     // checked, it exists in alternatives
+     requires (lowMFP.PortsCommonRefinementSteps.m_Thread_DataOrEventDataPort_Output_Instance, {"port.dstConnectionInstance->collect(e|e.source)"})
+     and
+      // checked, it exists in alternatives
+      excludes(lowMC.EventDataPorts_Mutex_ARINC653.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_Mutex_ARINC653,{"port"})
+  	  and
+  	  // checked, it exists in alternatives
+  	  excludes(lowMC.EventDataPorts_Mutex.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_ReceiveInputs_Mutex, {"port"})
+  	  and
+  	  // checked, it exists in alternatives
+  	  (
+  	  	excludes(lowMC.EventDataPorts_Mutex.m_Thread_With_Input_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  	  	or
+  		excludes (lowMC.EventDataPorts_Mutex.m_Thread_With_Input_and_Output_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  	  )
+  	  and
+  	  // checked, it exists in alternatives
+  	  excludes(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex, {"port.dstConnectionInstance->collect(e|e.source)"})
+  	  and
+  	  // checked, it exists in alternatives
+  	  excludes(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_Mutex_ARINC653, {"port.dstConnectionInstance->collect(e|e.source)"})
+   )
+  ];
+  Apply(lowMFP.EventDataPorts_LowMFP.m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_LowMFP, {port})
+  [
+  	(
+  		// checked, it exists in alternatives
+  		requires (lowMFP.EventDataPorts_LowMFP.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_LowMFP, {"port"})
+  		and
+  		// checked, it exists in alternatives
+  		requires (lowMFP.EventDataPorts_LowMFP.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput_LowMFP, {"port"})
+  		and
+  		// checked, it exists in alternatives
+     	requires (lowMFP.PortsCommonRefinementSteps.m_Thread_DataOrEventDataPort_Output_Instance, {"port"})
+     	and
+     	// checked, it exists in alternatives
+     	excludes (lowMC.EventDataPorts_Mutex_ARINC653.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_ARINC653, {"port.srcConnectionInstance->collect(e|e.destination)"})
+     	and
+     	// checked, it exists in alternatives
+     	excludes(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_Mutex_ARINC653, {"port"})
+  		and
+  		// checked, it exists in alternatives
+  		(
+  			excludes(lowMC.EventDataPorts_Mutex.m_Thread_With_Input_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  			or
+  			excludes (lowMC.EventDataPorts_Mutex.m_Thread_With_Input_and_Output_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  		)
+  		and
+  		// checked, it exists in alternatives
+  		(
+  			excludes (lowMC.EventDataPorts_Mutex.m_Thread_With_Output_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  			or
+  			excludes (lowMC.EventDataPorts_Mutex.m_Thread_With_Input_and_Output_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  		)
+  		and
+  		// checked, it exists in alternatives
+  		excludes(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex, {"port"})
+  	)
+  ];
+  
+  Apply (lowMC.EventDataPorts_Mutex_ARINC653.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_ARINC653, {port})
+  [
+  	(
+  		// checked, it exists in alternatives
+  		requires(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex, {"port.dstConnectionInstance->collect(e|e.source)"})
+  		and
+  		// checked, it exists in alternatives
+  		requires(lowMC.EventDataPorts_Mutex_ARINC653.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_Mutex_ARINC653,{"port"})
+  		and
+  		// checked, it exists in alternatives
+  		requires(lowMC.EventDataPorts_Mutex.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_ReceiveInputs_Mutex, {"port"})
+  		and
+  		// checked, it exists in alternatives
+  		requires(lowMC.EventDataPorts_Mutex_ARINC653.m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_Mutex_ARINC, {"port.dstConnectionInstance->collect(e|e.source)"})
+  		and
+  		// checked, it exists in alternatives
+  		(
+  			requires(lowMC.EventDataPorts_Mutex.m_Thread_With_Input_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  			or
+  			requires (lowMC.EventDataPorts_Mutex.m_Thread_With_Input_and_Output_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  		)
+  		and
+  		excludes(lowET.PortsCommonRefinementSteps.m_Thread_DataOrEventDataPort_Output_Instance, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  	)
+  ];
+  Apply (lowMC.EventDataPorts_Mutex_ARINC653.m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_Mutex_ARINC, {port})
+  [
+  	(
+  		// checked, it exists in alternatives
+  		requires(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex, {"port"})
+  		and
+  		// checked, it exists in alternatives
+  		requires (lowMC.SharedRules.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput, {"port"})
+  		and
+  		// checked, it exists in alternatives
+  		requires(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_Mutex_ARINC653, {"port"})
+  		and
+  		// checked, it exists in alternatives
+  		requires (lowMC.EventDataPorts_Mutex_ARINC653.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_ARINC653, {"port.srcConnectionInstance->collect(e|e.destination)"})
+  		and
+  		// checked, it exists in alternatives
+  		(
+  			requires (lowMC.EventDataPorts_Mutex.m_Thread_With_Output_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  			or
+  			requires (lowMC.EventDataPorts_Mutex.m_Thread_With_Input_and_Output_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  		)
+  		and
+  		excludes(lowET.PortsCommonRefinementSteps.m_Thread_DataOrEventDataPort_Output_Instance, {"port"})
+  	)
+  ];
+}

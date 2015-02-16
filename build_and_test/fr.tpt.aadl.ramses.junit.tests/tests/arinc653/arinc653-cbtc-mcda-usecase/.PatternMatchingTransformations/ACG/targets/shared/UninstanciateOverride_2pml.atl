@@ -1,0 +1,236 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @nsURI AADLI=http:///AADL2/instance
+-- @atlcompiler emftvm
+module UninstanciateOverride;
+create OUT : MM_ATL2PM from IN : AADLI;
+
+helper context AADLI!ComponentImplementation def: needsCopy() : Boolean =
+ self.type.needsCopy();
+
+helper context AADLI!ComponentType def: needsCopy() : Boolean =
+ if self.oclIsKindOf(AADLI!SubprogramType) then
+  self.subprogramNeedsCopy()
+ else
+  false
+ endif;
+
+helper context AADLI!ComponentType def: subprogramNeedsCopy() : Boolean =
+ if self.oclIsKindOf(AADLI!SubprogramType) and self.ownedPrototype->isEmpty() then
+  not self.ownedEventPort->isEmpty() or not self.ownedEventDataPort->isEmpty()
+ else
+  false
+ endif;
+
+helper context AADLI!FeatureInstance def: getOutputPortId(processInstance : AADLI!ComponentInstance) : Integer =
+ processInstance.componentInstance->select(e |
+  e.category = #thread
+ )->collect(e |
+  e.featureInstance
+ )->flatten()->select(e |
+  e.feature.oclIsKindOf(AADLI!Port) and e.direction = #out
+ )->indexOf(self) - 1; --- Next is used to remove systems hierarchy in ContainmentPathElement
+--- Next is used to remove systems hierarchy in ContainmentPathElement
+helper def: createContainmentPathElement(neList : Sequence(AADLI!NamedElement)) : AADLBA!ContainmentPathElement =
+ thisModule.createContainmentPathElementLazyRule(neList->select(e |
+  e.oclIsKindOf(AADLI!ComponentInstance) and not(e.category = #system)
+ ));
+
+rule m_RootSystem_Instance {
+ from
+  c : AADLI!SystemInstance
+  (
+   c.category = #system and c.eContainer().oclIsUndefined()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'UninstanciateOverride.m_RootSystem_Instance'
+  )
+} -------- End of code to remove systems hirarchy
+-- @extends m_Component_Instance
+-------- End of code to remove systems hirarchy
+-- @extends m_Component_Instance
+rule m_Processor_Instance {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.category = #processor
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'UninstanciateOverride.m_Processor_Instance'
+  )
+} -- @extends m_Component_Instance
+-- @extends m_Component_Instance
+rule m_Memory_Instance {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.category = #memory
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'UninstanciateOverride.m_Memory_Instance'
+  )
+} -- @extends m_Component_Instance
+-- @extends m_Component_Instance
+rule m_Process_Instance {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.category = #process
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'UninstanciateOverride.m_Process_Instance'
+  )
+} -- @extends m_Connection_Reference
+-- @extends m_Connection_Reference
+rule m_AccessConnection_Reference {
+ from
+  cnxRef : AADLI!ConnectionReference
+  (
+   cnxRef.eContainer().kind = #accessConnection and not(cnxRef.connection.accessCategory = #subprogram)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {cnxRef},
+   value <- 'UninstanciateOverride.m_AccessConnection_Reference'
+  )
+} --rule m_PropertyAssociationAppliesToSelf { 
+--    from 
+--    	p : AADLI!PropertyAssociation in IN
+--		(p.collectInstanceReferenceValue()->isEmpty()
+--		 and
+--		 not p.property.name.equalsIgnoreCase('Compute_Entrypoint_Call_Sequence')
+--		)
+--    to
+--    	p2 : AADLBA!PropertyAssociation (
+--    		property <- thisModule.getProperty(p.property.getAbsoluteName()),  
+--    		appliesTo <- p.appliesTo,
+--    		inBinding <- p.inBinding,
+--    		append <- p.append,
+--    		constant <- p.constant,
+--			ownedValue <- p.ownedValue
+--    	)
+--}
+--
+--rule m_SubprogramCallSequence
+--{
+--	from
+--		seq : AADLI!SubprogramCallSequence
+--}
+--
+--rule m_SubprogramCall
+--{
+--	from
+--		sc: AADLI!SubprogramCall
+--}
+--rule m_PropertyAssociationAppliesToSelf { 
+--    from 
+--    	p : AADLI!PropertyAssociation in IN
+--		(p.collectInstanceReferenceValue()->isEmpty()
+--		 and
+--		 not p.property.name.equalsIgnoreCase('Compute_Entrypoint_Call_Sequence')
+--		)
+--    to
+--    	p2 : AADLBA!PropertyAssociation (
+--    		property <- thisModule.getProperty(p.property.getAbsoluteName()),  
+--    		appliesTo <- p.appliesTo,
+--    		inBinding <- p.inBinding,
+--    		append <- p.append,
+--    		constant <- p.constant,
+--			ownedValue <- p.ownedValue
+--    	)
+--}
+--
+--rule m_SubprogramCallSequence
+--{
+--	from
+--		seq : AADLI!SubprogramCallSequence
+--}
+--
+--rule m_SubprogramCall
+--{
+--	from
+--		sc: AADLI!SubprogramCall
+--}
+rule m_SubprogramAccessConnection_Reference {
+ from
+  cnxRef : AADLI!ConnectionReference
+  (
+   cnxRef.eContainer().kind = #accessConnection and cnxRef.connection.accessCategory = #subprogram
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {cnxRef},
+   value <- 'UninstanciateOverride.m_SubprogramAccessConnection_Reference'
+  )
+}
+
+rule m_ParameterConnection_Reference {
+ from
+  cnxRef : AADLI!ConnectionReference
+  (
+   cnxRef.eContainer().kind = #parameterConnection
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {cnxRef},
+   value <- 'UninstanciateOverride.m_ParameterConnection_Reference'
+  )
+}
+
+rule m_FeatureGroupConnection_Reference {
+ from
+  cnxRef : AADLI!ConnectionReference
+  (
+   cnxRef.eContainer().kind = #featureGroupConnection
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {cnxRef},
+   value <- 'UninstanciateOverride.m_FeatureGroupConnection_Reference'
+  )
+}
+
+helper def: collectInitializationEntryPoint(c : AADLI!ComponentInstance) : AADLBA!PropertyAssociation =
+ OclUndefined;
+
+helper def: collectThreadVariables(c : AADLI!ComponentInstance) : AADLBA!DataSubcomponent =
+ if c.isSporadicThread() then
+  thisModule.collectSporadicThreadVariables(c)
+ else
+  Sequence {}
+ endif->union(thisModule.collectPeriodicDelayed_ThreadVariables(c));
+
+helper context AADLI!FeatureInstance def: collectPortGlobalVariableImg() : Sequence(AADLBA!DataSubcomponent) =
+ Sequence {thisModule.resolveMatchedSingleIfExists(self, 'globalVariable')};
+
+helper context AADLI!ComponentInstance def: collectGlobalVariableImg() : Sequence(AADLBA!DataSubcomponent) =
+ Sequence {};
+
+helper context AADLI!ComponentInstance def: retrieveErrorHandler() : Sequence(AADLBA!SubprogramSubcomponent) =
+ Sequence {};
