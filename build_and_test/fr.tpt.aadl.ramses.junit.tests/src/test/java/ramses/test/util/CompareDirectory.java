@@ -14,8 +14,8 @@ public class CompareDirectory {
   private int maxPath = 20;
   private ArrayList<File> listRef;
   private ArrayList<File> listGen;
-  private static ArrayList<String> ignored_files;
-  private static ArrayList<String> ignored_dir;
+  private ArrayList<String> ignored_files;
+  private ArrayList<String> ignored_dir;
   File rootRef;
   File rootGen;
   
@@ -170,7 +170,7 @@ public class CompareDirectory {
    * @param list
    * @throws IOException 
    */
-  private static void iterateOnDirectories(String repertoire, int j, ArrayList<File> list) throws IOException {
+  private void iterateOnDirectories(String repertoire, int j, ArrayList<File> list) throws IOException {
 
     File rep = new File(repertoire);
     if (!rep.exists())
@@ -196,7 +196,7 @@ public class CompareDirectory {
    * @param maxDepth
    * @param list
    */
-  public static void iterateOnDirectories(File dir, int depth, int maxDepth,
+  public void iterateOnDirectories(File dir, int depth, int maxDepth,
       ArrayList<File> list) {
     if (depth > maxDepth || dir.getName().contains(".svn")) {
       return;
@@ -218,14 +218,14 @@ public class CompareDirectory {
     }
   }
 
-  private static  Boolean isIgnoredFile (File f){
+  private  Boolean isIgnoredFile (File f){
 	  Boolean res = false;
 	  for ( String i : ignored_files)
 		  res = res || f.getName().endsWith(i);	  
 	  return res;
   }
   
-  private static Boolean isIgnoredDir (File f){
+  private Boolean isIgnoredDir (File f){
 	  Boolean res = false;
 	  for ( String i : ignored_dir)
 		  res = res || f.getName().endsWith(i);	  
