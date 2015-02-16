@@ -1,0 +1,147 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @nsURI AADLI=http:///AADL2/instance
+-- @atlcompiler emftvm
+module PropertiesTools;
+create OUT : MM_ATL2PM from IN : AADLI, BASE_TYPES : AADLBA, AADL_RUNTIME : AADLBA, DATA_MODEL : AADLBA, SCHEDULER_CONSTANTS : AADLBA, SCHEDULER_REALIZATIONS : AADLBA, SCHEDULER_RUNTIME : AADLBA;
+
+helper context AADLI!ComponentInstance def: hasProperty(propertyName : String) : Boolean =
+ self.ownedPropertyAssociation->exists(e |
+  e.property.name.toLower() = propertyName.toLower()
+ );
+
+helper context AADLI!ComponentInstance def: hasPropertyAssigned(p : AADLI!Property) : Boolean =
+ self.ownedPropertyAssociation->exists(e |
+  e.property = p
+ );
+
+helper context AADLI!ComponentImplementation def: hasProperty(propertyName : String) : Boolean =
+ self.getAllPropertyAssociations()->exists(e |
+  e.property.name.toLower() = propertyName.toLower()
+ ) or self.type.hasProperty(propertyName);
+
+helper context AADLI!ComponentType def: hasProperty(propertyName : String) : Boolean =
+ self.getAllPropertyAssociations()->exists(e |
+  e.property.name.toLower() = propertyName.toLower()
+ );
+
+helper context AADLI!NamedElement def: hasPropertyAssigned(p : AADLI!Property) : Boolean =
+ self.getAllPropertyAssociations()->exists(e |
+  e.property = p
+ );
+
+helper context String def: asBaseType() : AADLBA!Classifier =
+ AADLBA!Classifier->allInstancesFrom('BASE_TYPES')->any(c |
+  c.name = self
+ );
+
+helper context String def: asDataType(model : String) : AADLBA!Classifier =
+ AADLBA!Classifier->allInstancesFrom(model)->any(c |
+  c.name = self
+ );
+
+helper context String def: asSubprogramType(model : String) : AADLBA!Classifier =
+ AADLBA!Classifier->allInstancesFrom(model)->any(c |
+  c.name = self
+ );
+
+helper context String def: asProperty(model : String) : AADLBA!Property =
+ AADLBA!Property->allInstancesFrom(model)->any(p |
+  p.name = self
+ );
+
+helper context String def: asEnumeration(model : String) : AADLBA!EnumerationLiteral =
+ AADLBA!EnumerationLiteral->allInstancesFrom(model)->any(e |
+  e.name = self
+ );
+
+helper context String def: asClassifier(model : String) : AADLBA!Classifier =
+ AADLBA!Classifier->allInstancesFrom(model)->any(p |
+  p.name = self
+ );
+
+helper def: getStringListValue(v : AADLBA!ModalPropertyValue) : Sequence(String) =
+ v.ownedValue.getOwnedListElements()->collect(e |
+  e.getValue()
+ );
+
+helper def: getProperty(propertyName : String) : AADLBA!Property =
+ if propertyName.contains('::') then
+  let index : Integer = propertyName.indexOf('::') in
+  let psName : String = propertyName.substring(1, index - 1) in
+  let propName : String = propertyName.substring(index + 2, propertyName.size()) in
+  AADLBA!PropertySet->allInstances()->select(ps |
+   ps.name.toLower() = psName.toLower()
+  )->collect(ps |
+   ps.ownedProperty
+  )->flatten()->any(p |
+   p.name.toLower() = propName.toLower()
+  )
+ else
+  AADLBA!PropertySet->allInstances()->collect(ps |
+   ps.ownedProperty
+  )->flatten()->any(p |
+   p.name.toLower() = propertyName.toLower()
+  )
+ endif;
+
+helper context AADLBA!NamedElement def: getPropertyIntValue(propertyName : String) : Integer =
+ let v : AADLBA!ModalPropertyValue = self.ownedPropertyAssociation->any(pa |
+  pa.property.name = propertyName
+ ) in
+ if v.oclIsUndefined() then
+  OclUndefined
+ else
+  v.ownedValue->first().ownedValue.value
+ endif;
+
+helper context AADLBA!NamedElement def: getPropertyAssociation(propertyType : String) : AADLBA!PropertyAssociation =
+ let propertyAssociations : Sequence(AADLBA!PropertyAssociation) = self.ownedPropertyAssociation in
+ let selection : Sequence(AADLBA!PropertyAssociation) = propertyAssociations->select(p |
+  p.isIdentifiedPropertyAssociation(propertyType.toLower()) = true
+ ) in
+ if not selection->isEmpty() then
+  selection->first()
+ else
+  OclUndefined
+ endif;
+
+helper context AADLBA!NamedElement def: getModalPropertyValue(propertyType : String) : AADLBA!ModalPropertyValue =
+ if not self.getPropertyAssociation(propertyType).oclIsUndefined() then
+  self.getPropertyAssociation(propertyType).ownedValue->first()
+ else
+  if self.oclIsTypeOf(AADLBA!ComponentImplementation) then
+   self.type.getPropertyAssociation(propertyType).ownedValue->first()
+  else
+   OclUndefined
+  endif
+ endif;
+
+helper context AADLBA!PropertyAssociation def: isIdentifiedPropertyAssociation(identifier : String) : Boolean =
+ if self.property.oclIsUndefined() or self.property.name.oclIsUndefined() then
+  false.debug('UNDEFINED OR UNAMED')
+ else
+  if self.property.name.toLower() = identifier.toLower() then
+   true
+  else
+   false
+  endif
+ endif;

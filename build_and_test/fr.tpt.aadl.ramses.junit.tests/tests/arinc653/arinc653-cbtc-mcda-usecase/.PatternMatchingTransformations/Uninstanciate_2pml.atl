@@ -1,0 +1,326 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @nsURI AADLI=http:///AADL2/instance
+-- @atlcompiler emftvm
+module Uninstanciate;
+create OUT : MM_ATL2PM from IN : AADLI, HOOKS : ATLHOOKS;
+
+rule Comment {
+ from
+  c : AADLI!Comment
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'Uninstanciate.Comment'
+  )
+} -------------------------------------------------------------------------------------
+---  RULES FOR KINDS OF COMPONENT INSTANCES
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+---  RULES FOR KINDS OF COMPONENT INSTANCES
+-------------------------------------------------------------------------------------
+helper def: allImportedUnits : Sequence(AADLBA!ModelUnit) =
+ Sequence {};
+
+helper def: getPackageSuffix() : String =
+ '_' + thisModule.theHOOK.getOutputPackageName();
+
+rule m_RootSystem_Instance {
+ from
+  c : AADLI!SystemInstance
+  (
+   c.category = #system and c.eContainer().oclIsUndefined()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'Uninstanciate.m_RootSystem_Instance'
+  )
+}
+
+--rule m_System_Instance {
+--	from
+--		c : AADLI!ComponentInstance (c.category = #system and not c.eContainer().oclIsUndefined())
+--	to
+--		sub : AADLBA!SystemSubcomponent
+--		(
+--			name <- c.subcomponent.name,
+--			systemSubcomponentType <- c.subcomponent.subcomponentType
+--		)
+--	do
+--	{
+--		c.subcomponent.systemSubcomponentType.resolve().ownedPropertyAssociation <- c.getPropertyAssociationImg();
+--		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+--	}
+--}
+helper context AADLI!ComponentInstance def: getInstanceReferenceValue() : Sequence(AADLI!PropertyAssociation) =
+ self.componentInstance->collect(e |
+  e.ownedPropertyAssociation->select(f |
+   not f.collectInstanceReferenceValue()->isEmpty() and not f.collectInstanceReferenceValue()->select(g |
+    not g.referencedInstanceObject.isContainedIn(self)
+   )->isEmpty()
+  )
+ )->union(self.componentInstance->collect(e |
+  e.getInstanceReferenceValue()
+ ))->flatten();
+
+helper context AADLI!InstanceObject def: isContainedIn(container : AADLI!InstanceObject) : Boolean =
+ if container.oclIsTypeOf(AADLI!ComponentInstance) then
+  container.componentInstance->union(container.featureInstance)->includes(self)
+ else
+  false
+ endif;
+
+rule m_Mode_Instance {
+ from
+  m : AADLI!ModeInstance
+  (
+   m.eContainer().oclIsTypeOf(AADLI!ComponentInstance)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {m},
+   value <- 'Uninstanciate.m_Mode_Instance'
+  )
+}
+
+rule m_ModeTransition_Instance {
+ from
+  m : AADLI!ModeTransitionInstance
+  (
+   m.eContainer().oclIsTypeOf(AADLI!ComponentInstance)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {m},
+   value <- 'Uninstanciate.m_ModeTransition_Instance'
+  )
+}
+
+abstract rule m_Component_Instance {
+ from
+  c : AADLI!ComponentInstance in IN
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'Uninstanciate.m_Component_Instance'
+  )
+}
+
+-- @extends m_Component_Instance
+rule m_Memory_Instance {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.category = #memory
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'Uninstanciate.m_Memory_Instance'
+  )
+} -- @extends m_Component_Instance
+-- @extends m_Component_Instance
+rule m_Bus_Instance {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.category = #bus
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'Uninstanciate.m_Bus_Instance'
+  )
+} -- @extends m_Component_Instance
+-- @extends m_Component_Instance
+rule m_Device_Instance {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.category = #device
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'Uninstanciate.m_Device_Instance'
+  )
+} -- @extends m_Component_Instance
+-- @extends m_Component_Instance
+rule m_Processor_Instance {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.category = #processor
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'Uninstanciate.m_Processor_Instance'
+  )
+} -- @extends m_Component_Instance
+-- @extends m_Component_Instance
+rule m_VirtualProcessor_Instance {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.category.getName() = 'virtual processor'
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'Uninstanciate.m_VirtualProcessor_Instance'
+  )
+} -- @extends m_Component_Instance
+-- @extends m_Component_Instance
+rule m_Thread_Instance {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.category = #thread
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'Uninstanciate.m_Thread_Instance'
+  )
+} -- @extends m_Component_Instance
+-- @extends m_Component_Instance
+rule m_Subprogram_Instance {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.category = #subprogram
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'Uninstanciate.m_Subprogram_Instance'
+  )
+} -- @extends m_Component_Instance
+-- @extends m_Component_Instance
+rule m_Process_Instance {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.category = #process
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'Uninstanciate.m_Process_Instance'
+  )
+} -- @extends m_Component_Instance
+-- @extends m_Component_Instance
+rule m_Data_Instance {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.category = #data
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'Uninstanciate.m_Data_Instance'
+  )
+} ------------------------------------------------------------------------------------
+--- Filters
+------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
+--- Filters
+------------------------------------------------------------------------------------
+abstract rule m_Thread_Instance_Filter {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.category = #thread
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'Uninstanciate.m_Thread_Instance_Filter'
+  )
+}
+
+abstract rule m_BA_Filter {
+ from
+  behavior : AADLI!AnnexSubclause
+  (
+   behavior.oclIsTypeOf(AADLBA!BehaviorAnnex)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {behavior},
+   value <- 'Uninstanciate.m_BA_Filter'
+  )
+}
+
+abstract rule m_DataPort_Filter {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isDataPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'Uninstanciate.m_DataPort_Filter'
+  )
+}
+
+abstract rule m_EventOrEnvetDataPort_Filter {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isEventOrEventDataPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'Uninstanciate.m_EventOrEnvetDataPort_Filter'
+  )
+}
+
+abstract rule m_ThreadPort_Filter {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isThreadPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'Uninstanciate.m_ThreadPort_Filter'
+  )
+}
+
+abstract rule m_OutputFeature_Filter {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isOutputFeature()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'Uninstanciate.m_OutputFeature_Filter'
+  )
+}
