@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ASCII"?>
 <instance:SystemInstance xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aadl2="http://aadl.info/AADL/2.0" xmlns:instance="http://aadl.info/AADL/2.0/instance" name="refined_model_impl_Instance" category="system">
-  <componentInstance name="the_bus" dstConnectionInstance="//@connectionInstance.0 //@connectionInstance.1" category="bus">
-    <subcomponent xsi:type="aadl2:BusSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedBusSubcomponent.0"/>
+  <componentInstance name="the_bus" category="bus">
+    <subcomponent xsi:type="aadl2:BusSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedBusSubcomponent.0"/>
     <index>0</index>
   </componentInstance>
   <componentInstance name="the_mem1" category="memory">
@@ -40,7 +40,7 @@
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
-      <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.5/@ownedMemorySubcomponent.0"/>
+      <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.2/@ownedMemorySubcomponent.0"/>
       <index>0</index>
     </componentInstance>
     <componentInstance name="part2_mem" category="memory">
@@ -70,10 +70,10 @@
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
-      <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.5/@ownedMemorySubcomponent.1"/>
+      <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.2/@ownedMemorySubcomponent.1"/>
       <index>0</index>
     </componentInstance>
-    <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedMemorySubcomponent.0"/>
+    <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedMemorySubcomponent.0"/>
     <index>0</index>
   </componentInstance>
   <componentInstance name="the_mem2" category="memory">
@@ -112,7 +112,7 @@
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
-      <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.5/@ownedMemorySubcomponent.0"/>
+      <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.8/@ownedMemorySubcomponent.0"/>
       <index>0</index>
     </componentInstance>
     <componentInstance name="part2_mem" category="memory">
@@ -142,10 +142,10 @@
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
-      <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.5/@ownedMemorySubcomponent.1"/>
+      <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.8/@ownedMemorySubcomponent.1"/>
       <index>0</index>
     </componentInstance>
-    <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedMemorySubcomponent.1"/>
+    <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedMemorySubcomponent.1"/>
     <index>0</index>
   </componentInstance>
   <componentInstance name="the_cpu1_system_part_comProcess" category="process">
@@ -189,7 +189,7 @@
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
-      <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedDataSubcomponent.0"/>
+      <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.19/@ownedDataSubcomponent.0"/>
       <index>0</index>
     </componentInstance>
     <componentInstance name="system_part_comm" category="thread">
@@ -228,7 +228,7 @@
         <ownedValue>
           <ownedValue xsi:type="aadl2:ReferenceValue">
             <path>
-              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.20/@ownedSubprogramCallSequence.1"/>
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.29/@ownedSubprogramCallSequence.1"/>
             </path>
           </ownedValue>
         </ownedValue>
@@ -246,13 +246,13 @@
         <ownedValue>
           <ownedValue xsi:type="aadl2:ReferenceValue">
             <path>
-              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.20/@ownedSubprogramCallSequence.0"/>
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.29/@ownedSubprogramCallSequence.0"/>
             </path>
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
       <featureInstance name="p_out" dstConnectionInstance="//@componentInstance.3/@connectionInstance.0" category="dataAccess" direction="in out">
-        <feature xsi:type="aadl2:DataAccess" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.21/@ownedDataAccess.0"/>
+        <feature xsi:type="aadl2:DataAccess" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.30/@ownedDataAccess.0"/>
       </featureInstance>
       <componentInstance name="the_proc1_p_out_createVirtualPortId" category="data">
         <ownedPropertyAssociation>
@@ -287,7 +287,7 @@
             </ownedValue>
           </ownedValue>
         </ownedPropertyAssociation>
-        <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.20/@ownedDataSubcomponent.0"/>
+        <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.29/@ownedDataSubcomponent.0"/>
         <index>0</index>
       </componentInstance>
       <componentInstance name="the_proc1_p_out_createVirtualPortName" category="data">
@@ -315,7 +315,7 @@
             </ownedValue>
           </ownedValue>
         </ownedPropertyAssociation>
-        <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.20/@ownedDataSubcomponent.1"/>
+        <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.29/@ownedDataSubcomponent.1"/>
         <index>0</index>
       </componentInstance>
       <componentInstance name="the_proc1_p_out_length" category="data">
@@ -359,10 +359,10 @@
             </ownedValue>
           </ownedValue>
         </ownedPropertyAssociation>
-        <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.20/@ownedDataSubcomponent.2"/>
+        <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.29/@ownedDataSubcomponent.2"/>
         <index>0</index>
       </componentInstance>
-      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedThreadSubcomponent.0"/>
+      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.19/@ownedThreadSubcomponent.0"/>
       <index>0</index>
     </componentInstance>
     <componentInstance name="the_cpu1_system_part_comm" category="thread">
@@ -401,7 +401,7 @@
         <ownedValue>
           <ownedValue xsi:type="aadl2:ReferenceValue">
             <path>
-              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.25/@ownedSubprogramCallSequence.1"/>
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.34/@ownedSubprogramCallSequence.1"/>
             </path>
           </ownedValue>
         </ownedValue>
@@ -419,20 +419,20 @@
         <ownedValue>
           <ownedValue xsi:type="aadl2:ReferenceValue">
             <path>
-              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.25/@ownedSubprogramCallSequence.0"/>
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.34/@ownedSubprogramCallSequence.0"/>
             </path>
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
-      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedThreadSubcomponent.1"/>
+      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.19/@ownedThreadSubcomponent.1"/>
       <index>0</index>
     </componentInstance>
     <connectionInstance name="the_cpu1_system_part_comProcess_the_proc1_p_outglobalVariable -> system_part_comm.p_out" complete="true" kind="accessConnection" destination="//@componentInstance.3/@componentInstance.1/@featureInstance.0" source="//@componentInstance.3/@componentInstance.0">
       <connectionReference context="//@componentInstance.3" source="//@componentInstance.3/@componentInstance.0" destination="//@componentInstance.3/@componentInstance.1/@featureInstance.0">
-        <connection xsi:type="aadl2:AccessConnection" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedAccessConnection.0"/>
+        <connection xsi:type="aadl2:AccessConnection" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.19/@ownedAccessConnection.0"/>
       </connectionReference>
     </connectionInstance>
-    <subcomponent xsi:type="aadl2:ProcessSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedProcessSubcomponent.0"/>
+    <subcomponent xsi:type="aadl2:ProcessSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedProcessSubcomponent.0"/>
     <index>0</index>
   </componentInstance>
   <componentInstance name="the_cpu2_system_part_comProcess" category="process">
@@ -476,7 +476,7 @@
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
-      <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.1/@ownedDataSubcomponent.0"/>
+      <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.21/@ownedDataSubcomponent.0"/>
       <index>0</index>
     </componentInstance>
     <componentInstance name="system_part_comm" category="thread">
@@ -515,7 +515,7 @@
         <ownedValue>
           <ownedValue xsi:type="aadl2:ReferenceValue">
             <path>
-              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.30/@ownedSubprogramCallSequence.1"/>
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.39/@ownedSubprogramCallSequence.1"/>
             </path>
           </ownedValue>
         </ownedValue>
@@ -533,13 +533,13 @@
         <ownedValue>
           <ownedValue xsi:type="aadl2:ReferenceValue">
             <path>
-              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.30/@ownedSubprogramCallSequence.0"/>
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.39/@ownedSubprogramCallSequence.0"/>
             </path>
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
       <featureInstance name="the_proc2_p_in_cnx_p_in" dstConnectionInstance="//@componentInstance.4/@connectionInstance.0" category="dataAccess" direction="in out">
-        <feature xsi:type="aadl2:DataAccess" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.31/@ownedDataAccess.0"/>
+        <feature xsi:type="aadl2:DataAccess" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.40/@ownedDataAccess.0"/>
       </featureInstance>
       <componentInstance name="the_proc2_p_in_createVirtualPortId" category="data">
         <ownedPropertyAssociation>
@@ -574,7 +574,7 @@
             </ownedValue>
           </ownedValue>
         </ownedPropertyAssociation>
-        <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.30/@ownedDataSubcomponent.0"/>
+        <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.39/@ownedDataSubcomponent.0"/>
         <index>0</index>
       </componentInstance>
       <componentInstance name="the_proc2_p_in_createVirtualPortName" category="data">
@@ -602,7 +602,7 @@
             </ownedValue>
           </ownedValue>
         </ownedPropertyAssociation>
-        <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.30/@ownedDataSubcomponent.1"/>
+        <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.39/@ownedDataSubcomponent.1"/>
         <index>0</index>
       </componentInstance>
       <componentInstance name="the_proc2_p_in_length" category="data">
@@ -646,10 +646,10 @@
             </ownedValue>
           </ownedValue>
         </ownedPropertyAssociation>
-        <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.30/@ownedDataSubcomponent.2"/>
+        <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.39/@ownedDataSubcomponent.2"/>
         <index>0</index>
       </componentInstance>
-      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.1/@ownedThreadSubcomponent.0"/>
+      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.21/@ownedThreadSubcomponent.0"/>
       <index>0</index>
     </componentInstance>
     <componentInstance name="the_cpu2_system_part_comm" category="thread">
@@ -688,7 +688,7 @@
         <ownedValue>
           <ownedValue xsi:type="aadl2:ReferenceValue">
             <path>
-              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.35/@ownedSubprogramCallSequence.1"/>
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.44/@ownedSubprogramCallSequence.1"/>
             </path>
           </ownedValue>
         </ownedValue>
@@ -706,20 +706,20 @@
         <ownedValue>
           <ownedValue xsi:type="aadl2:ReferenceValue">
             <path>
-              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.35/@ownedSubprogramCallSequence.0"/>
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.44/@ownedSubprogramCallSequence.0"/>
             </path>
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
-      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.1/@ownedThreadSubcomponent.1"/>
+      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.21/@ownedThreadSubcomponent.1"/>
       <index>0</index>
     </componentInstance>
     <connectionInstance name="the_cpu2_system_part_comProcess_the_proc2_p_in_globalVariable -> system_part_comm.the_proc2_p_in_cnx_p_in" complete="true" kind="accessConnection" destination="//@componentInstance.4/@componentInstance.1/@featureInstance.0" source="//@componentInstance.4/@componentInstance.0">
       <connectionReference context="//@componentInstance.4" source="//@componentInstance.4/@componentInstance.0" destination="//@componentInstance.4/@componentInstance.1/@featureInstance.0">
-        <connection xsi:type="aadl2:AccessConnection" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.1/@ownedAccessConnection.0"/>
+        <connection xsi:type="aadl2:AccessConnection" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.21/@ownedAccessConnection.0"/>
       </connectionReference>
     </connectionInstance>
-    <subcomponent xsi:type="aadl2:ProcessSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedProcessSubcomponent.1"/>
+    <subcomponent xsi:type="aadl2:ProcessSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedProcessSubcomponent.1"/>
     <index>0</index>
   </componentInstance>
   <componentInstance name="the_proc1" category="process">
@@ -763,7 +763,7 @@
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
-      <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.2/@ownedDataSubcomponent.0"/>
+      <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.23/@ownedDataSubcomponent.0"/>
       <index>0</index>
     </componentInstance>
     <componentInstance name="the_sender" category="thread">
@@ -810,7 +810,7 @@
         <ownedValue>
           <ownedValue xsi:type="aadl2:ReferenceValue">
             <path>
-              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.40/@ownedSubprogramCallSequence.0"/>
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.49/@ownedSubprogramCallSequence.0"/>
             </path>
           </ownedValue>
         </ownedValue>
@@ -853,17 +853,17 @@
         </ownedValue>
       </ownedPropertyAssociation>
       <featureInstance name="cnx_p_out" dstConnectionInstance="//@componentInstance.5/@connectionInstance.0" category="dataAccess" direction="in out">
-        <feature xsi:type="aadl2:DataAccess" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.41/@ownedDataAccess.0"/>
+        <feature xsi:type="aadl2:DataAccess" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.50/@ownedDataAccess.0"/>
       </featureInstance>
-      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.2/@ownedThreadSubcomponent.0"/>
+      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.23/@ownedThreadSubcomponent.0"/>
       <index>0</index>
     </componentInstance>
     <connectionInstance name="the_proc1_p_out_globalVariable -> the_sender.cnx_p_out" complete="true" kind="accessConnection" destination="//@componentInstance.5/@componentInstance.1/@featureInstance.0" source="//@componentInstance.5/@componentInstance.0">
       <connectionReference context="//@componentInstance.5" source="//@componentInstance.5/@componentInstance.0" destination="//@componentInstance.5/@componentInstance.1/@featureInstance.0">
-        <connection xsi:type="aadl2:AccessConnection" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.2/@ownedAccessConnection.0"/>
+        <connection xsi:type="aadl2:AccessConnection" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.23/@ownedAccessConnection.0"/>
       </connectionReference>
     </connectionInstance>
-    <subcomponent xsi:type="aadl2:ProcessSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedProcessSubcomponent.2"/>
+    <subcomponent xsi:type="aadl2:ProcessSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedProcessSubcomponent.2"/>
     <index>0</index>
   </componentInstance>
   <componentInstance name="the_proc2" category="process">
@@ -907,7 +907,7 @@
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
-      <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.3/@ownedDataSubcomponent.0"/>
+      <subcomponent xsi:type="aadl2:DataSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.25/@ownedDataSubcomponent.0"/>
       <index>0</index>
     </componentInstance>
     <componentInstance name="the_receiver" category="thread">
@@ -954,7 +954,7 @@
         <ownedValue>
           <ownedValue xsi:type="aadl2:ReferenceValue">
             <path>
-              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.45/@ownedSubprogramCallSequence.0"/>
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.54/@ownedSubprogramCallSequence.0"/>
             </path>
           </ownedValue>
         </ownedValue>
@@ -997,17 +997,17 @@
         </ownedValue>
       </ownedPropertyAssociation>
       <featureInstance name="p_in" dstConnectionInstance="//@componentInstance.6/@connectionInstance.0" category="dataAccess" direction="in out">
-        <feature xsi:type="aadl2:DataAccess" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.46/@ownedDataAccess.0"/>
+        <feature xsi:type="aadl2:DataAccess" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.55/@ownedDataAccess.0"/>
       </featureInstance>
-      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.3/@ownedThreadSubcomponent.0"/>
+      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.25/@ownedThreadSubcomponent.0"/>
       <index>0</index>
     </componentInstance>
     <connectionInstance name="the_proc2_p_inglobalVariable -> the_receiver.p_in" complete="true" kind="accessConnection" destination="//@componentInstance.6/@componentInstance.1/@featureInstance.0" source="//@componentInstance.6/@componentInstance.0">
       <connectionReference context="//@componentInstance.6" source="//@componentInstance.6/@componentInstance.0" destination="//@componentInstance.6/@componentInstance.1/@featureInstance.0">
-        <connection xsi:type="aadl2:AccessConnection" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.3/@ownedAccessConnection.0"/>
+        <connection xsi:type="aadl2:AccessConnection" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.25/@ownedAccessConnection.0"/>
       </connectionReference>
     </connectionInstance>
-    <subcomponent xsi:type="aadl2:ProcessSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedProcessSubcomponent.3"/>
+    <subcomponent xsi:type="aadl2:ProcessSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedProcessSubcomponent.3"/>
     <index>0</index>
   </componentInstance>
   <componentInstance name="the_cpu1" category="processor">
@@ -1272,8 +1272,8 @@
         </ownedValue>
       </ownedValue>
     </ownedPropertyAssociation>
-    <featureInstance name="bus_access" srcConnectionInstance="//@connectionInstance.0" category="busAccess" direction="in out">
-      <feature xsi:type="aadl2:BusAccess" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.8/@ownedBusAccess.0"/>
+    <featureInstance name="bus_access" category="busAccess" direction="in out">
+      <feature xsi:type="aadl2:BusAccess" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.14/@ownedBusAccess.0"/>
     </featureInstance>
     <componentInstance name="the_part" category="virtual processor">
       <ownedPropertyAssociation>
@@ -1348,7 +1348,7 @@
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
-      <subcomponent xsi:type="aadl2:VirtualProcessorSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.4/@ownedVirtualProcessorSubcomponent.0"/>
+      <subcomponent xsi:type="aadl2:VirtualProcessorSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.15/@ownedVirtualProcessorSubcomponent.0"/>
       <index>0</index>
     </componentInstance>
     <componentInstance name="system_part" category="virtual processor">
@@ -1430,10 +1430,10 @@
           <ownedValue xsi:type="aadl2:BooleanLiteral" value="true"/>
         </ownedValue>
       </ownedPropertyAssociation>
-      <subcomponent xsi:type="aadl2:VirtualProcessorSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.4/@ownedVirtualProcessorSubcomponent.1"/>
+      <subcomponent xsi:type="aadl2:VirtualProcessorSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.15/@ownedVirtualProcessorSubcomponent.1"/>
       <index>0</index>
     </componentInstance>
-    <subcomponent xsi:type="aadl2:ProcessorSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedProcessorSubcomponent.0"/>
+    <subcomponent xsi:type="aadl2:ProcessorSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedProcessorSubcomponent.0"/>
     <index>0</index>
   </componentInstance>
   <componentInstance name="the_cpu2" category="processor">
@@ -1698,8 +1698,8 @@
         </ownedValue>
       </ownedValue>
     </ownedPropertyAssociation>
-    <featureInstance name="bus_access" srcConnectionInstance="//@connectionInstance.1" category="busAccess" direction="in out">
-      <feature xsi:type="aadl2:BusAccess" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.8/@ownedBusAccess.0"/>
+    <featureInstance name="bus_access" category="busAccess" direction="in out">
+      <feature xsi:type="aadl2:BusAccess" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.16/@ownedBusAccess.0"/>
     </featureInstance>
     <componentInstance name="the_part" category="virtual processor">
       <ownedPropertyAssociation>
@@ -1774,7 +1774,7 @@
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
-      <subcomponent xsi:type="aadl2:VirtualProcessorSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.4/@ownedVirtualProcessorSubcomponent.0"/>
+      <subcomponent xsi:type="aadl2:VirtualProcessorSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.17/@ownedVirtualProcessorSubcomponent.0"/>
       <index>0</index>
     </componentInstance>
     <componentInstance name="system_part" category="virtual processor">
@@ -1856,22 +1856,12 @@
           <ownedValue xsi:type="aadl2:BooleanLiteral" value="true"/>
         </ownedValue>
       </ownedPropertyAssociation>
-      <subcomponent xsi:type="aadl2:VirtualProcessorSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.4/@ownedVirtualProcessorSubcomponent.1"/>
+      <subcomponent xsi:type="aadl2:VirtualProcessorSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.17/@ownedVirtualProcessorSubcomponent.1"/>
       <index>0</index>
     </componentInstance>
-    <subcomponent xsi:type="aadl2:ProcessorSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedProcessorSubcomponent.1"/>
+    <subcomponent xsi:type="aadl2:ProcessorSubcomponent" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedProcessorSubcomponent.1"/>
     <index>0</index>
   </componentInstance>
-  <connectionInstance name="the_cpu1.bus_access -> the_bus" complete="true" kind="accessConnection" destination="//@componentInstance.0" source="//@componentInstance.7/@featureInstance.0">
-    <connectionReference context="/" source="//@componentInstance.7/@featureInstance.0" destination="//@componentInstance.0">
-      <connection xsi:type="aadl2:AccessConnection" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedAccessConnection.0"/>
-    </connectionReference>
-  </connectionInstance>
-  <connectionInstance name="the_cpu2.bus_access -> the_bus" complete="true" kind="accessConnection" destination="//@componentInstance.0" source="//@componentInstance.8/@featureInstance.0">
-    <connectionReference context="/" source="//@componentInstance.8/@featureInstance.0" destination="//@componentInstance.0">
-      <connection xsi:type="aadl2:AccessConnection" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedAccessConnection.1"/>
-    </connectionReference>
-  </connectionInstance>
   <systemOperationMode name="No Modes"/>
-  <componentImplementation xsi:type="aadl2:SystemImplementation" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.6"/>
+  <componentImplementation xsi:type="aadl2:SystemImplementation" href="../test_network_rtl8029_root_impl_Instance_extended_remote_communications_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0"/>
 </instance:SystemInstance>

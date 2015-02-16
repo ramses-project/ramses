@@ -70,40 +70,42 @@ process implementation  movement.impl
         leftEnginePort: data nxt_motor_port {Data_Model::Initial_Value => ("NXT_PORT_B");};
         rightEnginePort: data nxt_motor_port {Data_Model::Initial_Value => ("NXT_PORT_C");};
         sp: data speed{Data_Model::Initial_Value => ("100");};  
-        fwd: data command{Data_Model::Initial_Value => ("FORWARD");};       
---        stp: data command{Data_Model::Initial_Value => ("STOP");};          
+        fwd: data command{Data_Model::Initial_Value => ("FORWARD");};               
         bwd: data command{Data_Model::Initial_Value => ("BACKWARD");};
---        lft: data command{Data_Model::Initial_Value => ("LEFT");};
---        llft: data command{Data_Model::Initial_Value => ("LLEFT");};
---        rgt: data command{Data_Model::Initial_Value => ("RIGHT");};
---        rrgt: data command{Data_Model::Initial_Value => ("RRIGHT");};
+        
+        lft: data command{Data_Model::Initial_Value => ("LEFT");};
+        llft: data command{Data_Model::Initial_Value => ("LLEFT");};
+        rgt: data command{Data_Model::Initial_Value => ("RIGHT");};
+        rrgt: data command{Data_Model::Initial_Value => ("RRIGHT");};
+        stp: data command{Data_Model::Initial_Value => ("STOP");};          
     connections
         transfimt_sp : port sp -> wheels.speed;
         
         transmit_fwd :  port fwd -> wheels.cmd in modes (forward);
         transmit_bwd :  port bwd -> wheels.cmd in modes (backward);
---        transmit_stp :  port stp -> wheels.cmd in modes (stop);
---        transmit_rgt :  port rgt -> wheels.cmd in modes (right);
---        transmit_lft :  port lft -> wheels.cmd in modes (left);
---        transmit_rrgt :  port rrgt -> wheels.cmd in modes (rright);
---        transmit_llft :  port llft -> wheels.cmd in modes (lleft);
+        transmit_stp :  port stp -> wheels.cmd in modes (stopp);
+        transmit_rgt :  port rgt -> wheels.cmd in modes (right);
+        transmit_lft :  port lft -> wheels.cmd in modes (left);
+        transmit_rrgt :  port rrgt -> wheels.cmd in modes (rright);
+        transmit_llft :  port llft -> wheels.cmd in modes (lleft);
     modes
         forward : initial mode;
         backward : mode;
---        stop : mode;
---        right : mode;
---        rright : mode;
---        left : mode;
---        lleft : mode;
+        stopp : mode;
+        right : mode;
+        rright : mode;
+        left : mode;
+        lleft : mode;
+    
+--        backward -[wheels.done]-> forward;
     
         forward -[wheels.done]-> backward;
-        backward -[wheels.done]-> forward;
---        backward -[wheels.done]-> stop;
---        stop -[wheels.done]-> right;
---        right -[wheels.done]-> left;
---        left -[wheels.done]-> rright;
---        rright -[wheels.done]-> lleft;
---        lleft -[wheels.done]-> forward;
+        backward -[wheels.done]-> stopp;
+        stopp -[wheels.done]-> right;
+        right -[wheels.done]-> left;
+        left -[wheels.done]-> rright;
+        rright -[wheels.done]-> lleft;
+        lleft -[wheels.done]-> forward;
 end movement.impl;
 
 thread implementation engines.impl
