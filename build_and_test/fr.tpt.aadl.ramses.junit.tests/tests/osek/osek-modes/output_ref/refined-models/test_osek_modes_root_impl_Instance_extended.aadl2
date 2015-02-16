@@ -1,14 +1,11 @@
 package test_osek_modes_modes_refined
 public
 with OSEK,Data_Model,test_osek_modes,Base_Types,OSEK_runtime;
-  processor implementation cpu.impl
-  end cpu.impl;
-  
   system implementation modes_refined.impl
     subcomponents
-      the_mem: memory mem;
-      the_proc_modes: process proc1.impl;
-      the_cpu: processor cpu.impl {
+      the_mem: memory the_mem.impl;
+      the_proc_modes: process the_proc_modes.impl;
+      the_cpu: processor the_cpu.impl {
         Scheduling_Protocol => (RMS);
         OSEK::SystemCounter_MaxAllowedValue => 2000;
         OSEK::SystemCounter_TicksPerBase => 1;
@@ -29,14 +26,20 @@ with OSEK,Data_Model,test_osek_modes,Base_Types,OSEK_runtime;
       Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_receiver_m2;
   end modes_refined.impl;
   
-  processor cpu
-  end cpu;
+  system modes_refined
+  end modes_refined;
   
-  memory mem
-  end mem;
+  memory implementation the_mem.impl
+  end the_mem.impl;
   
-  process proc1
-  end proc1;
+  memory the_mem
+  end the_mem;
+  
+  processor the_cpu
+  end the_cpu;
+  
+  processor implementation the_cpu.impl
+  end the_cpu.impl;
   
   subprogram sender_spg
     features
@@ -55,10 +58,7 @@ with OSEK,Data_Model,test_osek_modes,Base_Types,OSEK_runtime;
       Source_Name => "__sender_spg_context";
   end sender_spg_context;
   
-  system modes_refined
-  end modes_refined;
-  
-  process implementation proc1.impl
+  process implementation the_proc_modes.impl
     subcomponents
       c11: data test_osek_modes::Integer {
         Data_Model::Initial_Value => ("11");
@@ -120,7 +120,7 @@ with OSEK,Data_Model,test_osek_modes,Base_Types,OSEK_runtime;
     modes
       m1: initial mode ;
       m2: mode ;
-  end proc1.impl;
+  end the_proc_modes.impl;
   
   data the_proc_modes_modeDataClassifier
     extends OSEK_runtime::AppModeType
@@ -128,6 +128,9 @@ with OSEK,Data_Model,test_osek_modes,Base_Types,OSEK_runtime;
       Data_Model::Data_Representation => Enum;
       Data_Model::Enumerators => ("m1", "m2");
   end the_proc_modes_modeDataClassifier;
+  
+  process the_proc_modes
+  end the_proc_modes;
   
   thread implementation the_proc_modes_mode_m1_modeSwitchManager.impl
     subcomponents
