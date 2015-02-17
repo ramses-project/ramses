@@ -1,7 +1,46 @@
 package test_osek_dataports_refined_model
 public
-with OSEK,Data_Model,test_osek_dataports,PeriodicDelayed_runtime,arinc653_runtime,Base_Types,OSEK_runtime;
-  process implementation proc.impl
+with OSEK,Data_Model,test_osek_dataports,Base_Types,OSEK_runtime;
+  system implementation refined_model.impl
+    subcomponents
+      the_mem: memory the_mem.impl {
+        Byte_Count => 200000;
+        };
+      the_proc: process the_proc.impl;
+      the_cpu: processor the_cpu.impl {
+        Scheduling_Protocol => (RMS);
+        OSEK::SystemCounter_MaxAllowedValue => 2000;
+        OSEK::SystemCounter_TicksPerBase => 1;
+        OSEK::SystemCounter_MinCycle => 1;
+        };
+    properties
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc;
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc.the_sender;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_sender;
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc.the_receiver;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_receiver;
+  end refined_model.impl;
+  
+  system refined_model
+  end refined_model;
+  
+  memory implementation the_mem.impl
+  end the_mem.impl;
+  
+  memory the_mem
+  end the_mem;
+  
+  processor the_cpu
+  end the_cpu;
+  
+  processor implementation the_cpu.impl
+  end the_cpu.impl;
+  
+  process the_proc
+  end the_proc;
+  
+  process implementation the_proc.impl
     subcomponents
       the_receiver_p_value: data test_osek_dataports::Integer;
       the_receiver_p_globalVariable: data OSEK_runtime::DataPortType {
@@ -30,46 +69,7 @@ with OSEK,Data_Model,test_osek_dataports,PeriodicDelayed_runtime,arinc653_runtim
     connections
       cnx_p_to_globalVariable: data access the_receiver_p_globalVariable -> the_sender.cnx_p;
       Id_instance_to_the_receiver_p: data access the_receiver_p_globalVariable -> the_receiver.p;
-  end proc.impl;
-  
-  processor implementation cpu.impl
-  end cpu.impl;
-  
-  memory implementation mem.impl
-  end mem.impl;
-  
-  system implementation refined_model.impl
-    subcomponents
-      the_mem: memory mem.impl {
-        Byte_Count => 200000;
-        };
-      the_proc: process proc.impl;
-      the_cpu: processor cpu.impl {
-        Scheduling_Protocol => (RMS);
-        OSEK::SystemCounter_MaxAllowedValue => 2000;
-        OSEK::SystemCounter_TicksPerBase => 1;
-        OSEK::SystemCounter_MinCycle => 1;
-        };
-    properties
-      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc;
-      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc;
-      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc.the_sender;
-      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_sender;
-      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc.the_receiver;
-      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_receiver;
-  end refined_model.impl;
-  
-  processor cpu
-  end cpu;
-  
-  memory mem
-  end mem;
-  
-  process proc
-  end proc;
-  
-  system refined_model
-  end refined_model;
+  end the_proc.impl;
   
   subprogram the_proc_the_sender_entrypoint
     features

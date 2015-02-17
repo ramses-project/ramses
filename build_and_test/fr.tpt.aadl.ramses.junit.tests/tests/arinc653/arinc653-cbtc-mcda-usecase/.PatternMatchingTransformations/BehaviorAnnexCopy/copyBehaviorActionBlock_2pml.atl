@@ -1,0 +1,275 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @atlcompiler emftvm
+module copyBehaviorActionBlock;
+create OUT : MM_ATL2PM from IN : AADLBA, HOOKS : ATLHOOKS;
+
+rule m_BehaviorActionBlock {
+ from
+  src_actionBlock : AADLBA!BehaviorActionBlock
+  (
+   src_actionBlock.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_actionBlock},
+   value <- 'copyBehaviorActionBlock.m_BehaviorActionBlock'
+  )
+}
+
+rule m_BehaviorActionSequence {
+ from
+  src_behaviorActionSequence : AADLBA!BehaviorActionSequence
+  (
+   src_behaviorActionSequence.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_behaviorActionSequence},
+   value <- 'copyBehaviorActionBlock.m_BehaviorActionSequence'
+  )
+}
+
+rule m_IfStatement {
+ from
+  src_ifStatement : AADLBA!IfStatement
+  (
+   not src_ifStatement.oclIsTypeOf(AADLBA!ElseStatement) and src_ifStatement.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_ifStatement},
+   value <- 'copyBehaviorActionBlock.m_IfStatement'
+  )
+}
+
+rule m_AssignmentAction {
+ from
+  src_assignmentAction : AADLBA!AssignmentAction
+  (
+   src_assignmentAction.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_assignmentAction},
+   value <- 'copyBehaviorActionBlock.m_AssignmentAction'
+  )
+}
+
+rule m_ElseStatement {
+ from
+  src_elseStatement : AADLBA!ElseStatement
+  (
+   not src_elseStatement.oclIsTypeOf(AADLBA!IfStatement) and src_elseStatement.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_elseStatement},
+   value <- 'copyBehaviorActionBlock.m_ElseStatement'
+  )
+}
+
+abstract rule m_PropertyReference {
+ from
+  src_propertyReference : AADLBA!PropertyReference
+  (
+   src_propertyReference.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_propertyReference},
+   value <- 'copyBehaviorActionBlock.m_PropertyReference'
+  )
+} -- @extends m_PropertyReference
+-- @extends m_PropertyReference
+rule m_ClassifierPropertyReference {
+ from
+  src_propertyReference : AADLBA!ClassifierPropertyReference
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_propertyReference},
+   value <- 'copyBehaviorActionBlock.m_ClassifierPropertyReference'
+  )
+} -- @extends m_PropertyReference
+-- @extends m_PropertyReference
+rule m_PropertySetPropertyReference {
+ from
+  src_propertyReference : AADLBA!PropertySetPropertyReference
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_propertyReference},
+   value <- 'copyBehaviorActionBlock.m_PropertySetPropertyReference'
+  )
+}
+
+rule m_PropertyNameHolder {
+ from
+  src_propertyNameHolder : AADLBA!PropertyNameHolder
+  (
+   src_propertyNameHolder.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_propertyNameHolder},
+   value <- 'copyBehaviorActionBlock.m_PropertyNameHolder'
+  )
+}
+
+abstract rule m_PropertyElementHolder {
+ from
+  src_propertyElementHolder : AADLBA!PropertyElementHolder
+  (
+   src_propertyElementHolder.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_propertyElementHolder},
+   value <- 'copyBehaviorActionBlock.m_PropertyElementHolder'
+  )
+} -- @extends m_PropertyElementHolder
+-- @extends m_PropertyElementHolder
+rule m_PropertyExpressionHolder {
+ from
+  src_propertyElementHolder : AADLBA!PropertyExpressionHolder
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_propertyElementHolder},
+   value <- 'copyBehaviorActionBlock.m_PropertyExpressionHolder'
+  )
+} -- @extends m_PropertyElementHolder
+-- @extends m_PropertyElementHolder
+rule m_PropertyAssociationHolder {
+ from
+  src_propertyElementHolder : AADLBA!PropertyAssociationHolder
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_propertyElementHolder},
+   value <- 'copyBehaviorActionBlock.m_PropertyAssociationHolder'
+  )
+}
+
+rule m_ValueExpression {
+ from
+  src_valueExpression : AADLBA!ValueExpression
+  (
+   src_valueExpression.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_valueExpression},
+   value <- 'copyBehaviorActionBlock.m_ValueExpression'
+  )
+}
+
+rule m_Relation {
+ from
+  src_relation : AADLBA!Relation
+  (
+   src_relation.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_relation},
+   value <- 'copyBehaviorActionBlock.m_Relation'
+  )
+}
+
+rule m_SimpleExpression {
+ from
+  src_simpleExpression : AADLBA!SimpleExpression
+  (
+   src_simpleExpression.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_simpleExpression},
+   value <- 'copyBehaviorActionBlock.m_SimpleExpression'
+  )
+}
+
+rule m_Term {
+ from
+  src_term : AADLBA!Term
+  (
+   src_term.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_term},
+   value <- 'copyBehaviorActionBlock.m_Term'
+  )
+}
+
+rule m_Factor {
+ from
+  src_factor : AADLBA!Factor
+  (
+   src_factor.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_factor},
+   value <- 'copyBehaviorActionBlock.m_Factor'
+  )
+}
+
+abstract rule m_CommunicationAction {
+ from
+  src_BehaviorElement : AADLBA!CommunicationAction
+  (
+   src_BehaviorElement.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement},
+   value <- 'copyBehaviorActionBlock.m_CommunicationAction'
+  )
+} -- @extends m_CommunicationAction
+-- @extends m_CommunicationAction
+rule m_SubprogramCallAction {
+ from
+  src_BehaviorElement : AADLBA!SubprogramCallAction
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement},
+   value <- 'copyBehaviorActionBlock.m_SubprogramCallAction'
+  )
+} -- @extends m_CommunicationAction
+-- @extends m_CommunicationAction
+rule m_PortDequeueAction {
+ from
+  src_BehaviorElement : AADLBA!PortDequeueAction
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement},
+   value <- 'copyBehaviorActionBlock.m_PortDequeueAction'
+  )
+} -- @extends m_CommunicationAction
+-- @extends m_CommunicationAction
+rule m_PortSendAction {
+ from
+  src_BehaviorElement : AADLBA!PortSendAction
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement},
+   value <- 'copyBehaviorActionBlock.m_PortSendAction'
+  )
+}

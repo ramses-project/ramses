@@ -272,6 +272,7 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance
 {
   	from
 		fi: AADLI!FeatureInstance
+		(fi.isDataPort())
 	to
 		f: AADLBA!DataAccess
 		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),

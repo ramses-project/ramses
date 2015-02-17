@@ -1,0 +1,145 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @atlcompiler emftvm
+library BehaviorAnnexServices;
+
+helper context AADLBA!BehaviorElement def: getBehaviorAnnex() : AADLBA!BehaviorAnnex =
+ if self.oclIsTypeOf(AADLBA!BehaviorAnnex) then
+  self
+ else
+  self.eContainer().getBehaviorAnnex()
+ endif;
+
+helper context AADLBA!BehaviorElement def: getContainingClassifier() : AADLBA!Classifier =
+ if self.eContainer().oclIsKindOf(AADLBA!Classifier) then
+  self.eContainer()
+ else
+  if not self.eContainer().oclIsUndefined() then
+   self.eContainer().getContainingClassifier()
+  else
+   OclUndefined
+  endif
+ endif;
+
+helper context AADLBA!BehaviorElement def: isThreadBehaviorElement() : Boolean =
+ self.getContainingClassifier().oclIsKindOf(AADLBA!ThreadClassifier);
+
+helper context AADLBA!BehaviorElement def: isPartOfBehaviorAnnexOf(c : AADLI!ComponentInstance) : Boolean =
+ if c.oclIsKindOf(AADLI!SystemInstance) then
+  c.componentImplementation.getBA() = self.getBehaviorAnnex()
+ else
+  c.subcomponent.subcomponentType.getBA() = self.getBehaviorAnnex()
+ endif;
+
+helper context AADLI!FeatureInstance def: isUsedInFresh() : Boolean =
+ --if(self.direction=#out or self.direction=#inOut) then
+ --if(self.direction=#out or self.direction=#inOut) then
+ --if(self.direction=#out or self.direction=#inOut) then
+ --if(self.direction=#out or self.direction=#inOut) then
+ --if(self.direction=#out or self.direction=#inOut) then
+ --if(self.direction=#out or self.direction=#inOut) then
+ self.isDirectlyUsedInFresh() or not self.srcConnectionInstance->any(e |
+  e.source.isDirectlyUsedInFresh()
+ ).oclIsUndefined() --else
+ --	self.isUsedInFreshClause(ba)
+ --else
+ --	self.isUsedInFreshClause(ba)
+ --else
+ --	self.isUsedInFreshClause(ba)
+ or not self.dstConnectionInstance->any(e |
+  e.destination.isDirectlyUsedInFresh()
+ ).oclIsUndefined() or not self.srcConnectionInstance->any(e |
+  e.destination.isDirectlyUsedInFresh()
+ ).oclIsUndefined() or not self.dstConnectionInstance->any(e |
+  e.source.isDirectlyUsedInFresh()
+ ).oclIsUndefined() --endif
+ --endif
+ --endif
+ --endif
+--endif
+;
+
+helper context OclAny def: isDirectlyUsedInFresh() : Boolean =
+ self.isUsedInSpecialOperator('fresh');
+
+helper context AADLI!FeatureInstance def: isUsedInCount() : Boolean =
+ self.isUsedInSpecialOperator('count');
+
+helper context AADLI!FeatureInstance def: isUsedInSpecialOperator(operatorName : String) : Boolean =
+ let as : AADLBA!DefaultAnnexSubclause = self.eContainer().subcomponent.classifier.ownedAnnexSubclause->any(e |
+  e.name = 'behavior_specification'
+ ) in
+ if as.oclIsKindOf(AADLBA!BehaviorAnnex) then
+  ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().isUsedInSpecialOperator(as, self.feature, operatorName)
+ else
+  if not as.oclIsUndefined() then
+   let ba : AADLBA!BehaviorAnnex = as.parsedAnnexSubclause in
+   if not ba.oclIsUndefined() then
+    ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().isUsedInSpecialOperator(ba, self.feature, operatorName)
+   else
+    false
+   endif
+  else
+   false
+  endif
+ endif;
+
+helper context AADLI!ComponentInstance def: isUsedInSpecialOperator(operatorName : String) : Boolean =
+ false;
+
+helper context AADLI!FeatureInstance def: getDirectlyUsedInFresh() : AADLI!FeatureInstance =
+ if self.isDirectlyUsedInFresh() then
+  self
+ else
+  if not self.srcConnectionInstance->any(e |
+   e.source.isDirectlyUsedInFresh()
+  ).oclIsUndefined() then
+   self.srcConnectionInstance->any(e |
+    e.source.isDirectlyUsedInFresh()
+   ).source
+  else
+   if not self.dstConnectionInstance->any(e |
+    e.destination.isDirectlyUsedInFresh()
+   ).oclIsUndefined() then
+    self.dstConnectionInstance->any(e |
+     e.destination.isDirectlyUsedInFresh()
+    ).destination
+   else
+    if not self.srcConnectionInstance->any(e |
+     e.destination.isDirectlyUsedInFresh()
+    ).oclIsUndefined() then
+     self.srcConnectionInstance->any(e |
+      e.destination.isDirectlyUsedInFresh()
+     ).destination
+    else
+     if not self.dstConnectionInstance->any(e |
+      e.source.isDirectlyUsedInFresh()
+     ).oclIsUndefined() then
+      self.dstConnectionInstance->any(e |
+       e.source.isDirectlyUsedInFresh()
+      ).source
+     else
+      OclUndefined
+     endif
+    endif
+   endif
+  endif
+ endif;

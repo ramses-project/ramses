@@ -1,0 +1,126 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @nsURI AADLI=http:///AADL2/instance
+-- @atlcompiler emftvm
+module Features;
+create OUT : MM_ATL2PM from IN : AADLI;
+
+abstract rule m_Feature_Instance {
+ from
+  fi : AADLI!FeatureInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'Features.m_Feature_Instance'
+  )
+} -- @extends m_Feature_Instance
+-- @extends m_Feature_Instance
+rule m_DataPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.category = #dataPort
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'Features.m_DataPort_Instance'
+  )
+} -- @extends m_Feature_Instance
+-- @extends m_Feature_Instance
+rule m_EventPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.category = #eventPort
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'Features.m_EventPort_Instance'
+  )
+} -- @extends m_Feature_Instance
+-- @extends m_Feature_Instance
+rule m_EventDataPort_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.category = #eventDataPort
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'Features.m_EventDataPort_Instance'
+  )
+} -- @extends m_Feature_Instance
+-- @extends m_Feature_Instance
+rule m_DataAccess_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.category = #dataAccess
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'Features.m_DataAccess_Instance'
+  )
+} -- @extends m_Feature_Instance
+-- @extends m_Feature_Instance
+rule m_BusAccess_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.category = #busAccess
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'Features.m_BusAccess_Instance'
+  )
+} -- @extends m_Feature_Instance
+-- @extends m_Feature_Instance
+rule m_SubprogramAccess_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.category = #subprogramAccess
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'Features.m_SubprogramAccess_Instance'
+  )
+}
+
+-- @extends m_Feature_Instance
+rule m_Parameter_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.category = #parameter
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'Features.m_Parameter_Instance'
+  )
+}

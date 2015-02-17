@@ -1,0 +1,240 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+module SharedRules;
+create OUT : MM_ATL2PM from IN : AADLI;
+
+helper def: Receive_Input_Name : String =
+ 'Receive_Input';
+
+helper def: Next_Value_Name : String =
+ 'Next_Value';
+
+helper def: collectPeriodicDelayed_GlobalVariables_LowMFP(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+ Sequence {};
+
+helper def: collectPeriodicDelayed_GlobalVariablesAccesses_LowMFP(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
+ Sequence {};
+
+helper def: collectPeriodicDelayed_GlobalVariablesAccesses_Mutex(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
+ Sequence {};
+
+helper def: collectPeriodicDelayed_GlobalVariablesConnections_LowMFP(c : AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnection) =
+ Sequence {};
+
+helper def: collectPeriodicDelayed_GlobalVariablesConnections_Mutex(c : AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnection) =
+ Sequence {};
+
+helper def: collectPeriodicDelayed_LocalVariablesAccesses_LowMFP(c : AADLI!ComponentInstance, behavior : AADLI!Element) : Sequence(AADLBA!DataAccess) =
+ Sequence {};
+
+helper def: collectPeriodicDelayed_LocalVariablesAccesses_Mutex(c : AADLI!ComponentInstance, behavior : AADLI!Element) : Sequence(AADLBA!DataAccess) =
+ Sequence {};
+
+helper def: collectPeriodicDelayed_LocalVariablesConnections_LowMFP(c : AADLI!ComponentInstance, behavior : AADLI!Element) : Sequence(AADLBA!AccessConnection) =
+ Sequence {};
+
+helper def: collectPeriodicDelayed_LocalVariablesConnections_Mutex(c : AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnection) =
+ Sequence {};
+
+helper def: collectPeriodicDelayed_LocalVariables_LowMFP(c : AADLI!ComponentInstance, behavior : AADLI!Element) : Sequence(AADLBA!DataAccess) =
+ Sequence {};
+
+helper def: collectPeriodicDelayed_LocalVariables_LowET(c : AADLI!ComponentInstance, behavior : AADLI!Element) : Sequence(AADLBA!DataAccess) =
+ Sequence {};
+
+helper def: collectPeriodicDelayed_LocalVariables_Mutex(c : AADLI!ComponentInstance, behavior : AADLI!Element) : Sequence(AADLBA!DataAccess) =
+ Sequence {};
+
+helper def: collectPeriodicDelayed_GlobalVariables_Mutex(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+ Sequence {};
+
+helper def: collectPeriodicDelayed_ThreadVariables(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+ thisModule.collectPeriodicDelayed_ThreadVariables_LowMFP(c)->union(thisModule.collectPeriodicDelayed_ThreadVariables_Mutex(c));
+
+helper def: collectPeriodicDelayed_ThreadVariables_Mutex(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+ Sequence {};
+
+helper def: collectPeriodicDelayed_ThreadVariables_LowMFP(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+ Sequence {};
+
+helper def: collectPeriodicDelayed_GlobalVariables(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+ thisModule.collectPeriodicDelayed_GlobalVariables_LowMFP(c)->union(thisModule.collectPeriodicDelayed_GlobalVariables_Mutex(c));
+
+helper def: collectPeriodicDelayed_GlobalVariablesAccesses(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
+ thisModule.collectPeriodicDelayed_GlobalVariablesAccesses_LowMFP(c)->union(thisModule.collectPeriodicDelayed_GlobalVariablesAccesses_Mutex(c));
+
+helper def: collectPeriodicDelayed_GlobalVariablesConnections(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
+ thisModule.collectPeriodicDelayed_GlobalVariablesConnections_LowMFP(c)->union(thisModule.collectPeriodicDelayed_GlobalVariablesConnections_Mutex(c));
+
+helper def: collectPeriodicDelayed_LocalVariablesAccesses(c : AADLI!ComponentInstance, behavior : AADLI!Element) : Sequence(AADLBA!DataAccess) =
+ thisModule.collectPeriodicDelayed_LocalVariablesAccesses_LowMFP(c, behavior)->union(thisModule.collectPeriodicDelayed_LocalVariablesAccesses_Mutex(c, behavior));
+
+helper def: collectPeriodicDelayed_LocalVariablesConnections(c : AADLI!ComponentInstance, behavior : AADLI!Element) : Sequence(AADLBA!DataAccess) =
+ thisModule.collectPeriodicDelayed_LocalVariablesConnections_LowMFP(c, behavior)->union(thisModule.collectPeriodicDelayed_LocalVariablesConnections_Mutex(c))->asSet();
+
+helper def: collectPeriodicDelayed_LocalVariables(c : AADLI!ComponentInstance, behavior : Sequence(AADLI!SubprogramCallSequence)) : Sequence(AADLBA!DataSubcomponent) =
+ if not c.featureInstance->exists(e |
+  e.isPeriodicDelayedPort()
+ ) then
+  Sequence {}
+ else
+  Sequence {thisModule.resolveLazySingleIfExists(c, 'createIterationCounter', 'IterationCounter')}->union(c.featureInstance->select(e |
+   e.isEventOrEventDataPort() and e.isPeriodicDelayedPort()
+  )->collect(fi |
+   thisModule.resolveMatchedSingleIfExists(fi, 'localVariable')
+  ))->union(c.featureInstance->select(e |
+   e.isEventOrEventDataPort() and e.isPeriodicDelayedPort()
+  )->collect(fi |
+   fi.srcConnectionInstance->collect(cnxInst |
+    Sequence {thisModule.resolveMatchedTupleIfExists(Sequence {fi, cnxInst.connectionReference->first().connection}, 'CDWSize')}
+   )
+  ))->union(c.featureInstance->select(e |
+   e.isEventOrEventDataPort() and e.isPeriodicDelayedPort() and e.isInputFeature()
+  )->collect(fi |
+   Sequence {thisModule.resolveMatchedSingleIfExists(fi, 'CPRSize'), thisModule.resolveMatchedSingleIfExists(fi, 'lastIndex'), thisModule.resolveMatchedSingleIfExists(fi, 'readIndex'), thisModule.resolveMatchedSingleIfExists(fi, 'localVariable'), thisModule.resolveMatchedSingleIfExists(fi, 'bufferSizeSubcomponent')}
+  ))->union(behavior->collect(b |
+   thisModule.collectPeriodicDelayed_LocalVariables_LowMFP(c, b)
+  ))->union(behavior->collect(b |
+   thisModule.collectPeriodicDelayed_LocalVariables_LowET(c, b)
+  ))->union(behavior->collect(b |
+   thisModule.collectPeriodicDelayed_LocalVariables_Mutex(c, b)
+  ))->flatten()
+ endif;
+
+helper def: getCurrentPerionReadTable(port : AADLI!FeatureInstance) : Sequence(Integer) =
+ thisModule.theHOOK.getCurrentPerionReadTable(port);
+
+helper def: getCurrentDeadlineWriteTable(sourcePort : AADLI!FeatureInstance, destinationPort : AADLI!FeatureInstance) : Sequence(Integer) =
+ thisModule.theHOOK.getCurrentDeadlineWriteTable(sourcePort, destinationPort);
+
+helper def: getBufferSize(destinationPort : AADLI!FeatureInstance) : Integer =
+ thisModule.theHOOK.getBufferSize(destinationPort);
+
+helper def: PDC_RUNTIME_NAME : String =
+ 'PeriodicDelayed_runtime';
+
+helper def: PDC_RUNTIME_MUTEX_NAME : String =
+ 'PeriodicDelayedMutex_runtime';
+
+abstract rule m_PeriodicDelayed_Port {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isPeriodicDelayedPort() and fi.isIntraProcessFeatureInstance()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'SharedRules.m_PeriodicDelayed_Port'
+  )
+} -- @extends m_PeriodicDelayed_Port,m_Thread_Output_Port_Instance
+-- @extends m_PeriodicDelayed_Port,m_Thread_Output_Port_Instance
+abstract rule m_Thread_Output_PeriodicDelayed_Port {
+ from
+  fi : AADLI!FeatureInstance,
+  cnxRef : AADLI!PortConnection
+  (
+   fi.isPeriodicDelayedPort() and fi.isOutputFeature() and cnxRef.destination.connectionEnd.isThreadPort() or cnxRef.source.connectionEnd.isThreadPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, cnxRef},
+   value <- 'SharedRules.m_Thread_Output_PeriodicDelayed_Port'
+  )
+} -- @extends m_Thread_Output_PeriodicDelayed_Port
+-- @extends m_Thread_Output_PeriodicDelayed_Port
+rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance {
+ from
+  fi : AADLI!FeatureInstance,
+  cnxRef : AADLI!PortConnection
+  (
+   fi.isEventOrEventDataPort() and cnxRef.destination.connectionEnd.isThreadPort() or cnxRef.source.connectionEnd.isThreadPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, cnxRef},
+   value <- 'SharedRules.m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance'
+  )
+} -- @extends m_PeriodicDelayed_Port,m_Thread_Input_Port_Instance
+-- @extends m_PeriodicDelayed_Port,m_Thread_Input_Port_Instance
+abstract rule m_Input_PeriodicDelayed_Port {
+ from
+  fi : AADLI!FeatureInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'SharedRules.m_Input_PeriodicDelayed_Port'
+  )
+} -- @extends m_Input_PeriodicDelayed_Port,m_Thread_IntraProcess_Input_Port_Instance
+-- @extends m_Input_PeriodicDelayed_Port,m_Thread_IntraProcess_Input_Port_Instance
+rule m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isEventOrEventDataPort() and fi.isIntraProcessFeatureInstance()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'SharedRules.m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance'
+  )
+} -- @extends m_Input_PeriodicDelayed_Port
+-- @extends m_Input_PeriodicDelayed_Port
+rule m_Thread_IntraProcess_Input_DataPort_PeriodicDelayed_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isDataPort() and fi.isIntraProcessFeatureInstance()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'SharedRules.m_Thread_IntraProcess_Input_DataPort_PeriodicDelayed_Instance'
+  )
+} -- @extends m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance,m_Thread_DataOrEventDataPort_Input_Instance,m_Input_PeriodicDelayed_Port
+-- @extends m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance,m_Thread_DataOrEventDataPort_Input_Instance,m_Input_PeriodicDelayed_Port
+rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isEventDataPort() and fi.isIntraProcessFeatureInstance()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'SharedRules.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance'
+  )
+} -- @extends m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance,m_Input_PeriodicDelayed_Port
+-- @extends m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance,m_Input_PeriodicDelayed_Port
+rule m_Thread_IntraProcess_Input_EventPort_PeriodicDelayed_Instance {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isEventPort() and fi.isIntraProcessFeatureInstance()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'SharedRules.m_Thread_IntraProcess_Input_EventPort_PeriodicDelayed_Instance'
+  )
+}

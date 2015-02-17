@@ -35,9 +35,15 @@ public abstract class OSGIOSEKScenario extends OSGIScenario {
 		if(aadlInspectorPath == null || aadlInspectorPath.equals(""))
 			aadlInspectorPath = System.getProperty("AADLINSPECTOR_PATH");
 		
+		//binaries
 		IGNORE_FILES.add(".map");
+		IGNORE_FILES.add(".rxe");
+		IGNORE_FILES.add(".elf");
+		IGNORE_FILES.add(".bin");
+		//generated with the day date => always different 
 		IGNORE_FILES.add("kernel_cfg.c");
 		IGNORE_FILES.add("kernel_id.h");		
+		
 		IGNORE_DIR.add("kernel");
 		IGNORE_DIR.add("build");
 		

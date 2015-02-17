@@ -1,0 +1,157 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+module EventDataPorts_Mutex_ARINC653;
+create OUT : MM_ATL2PM from IN : AADLI;
+
+helper def: ARINC653_Package : String =
+ 'PeriodicDelayedMutex_runtime'; -----------------------------------------------------------------------------------------------------
+-- Platform-dependent resources (refine lock type on queues and lock/unlock suprograms)
+-- Defined for ARINC653
+-----------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------
+-- Platform-dependent resources (refine lock type on queues and lock/unlock suprograms)
+-- Defined for ARINC653
+-----------------------------------------------------------------------------------------------------
+helper def: collectEventDataNextValueCalls(fi : AADLI!FeatureInstance, behavior : AADLI!SubprogramCallSequence, paramCnx : AADLBA!ParameterConnection) : Sequence(AADLBA!SubprogramCall) =
+ Sequence {thisModule.resolveMatchedTupleIfExists(Sequence {fi, behavior, paramCnx}, 'callLockNextValue'), thisModule.resolveMatchedTupleIfExists(Sequence {fi, behavior, paramCnx}, 'call'), thisModule.resolveMatchedTupleIfExists(Sequence {fi, behavior, paramCnx}, 'callUnlockNextValue')};
+
+helper def: collectEventDataPutValueCalls(fi : AADLI!FeatureInstance, behavior : AADLI!SubprogramCallSequence, paramCnx : AADLBA!Connection, cnxInst : AADLI!ConnectionInstance) : Sequence(AADLBA!SubprogramCall) =
+ Sequence {thisModule.resolveMatchedTupleIfExists(Sequence {fi, behavior, paramCnx, cnxInst.connectionReference->first().connection}, 'callLockPutValue'), thisModule.resolveMatchedTupleIfExists(Sequence {fi, behavior, paramCnx, cnxInst.connectionReference->first().connection}, 'call'), thisModule.resolveMatchedTupleIfExists(Sequence {fi, behavior, paramCnx, cnxInst.connectionReference->first().connection}, 'callUnlockPutValue')};
+
+helper def: collectPeriodicDelayed_LocalVariables_Mutex_PFSpec(c : AADLI!ComponentInstance, behavior : AADLI!Element) : Sequence(AADLBA!DataAccess) =
+ c.featureInstance->select(e |
+  e.isPeriodicDelayedPort()
+ )->collect(f |
+  Sequence {thisModule.resolveMatchedSingleIfExists(f, 'infinityTimeOut'), thisModule.resolveMatchedSingleIfExists(f, 'semCallReturnCode')}
+ )->flatten();
+
+helper def: collectPeriodicDelayed_LocalVariablesConnections_Mutex(c : AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnection) =
+ c.featureInstance->select(e |
+  e.isInputFeature() and e.isPeriodicDelayedPort()
+ )->collect(e |
+  Sequence {thisModule.resolveMatchedSingleIfExists(e, 'cnxBuffer'), thisModule.resolveMatchedSingleIfExists(e, 'cnxSize'), thisModule.resolveMatchedSingleIfExists(e, 'semaphoreEntryPointAccessCnx')}
+ )->union(c.featureInstance->select(e |
+  e.isPeriodicDelayedPort()
+ )->collect(fi |
+  thisModule.resolveMatchedSingleIfExists(fi, 'semaphoreEntryPointAccessCnx')
+ ));
+
+helper def: collectPeriodicDelayed_GlobalVariablesAccesses_Mutex(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
+ c.featureInstance->select(e |
+  e.isPeriodicDelayedPort()
+ )->collect(e |
+  thisModule.resolveMatchedSingleIfExists(e, 'semaphoreThreadDataAccess')
+ );
+
+helper def: collectPeriodicDelayed_LocalVariablesAccesses_Mutex(c : AADLI!ComponentInstance, behavior : AADLI!Element) : Sequence(AADLBA!DataAccess) =
+ c.featureInstance->select(e |
+  e.isPeriodicDelayedPort()
+ )->collect(e |
+  thisModule.resolveMatchedSingleIfExists(e, 'semaphoreEntryPointDataAccess')
+ );
+
+helper def: collectPeriodicDelayed_GlobalVariables_Mutex(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+ c.featureInstance->select(e |
+  e.isInputFeature() and e.isPeriodicDelayedPort()
+ )->collect(e |
+  thisModule.resolveMatchedSingleIfExists(e, 'semaphoreGlobalVariable')
+ );
+
+helper def: collectPeriodicDelayed_GlobalVariablesConnections_Mutex(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+ c.featureInstance->select(e |
+  e.isInputFeature() and e.isPeriodicDelayedPort()
+ )->collect(e |
+  thisModule.resolveMatchedSingleIfExists(e, 'semaphoreGVAccessCnx')
+ )->union(c.featureInstance->select(e |
+  e.isOutputFeature() and e.isPeriodicDelayedPort()
+ )->collect(fi |
+  fi.srcConnectionInstance->collect(cnxInst |
+   thisModule.resolveMatchedTupleIfExists(Sequence {fi, cnxInst.connectionReference->first().connection}, 'semaphoreGVAccessCnx')
+  )
+ )); -- @extends m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex
+-- @extends m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex
+rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_ARINC653 {
+ from
+  fi : AADLI!FeatureInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'EventDataPorts_Mutex_ARINC653.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_ARINC653'
+  )
+} -- @extends m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_Mutex
+-- @extends m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_Mutex
+rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_Mutex_ARINC653 {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  paramCnx : AADLI!ParameterConnection
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, paramCnx},
+   value <- 'EventDataPorts_Mutex_ARINC653.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_Mutex_ARINC653'
+  )
+} -- @extends m_Thread_DataOrEventDataPort_Output_Instance
+-- @extends m_Thread_DataOrEventDataPort_Output_Instance
+rule m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isPeriodicDelayedPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex'
+  )
+} -- @extends m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_Mutex
+-- @extends m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_Mutex
+rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_Mutex_ARINC {
+ from
+  fi : AADLI!FeatureInstance,
+  cnxRef : AADLI!PortConnection
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, cnxRef},
+   value <- 'EventDataPorts_Mutex_ARINC653.m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_Mutex_ARINC'
+  )
+} -- @extends m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_Mutex
+-- @extends m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_Mutex
+rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_Mutex_ARINC653 {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  paramCnx : AADLI!ParameterConnection,
+  cnxRef : AADLI!PortConnection
+  (
+   fi.srcConnectionInstance->exists(e |
+    e.connectionReference->first().connection = cnxRef
+   )
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, paramCnx, cnxRef},
+   value <- 'EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_Mutex_ARINC653'
+  )
+} -----------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------

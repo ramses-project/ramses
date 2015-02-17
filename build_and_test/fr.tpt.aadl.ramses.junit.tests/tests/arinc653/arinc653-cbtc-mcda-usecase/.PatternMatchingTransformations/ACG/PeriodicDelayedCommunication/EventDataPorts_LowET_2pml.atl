@@ -1,0 +1,150 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+module EventDataPorts_LowET;
+create OUT : MM_ATL2PM from IN : AADLI;
+
+helper def: Put_Value_Name : String =
+ 'Put_Value';
+
+helper def: Send_Output_Name : String =
+ 'Send_Output';
+
+helper def: Receive_Input_Name : String =
+ 'Receive_Input';
+
+helper def: Next_Value_Name : String =
+ 'Next_Value';
+
+helper def: collectPeriodicDelayed_LocalVariables_LowET(c : AADLI!ComponentInstance, behavior : AADLI!Element) : Sequence(AADLBA!DataAccess) =
+ c.featureInstance->select(e |
+  e.isEventOrEventDataPort() and e.isPeriodicDelayedPort() and e.isInputFeature()
+ )->collect(fi |
+  thisModule.resolveMatchedSingleIfExists(fi, 'CurrentPeriodReadTable')
+ )->union(c.featureInstance->select(e |
+  e.isEventOrEventDataPort() and e.isPeriodicDelayedPort()
+ )->collect(fi |
+  fi.srcConnectionInstance->collect(cnxInst |
+   thisModule.resolveMatchedTupleIfExists(Sequence {fi, cnxInst.connectionReference->first().connection}, 'CurrentDeadlineWrite')
+  )
+ )); -- @extends m_Thread_Output_PeriodicDelayed_Port_No_Mutex
+-- @extends m_Thread_Output_PeriodicDelayed_Port_No_Mutex
+rule m_Thread_Output_PeriodicDelayed_Port_LowET {
+ from
+  fi : AADLI!FeatureInstance,
+  cnxRef : AADLI!PortConnection
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, cnxRef},
+   value <- 'EventDataPorts_LowET.m_Thread_Output_PeriodicDelayed_Port_LowET'
+  )
+} -- @extends m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_No_Mutex,m_Thread_Output_PeriodicDelayed_Port_LowET
+-- @extends m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_No_Mutex,m_Thread_Output_PeriodicDelayed_Port_LowET
+rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_LowET {
+ from
+  fi : AADLI!FeatureInstance,
+  cnxRef : AADLI!PortConnection
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, cnxRef},
+   value <- 'EventDataPorts_LowET.m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_LowET'
+  )
+} -- @extends m_PeriodicDelayed_Port,m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
+-- @extends m_PeriodicDelayed_Port,m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
+rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_LowET {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  paramCnx : AADLI!ParameterConnection,
+  cnxRef : AADLI!PortConnection
+  (
+   fi.srcConnectionInstance->exists(e |
+    e.connectionReference->first().connection = cnxRef
+   )
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, paramCnx, cnxRef},
+   value <- 'EventDataPorts_LowET.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_LowET'
+  )
+} -- @extends m_Input_Port_ComputeEntrypointCallSequence,m_PeriodicDelayed_Port
+-- @extends m_Input_Port_ComputeEntrypointCallSequence,m_PeriodicDelayed_Port
+rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_ReceiveInputs_LowET {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence
+  (
+   behavior.isComputeEntryPointOf(fi.getComponentInstance()) and fi.isInputFeature() and fi.isEventPort() or fi.isEventDataPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior},
+   value <- 'EventDataPorts_LowET.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_ReceiveInputs_LowET'
+  )
+} -- @extends m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput
+-- @extends m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput
+rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput_LowET {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  cnxRef : AADLI!PortConnection
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, cnxRef},
+   value <- 'EventDataPorts_LowET.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput_LowET'
+  )
+} -- @extends m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance,m_Input_PeriodicDelayed_Port_LowET
+-- @extends m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance,m_Input_PeriodicDelayed_Port_LowET
+rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_LowET {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isEventDataPort() and fi.isIntraProcessFeatureInstance()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'EventDataPorts_LowET.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_LowET'
+  )
+} -- @extends m_Input_PeriodicDelayed_Port_No_Mutex
+-- @extends m_Input_PeriodicDelayed_Port_No_Mutex
+rule m_Input_PeriodicDelayed_Port_LowET {
+ from
+  fi : AADLI!FeatureInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'EventDataPorts_LowET.m_Input_PeriodicDelayed_Port_LowET'
+  )
+} -- @extends m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue
+-- @extends m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue
+rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_LowET {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  paramCnx : AADLI!ParameterConnection
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, paramCnx},
+   value <- 'EventDataPorts_LowET.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_LowET'
+  )
+}
