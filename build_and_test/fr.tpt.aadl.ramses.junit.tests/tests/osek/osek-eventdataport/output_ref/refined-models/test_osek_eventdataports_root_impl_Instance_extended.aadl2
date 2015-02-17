@@ -1,7 +1,44 @@
 package test_osek_eventdataports_refined_model
 public
-with OSEK,Data_Model,test_osek_eventdataports,Base_Types,arinc653_runtime,PeriodicDelayed_runtime,OSEK_runtime;
-  process implementation proc1.impl
+with OSEK,Data_Model,test_osek_eventdataports,Base_Types,OSEK_runtime;
+  system implementation refined_model.impl
+    subcomponents
+      the_mem: memory the_mem.impl;
+      the_proc1: process the_proc1.impl;
+      the_cpu: processor the_cpu.impl {
+        Scheduling_Protocol => (RMS);
+        OSEK::SystemCounter_MaxAllowedValue => 2000;
+        OSEK::SystemCounter_TicksPerBase => 1;
+        OSEK::SystemCounter_MinCycle => 1;
+        };
+    properties
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc1;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc1;
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc1.the_sender;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc1.the_sender;
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc1.the_receiver;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc1.the_receiver;
+  end refined_model.impl;
+  
+  system refined_model
+  end refined_model;
+  
+  memory implementation the_mem.impl
+  end the_mem.impl;
+  
+  memory the_mem
+  end the_mem;
+  
+  processor the_cpu
+  end the_cpu;
+  
+  processor implementation the_cpu.impl
+  end the_cpu.impl;
+  
+  process the_proc1
+  end the_proc1;
+  
+  process implementation the_proc1.impl
     subcomponents
       the_receiver_globalQueue: data OSEK_runtime::ThreadQueueType {
         Data_Model::Initial_Value => ("{&the_receiver_globalQueue_rez, &the_receiver, &the_receiver_globalQueue_evt, 0, 0, {&the_receiver_p_globalVariable}}");
@@ -33,38 +70,7 @@ with OSEK,Data_Model,test_osek_eventdataports,Base_Types,arinc653_runtime,Period
     connections
       cnx_p_to_globalVariable: data access the_receiver_globalQueue -> the_sender.cnx_p;
       Id_instance_to_the_receiver_p: data access the_receiver_globalQueue -> the_receiver.p;
-  end proc1.impl;
-  
-  processor implementation cpu.impl
-  end cpu.impl;
-  
-  system implementation refined_model.impl
-    subcomponents
-      the_mem: memory mem;
-      the_proc1: process proc1.impl;
-      the_cpu: processor cpu.impl {
-        Scheduling_Protocol => (RMS);
-        OSEK::SystemCounter_MaxAllowedValue => 2000;
-        OSEK::SystemCounter_TicksPerBase => 1;
-        OSEK::SystemCounter_MinCycle => 1;
-        };
-    properties
-      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc1;
-      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc1;
-      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc1.the_sender;
-      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc1.the_sender;
-      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc1.the_receiver;
-      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc1.the_receiver;
-  end refined_model.impl;
-  
-  processor cpu
-  end cpu;
-  
-  memory mem
-  end mem;
-  
-  process proc1
-  end proc1;
+  end the_proc1.impl;
   
   subprogram sender_spg
     features
@@ -72,7 +78,7 @@ with OSEK,Data_Model,test_osek_eventdataports,Base_Types,arinc653_runtime,Period
     properties
       Source_Name => "send";
       Source_Language => (C);
-      Source_Text => ("/home/castella/workspaces/runtime-New_configuration2/eventdataport/input/user_send.h", "/home/castella/workspaces/runtime-New_configuration2/eventdataport/input/user_send.c");
+      Source_Text => ("/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/osek/osek-eventdataport/input/user_send.h", "/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/osek/osek-eventdataport/input/user_send.c");
   end sender_spg;
   
   data sender_spg_context
@@ -82,9 +88,6 @@ with OSEK,Data_Model,test_osek_eventdataports,Base_Types,arinc653_runtime,Period
       Data_Model::Base_Type => (classifier(Base_Types::Unsigned_8));
       Source_Name => "__sender_spg_context";
   end sender_spg_context;
-  
-  system refined_model
-  end refined_model;
   
   data the_receiver_p_bufferType
     properties
@@ -139,9 +142,7 @@ transitions
   
   thread the_proc1_the_sender
     features
-      cnx_p: requires data access OSEK_runtime::ThreadQueueType {
-        Data_Model::Data_Representation => Integer;
-        };
+      cnx_p: requires data access OSEK_runtime::ThreadQueueType;
   end the_proc1_the_sender;
   
   subprogram the_proc1_the_receiver_entrypoint
@@ -196,9 +197,7 @@ if (p_ErrorCode = 0) test_osek_eventdataports::receiver_spg ! (p_localVariable) 
   
   thread the_proc1_the_receiver
     features
-      p: requires data access OSEK_runtime::ThreadQueueType {
-        Data_Model::Data_Representation => Integer;
-        };
+      p: requires data access OSEK_runtime::ThreadQueueType;
   end the_proc1_the_receiver;
   
   subprogram NextValue_Integer
