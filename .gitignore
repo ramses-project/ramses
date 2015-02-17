@@ -12,3 +12,4 @@ qemu.pid
 *.map
 sizes.c
 *.class
+*.rxe
