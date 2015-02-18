@@ -430,10 +430,7 @@ Write_Sampling_Message_ROLE ! (PortCnx8_mode_C2, mode_C2_localVariable, mode_C2_
       delayed_error_C2: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx1_mode_C1: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx2_mode_C1: requires data access arinc653_runtime::Blackboard_Id_Type;
-      PortCnx3_mode_C1: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Source_Name => "ROLE";
-        Source_Text => ("business-code/PingPong_module.h");
-        };
+      PortCnx3_mode_C1: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx8_mode_C2: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       Parent_BA_currentState_Access: requires data access S1_inst_Monitor_changeState_currentState;
   end S1_inst_Monitor_changeState;
@@ -506,10 +503,7 @@ Display_Blackboard_Exception ! (PortCnx11_delayed_error_C2, delayed_error_C2_loc
     features
       State_baKeywords: requires data access PingPong::TYPE_aadlKeywords;
       error_C2: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx11_delayed_error_C2: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Source_Name => "Exception";
-        Source_Text => ("business-code/PingPong_module.h");
-        };
+      PortCnx11_delayed_error_C2: requires data access arinc653_runtime::Blackboard_Id_Type;
       Parent_BA_currentState_Access: requires data access S1_inst_Monitor_delayed_error_C2_currentState;
   end S1_inst_Monitor_delayed_error_C2;
   
@@ -617,10 +611,7 @@ Display_Blackboard_Exception ! (PortCnx4_badSequenceNumber, badSequenceNumber_lo
       delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type;
       mode_aadlKeywords: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx9_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx4_badSequenceNumber: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Source_Name => "Exception";
-        Source_Text => ("business-code/PingPong_module.h");
-        };
+      PortCnx4_badSequenceNumber: requires data access arinc653_runtime::Blackboard_Id_Type;
       Parent_BA_currentState_Access: requires data access S1_inst_IPingOrPong_Cping_ping_currentState;
   end S1_inst_IPingOrPong_Cping_ping;
   
@@ -707,10 +698,7 @@ Display_Blackboard_PingPongMessage ! (PortCnx12_delayed_PongIn, delayed_PongIn_l
       seqNb: requires data access PingPong::SEQ;
       PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       mode_aadlKeywords: requires data access arinc653_runtime::Blackboard_Id_Type;
-      PortCnx12_delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Source_Name => "PingPongMessage";
-        Source_Text => ("business-code/PingPong_module.h");
-        };
+      PortCnx12_delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type;
       Parent_BA_currentState_Access: requires data access S1_inst_IPingOrPong_Cping_delayed_PongIn_currentState;
   end S1_inst_IPingOrPong_Cping_delayed_PongIn;
   
@@ -913,14 +901,8 @@ Write_Sampling_Message_Exception ! (PortCnx8_badSequenceNumber, badSequenceNumbe
       seqNb: requires data access PingPong::SEQ;
       delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type;
       mode_aadlKeywords: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx6_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
-        Source_Name => "PingPongMessage";
-        Source_Text => ("business-code/PingPong_module.h");
-        };
-      PortCnx8_badSequenceNumber: requires data access arinc653_runtime::Sampling_Port_Id_Type {
-        Source_Name => "Exception";
-        Source_Text => ("business-code/PingPong_module.h");
-        };
+      PortCnx6_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      PortCnx8_badSequenceNumber: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       Parent_BA_currentState_Access: requires data access S2_inst_IPingOrPong_Cping_ping_currentState;
   end S2_inst_IPingOrPong_Cping_ping;
   
@@ -1005,10 +987,7 @@ Display_Blackboard_PingPongMessage ! (PortCnx9_delayed_PongIn, delayed_PongIn_lo
       seqNb: requires data access PingPong::SEQ;
       PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       mode_aadlKeywords: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx9_delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Source_Name => "PingPongMessage";
-        Source_Text => ("business-code/PingPong_module.h");
-        };
+      PortCnx9_delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type;
       Parent_BA_currentState_Access: requires data access S2_inst_IPingOrPong_Cping_delayed_PongIn_currentState;
   end S2_inst_IPingOrPong_Cping_delayed_PongIn;
   
@@ -1104,10 +1083,7 @@ Write_Sampling_Message_PingPongMessage ! (PortCnx7_PongOut, PongOut_localVariabl
       seqNb: requires data access PingPong::SEQ;
       PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       mode_aadlKeywords: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx7_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
-        Source_Name => "PingPongMessage";
-        Source_Text => ("business-code/PingPong_module.h");
-        };
+      PortCnx7_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       Parent_BA_currentState_Access: requires data access S2_inst_IPingOrPong_Cpong_pong_currentState;
   end S2_inst_IPingOrPong_Cpong_pong;
   

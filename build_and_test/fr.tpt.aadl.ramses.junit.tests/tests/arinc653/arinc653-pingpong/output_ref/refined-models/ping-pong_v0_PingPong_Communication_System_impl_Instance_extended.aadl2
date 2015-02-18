@@ -359,14 +359,8 @@ Write_Sampling_Message_Exception ! (C2_error_implicit_cnx_C2_badSequenceNumber, 
       C2_mode: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       C2_PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       C2_PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      C2_ping_implicit_cnx_C2_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
-        Source_Name => "PingPongMessage";
-        Source_Text => ("pingpong.h");
-        };
-      C2_pong_implicit_cnx_C2_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
-        Source_Name => "PingPongMessage";
-        Source_Text => ("pingpong.h");
-        };
+      C2_ping_implicit_cnx_C2_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      C2_pong_implicit_cnx_C2_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       C2_error_implicit_cnx_C2_badSequenceNumber: requires data access arinc653_runtime::Sampling_Port_Id_Type;
   end S2_inst_a2_inst;
   

@@ -591,7 +591,7 @@ public class AadlTargetSpecificGenerator implements Generator
           }
         }
       }
-      if(result == null)
+      if(qaResult == null)
       {
         msg = ">> " + analysisName + " result not found" ;
         _LOGGER.trace(msg);

@@ -1,0 +1,197 @@
+package readColor
+public
+    
+with Data_Model, Osek;
+with nxtTypes;
+with plateform;
+with Generation_Properties;    
+
+system read
+end read;
+
+system implementation read.impl
+    subcomponents
+        cpu : processor arm.impl;
+        mem   : memory mem.impl;
+        proces : process proc.impl;
+        ColorSensor : device ColorSensor;        
+    properties
+        Actual_Processor_Binding => (reference (cpu)) applies to proces;
+        Actual_Memory_Binding => (reference (mem)) applies to proces;
+        Actual_Processor_Binding => (reference (cpu)) applies to ColorSensor;                     
+end read.impl;    
+    
+
+process implementation proc.impl
+    subcomponents
+        colorPortNb: data nxt_sensor_port  {Data_Model::Initial_Value => ("NXT_PORT_S2");};
+        sensorMode : data sensor_mode {Data_Model::Initial_Value => ("NXT_COLORSENSOR");};
+        th1 : thread identifyColors.impl in modes (lost_mode);
+        th2 : thread identifyColors.impl in modes (onpath_mode);
+        bg : thread bg.impl;
+        connections 
+            cnx_port1 : port colorPortNb -> th1.colorPortNb in modes (lost_mode);
+            cnx_port2 : port colorPortNb -> th2.colorPortNb in modes (onpath_mode);
+        modes
+            lost_mode :  mode;
+            onpath_mode : initial mode;            
+--            lost_mode -[th.onpath]-> onpath_mode;
+            onpath_mode -[th2.lost]->lost_mode;
+            lost_mode -[th1.lost]->onpath_mode;    
+end proc.impl;
+----------------------------------------------------------------------------
+
+thread implementation identifyColors.impl          
+    subcomponents 
+        colorPath: data color_id {Data_Model::Initial_Value => ("NXT_COLOR_BLACK");}; 
+    calls
+        color:{
+            call1 : subprogram getColor;
+            call2: subprogram displayColor;
+        };
+    connections
+        cc0 : parameter call1.portId -> colorPortNb;
+        cc1 : parameter call1.currentColor -> call2.currentColor ;
+        cc2 : parameter call2.colorPath -> colorPath;
+        
+--        cnx_onpath : port call2.onpath -> onpath;      
+        cnx_lost : port call2.lost -> lost;
+    properties
+        Dispatch_protocol => periodic;
+        Period            => 100 ms;
+        Compute_Execution_time   => 0 ms .. 20 ms;
+        Deadline                           => 80 ms;
+        Priority                           => 2;
+        stack_size  => 512 Bytes;
+        POSIX_Scheduling_Policy => SCHED_FIFO;
+        Compute_Entrypoint_Call_Sequence => reference (color);
+end    identifyColors.impl; 
+
+    
+----------------------------------------------------------------------------
+subprogram displayColor
+    features
+--        onpath : out event port;
+        lost : out event port;
+        currentColor : in parameter color_id;
+        colorPath : in parameter color_id;          
+properties
+Source_language =>(C);
+        Source_text => ("diplay.h","diplay.c");
+        Source_name => "decide";
+end displayColor;
+----------------------------------------------------------------------------
+thread identifyColors
+    features
+       getColor: requires subprogram access ecrobotGetColorId;
+       displayColor : requires subprogram access displayColor;
+       colorPortNb : in data port nxt_sensor_port;
+--       onpath : out event port;
+       lost : out event port;
+end identifyColors;
+
+thread bg
+end bg;
+
+data color_id
+properties
+  Data_Model::Data_Representation => Enum;
+  Data_Model::Enumerators => (
+    "NXT_COLOR_BLACK", 
+    "NXT_COLOR_BLUE",
+    "NXT_COLOR_GREEN",
+    "NXT_COLOR_YELLOW",
+    "NXT_COLOR_ORANGE",
+    "NXT_COLOR_RED",
+    "NXT_COLOR_WHITE",
+    "NXT_COLOR_UNKNOWN"
+    );
+  Source_name => "U16";
+  Source_Text => ("ecrobot/c/ecrobot_interface.h");
+end color_id;
+
+data sensor_mode
+properties
+  Data_Model::Data_Representation => Enum;
+  Data_Model::Enumerators => (
+    "NXT_COLORSENSOR",
+    "NXT_LIGHTSENSOR_RED",
+    "NXT_LIGHTSENSOR_GREEN",
+    "NXT_LIGHTSENSOR_BLUE",
+    "NXT_LIGHTSENSOR_WHITE",    
+    "NXT_COLORSENSOR_DEACTIVATE",
+    "NUM_OF_NXT_COLORSENSOR_MODES",
+    "NXT_LIGHTSENSOR_NONE" 
+    );
+  Source_name => "U8";
+  Source_Text => ("ecrobot/c/ecrobot_interface.h");
+end sensor_mode;
+
+device ColorSensor
+features
+  getColor: provides subprogram access ecrobotGetColorId;    
+end ColorSensor;
+
+subprogram ecrobotGetColorId
+features
+  portId: in parameter nxt_sensor_port;
+  currentColor : out parameter color_id {Generation_Properties::Return_Parameter => true;};
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot/c/ecrobot_interface.h");
+  Source_name => "ecrobot_get_nxtcolorsensor_id";
+end ecrobotGetColorId;
+
+subprogram bgColorSensor
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot/c/ecrobot_interface.h");
+  Source_name => "ecrobot_process_bg_nxtcolorsensor";
+end bgColorSensor;
+
+thread implementation bg.impl
+    calls
+        background: {
+            bg1 : subprogram bgColorSensor;
+        };
+    properties
+        Dispatch_protocol => periodic;
+        Period            => 50 ms;
+        Compute_Execution_time   => 0 ms .. 10 ms;
+        Deadline                           => 50 ms;
+        Priority                           => 1;
+        stack_size  => 512 Bytes;
+        Compute_Entrypoint_Call_Sequence => reference (background); 
+end bg.impl;
+
+process proc
+ features
+  getColor: requires subprogram access ecrobotGetColorId;
+end proc;
+
+processor arm extends plateform::arm
+end arm;
+
+processor implementation arm.impl extends plateform::arm.impl
+end arm.impl;
+
+memory mem extends plateform::nxt_mem 
+end mem;  
+
+memory implementation mem.impl extends plateform::nxt_mem.impl 
+end mem.impl;
+
+data nxt_sensor_port
+properties
+  Data_Model::Data_Representation => Enum;
+  Data_Model::Enumerators => (
+    "NXT_PORT_S1", 
+    "NXT_PORT_S2",
+    "NXT_PORT_S3",
+    "NXT_PORT_S4"
+    );
+  source_name => "int";
+  source_text => ("ecrobot/c/ecrobot_interface.h");    
+end nxt_sensor_port;
+  
+end readColor;
