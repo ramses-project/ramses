@@ -86,13 +86,16 @@ abstract rule m_Input_BlackBoard
 	}
 }
 
--- @extends m_Input_BlackBoard_ComputeEntrypointCallSequence,m_Input_Port_ComputeEntrypointCallSequence_Mode
+-- @extends m_Input_Port_ComputeEntrypointCallSequence_Mode,m_Input_BlackBoard_ComputeEntrypointCallSequence
 rule m_Input_BlackBoard_ComputeEntrypointCallSequence_mode
 {
 	from
 		fi: AADLI!FeatureInstance,
 		behavior: AADLI!SubprogramCallSequence,
 		mode: AADLI!Mode
+		(
+			 not fi.getProcess().modeInstance->isEmpty()
+		)
 	to
 		call: AADLBA!SubprogramCallAction,
 		BLACKBOARD_ID_HOLDER: AADLBA!DataAccessHolder
