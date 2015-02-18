@@ -270,25 +270,24 @@ public class ArchitectureRefinementProcessLauncher {
     
     String message = "End of HOT to produce pattern matching traces";
     _LOGGER.trace(message);
-    
+    Resource r = null;
     try {
         TipUtils.setCurrentIteration(TipUtils.getCurrentIteration()+1);
         message = "Start production of " + outputResourceID;
         _LOGGER.trace(message);
-        Resource r = this.runArchitectureRefinementIteration(trcSpec,
+        r = this.runArchitectureRefinementIteration(trcSpec,
                                                              systemInstance, 
                                                              config,
                                                              outputResourceID);
-        if(r==null)
-          return r;
-        message = "Finish production of " + outputResourceID;
+        if(r!=null)
+          message = "Finish production of " + outputResourceID;
         config.setRamsesOutputDir(outputPathSave.getAbsolutePath());
-        return r;
     }
     finally
     {
       RuleApplicationUtils.clean();
     }
+    return r;
   }
 
 
@@ -416,7 +415,12 @@ public class ArchitectureRefinementProcessLauncher {
     }
     finally
     {
-      resourceSet.getResources().addAll(intermediateRs.getResources());
+      List<Resource> resList = new ArrayList<Resource>();
+      for(Resource r: intermediateRs.getResources())
+        if(false==resourceSet.getResources().contains(r))
+          resList.add(r);
+      
+      resourceSet.getResources().addAll(resList);
     }
 
 
