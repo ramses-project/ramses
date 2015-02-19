@@ -142,7 +142,12 @@ public abstract class RamsesActionHandler extends AbstractHandler {
           if (targetElement != null) {
               ComponentImplementation cc = ((Element) targetElement).getContainingComponentImpl();
                 try {
-                  _sysInst = InstantiateModel.buildInstanceModelFile(cc);
+                  URI uri = OsateResourceUtil.getInstanceModelURI(cc);
+                  Resource res = OsateResourceUtil.getResource(uri);
+                  if(res!=null && !res.getContents().isEmpty())
+                	_sysInst = (SystemInstance) res.getContents().get(0);
+                  else
+                	_sysInst = InstantiateModel.buildInstanceModelFile(cc);
                 } catch (UnsupportedOperationException uoe) {
                   Dialog.showError("Model Instantiate",
                                    "Operation is not supported: " + uoe.getMessage());
