@@ -44,8 +44,10 @@ import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.SystemInstance;
+import org.osate.aadl2.instantiation.InstantiateModel;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
 
 import fr.tpt.aadl.ramses.control.osate.properties.AadlInspectorPropertyPage;
@@ -86,6 +88,9 @@ public class GenerateActionHandler extends RamsesActionHandler {
       init(event, _OUTLINE_COMMAND_ID) ;
       
       Resource r = _sysInst.eResource();
+      ComponentImplementation cc = _sysInst.getComponentImplementation();
+      if(r==null)
+    	  _sysInst = InstantiateModel.buildInstanceModelFile(cc);
       String workflowFile = getConfigFile(r, "workflow");
 
       boolean foundGenerationPhase = false;
