@@ -5,10 +5,10 @@ with Data_Model, Osek;
 with nxtTypes,sonar;
 with plateform; 
 
-system bat
-end bat;
+system root
+end root;
 
-system implementation bat.impl
+system implementation root.impl
     subcomponents
         cpu : processor arm.impl;
         mem   : memory mem.impl;
@@ -18,7 +18,7 @@ system implementation bat.impl
         Actual_Processor_Binding => (reference (cpu)) applies to proces;
         Actual_Memory_Binding => (reference (mem)) applies to proces;
         Actual_Processor_Binding => (reference (cpu)) applies to echo;                     
-end bat.impl;
+end root.impl;
 
 
 process implementation Proc.Impl
