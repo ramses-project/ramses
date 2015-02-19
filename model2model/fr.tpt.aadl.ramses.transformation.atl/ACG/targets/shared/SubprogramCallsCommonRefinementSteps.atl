@@ -98,7 +98,11 @@ helper def: collectComputeEntryPointTransitions(c: AADLI!ComponentInstance): Seq
 			)
 	)
 	->union(
-			c.getComputeEntryPoints()->collect(cep | thisModule.resolveMatchedTupleIfExists(Sequence{c, cep}, 'computeEntryPointTransition'))
+			c.getComputeEntryPoints()->collect(cep | 
+				-- if in mode
+				-- thisModule.resolveMatchedTupleIfExists(Sequence{c, cep, mode}, 'computeEntryPointTransition'))
+				-- else
+				thisModule.resolveMatchedTupleIfExists(Sequence{c, cep}, 'computeEntryPointTransition'))
 		)
 	->flatten()->excluding(OclUndefined)
 ;
@@ -1664,7 +1668,8 @@ lazy rule populateParameterLabels
 	  	for(sc in behavior.ownedSubprogramCall)
 	  	{
 	  		-- if context is needed we reuse the context
-	  		if(sc.getSubprogramClassifier().needsContext())
+--	  		if(sc.getSubprogramClassifier().needsContext())
+	  		if(sc.getSubprogramClassifier()=spgClassifier and spgClassifier.needsContext())
 	  		{
 	  			intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateDataSubcomponentHolder(thisModule.createSubprogramCallContext(sc,c)));
 	  		}
