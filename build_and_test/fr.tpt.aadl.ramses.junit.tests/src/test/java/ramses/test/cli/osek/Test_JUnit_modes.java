@@ -23,6 +23,7 @@ public class Test_JUnit_modes extends OSGIOSEKScenario{
 		output = root_path+"/output";
 		output_ref = root_path+"/output_ref";
 		system_impl = "root.impl";
+		workflowPath = "osek-modes/input/modes.workflow";
 		
 	    File dir = new File(output);
 	    if (!dir.exists()) {
