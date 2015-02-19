@@ -42,6 +42,7 @@ import org.eclipse.emf.common.util.TreeIterator ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.osate.aadl2.ComponentImplementation;
@@ -49,6 +50,7 @@ import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.instantiation.InstantiateModel;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 
 import fr.tpt.aadl.ramses.control.osate.properties.AadlInspectorPropertyPage;
 import fr.tpt.aadl.ramses.control.osate.properties.LoggingConfigPage;
@@ -85,12 +87,19 @@ public class GenerateActionHandler extends RamsesActionHandler {
     {
       _JOB_NAME = "RAMSES code generation";
       
+      OsateResourceUtil.refreshResourceSet();
+      
       init(event, _OUTLINE_COMMAND_ID) ;
       
       Resource r = _sysInst.eResource();
-      ComponentImplementation cc = _sysInst.getComponentImplementation();
       if(r==null)
-    	  _sysInst = InstantiateModel.buildInstanceModelFile(cc);
+      {
+    	ComponentImplementation cc = _sysInst.getComponentImplementation();
+    	URI uri = OsateResourceUtil.getInstanceModelURI(cc);
+    	Resource res = OsateResourceUtil.getResource(uri);
+  		res.unload();
+  		_sysInst = InstantiateModel.buildInstanceModelFile(cc);
+      }
       String workflowFile = getConfigFile(r, "workflow");
 
       boolean foundGenerationPhase = false;
