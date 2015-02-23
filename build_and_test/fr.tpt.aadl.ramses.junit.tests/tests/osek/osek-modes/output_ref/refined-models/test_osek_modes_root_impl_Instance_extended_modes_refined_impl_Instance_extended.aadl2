@@ -1,7 +1,56 @@
 package test_osek_modes_modes_refined_refined_model
 public
-with Base_Types,OSEK,Data_Model,test_osek_modes,OSEK_runtime,test_osek_modes_modes_refined,arinc653_runtime,PeriodicDelayed_runtime;
-  process implementation proc1.impl
+with Base_Types,OSEK,Data_Model,test_osek_modes,OSEK_runtime,test_osek_modes_modes_refined;
+  system implementation refined_model.impl
+    subcomponents
+      the_mem: memory the_mem.impl;
+      the_proc_modes: process the_proc_modes.impl;
+      the_cpu: processor the_cpu.impl {
+        Scheduling_Protocol => (RMS);
+        OSEK::SystemCounter_MaxAllowedValue => 2000;
+        OSEK::SystemCounter_TicksPerBase => 1;
+        OSEK::SystemCounter_MinCycle => 1;
+        };
+    properties
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.c11;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.c22;
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes.the_sender;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_sender;
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes.the_receiver;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_receiver;
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes.the_receiver_m1;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_receiver_m1;
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes.the_receiver_m2;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_receiver_m2;
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes.the_proc_modes_mode_m1;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_proc_modes_mode_m1;
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes.the_proc_modes_mode_m2;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_proc_modes_mode_m2;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_proc_modes_mode_m1.targetModeValue;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_proc_modes_mode_m2.targetModeValue;
+  end refined_model.impl;
+  
+  system refined_model
+  end refined_model;
+  
+  memory implementation the_mem.impl
+  end the_mem.impl;
+  
+  memory the_mem
+  end the_mem;
+  
+  processor the_cpu
+  end the_cpu;
+  
+  processor implementation the_cpu.impl
+  end the_cpu.impl;
+  
+  process the_proc_modes
+  end the_proc_modes;
+  
+  process implementation the_proc_modes.impl
     subcomponents
       c11: data test_osek_modes::Integer {
         Data_Model::Initial_Value => ("11");
@@ -19,21 +68,17 @@ with Base_Types,OSEK,Data_Model,test_osek_modes,OSEK_runtime,test_osek_modes_mod
       the_proc_modes_mode_m2_globalQueue: data OSEK_runtime::ThreadQueueType {
         Data_Model::Initial_Value => ("{&the_proc_modes_mode_m2_globalQueue_rez, &the_proc_modes_mode_m2, &the_proc_modes_mode_m2_globalQueue_evt, 0, 0, {&the_proc_modes_mode_m2_p_globalVariable}}");
         };
-      the_receiver_input_data_m1_value: data test_osek_modes::Integer;
       the_receiver_input_data_globalVariable_m1: data OSEK_runtime::DataPortType {
-        Data_Model::Initial_Value => ("{&the_receiver_input_data_globalVariable_m1_rez, &the_receiver_input_data_m1_value, sizeof(test_osek_modes__Integer)}");
+        Data_Model::Initial_Value => ("{&the_receiver_input_data_globalVariable_m1_rez, &c11, sizeof(test_osek_modes__Integer)}");
         };
-      the_receiver_input_data_m2_value: data test_osek_modes::Integer;
       the_receiver_input_data_globalVariable_m2: data OSEK_runtime::DataPortType {
-        Data_Model::Initial_Value => ("{&the_receiver_input_data_globalVariable_m2_rez, &the_receiver_input_data_m2_value, sizeof(test_osek_modes__Integer)}");
+        Data_Model::Initial_Value => ("{&the_receiver_input_data_globalVariable_m2_rez, &c22, sizeof(test_osek_modes__Integer)}");
         };
-      the_receiver_m1_input_data_value: data test_osek_modes::Integer;
-      the_receiver_m1_input_data_globalVariable: data OSEK_runtime::DataPortType {
-        Data_Model::Initial_Value => ("{&the_receiver_m1_input_data_globalVariable_rez, &c11, sizeof(test_osek_modes__Integer)}");
+      the_receiver_m1_input_data_globalVariable_m1: data OSEK_runtime::DataPortType {
+        Data_Model::Initial_Value => ("{&the_receiver_m1_input_data_globalVariable_m1_rez, &c11, sizeof(test_osek_modes__Integer)}");
         };
-      the_receiver_m2_input_data_value: data test_osek_modes::Integer;
-      the_receiver_m2_input_data_globalVariable: data OSEK_runtime::DataPortType {
-        Data_Model::Initial_Value => ("{&the_receiver_m2_input_data_globalVariable_rez, &c22, sizeof(test_osek_modes__Integer)}");
+      the_receiver_m2_input_data_globalVariable_m2: data OSEK_runtime::DataPortType {
+        Data_Model::Initial_Value => ("{&the_receiver_m2_input_data_globalVariable_m2_rez, &c22, sizeof(test_osek_modes__Integer)}");
         };
       the_proc_modes_mode_m1_p_value: data the_proc_modes_mode_m1_p_bufferType;
       the_proc_modes_mode_m1_p_globalVariable: data OSEK_runtime::PortQueueType {
@@ -100,8 +145,8 @@ with Base_Types,OSEK,Data_Model,test_osek_modes,OSEK_runtime,test_osek_modes_mod
       m2_the_sender_p_m1_p_to_globalVariable: data access the_proc_modes_mode_m2_globalQueue -> the_sender.m2_the_sender_p_m1_p;
       Id_instance_to_the_receiver_input_data_m1: data access the_receiver_input_data_globalVariable_m1 -> the_receiver.input_data_m1;
       Id_instance_to_the_receiver_input_data_m2: data access the_receiver_input_data_globalVariable_m2 -> the_receiver.input_data_m2;
-      Id_instance_to_the_receiver_m1_input_data: data access the_receiver_m1_input_data_globalVariable -> the_receiver_m1.input_data;
-      Id_instance_to_the_receiver_m2_input_data: data access the_receiver_m2_input_data_globalVariable -> the_receiver_m2.input_data;
+      Id_instance_to_the_receiver_m1_input_data_m1: data access the_receiver_m1_input_data_globalVariable_m1 -> the_receiver_m1.input_data_m1;
+      Id_instance_to_the_receiver_m2_input_data_m2: data access the_receiver_m2_input_data_globalVariable_m2 -> the_receiver_m2.input_data_m2;
       Id_instance_to_the_proc_modes_mode_m1_p: data access the_proc_modes_mode_m1_globalQueue -> the_proc_modes_mode_m1.p_PortIdAccess_in;
       Id_instance_to_the_proc_modes_mode_m2_p: data access the_proc_modes_mode_m2_globalQueue -> the_proc_modes_mode_m2.p_PortIdAccess_in;
       the_proc_modes_mode_m1_CNX_CURRENT_STATE_BA: data access the_proc_modes_mode_m1.Parent_BA_currentState_Access -> the_proc_modes_mode_m1Parent_BA_currentState;
@@ -109,50 +154,7 @@ with Base_Types,OSEK,Data_Model,test_osek_modes,OSEK_runtime,test_osek_modes_mod
     modes
       m1: initial mode ;
       m2: mode ;
-  end proc1.impl;
-  
-  processor implementation cpu.impl
-  end cpu.impl;
-  
-  system implementation refined_model.impl
-    subcomponents
-      the_mem: memory mem;
-      the_proc_modes: process proc1.impl;
-      the_cpu: processor cpu.impl {
-        Scheduling_Protocol => (RMS);
-        OSEK::SystemCounter_MaxAllowedValue => 2000;
-        OSEK::SystemCounter_TicksPerBase => 1;
-        OSEK::SystemCounter_MinCycle => 1;
-        };
-    properties
-      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes;
-      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes;
-      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.c11;
-      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.c22;
-      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes.the_sender;
-      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_sender;
-      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes.the_receiver;
-      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_receiver;
-      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes.the_receiver_m1;
-      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_receiver_m1;
-      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes.the_receiver_m2;
-      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_receiver_m2;
-      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes.the_proc_modes_mode_m1;
-      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_proc_modes_mode_m1;
-      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes.the_proc_modes_mode_m2;
-      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_proc_modes_mode_m2;
-      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_proc_modes_mode_m1.targetModeValue;
-      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_proc_modes_mode_m2.targetModeValue;
-  end refined_model.impl;
-  
-  processor cpu
-  end cpu;
-  
-  memory mem
-  end mem;
-  
-  process proc1
-  end proc1;
+  end the_proc_modes.impl;
   
   subprogram sender_spg
     features
@@ -160,7 +162,7 @@ with Base_Types,OSEK,Data_Model,test_osek_modes,OSEK_runtime,test_osek_modes_mod
     properties
       Source_Name => "send";
       Source_Language => (C);
-      Source_Text => ("/home/castella/workspaces/runtime-New_configuration2/modes/user_send.h", "/home/castella/workspaces/runtime-New_configuration2/modes/user_send.c");
+      Source_Text => ("/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/osek/osek-modes/input/user_send.h", "/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/osek/osek-modes/input/user_send.c");
   end sender_spg;
   
   data sender_spg_context
@@ -171,25 +173,8 @@ with Base_Types,OSEK,Data_Model,test_osek_modes,OSEK_runtime,test_osek_modes_mod
       Source_Name => "__sender_spg_context";
   end sender_spg_context;
   
-  system refined_model
-  end refined_model;
-  
   system root
   end root;
-  
-  data the_proc_modes_the_proc_modes_mode_m1_currentState
-    properties
-      Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("ModeSwitch_init_state", "ModeSwitch_final_state");
-      Data_Model::Initial_Value => ("test_osek_modes_modes_refined_refined_model__the_proc_modes_the_proc_modes_mode_m1_currentState_ModeSwitch_init_state");
-  end the_proc_modes_the_proc_modes_mode_m1_currentState;
-  
-  data the_proc_modes_the_proc_modes_mode_m2_currentState
-    properties
-      Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("ModeSwitch_init_state", "ModeSwitch_final_state");
-      Data_Model::Initial_Value => ("test_osek_modes_modes_refined_refined_model__the_proc_modes_the_proc_modes_mode_m2_currentState_ModeSwitch_init_state");
-  end the_proc_modes_the_proc_modes_mode_m2_currentState;
   
   data the_proc_modes_mode_m1_p_bufferType
     properties
@@ -257,117 +242,19 @@ transitions
       m2_the_sender_p_m1_p: requires data access OSEK_runtime::ThreadQueueType;
   end the_proc_modes_the_sender;
   
-  subprogram the_proc_modes_the_receiver_m1_entrypoint
-    features
-      input_data: requires data access OSEK_runtime::DataPortType;
-  end the_proc_modes_the_receiver_m1_entrypoint;
-  
-  subprogram implementation the_proc_modes_the_receiver_m1_entrypoint.impl
-    subcomponents
-      the_proc_modes_the_receiver_m1_runtime_call_ret: data OSEK_runtime::StatusType;
-      input_data_localVariable: data test_osek_modes::Integer;
-      input_data_Length: data Base_Types::Integer_16 {
-        Data_Model::Initial_Value => ("sizeof(test_osek_modes__Integer)");
-        };
-      input_data_ErrorCode: data OSEK_runtime::StatusType {
-        Data_Model::Initial_Value => ("0");
-        };
-    annex behavior_specification {**
-      variables
-  whichPortActivated : test_osek_modes_modes_refined_refined_model::the_proc_modes_the_receiver_m1_behaviorIdentifier_enum ;
-states
-  BA_entrypoint_init_state : initial state ;
-  BA_entrypoint_wait_dispatch_state : state ;
-  BA_entrypoint_exec_state : state ;
-  BA_entrypoint_final_state : final state ;
-transitions
-  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc_modes_the_receiver_m1_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {GetValueDataPort_Integer ! (input_data, input_data_localVariable, input_data_ErrorCode) ;
-if (input_data_ErrorCode = 0) test_osek_modes::receiver_spg ! (input_data_localVariable) end if
-  } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc_modes_the_receiver_m1_behaviorIdentifier_enum#Enumerators.default_behavior} ;
-  dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {OSEK_runtime::TerminateTask !} ;
-**};
-  end the_proc_modes_the_receiver_m1_entrypoint.impl;
-  
-  data the_proc_modes_the_receiver_m1_behaviorIdentifier_enum
+  data the_proc_modes_the_proc_modes_mode_m1_currentState
     properties
       Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("default_behavior", "input_data");
-      Data_Model::Initial_Value => ("test_osek_modes_modes_refined_refined_model__the_proc_modes_the_receiver_m1_behaviorIdentifier_enum_default_behavior");
-  end the_proc_modes_the_receiver_m1_behaviorIdentifier_enum;
+      Data_Model::Enumerators => ("ModeSwitch_init_state", "ModeSwitch_final_state");
+      Data_Model::Initial_Value => ("test_osek_modes_modes_refined_refined_model__the_proc_modes_the_proc_modes_mode_m1_currentState_ModeSwitch_init_state");
+  end the_proc_modes_the_proc_modes_mode_m1_currentState;
   
-  thread implementation the_proc_modes_the_receiver_m1.impl
-    calls
-      main_call:  {
-        call_entrypoint: subprogram the_proc_modes_the_receiver_m1_entrypoint.impl;
-        } 
-      ;
-    connections
-      input_data_accessCnx_call: data access input_data -> call_entrypoint.input_data;
-  end the_proc_modes_the_receiver_m1.impl;
-  
-  thread the_proc_modes_the_receiver_m1
-    features
-      input_data: requires data access OSEK_runtime::DataPortType {
-        Data_Model::Data_Representation => Integer;
-        };
-  end the_proc_modes_the_receiver_m1;
-  
-  subprogram the_proc_modes_the_receiver_m2_entrypoint
-    features
-      input_data: requires data access OSEK_runtime::DataPortType;
-  end the_proc_modes_the_receiver_m2_entrypoint;
-  
-  subprogram implementation the_proc_modes_the_receiver_m2_entrypoint.impl
-    subcomponents
-      the_proc_modes_the_receiver_m2_runtime_call_ret: data OSEK_runtime::StatusType;
-      input_data_localVariable: data test_osek_modes::Integer;
-      input_data_Length: data Base_Types::Integer_16 {
-        Data_Model::Initial_Value => ("sizeof(test_osek_modes__Integer)");
-        };
-      input_data_ErrorCode: data OSEK_runtime::StatusType {
-        Data_Model::Initial_Value => ("0");
-        };
-    annex behavior_specification {**
-      variables
-  whichPortActivated : test_osek_modes_modes_refined_refined_model::the_proc_modes_the_receiver_m2_behaviorIdentifier_enum ;
-states
-  BA_entrypoint_init_state : initial state ;
-  BA_entrypoint_wait_dispatch_state : state ;
-  BA_entrypoint_exec_state : state ;
-  BA_entrypoint_final_state : final state ;
-transitions
-  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc_modes_the_receiver_m2_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {GetValueDataPort_Integer ! (input_data, input_data_localVariable, input_data_ErrorCode) ;
-if (input_data_ErrorCode = 0) test_osek_modes::receiver_spg ! (input_data_localVariable) end if
-  } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc_modes_the_receiver_m2_behaviorIdentifier_enum#Enumerators.default_behavior} ;
-  dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {OSEK_runtime::TerminateTask !} ;
-**};
-  end the_proc_modes_the_receiver_m2_entrypoint.impl;
-  
-  data the_proc_modes_the_receiver_m2_behaviorIdentifier_enum
+  data the_proc_modes_the_proc_modes_mode_m2_currentState
     properties
       Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("default_behavior", "input_data");
-      Data_Model::Initial_Value => ("test_osek_modes_modes_refined_refined_model__the_proc_modes_the_receiver_m2_behaviorIdentifier_enum_default_behavior");
-  end the_proc_modes_the_receiver_m2_behaviorIdentifier_enum;
-  
-  thread implementation the_proc_modes_the_receiver_m2.impl
-    calls
-      main_call:  {
-        call_entrypoint: subprogram the_proc_modes_the_receiver_m2_entrypoint.impl;
-        } 
-      ;
-    connections
-      input_data_accessCnx_call: data access input_data -> call_entrypoint.input_data;
-  end the_proc_modes_the_receiver_m2.impl;
-  
-  thread the_proc_modes_the_receiver_m2
-    features
-      input_data: requires data access OSEK_runtime::DataPortType {
-        Data_Model::Data_Representation => Integer;
-        };
-  end the_proc_modes_the_receiver_m2;
+      Data_Model::Enumerators => ("ModeSwitch_init_state", "ModeSwitch_final_state");
+      Data_Model::Initial_Value => ("test_osek_modes_modes_refined_refined_model__the_proc_modes_the_proc_modes_mode_m2_currentState_ModeSwitch_init_state");
+  end the_proc_modes_the_proc_modes_mode_m2_currentState;
   
   subprogram the_proc_modes_the_receiver_entrypoint
     features
@@ -431,6 +318,120 @@ if (input_data_ErrorCode = 0) test_osek_modes::receiver_spg ! (input_data_localV
       input_data_m2: requires data access OSEK_runtime::DataPortType;
   end the_proc_modes_the_receiver;
   
+  subprogram the_proc_modes_the_receiver_m1_entrypoint
+    features
+      input_data_m1: requires data access OSEK_runtime::DataPortType;
+  end the_proc_modes_the_receiver_m1_entrypoint;
+  
+  subprogram implementation the_proc_modes_the_receiver_m1_entrypoint.impl
+    subcomponents
+      the_proc_modes_the_receiver_m1_runtime_call_ret: data OSEK_runtime::StatusType;
+      input_data_localVariable: data test_osek_modes::Integer;
+      input_data_Length: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("sizeof(test_osek_modes__Integer)");
+        };
+      input_data_ErrorCode: data OSEK_runtime::StatusType {
+        Data_Model::Initial_Value => ("0");
+        };
+      the_receiver_m1_currentMode: data test_osek_modes_modes_refined::the_proc_modes_modeDataClassifier;
+    annex behavior_specification {**
+      variables
+  whichPortActivated : test_osek_modes_modes_refined_refined_model::the_proc_modes_the_receiver_m1_behaviorIdentifier_enum ;
+states
+  BA_entrypoint_init_state : initial state ;
+  BA_entrypoint_wait_dispatch_state : state ;
+  BA_entrypoint_exec_state : state ;
+  BA_entrypoint_final_state : final state ;
+transitions
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc_modes_the_receiver_m1_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {OSEK_runtime::GetActiveApplicationMode ! (the_receiver_m1_currentMode) ;
+if (the_receiver_m1_currentMode = test_osek_modes_modes_refined::the_proc_modes_modeDataClassifier#Enumerators.m1) GetValueDataPort_Integer ! (input_data_m1, input_data_localVariable, input_data_ErrorCode) end if
+   ;
+if (input_data_ErrorCode = 0) test_osek_modes::receiver_spg ! (input_data_localVariable) end if
+  } ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc_modes_the_receiver_m1_behaviorIdentifier_enum#Enumerators.default_behavior} ;
+  dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {OSEK_runtime::TerminateTask !} ;
+**};
+  end the_proc_modes_the_receiver_m1_entrypoint.impl;
+  
+  data the_proc_modes_the_receiver_m1_behaviorIdentifier_enum
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("default_behavior", "input_data");
+      Data_Model::Initial_Value => ("test_osek_modes_modes_refined_refined_model__the_proc_modes_the_receiver_m1_behaviorIdentifier_enum_default_behavior");
+  end the_proc_modes_the_receiver_m1_behaviorIdentifier_enum;
+  
+  thread implementation the_proc_modes_the_receiver_m1.impl
+    calls
+      main_call:  {
+        call_entrypoint: subprogram the_proc_modes_the_receiver_m1_entrypoint.impl;
+        } 
+      ;
+    connections
+      input_data_accessCnx_call_m1: data access input_data_m1 -> call_entrypoint.input_data_m1;
+  end the_proc_modes_the_receiver_m1.impl;
+  
+  thread the_proc_modes_the_receiver_m1
+    features
+      input_data_m1: requires data access OSEK_runtime::DataPortType;
+  end the_proc_modes_the_receiver_m1;
+  
+  subprogram the_proc_modes_the_receiver_m2_entrypoint
+    features
+      input_data_m2: requires data access OSEK_runtime::DataPortType;
+  end the_proc_modes_the_receiver_m2_entrypoint;
+  
+  subprogram implementation the_proc_modes_the_receiver_m2_entrypoint.impl
+    subcomponents
+      the_proc_modes_the_receiver_m2_runtime_call_ret: data OSEK_runtime::StatusType;
+      input_data_localVariable: data test_osek_modes::Integer;
+      input_data_Length: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("sizeof(test_osek_modes__Integer)");
+        };
+      input_data_ErrorCode: data OSEK_runtime::StatusType {
+        Data_Model::Initial_Value => ("0");
+        };
+      the_receiver_m2_currentMode: data test_osek_modes_modes_refined::the_proc_modes_modeDataClassifier;
+    annex behavior_specification {**
+      variables
+  whichPortActivated : test_osek_modes_modes_refined_refined_model::the_proc_modes_the_receiver_m2_behaviorIdentifier_enum ;
+states
+  BA_entrypoint_init_state : initial state ;
+  BA_entrypoint_wait_dispatch_state : state ;
+  BA_entrypoint_exec_state : state ;
+  BA_entrypoint_final_state : final state ;
+transitions
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc_modes_the_receiver_m2_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {OSEK_runtime::GetActiveApplicationMode ! (the_receiver_m2_currentMode) ;
+if (the_receiver_m2_currentMode = test_osek_modes_modes_refined::the_proc_modes_modeDataClassifier#Enumerators.m2) GetValueDataPort_Integer ! (input_data_m2, input_data_localVariable, input_data_ErrorCode) end if
+   ;
+if (input_data_ErrorCode = 0) test_osek_modes::receiver_spg ! (input_data_localVariable) end if
+  } ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc_modes_the_receiver_m2_behaviorIdentifier_enum#Enumerators.default_behavior} ;
+  dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {OSEK_runtime::TerminateTask !} ;
+**};
+  end the_proc_modes_the_receiver_m2_entrypoint.impl;
+  
+  data the_proc_modes_the_receiver_m2_behaviorIdentifier_enum
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("default_behavior", "input_data");
+      Data_Model::Initial_Value => ("test_osek_modes_modes_refined_refined_model__the_proc_modes_the_receiver_m2_behaviorIdentifier_enum_default_behavior");
+  end the_proc_modes_the_receiver_m2_behaviorIdentifier_enum;
+  
+  thread implementation the_proc_modes_the_receiver_m2.impl
+    calls
+      main_call:  {
+        call_entrypoint: subprogram the_proc_modes_the_receiver_m2_entrypoint.impl;
+        } 
+      ;
+    connections
+      input_data_accessCnx_call_m2: data access input_data_m2 -> call_entrypoint.input_data_m2;
+  end the_proc_modes_the_receiver_m2.impl;
+  
+  thread the_proc_modes_the_receiver_m2
+    features
+      input_data_m2: requires data access OSEK_runtime::DataPortType;
+  end the_proc_modes_the_receiver_m2;
+  
   subprogram the_proc_modes_the_proc_modes_mode_m1_entrypoint
     features
       p_PortIdAccess_in: requires data access OSEK_runtime::ThreadQueueType;
@@ -481,10 +482,9 @@ OSEK_runtime::TerminateTask ! end if
     subcomponents
       targetModeValue: data test_osek_modes_modes_refined::the_proc_modes_modeDataClassifier {
         Data_Model::Data_Representation => Enum;
-        Priority => 9;
         Data_Model::Enumerators => ("m1", "m2");
         Source_Name => "AppModeType";
-        Source_Text => ("kernel.h");
+        Source_Text => ("toppers_osek/include/kernel.h");
         };
     calls
       main_call:  {
@@ -553,10 +553,9 @@ OSEK_runtime::TerminateTask ! end if
     subcomponents
       targetModeValue: data test_osek_modes_modes_refined::the_proc_modes_modeDataClassifier {
         Data_Model::Data_Representation => Enum;
-        Priority => 9;
         Data_Model::Enumerators => ("m1", "m2");
         Source_Name => "AppModeType";
-        Source_Text => ("kernel.h");
+        Source_Text => ("toppers_osek/include/kernel.h");
         };
     calls
       main_call:  {
