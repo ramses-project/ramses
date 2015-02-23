@@ -15,7 +15,7 @@ public class Test_JUnit_sonarTest extends OSGIOSEKScenario{
 	}
 
 	@Test
-	public void Test_JUnit_modes_exec() {
+	public void Test_JUnit_sonarTest_exec() {
 		String root_path = "tests/osek/osek-sonar-test";
 		input = "osek-modes/input/model.aadl,";
 		includeList = "tests/osek/";
