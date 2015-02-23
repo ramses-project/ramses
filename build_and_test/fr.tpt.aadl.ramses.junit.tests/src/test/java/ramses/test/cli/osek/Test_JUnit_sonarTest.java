@@ -19,7 +19,7 @@ public class Test_JUnit_sonarTest extends OSGIOSEKScenario{
 		String project = "osek-sonar-test";
 		String root_path = "tests/osek/"+project;
 		input = project+"/input/model.aadl,";
-		includeList = "tests/osek/";
+		includeList = "tests/osek/osek-lego-devices-commons";
 		ramses_dir = System.getProperty("RAMSES_DIR");
 		output = root_path+"/output";
 		output_ref = root_path+"/output_ref";
