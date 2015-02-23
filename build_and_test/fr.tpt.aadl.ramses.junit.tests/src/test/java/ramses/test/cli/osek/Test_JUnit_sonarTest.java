@@ -16,14 +16,15 @@ public class Test_JUnit_sonarTest extends OSGIOSEKScenario{
 
 	@Test
 	public void Test_JUnit_sonarTest_exec() {
-		String root_path = "tests/osek/osek-sonar-test";
-		input = "osek-modes/input/model.aadl,";
+		String project = "osek-sonar-test";
+		String root_path = "tests/osek/"+project;
+		input = project+"/input/model.aadl,";
 		includeList = "tests/osek/";
 		ramses_dir = System.getProperty("RAMSES_DIR");
 		output = root_path+"/output";
 		output_ref = root_path+"/output_ref";
 		system_impl = "root.impl";
-//		workflowPath = "osek-modes/input/modes.workflow";
+//		workflowPath = project+"/input/modes.workflow";
 		
 	    File dir = new File(output);
 	    if (!dir.exists()) {
