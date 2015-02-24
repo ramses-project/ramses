@@ -22,7 +22,7 @@
 -- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
 -- @atlcompiler emftvm
 
-module Common;
+module DataInstances;
 create OUT : CV 	from 		IN : AADLI;
 
 --@extends check_ComponentInstance
