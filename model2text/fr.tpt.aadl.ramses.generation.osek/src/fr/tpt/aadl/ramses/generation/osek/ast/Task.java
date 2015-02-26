@@ -107,6 +107,8 @@ public class Task {
 			if (! lst.contains(resourceName)){
 				lst.add(resourceName);
 				code.addOutputNewline("RESOURCE = " + resourceName + "_rez;");
+			}else{
+				System.out.println("WARNING : Duplicated entry for RESSOURCE "+resourceName+" in task "+this.name+" ; has been supressed");
 			}
 		}
 		lst.clear();
@@ -115,6 +117,8 @@ public class Task {
 			if (! lst.contains(eventName)){
 				lst.add(eventName);
 				code.addOutputNewline("EVENT = " + eventName + "_evt;");
+			}else{
+				System.out.println("WARNING : Duplicated entry for EVENT "+eventName+" in task "+this.name+" ; has been supressed");
 			}
 		}
 		code.addOutputNewline("};");
