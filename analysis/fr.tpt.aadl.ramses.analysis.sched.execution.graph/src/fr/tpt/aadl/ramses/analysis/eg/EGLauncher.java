@@ -126,6 +126,7 @@ public class EGLauncher {
 	 */
 	public static EGNode entrypoint (NamedElement entry)
 	{
+	  EGNode res;
 	  /** Try to find a behavior annex in the current entrypoint */
 	  BehaviorAnnex ba = null;
     
@@ -134,40 +135,42 @@ public class EGLauncher {
 	  if (ba != null)
     {
 	    /** Behavior annex found on the entrypoint */
-      return new BA2EG (ba, entry).toEG();
+      res = new BA2EG (ba, entry).toEG();
+      if(!res.isNullWCET())
+        return res;
     }
-	  else
+	  /** Try to find a call sequence in the entrypoint */
+	  List<SubprogramCall> sequence = BehaviorUtil.getCallSequence(entry);
+	  if (sequence != null)
 	  {
-	    /** Try to find a call sequence in the entrypoint */
-	    List<SubprogramCall> sequence = BehaviorUtil.getCallSequence(entry);
-	    if (sequence != null)
+	    /** Call sequence found */
+	    if (sequence.size()==1) // entrypoint subprogram
 	    {
-	      /** Call sequence found */
-	      if (sequence.size()==1) // entrypoint subprogram
+	      /** Unique call: assumes its an entrypoint subprogram */
+	      SubprogramCall call = sequence.get(0);
+	      CalledSubprogram called = call.getCalledSubprogram();
+	      if (called instanceof SubprogramClassifier)
 	      {
-	        /** Unique call: assumes its an entrypoint subprogram */
-	        SubprogramCall call = sequence.get(0);
-	        CalledSubprogram called = call.getCalledSubprogram();
-	        if (called instanceof SubprogramClassifier)
-	        {
-	          EGContext.getInstance().pushCurrentSubprogram(call);
-	          EGNode e = entrypoint ((SubprogramClassifier) called);
-	          EGContext.getInstance().popCurrentSubprogram();
-	          return e;
-	        }
-	        else // subprogram prototype ?
-	        {
-	          String msg = "unsupported type \'" +
-	              called.getClass().getSimpleName() + '\'' ;
-	          _LOGGER.fatal(msg) ;
-	          throw new UnsupportedOperationException(msg);
-	        }
+	        EGContext.getInstance().pushCurrentSubprogram(call);
+	        res = entrypoint ((SubprogramClassifier) called);
+	        EGContext.getInstance().popCurrentSubprogram();
+	        if(!res.isNullWCET())
+	          return res;
 	      }
-	      else if (sequence.size() > 1)
+	      else // subprogram prototype ?
 	      {
-	        /** Multiple calls: the execution graph will be defined from them */
-	        return new CallSequence2EG (sequence).toEG();
+	        String msg = "unsupported type \'" +
+	            called.getClass().getSimpleName() + '\'' ;
+	        _LOGGER.fatal(msg) ;
+	        throw new UnsupportedOperationException(msg);
 	      }
+	    }
+	    else if (sequence.size() > 1)
+	    {
+	      /** Multiple calls: the execution graph will be defined from them */
+	      res = new CallSequence2EG (sequence).toEG();
+	      if(!res.isNullWCET())
+	        return res;
 	    }
 	  }
 	  
@@ -178,11 +181,11 @@ public class EGLauncher {
 	  if(range!=null)
 	  {
 	    bcet = range.getMin();
-        wcet = range.getMax();
+      wcet = range.getMax();
 	  }
 	  
 	  EGNode nCompute = new EGNode ("No_Behavior_Call_" + entry.getName());
-      nCompute.setBCET(bcet);
+    nCompute.setBCET(bcet);
 	  nCompute.setWCET(wcet);
     return nCompute;
 	}

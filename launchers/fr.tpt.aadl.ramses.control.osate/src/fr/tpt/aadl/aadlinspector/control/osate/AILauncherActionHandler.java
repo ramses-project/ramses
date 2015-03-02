@@ -1,5 +1,7 @@
 package fr.tpt.aadl.aadlinspector.control.osate;
 
+import java.io.IOException ;
+
 import org.apache.log4j.Logger;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -11,10 +13,12 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.osate.aadl2.instance.SystemInstance;
 
+import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory ;
 import fr.tpt.aadl.ramses.control.osate.RamsesActionHandler;
 import fr.tpt.aadl.ramses.control.osate.WorkbenchUtils;
 import fr.tpt.aadl.ramses.control.osate.properties.AadlInspectorPropertyPage;
 import fr.tpt.aadl.ramses.control.osate.properties.LoggingConfigPage;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException;
 import fr.tpt.aadl.ramses.control.support.config.ConfigurationException;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
@@ -22,6 +26,7 @@ import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.sched.aadlinspector.AADLInspectorLauncher;
+import fr.tpt.aadl.sched.aadlinspector.output.AnalysisResult ;
 
 public class AILauncherActionHandler extends RamsesActionHandler {
 
@@ -136,8 +141,21 @@ public class AILauncherActionHandler extends RamsesActionHandler {
 		
 		AADLInspectorLauncher aiLauncher = new AADLInspectorLauncher(config.getAadlInspectorInstallDir());
 		
-		aiLauncher.launchAnalysis(sysInst, config.getAadlInspectorOutputDir(), config.getMode(), monitor);
-	    
+		AnalysisResult ar = aiLauncher.launchAnalysis(sysInst, config.getAadlInspectorOutputDir(), config.getMode(), monitor);
+		
+		AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE ;
+    AnalysisArtifact result = f.createAnalysisArtifact() ;
+    ar.normalize(result);
+	  try
+    {
+      updateAnalysisResults(result);
+    }
+    catch(IOException e)
+    {
+      String msg = "cannot save analysis results" ;
+      _LOGGER.error(msg, e);
+      ServiceProvider.SYS_ERR_REP.error(msg, false);
+    }
 	}
 	
 }

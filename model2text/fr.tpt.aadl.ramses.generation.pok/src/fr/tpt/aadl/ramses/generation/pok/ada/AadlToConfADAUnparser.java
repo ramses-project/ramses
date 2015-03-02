@@ -1207,7 +1207,7 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
     {
       additionalFeatures =
           PropertyUtils.getStringListValue(vps, "Additional_Features") ;
-      if(additionalFeatures != null)
+      if(additionalFeatures!=null)
       {
         for(String s : additionalFeatures)
         {
@@ -1241,7 +1241,7 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
       else
       {
         String errMsg = "cannot fecth Additional_Features for \'" +
-                                                vps.getName() + '\'' ;
+            vps.getName() + '\'' ;
         _LOGGER.error(errMsg) ;
         ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
       }
@@ -1322,7 +1322,7 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
     {
       boolean foundRR = false ;
 
-     String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduling_Protocol") ;
+      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduling_Protocol") ;
       if(requiredScheduler != null)
       {
         if(requiredScheduler.equalsIgnoreCase("Round_Robin_Protocol") && foundRR == false)
@@ -1346,6 +1346,7 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
       String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduling_Protocol") ;
+      
       if(requiredScheduler != null)
       {
         if(requiredScheduler.equalsIgnoreCase("Round_Robin_Protocol"))
@@ -1490,9 +1491,9 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
     }
 
     deploymentHeaderCode.addOutputNewline("}") ;
-    NamedElement ne = processor.getContainingClassifier();
+    
     PropertyAssociation moduleSchedulePA = PropertyUtils.
-                                 findPropertyAssociation("Module_Schedule", ne);
+                                 findPropertyAssociation("Module_Schedule", processor);
     if(moduleSchedulePA == null)
     {
       String errMsg =  "cannot fetch Module_Schedule for \'"+

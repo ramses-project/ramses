@@ -27,6 +27,9 @@ import java.util.ArrayList ;
 import java.util.List ;
 
 import org.apache.log4j.Logger ;
+import org.eclipse.core.resources.IProject ;
+import org.eclipse.core.resources.IWorkspaceRoot ;
+import org.eclipse.core.resources.ResourcesPlugin ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.core.runtime.OperationCanceledException ;
 import org.eclipse.core.runtime.Platform ;
@@ -226,7 +229,16 @@ public class AADLInspectorLauncher
 		  paths.add(path);
 		else
 		{
-		  String filePath = Platform.getLocation().toOSString();
+			
+		  IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		  String projectName = uri.toPlatformString(true).substring(1);
+		  projectName = projectName.substring(0, projectName.indexOf("/"));
+		  
+
+		  IProject project = workspaceRoot.getProject(projectName);
+
+		  String filePath = project.getLocation().toOSString();
+		  filePath = filePath.substring(0, filePath.lastIndexOf("/"));
 		  filePath = filePath + uri.toPlatformString(true) ;
 		  paths.add(filePath);
 		}
@@ -247,8 +259,16 @@ public class AADLInspectorLauncher
 			String path = uri.toFileString();
 			if(path==null)
 			{
-			  path = Platform.getLocation().toOSString();
-			  path = path + uri.toPlatformString(true) ;
+			  IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+	      String projectName = uri.toPlatformString(true).substring(1);
+	      projectName = projectName.substring(0, projectName.indexOf("/"));
+	      
+
+	      IProject project = workspaceRoot.getProject(projectName);
+
+	      String filePath = project.getLocation().toOSString();
+	      filePath = filePath.substring(0, filePath.lastIndexOf("/"));
+			  path = filePath + uri.toPlatformString(true) ;
 			}
 			if (! pathList.contains(path))
 			{

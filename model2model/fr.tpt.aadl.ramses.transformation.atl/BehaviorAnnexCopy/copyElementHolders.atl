@@ -28,12 +28,12 @@ create OUT : AADLBA 	from 	IN : AADLBA,
 abstract rule m_ElementHolder
 {
 	from
-		src_Holder: AADLBA!ElementHolder
-		(src_Holder.isThreadBehaviorElement())
+		src_BehaviorElement: AADLBA!ElementHolder
+		(src_BehaviorElement.isThreadBehaviorElement())
 	to
-		target_Holder: AADLBA!ElementHolder
+		target_BehaviorElement: AADLBA!ElementHolder
 		(
-			element<-src_Holder.element	
+			element<-src_BehaviorElement.element	
 		)
 }
 
@@ -41,70 +41,70 @@ abstract rule m_ElementHolder
 rule m_SubprogramAccessHolder
 {
 	from
-		src_Holder: AADLBA!SubprogramAccessHolder
+		src_BehaviorElement: AADLBA!SubprogramAccessHolder
 	to
-		target_Holder: AADLBA!SubprogramAccessHolder
+		target_BehaviorElement: AADLBA!SubprogramAccessHolder
 }
 
 -- @extends m_ElementHolder
 rule m_EventPortHolder
 {
 	from
-		src_Holder: AADLBA!EventPortHolder
+		src_BehaviorElement: AADLBA!EventPortHolder
 	to
-		target_Holder: AADLBA!EventPortHolder
+		target_BehaviorElement: AADLBA!EventPortHolder
 }
 
 -- @extends m_ElementHolder
 rule m_EventDataPortHolder
 {
 	from
-		src_Holder:AADLBA!EventDataPortHolder
+		src_BehaviorElement:AADLBA!EventDataPortHolder
 	to
-		target_Holder: AADLBA!EventDataPortHolder
+		target_BehaviorElement: AADLBA!EventDataPortHolder
 }
 
 -- @extends m_ElementHolder
 rule m_DataPortHolder
 {
 	from
-		src_Holder:AADLBA!DataPortHolder
+		src_BehaviorElement:AADLBA!DataPortHolder
 	to
-		target_Holder: AADLBA!DataPortHolder
+		target_BehaviorElement: AADLBA!DataPortHolder
 }
 
 -- @extends m_ElementHolder
 rule m_CalledSubprogramHolder
 {
 	from
-		src_Holder:AADLBA!CalledSubprogramHolder
+		src_BehaviorElement:AADLBA!CalledSubprogramHolder
 	to
-		target_Holder:AADLBA!CalledSubprogramHolder
+		target_BehaviorElement:AADLBA!CalledSubprogramHolder
 }
 
 -- @extends m_ElementHolder
 rule m_DataAccessHolder
 {
 	from
-		src_Holder:AADLBA!DataAccessHolder
+		src_BehaviorElement:AADLBA!DataAccessHolder
 	to
-		target_Holder:AADLBA!DataAccessHolder
+		target_BehaviorElement:AADLBA!DataAccessHolder
 }
 
 -- @extends m_ElementHolder
 rule m_BehaviorVariableHolder
 {
 	from
-		src_Holder: AADLBA!BehaviorVariableHolder
+		src_BehaviorElement: AADLBA!BehaviorVariableHolder
 	to
-		target_Holder: AADLBA!BehaviorVariableHolder
+		target_BehaviorElement: AADLBA!BehaviorVariableHolder
 }
 
 -- @extends m_ElementHolder
 rule m_PortFreshValue
 {
 	from
-		src_Holder: AADLBA!PortFreshValue
+		src_BehaviorElement: AADLBA!PortFreshValue
 	to
-		target_Holder: AADLBA!PortFreshValue
+		target_BehaviorElement: AADLBA!PortFreshValue
 }

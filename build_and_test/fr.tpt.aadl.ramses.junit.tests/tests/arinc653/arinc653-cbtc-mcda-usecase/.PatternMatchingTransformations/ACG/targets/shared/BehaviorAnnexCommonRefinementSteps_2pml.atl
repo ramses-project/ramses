@@ -1,0 +1,727 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+module BehaviorAnnexCommonRefinementSteps;
+create OUT : MM_ATL2PM from IN : AADLI, AADL_RUNTIME : AADLBA, DATA_MODEL : AADLBA, PROGRAMMING_PROPERTIES : AADLBA, HOOKS : ATLHOOKS, ARINC653_RUNTIME : AADLBA;
+
+-- List
+-- @extends m_ThreadPort_Filter,m_BA_Filter
+abstract rule m_Port_BehaviorAnnex {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!AnnexSubclause
+  (
+   fi.getComponentInstance().subcomponent.subcomponentType.getBA() = behavior and not fi.isPeriodicDelayedPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_Port_BehaviorAnnex'
+  )
+}
+
+-- @extends m_Port_BehaviorAnnex
+rule m_Input_Port_BehaviorAnnex {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!AnnexSubclause
+  (
+   fi.isInputFeature()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_Input_Port_BehaviorAnnex'
+  )
+} -- @extends m_Port_BehaviorAnnex,m_OutputFeature_Filter
+-- @extends m_Port_BehaviorAnnex,m_OutputFeature_Filter
+rule m_Output_Port_BehaviorAnnex {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!AnnexSubclause,
+  cnxRef : AADLI!PortConnection
+  (
+   fi.srcConnectionInstance->exists(e |
+    e.connectionReference->exists(cnx |
+     cnx.connection = cnxRef
+    )
+   )
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, cnxRef},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_Output_Port_BehaviorAnnex'
+  )
+} -- @extends m_Thread_Instance_Filter, m_BehavioredInstance
+-- @extends m_Thread_Instance_Filter, m_BehavioredInstance
+rule m_Compute_EntryPoint_from_BA_dataAccess {
+ from
+  c : AADLI!ComponentInstance,
+  data : AADLI!ComponentInstance
+  (
+   not c.subcomponent.classifier.getBA().oclIsUndefined() and data.eContainer() = c and AADLBA!ElementHolder.allInstances(c.subcomponent.classifier.getBA())->exists(f |
+    f.element = data.subcomponent
+   )
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c, data},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_Compute_EntryPoint_from_BA_dataAccess'
+  )
+} -- @extends m_ThreadBehavior, m_BehavioredInstance
+-- @extends m_ThreadBehavior, m_BehavioredInstance
+rule m_Compute_EntryPoint_from_BA {
+ from
+  c : AADLI!ComponentInstance,
+  behavior : AADLI!AnnexSubclause
+  (
+   c.category = #thread and behavior.oclIsTypeOf(AADLBA!BehaviorAnnex) and c.subcomponent.classifier.getBA() = behavior and c.subcomponent.subcomponentType.oclIsKindOf(AADLI!ComponentImplementation) and c.subcomponent.subcomponentType.needsToMapBehaviorAnnex()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c, behavior},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_Compute_EntryPoint_from_BA'
+  )
+} -- Next rule should be overriden as it is target specific
+helper context OclAny def: resolve(c : AADLI!ComponentInstance) : OclAny =
+ if self.oclIsUndefined() then
+  OclUndefined
+ else
+  self.debug(' WARNING, untreatead type')
+ endif;
+
+helper context AADLBA!BehaviorVariable def: resolve(c : AADLI!ComponentInstance) : AADLBA!BehaviorVariable =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!BehaviorActionBlock def: resolve(c : AADLI!ComponentInstance) : AADLBA!BehaviorActionBlock =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!BehaviorActionSequence def: resolve(c : AADLI!ComponentInstance) : AADLBA!BehaviorActionSequence =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!AssignmentAction def: resolve(c : AADLI!ComponentInstance) : AADLBA!SubprogramCallAction =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!SubprogramCallAction def: resolve(c : AADLI!ComponentInstance) : AADLBA!SubprogramCallAction =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!IfStatement def: resolve(c : AADLI!ComponentInstance) : AADLBA!IfStatement =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!ElseStatement def: resolve(c : AADLI!ComponentInstance) : AADLBA!IfStatement =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!ElementHolder def: resolve(c : AADLI!ComponentInstance) : AADLBA!ElementHolder =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!PropertyElementHolder def: resolve(c : AADLI!ComponentInstance) : AADLBA!ElementHolder =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!PortHolder def: resolve(c : AADLI!ComponentInstance) : AADLBA!ElementHolder =
+ let fi : AADLI!FeatureInstance = c.featureInstance->any(e |
+  e.feature = self.element
+ ) in
+ if fi.isUsedInFresh() then
+  thisModule.getValueComponentReference(fi)
+ else
+  thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement')
+ endif;
+
+helper context AADLBA!ClassifierPropertyReference def: resolve(c : AADLI!ComponentInstance) : AADLBA!ClassifierPropertyReference =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!PropertySetPropertyReference def: resolve(c : AADLI!ComponentInstance) : AADLBA!PropertySetPropertyReference =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!PropertyNameHolder def: resolve(c : AADLI!ComponentInstance) : AADLBA!PropertyNameHolder =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!UpperBound def: resolve(c : AADLI!ComponentInstance) : AADLBA!UpperBound =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!LowerBound def: resolve(c : AADLI!ComponentInstance) : AADLBA!LowerBound =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!PortFreshValue def: resolve(c : AADLI!ComponentInstance) : AADLBA!ElementHolder =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!Factor def: resolve(c : AADLI!ComponentInstance) : AADLBA!ElementHolder =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!Term def: resolve(c : AADLI!ComponentInstance) : AADLBA!ElementHolder =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!BehaviorIntegerLiteral def: resolve(c : AADLI!ComponentInstance) : AADLBA!BehaviorIntegerLiteral =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!ValueExpression def: resolve(c : AADLI!ComponentInstance) : AADLBA!ValueExpression =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!Relation def: resolve(c : AADLI!ComponentInstance) : AADLBA!Relation =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!SimpleExpression def: resolve(c : AADLI!ComponentInstance) : AADLBA!SimpleExpression =
+ thisModule.resolveMatchedTupleIfExists(Sequence {self, c}, 'target_BehaviorElement');
+
+helper context AADLBA!BehaviorTransition def: usedPortCount() : Sequence(AADLBA!Port) =
+ thisModule.theHOOK.allPortCount(self); -- next rule needs a target specific implementation
+-- @extends m_BehavioredInstance
+rule m_BehaviorActionsFromThread {
+ from
+  c : AADLI!ComponentInstance,
+  src_transition : AADLBA!BehaviorTransition
+  (
+   c.category = #thread and c.subcomponent.subcomponentType.oclIsKindOf(AADLI!ComponentImplementation) and c.subcomponent.subcomponentType.getBA() = src_transition.eContainer()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c, src_transition},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_BehaviorActionsFromThread'
+  )
+} ---- @extends m_BehaviorActionsFromThread
+--rule m_BehaviorActionsFromThread_Periodic
+--{
+--	from
+--		c: AADLI!ComponentInstance,
+--		src_transition: AADLBA!BehaviorTransition
+--		(
+--			c.isPeriodicThread()
+--			and
+--			c.subcomponent.subcomponentType.getBA() = src_transition.eContainer()
+--			and
+--			src_transition.destinationState.complete=true
+--		)
+--	using
+--	{
+--		ba: AADLBA!BehaviorAnnex = src_transition.eContainer();
+--		spg : AADLBA!SubprogramType = thisModule.getWaitPeriodSubprogram;
+--	}
+--	to
+--		callSequenceImg: AADLBA!SubprogramCallSequence,
+--		returnData: AADLBA!DataSubcomponent,
+--		waitDispatchCall: AADLBA!SubprogramCallAction
+--		(
+--			subprogram<-dispatchHolder,
+--			parameterLabels <- Sequence{RETURN_DATA_Holder}
+--		),
+--		dispatchHolder: AADLBA!CalledSubprogramHolder
+--		(
+--			element <- spg
+--		),
+--		RETURN_DATA_Holder: AADLBA!DataSubcomponentHolder
+--		(
+--			element<-thisModule.resolveMatchedSingleIfExists(c, 'returnData')
+--		)
+--	do
+--	{
+--		thisModule.addImportedUnit(thisModule.public(), thisModule.getLoadedAADLRuntime, thisModule.getRuntimeName);
+--	}
+--}
+abstract rule m_BehavioredInstance {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.oclIsKindOf(AADLI!SystemInstance) and not c.componentImplementation.getBA().oclIsUndefined() or not c.subcomponent.oclIsUndefined() and not c.subcomponent.subcomponentType.getBA().oclIsUndefined()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_BehavioredInstance'
+  )
+}
+
+abstract rule m_BehaviorElement {
+ from
+  src_BehaviorElement : AADLBA!BehaviorElement,
+  c : AADLI!ComponentInstance
+  (
+   src_BehaviorElement.isPartOfBehaviorAnnexOf(c)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_BehaviorElement'
+  )
+} -- @extends m_BehaviorElement,m_BehavioredInstance
+-- @extends m_BehaviorElement,m_BehavioredInstance
+rule m_ElseStatement {
+ from
+  src_BehaviorElement : AADLBA!ElseStatement,
+  c : AADLI!ComponentInstance
+  (
+   not src_BehaviorElement.oclIsTypeOf(AADLBA!IfStatement) and src_BehaviorElement.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_ElseStatement'
+  )
+} -- @extends m_BehaviorElement,m_BehavioredInstance
+-- @extends m_BehaviorElement,m_BehavioredInstance
+rule m_IfStatement {
+ from
+  src_BehaviorElement : AADLBA!IfStatement,
+  c : AADLI!ComponentInstance
+  (
+   not src_BehaviorElement.oclIsTypeOf(AADLBA!ElseStatement) and src_BehaviorElement.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_IfStatement'
+  )
+} -- @extends m_BehaviorElement,m_BehavioredInstance
+-- @extends m_BehaviorElement,m_BehavioredInstance
+rule m_BehaviorActionBlock {
+ from
+  src_BehaviorElement : AADLBA!BehaviorActionBlock,
+  c : AADLI!ComponentInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_BehaviorActionBlock'
+  )
+} -- @extends m_BehaviorElement,m_BehavioredInstance
+-- @extends m_BehaviorElement,m_BehavioredInstance
+rule m_BehaviorActionSequence {
+ from
+  src_BehaviorElement : AADLBA!BehaviorActionSequence,
+  c : AADLI!ComponentInstance
+  (
+   src_BehaviorElement.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_BehaviorActionSequence'
+  )
+} -- @extends m_BehaviorElement,m_BehavioredInstance
+-- @extends m_BehaviorElement,m_BehavioredInstance
+rule m_EventPortHolder {
+ from
+  src_BehaviorElement : AADLBA!EventPortHolder,
+  c : AADLI!ComponentInstance
+  (
+   let f : AADLI!FeatureInstance = c.featureInstance->any(e |
+    e.name = src_BehaviorElement.element.name
+   ) in
+   c.featureInstance->exists(fi |
+    fi.feature = src_BehaviorElement.element
+   )
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_EventPortHolder'
+  )
+} -- @extends m_BehaviorElement,m_BehavioredInstance
+-- @extends m_BehaviorElement,m_BehavioredInstance
+rule m_EventDataPortHolder {
+ from
+  src_BehaviorElement : AADLBA!EventDataPortHolder,
+  c : AADLI!ComponentInstance
+  (
+   let f : AADLI!FeatureInstance = c.featureInstance->any(e |
+    e.name = src_BehaviorElement.element.name
+   ) in
+   c.featureInstance->exists(fi |
+    fi.feature = src_BehaviorElement.element
+   )
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_EventDataPortHolder'
+  )
+} -- @extends m_BehaviorElement,m_BehavioredInstance
+-- @extends m_BehaviorElement,m_BehavioredInstance
+rule m_DataSubcomponentHolder {
+ from
+  src_BehaviorElement : AADLBA!DataSubcomponentHolder,
+  c : AADLI!ComponentInstance
+  (
+   c.componentInstance->exists(e |
+    e.subcomponent = src_BehaviorElement.element
+   )
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_DataSubcomponentHolder'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+rule m_BehaviorVariable {
+ from
+  src_BehaviorElement : AADLBA!BehaviorVariable,
+  c : AADLI!ComponentInstance
+  (
+   src_BehaviorElement.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_BehaviorVariable'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+rule m_BehaviorVariableHolder {
+ from
+  src_BehaviorElement : AADLBA!BehaviorVariableHolder,
+  c : AADLI!ComponentInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_BehaviorVariableHolder'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+rule m_SubprogramHolder {
+ from
+  src_BehaviorElement : AADLBA!SubprogramHolder,
+  c : AADLI!ComponentInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_SubprogramHolder'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+rule m_DataPortHolder_withFresh {
+ from
+  src_BehaviorElement : AADLBA!DataPortHolder,
+  c : AADLI!ComponentInstance
+  (
+   let f : AADLI!FeatureInstance = c.featureInstance->any(e |
+    e.feature.name = src_BehaviorElement.element.name
+   ) in
+   c.featureInstance->exists(fi |
+    fi.feature = src_BehaviorElement.element
+   ) and f.isUsedInFresh()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_DataPortHolder_withFresh'
+  )
+} -- @extends m_ElementHolder
+-- @extends m_ElementHolder
+rule m_DataPortHolder {
+ from
+  src_BehaviorElement : AADLBA!DataPortHolder,
+  c : AADLI!ComponentInstance
+  (
+   let f : AADLI!FeatureInstance = c.featureInstance->any(e |
+    e.name = src_BehaviorElement.element.name
+   ) in
+   c.featureInstance->exists(fi |
+    fi.feature = src_BehaviorElement.element
+   ) and not f.isUsedInFresh()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_DataPortHolder'
+  )
+} -- @extends m_ElementHolder
+-- @extends m_ElementHolder
+rule m_PortCountValue {
+ from
+  src_BehaviorElement : AADLBA!PortCountValue,
+  c : AADLI!ComponentInstance
+  (
+   let f : AADLI!FeatureInstance = c.featureInstance->any(e |
+    e.name = src_BehaviorElement.element.name
+   ) in
+   c.featureInstance->exists(fi |
+    fi.feature = src_BehaviorElement.element
+   )
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_PortCountValue'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+abstract rule m_PropertyReference {
+ from
+  src_BehaviorElement : AADLBA!PropertyReference,
+  c : AADLI!ComponentInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_PropertyReference'
+  )
+} -- @extends m_PropertyReference
+-- @extends m_PropertyReference
+rule m_ClassifierPropertyReference {
+ from
+  src_BehaviorElement : AADLBA!ClassifierPropertyReference,
+  c : AADLI!ComponentInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_ClassifierPropertyReference'
+  )
+} -- @extends m_PropertyReference
+-- @extends m_PropertyReference
+rule m_PropertySetPropertyReference {
+ from
+  src_BehaviorElement : AADLBA!PropertySetPropertyReference,
+  c : AADLI!ComponentInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_PropertySetPropertyReference'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+rule m_PropertyNameHolder {
+ from
+  src_BehaviorElement : AADLBA!PropertyNameHolder,
+  c : AADLI!ComponentInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_PropertyNameHolder'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+abstract rule m_PropertyElementHolder {
+ from
+  src_BehaviorElement : AADLBA!PropertyElementHolder,
+  c : AADLI!ComponentInstance
+  (
+   src_BehaviorElement.isPartOfBehaviorAnnexOf(c)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_PropertyElementHolder'
+  )
+} -- @extends m_PropertyElementHolder
+-- @extends m_PropertyElementHolder
+rule m_EnumLiteralHolder {
+ from
+  src_BehaviorElement : AADLBA!EnumLiteralHolder,
+  c : AADLI!ComponentInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_EnumLiteralHolder'
+  )
+} -- @extends m_PropertyElementHolder
+-- @extends m_PropertyElementHolder
+rule m_PropertyExpressionHolder {
+ from
+  src_BehaviorElement : AADLBA!PropertyExpressionHolder,
+  c : AADLI!ComponentInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_PropertyExpressionHolder'
+  )
+} -- @extends m_PropertyElementHolder
+-- @extends m_PropertyElementHolder
+rule m_PropertyAssociationHolder {
+ from
+  src_BehaviorElement : AADLBA!PropertyAssociationHolder,
+  c : AADLI!ComponentInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_PropertyAssociationHolder'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+rule m_UpperBound {
+ from
+  src_BehaviorElement : AADLBA!UpperBound,
+  c : AADLI!ComponentInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_UpperBound'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+rule m_LowerBound {
+ from
+  src_BehaviorElement : AADLBA!LowerBound,
+  c : AADLI!ComponentInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_LowerBound'
+  )
+} -- @extends m_CommunicationAction, m_BehavioredInstance
+-- @extends m_CommunicationAction, m_BehavioredInstance
+rule m_SubprogramCallAction {
+ from
+  src_BehaviorElement : AADLBA!SubprogramCallAction,
+  c : AADLI!ComponentInstance
+  (
+   src_BehaviorElement.isPartOfBehaviorAnnexOf(c)
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_SubprogramCallAction'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+rule m_AssignmentAction {
+ from
+  src_BehaviorElement : AADLBA!AssignmentAction,
+  c : AADLI!ComponentInstance
+  (
+   src_BehaviorElement.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_AssignmentAction'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+rule m_Term {
+ from
+  src_BehaviorElement : AADLBA!Term,
+  c : AADLI!ComponentInstance
+  (
+   src_BehaviorElement.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_Term'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+rule m_Factor {
+ from
+  src_BehaviorElement : AADLBA!Factor,
+  c : AADLI!ComponentInstance
+  (
+   src_BehaviorElement.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_Factor'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+rule m_BehaviorIntegerLiteral {
+ from
+  src_BehaviorElement : AADLBA!BehaviorIntegerLiteral,
+  c : AADLI!ComponentInstance
+  (
+   src_BehaviorElement.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_BehaviorIntegerLiteral'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+rule m_ValueExpression {
+ from
+  src_BehaviorElement : AADLBA!ValueExpression,
+  c : AADLI!ComponentInstance
+  (
+   src_BehaviorElement.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_ValueExpression'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+rule m_Relation {
+ from
+  src_BehaviorElement : AADLBA!Relation,
+  c : AADLI!ComponentInstance
+  (
+   src_BehaviorElement.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_Relation'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+rule m_SimpleExpression {
+ from
+  src_BehaviorElement : AADLBA!SimpleExpression,
+  c : AADLI!ComponentInstance
+  (
+   src_BehaviorElement.isThreadBehaviorElement()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_SimpleExpression'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+rule m_DataAccessHolder {
+ from
+  src_BehaviorElement : AADLBA!DataAccessHolder,
+  c : AADLI!ComponentInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_DataAccessHolder'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+rule m_ParameterHolder {
+ from
+  src_BehaviorElement : AADLBA!ParameterHolder,
+  c : AADLI!ComponentInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_ParameterHolder'
+  )
+} -- @extends m_BehaviorElement, m_BehavioredInstance
+-- @extends m_BehaviorElement, m_BehavioredInstance
+rule m_PortFreshValue {
+ from
+  src_BehaviorElement : AADLBA!PortFreshValue,
+  c : AADLI!ComponentInstance
+  (
+   c.featureInstance->exists(e |
+    e.feature = src_BehaviorElement.element
+   )
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {src_BehaviorElement, c},
+   value <- 'BehaviorAnnexCommonRefinementSteps.m_PortFreshValue'
+  )
+}

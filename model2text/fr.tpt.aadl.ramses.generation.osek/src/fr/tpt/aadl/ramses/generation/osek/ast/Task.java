@@ -80,10 +80,10 @@ public class Task {
 		this.events.add(evt);
 	}
 	
-	public void generateOil(UnparseText code) {
+	public void generateOil(UnparseText code) {		
 		code.addOutputNewline("TASK " + name + " {");
 		code.incrementIndent();
-		code.addOutputNewline("PRIORITY = " + priority + ";");
+		code.addOutputNewline("PRIORITY = " + priority + ";");		
 		if(autostart)
 		{
 			
@@ -100,19 +100,33 @@ public class Task {
 			code.addOutputNewline("STACKSIZE = " + stacksize + ";");
 		code.decrementIndent();
 		
+		List <String> lst = new ArrayList<String>(); 
+		lst.clear();		
 		for(String resourceName: this.resources)
-		{
-			code.addOutputNewline("RESOURCE = " + resourceName + "_rez;");
+		{	
+			if (! lst.contains(resourceName)){
+				lst.add(resourceName);
+				code.addOutputNewline("RESOURCE = " + resourceName + "_rez;");
+			}else{
+				System.out.println("WARNING : Duplicated entry for RESSOURCE "+resourceName+" in task "+this.name+" ; has been supressed");
+			}
 		}
+		lst.clear();
 		for(String eventName: this.events)
 		{
-			code.addOutputNewline("EVENT = " + eventName + "_evt;");
+			if (! lst.contains(eventName)){
+				lst.add(eventName);
+				code.addOutputNewline("EVENT = " + eventName + "_evt;");
+			}else{
+				System.out.println("WARNING : Duplicated entry for EVENT "+eventName+" in task "+this.name+" ; has been supressed");
+			}
 		}
 		code.addOutputNewline("};");
 		code.addOutputNewline("");
 	}
+	
 
 	public String getName() {
 		return name;
 	}
-}
+} 

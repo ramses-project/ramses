@@ -265,21 +265,12 @@ rule m_ProcessInstance_ModeTransition
 		)
 }
 
-rule m_ProcessInstance_Mode
+abstract rule m_ProcessInstance_Mode
 {
 	from
 		m: AADLI!ModeInstance,
 		p: AADLI!ComponentInstance
-		(
-			m.isModeInstanceOf(p)
-			and
-			not p.getThreadsInMode(m)->isEmpty()
-		)
-	using
-	{
-		threadsInM: Sequence(AADLI!ComponentInstance)
-			= p.getThreadsInMode(m);
-	}
+		(m.isModeInstanceOf(p))
 	to
 		modeThreadSub: AADLBA!ThreadSubcomponent
 		(
@@ -307,11 +298,7 @@ rule m_ProcessInstance_Mode
 				thisModule.CreatePropertyAssociation ('Priority', 'THREAD_PROPERTIES', modeSwitchPrio)
 			}
 		),
-		modeSwitchPeriod: AADLBA!IntegerLiteral
-		(
-			value <- thisModule.getHyperperiodFromThreads(p.getThreadsInMode(m)),
-		 	unit <- thisModule.UnitLiteral(p.getThreadsInMode(m)->first().getPeriodUnit())
-		),
+		modeSwitchPeriod: AADLBA!IntegerLiteral,
 		modeSwitchPrio: AADLBA!IntegerLiteral
 		(
 			value <- (p.getMaxPriority()-1).longValue()
@@ -320,13 +307,7 @@ rule m_ProcessInstance_Mode
 		(
 			name        <- 'behavior_specification',
 			states      <- Sequence{initCompleteState,finalState},
-			transitions <- Sequence{dispatchTransition},
-			actions		<- Sequence{switchActionBlock}
-						->union(
-							m.srcModeTransition->collect(
-								e|thisModule.createModeSwitchAction(e)
-							)
-						)
+			transitions <- Sequence{dispatchTransition}
 		),
 		initCompleteState: AADLBA!BehaviorState
 		(
@@ -360,9 +341,59 @@ rule m_ProcessInstance_Mode
 		switchActionBlock: AADLBA!BehaviorActionBlock
 		(content<-switchActions),
 		switchActions: AADLBA!BehaviorActionSequence
-		(
-			actions <- m.srcModeTransition->collect(
-								e|thisModule.modeTransitionInstanceToBehaviorTransition(e, p)
+	do
+	{
+		modeSwitchBa.actions<- Sequence{switchActionBlock}
+						->union(
+							m.srcModeTransition->collect(
+								e|thisModule.createModeSwitchAction(e)
 							)
+						);
+		switchActions.actions <- m.srcModeTransition->collect(
+								e|thisModule.modeTransitionInstanceToBehaviorTransition(e, p)
+						);
+	}
+}
+
+
+-- @extends m_ProcessInstance_Mode
+rule m_ProcessInstance_Mode_without_threadsInMode
+{
+	from
+		m: AADLI!ModeInstance,
+		p: AADLI!ComponentInstance
+		(p.getThreadsInMode(m)->isEmpty())
+	using
+	{
+		threadsInM: Sequence(AADLI!ComponentInstance)
+			= p.getThreads();
+	}
+	to
+		modeThreadSub: AADLBA!ThreadSubcomponent,
+		modeSwitchPeriod: AADLBA!IntegerLiteral
+		(
+			value <- thisModule.getHyperperiodFromThreads(threadsInM),
+		 	unit <- thisModule.UnitLiteral(threadsInM->first().getPeriodUnit())
+		)
+}
+
+-- @extends m_ProcessInstance_Mode
+rule m_ProcessInstance_Mode_with_threadsInMode 
+{
+	from
+		m: AADLI!ModeInstance,
+		p: AADLI!ComponentInstance
+		(not p.getThreadsInMode(m)->isEmpty())
+	using
+	{
+		threadsInM: Sequence(AADLI!ComponentInstance)
+			= p.getThreadsInMode(m);
+	}
+	to
+		modeThreadSub: AADLBA!ThreadSubcomponent,
+		modeSwitchPeriod: AADLBA!IntegerLiteral
+		(
+			value <- thisModule.getHyperperiodFromThreads(threadsInM),
+		 	unit <- thisModule.UnitLiteral(threadsInM->first().getPeriodUnit())
 		)
 }

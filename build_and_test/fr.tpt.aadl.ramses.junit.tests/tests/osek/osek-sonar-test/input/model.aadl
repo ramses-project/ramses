@@ -1,0 +1,85 @@
+package sonarTest
+public
+    
+with Data_Model, Osek;
+with nxtTypes,sonar;
+with plateform; 
+
+system root
+end root;
+
+system implementation root.impl
+    subcomponents
+        cpu : processor arm.impl;
+        mem   : memory mem.impl;
+        proces : process proc.impl;
+        echo: device sonar::Sonar;
+    properties
+        Actual_Processor_Binding => (reference (cpu)) applies to proces;
+        Actual_Memory_Binding => (reference (mem)) applies to proces;
+        Actual_Processor_Binding => (reference (cpu)) applies to echo;                     
+end root.impl;
+
+
+process implementation Proc.Impl
+    subcomponents 
+        th : thread echo.Impl;           
+end Proc.Impl;
+
+thread implementation echo.Impl 
+    subcomponents
+        batPort : data nxtTypes::nxt_sensor_port {Data_Model::Initial_Value => ("NXT_PORT_S4");};        
+  calls 
+    call1:
+    {
+      bat : subprogram getDistance;
+      show : subprogram display;
+    };
+connections
+  cc5 : parameter bat.portNb -> batPort;
+  cc6 : parameter bat.distance -> show.distance;
+
+properties
+  Dispatch_Protocol                  => periodic;
+  Period                             => 100 ms;
+  Compute_Execution_time             => 0 ms .. 100 ms;  
+  Deadline                           => 50 ms;
+  Priority                           => 2;
+  Compute_Entrypoint_Call_Sequence => reference (call1);
+  POSIX_Scheduling_Policy => SCHED_FIFO;
+end echo.Impl;    
+
+subprogram display
+    features
+        distance : in parameter nxtTypes::S32;  
+    properties
+        Source_language => (C);
+        Source_text => ("show.h","show.c");
+        Source_name => "show";
+end display;
+    
+    
+
+thread echo 
+    features
+        getDistance: requires subprogram access sonar::ecrobotGetSonarSensor;
+        print : requires subprogram access display;
+end echo;
+
+process proc
+end proc;
+
+processor arm extends plateform::arm
+end arm;
+
+processor implementation arm.impl extends plateform::arm.impl
+end arm.impl;
+
+memory mem extends plateform::nxt_mem 
+end mem;  
+
+memory implementation mem.impl extends plateform::nxt_mem.impl 
+end mem.impl;
+
+    
+end sonarTest;

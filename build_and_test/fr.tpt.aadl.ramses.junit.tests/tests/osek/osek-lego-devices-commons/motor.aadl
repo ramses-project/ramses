@@ -1,0 +1,46 @@
+package motor
+public
+    
+with motorTypes,nxtTypes;
+with Generation_Properties;
+    
+device Motor
+features
+  setSpeed: provides subprogram access nxtMotorSetSpeed;
+  setCount: provides subprogram access nxtMotorSetCount;
+  getCount: provides subprogram access nxtMotorGetCount;
+end Motor;
+
+subprogram nxtMotorSetSpeed
+features
+  portNb: in parameter nxtTypes::nxt_motor_port;
+  speed : in parameter motorTypes::speed;
+  brake : in parameter motorTypes::brake;
+properties
+  Source_language => (C);
+  Source_text => ("lejos_nxj/src/nxtvm/platform/nxt/nxt_motors.h");
+  Source_name => "nxt_motor_set_speed";
+  Compute_Execution_Time => 1 ms .. 2 ms;
+end nxtMotorSetSpeed;
+
+subprogram nxtMotorGetCount
+features
+  portNb: in parameter nxtTypes::nxt_motor_port;
+  count : out parameter nxtTypes::int {Generation_Properties::Return_Parameter => true;};
+properties
+  Source_language => (C);
+  Source_text => ("nxt_motors.h");
+  Source_name => "nxt_motor_get_count";
+end nxtMotorGetCount;
+
+subprogram nxtMotorSetCount
+features
+  portNb: in parameter nxtTypes::nxt_motor_port;
+  count : in parameter nxtTypes::int;
+properties
+  Source_language => (C);
+  Source_text => ("nxt_motors.h");
+  Source_name => "nxt_motor_set_count";
+end nxtMotorSetCount;
+    
+end motor;

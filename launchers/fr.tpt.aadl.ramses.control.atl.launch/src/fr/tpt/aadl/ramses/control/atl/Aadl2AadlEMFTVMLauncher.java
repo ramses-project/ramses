@@ -32,6 +32,7 @@ import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.m2m.atl.emftvm.ExecEnv ;
 import org.eclipse.m2m.atl.emftvm.util.ModuleResolver ;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.aadl2.util.Aadl2Util ;
 
 import com.google.common.util.concurrent.Monitor;
@@ -84,7 +85,8 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 		
 		String outputFilePath=outputModelDir.getAbsolutePath()+File.separator+aadlGeneratedFileName;
 		File outputFile = new File(outputFilePath);
-
+		if(OsateResourceUtil.USES_GUI)
+		  monitor.subTask("Producing AADL file...");
 		_modelInstantiator.serialize(transfoResult, outputFilePath);
 		try
 		{

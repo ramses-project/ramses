@@ -1,0 +1,208 @@
+package test_osek_eventdataports_refined_model
+public
+with OSEK,Data_Model,test_osek_eventdataports,Base_Types,OSEK_runtime;
+  system implementation refined_model.impl
+    subcomponents
+      the_mem: memory the_mem.impl;
+      the_proc1: process the_proc1.impl;
+      the_cpu: processor the_cpu.impl {
+        Scheduling_Protocol => (RMS);
+        OSEK::SystemCounter_MaxAllowedValue => 2000;
+        OSEK::SystemCounter_TicksPerBase => 1;
+        OSEK::SystemCounter_MinCycle => 1;
+        };
+    properties
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc1;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc1;
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc1.the_sender;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc1.the_sender;
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc1.the_receiver;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc1.the_receiver;
+  end refined_model.impl;
+  
+  system refined_model
+  end refined_model;
+  
+  memory implementation the_mem.impl
+  end the_mem.impl;
+  
+  memory the_mem
+  end the_mem;
+  
+  processor the_cpu
+  end the_cpu;
+  
+  processor implementation the_cpu.impl
+  end the_cpu.impl;
+  
+  process the_proc1
+  end the_proc1;
+  
+  process implementation the_proc1.impl
+    subcomponents
+      the_receiver_globalQueue: data OSEK_runtime::ThreadQueueType {
+        Data_Model::Initial_Value => ("{&the_receiver_globalQueue_rez, &the_receiver, &the_receiver_globalQueue_evt, 0, 0, {&the_receiver_p_globalVariable}}");
+        };
+      the_receiver_p_value: data the_receiver_p_bufferType;
+      the_receiver_p_globalVariable: data OSEK_runtime::PortQueueType {
+        Data_Model::Initial_Value => ("{5, 0, 0, 0, sizeof(test_osek_eventdataports__Integer), the_receiver_p_value, 0}");
+        };
+      the_sender: thread the_proc1_the_sender.impl {
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 1000 ms;
+        Priority => 10;
+        Data_Size => 4000 Bytes;
+        Stack_Size => 512 Bytes;
+        Code_Size => 40 Bytes;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+      the_receiver: thread the_proc1_the_receiver.impl {
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 2000 ms;
+        Priority => 5;
+        Data_Size => 4000 Bytes;
+        Stack_Size => 512 Bytes;
+        Code_Size => 40 Bytes;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+    connections
+      cnx_p_to_globalVariable: data access the_receiver_globalQueue -> the_sender.cnx_p;
+      Id_instance_to_the_receiver_p: data access the_receiver_globalQueue -> the_receiver.p;
+  end the_proc1.impl;
+  
+  subprogram sender_spg
+    features
+      context: requires data access sender_spg_context;
+    properties
+      Source_Name => "send";
+      Source_Language => (C);
+      Source_Text => ("/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/osek/osek-eventdataport/input/user_send.h", "/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/osek/osek-eventdataport/input/user_send.c");
+  end sender_spg;
+  
+  data sender_spg_context
+    properties
+      Data_Model::Data_Representation => Struct;
+      Data_Model::Element_Names => ("result");
+      Data_Model::Base_Type => (classifier(Base_Types::Unsigned_8));
+      Source_Name => "__sender_spg_context";
+  end sender_spg_context;
+  
+  data the_receiver_p_bufferType
+    properties
+      Data_Model::Data_Representation => Array;
+      Data_Model::Base_Type => (classifier(test_osek_eventdataports::Integer));
+      Data_Model::Dimension => (5);
+  end the_receiver_p_bufferType;
+  
+  subprogram the_proc1_the_sender_entrypoint
+    features
+      cnx_p: requires data access OSEK_runtime::ThreadQueueType;
+  end the_proc1_the_sender_entrypoint;
+  
+  subprogram implementation the_proc1_the_sender_entrypoint.impl
+    subcomponents
+      the_proc1_the_sender_runtime_call_ret: data OSEK_runtime::StatusType;
+      p_localVariable: data test_osek_eventdataports::Integer;
+      c_context: data sender_spg_context {
+        Data_Model::Initial_Value => ("{0}");
+        };
+    annex behavior_specification {**
+      variables
+  whichPortActivated : test_osek_eventdataports_refined_model::the_proc1_the_sender_behaviorIdentifier_enum ;
+states
+  BA_entrypoint_init_state : initial state ;
+  BA_entrypoint_wait_dispatch_state : state ;
+  BA_entrypoint_exec_state : state ;
+  BA_entrypoint_final_state : final state ;
+transitions
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc1_the_sender_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {sender_spg ! (c_context)} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc1_the_sender_behaviorIdentifier_enum#Enumerators.default_behavior} ;
+  dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {OSEK_runtime::TerminateTask !} ;
+**};
+  end the_proc1_the_sender_entrypoint.impl;
+  
+  data the_proc1_the_sender_behaviorIdentifier_enum
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("default_behavior");
+      Data_Model::Initial_Value => ("test_osek_eventdataports_refined_model__the_proc1_the_sender_behaviorIdentifier_enum_default_behavior");
+  end the_proc1_the_sender_behaviorIdentifier_enum;
+  
+  thread implementation the_proc1_the_sender.impl
+    calls
+      main_call:  {
+        call_entrypoint: subprogram the_proc1_the_sender_entrypoint.impl;
+        } 
+      ;
+    connections
+      p_accessCnx_call_cnx: data access cnx_p -> call_entrypoint.cnx_p;
+  end the_proc1_the_sender.impl;
+  
+  thread the_proc1_the_sender
+    features
+      cnx_p: requires data access OSEK_runtime::ThreadQueueType;
+  end the_proc1_the_sender;
+  
+  subprogram the_proc1_the_receiver_entrypoint
+    features
+      p: requires data access OSEK_runtime::ThreadQueueType;
+  end the_proc1_the_receiver_entrypoint;
+  
+  subprogram implementation the_proc1_the_receiver_entrypoint.impl
+    subcomponents
+      the_proc1_the_receiver_runtime_call_ret: data OSEK_runtime::StatusType;
+      p_localVariable: data test_osek_eventdataports::Integer;
+      p_Length: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("sizeof(test_osek_eventdataports__Integer)");
+        };
+      p_ErrorCode: data OSEK_runtime::StatusType {
+        Data_Model::Initial_Value => ("0");
+        };
+    annex behavior_specification {**
+      variables
+  whichPortActivated : test_osek_eventdataports_refined_model::the_proc1_the_receiver_behaviorIdentifier_enum ;
+states
+  BA_entrypoint_init_state : initial state ;
+  BA_entrypoint_wait_dispatch_state : state ;
+  BA_entrypoint_exec_state : state ;
+  BA_entrypoint_final_state : final state ;
+transitions
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc1_the_receiver_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {OSEK_runtime::ReceiveInputs ! (p, 0, p_ErrorCode) ;
+NextValue_Integer ! (p, 0, p_localVariable, p_ErrorCode) ;
+if (p_ErrorCode = 0) test_osek_eventdataports::receiver_spg ! (p_localVariable) end if
+  } ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc1_the_receiver_behaviorIdentifier_enum#Enumerators.default_behavior} ;
+  dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {OSEK_runtime::TerminateTask !} ;
+**};
+  end the_proc1_the_receiver_entrypoint.impl;
+  
+  data the_proc1_the_receiver_behaviorIdentifier_enum
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("default_behavior", "p");
+      Data_Model::Initial_Value => ("test_osek_eventdataports_refined_model__the_proc1_the_receiver_behaviorIdentifier_enum_default_behavior");
+  end the_proc1_the_receiver_behaviorIdentifier_enum;
+  
+  thread implementation the_proc1_the_receiver.impl
+    calls
+      main_call:  {
+        call_entrypoint: subprogram the_proc1_the_receiver_entrypoint.impl;
+        } 
+      ;
+    connections
+      p_accessCnx_call: data access p -> call_entrypoint.p;
+  end the_proc1_the_receiver.impl;
+  
+  thread the_proc1_the_receiver
+    features
+      p: requires data access OSEK_runtime::ThreadQueueType;
+  end the_proc1_the_receiver;
+  
+  subprogram NextValue_Integer
+    extends OSEK_runtime::NextValue
+    features
+      MESSAGE_ADDR: refined to in parameter test_osek_eventdataports::Integer;
+  end NextValue_Integer;
+end test_osek_eventdataports_refined_model;

@@ -102,6 +102,10 @@ helper def : resolveMatchedSingleIfExists(var : OclAny, target_pattern_name : St
 helper context OclAny def : debug(msg: String) : OclAny =
 	thisModule.theHOOK.log(msg, self)
 ;
+
+helper context OclAny def: allInstances(ele: AADLI!Element) : Sequence(OclAny) =
+	thisModule.theHOOK.allInstances(ele, self)
+;
        
 helper def: dataAccessSuffix(): String ='_PortIdAccess_';
 helper def: callPrefix(): String ='call';
@@ -257,9 +261,17 @@ helper context AADLI!FeatureInstance def : isDataPort(): Boolean =
 	self.feature.oclIsTypeOf(AADLI!DataPort);
 
 helper context AADLI!FeatureInstance def : connectedToDataComponent(): Boolean =
-	(not self.srcConnectionInstance->isEmpty() and self.srcConnectionInstance->first().destination.oclIsTypeOf(AADLI!ComponentInstance))
+	(not self.srcConnectionInstance->isEmpty() and self.srcConnectionInstance->size()=1 and self.srcConnectionInstance->first().destination.oclIsTypeOf(AADLI!ComponentInstance))
 	 or
-	(not self.dstConnectionInstance->isEmpty() and self.dstConnectionInstance->first().source.oclIsTypeOf(AADLI!ComponentInstance))
+	(not self.dstConnectionInstance->isEmpty() and self.dstConnectionInstance->size()=1 and self.dstConnectionInstance->first().source.oclIsTypeOf(AADLI!ComponentInstance))
+;
+
+helper context AADLI!FeatureInstance def : connectedToDataComponentInMode(mode: AADLI!Mode): Boolean = 
+	self.srcConnectionInstance->select(e|e.connectionReference->exists(f|f.connection.inModeOrTransition->includes(mode)))->collect(e|e.destination)
+	->union(	
+		self.dstConnectionInstance->select(e|e.connectionReference->exists(f|f.connection.inModeOrTransition->includes(mode)))->collect(e|e.source)
+	)
+	->exists(e|e.oclIsTypeOf(AADLI!ComponentInstance) and e.category = #data)
 ;
 
 helper context AADLI!FeatureInstance def : connectedDataComponent(): AADLI!ComponentInstance =
@@ -270,17 +282,44 @@ helper context AADLI!FeatureInstance def : connectedDataComponent(): AADLI!Compo
 	endif
 ;
 
+
+
+helper context AADLI!FeatureInstance def : getConnectedDataComponent() : Sequence(AADLI!ComponentInstance) =
+	if(not self.srcConnectionInstance->isEmpty()) then
+		self.srcConnectionInstance->select(e|e.destination.oclIsTypeOf(AADLI!ComponentInstance))
+	else
+		if(not self.dstConnectionInstance->isEmpty()) then
+			self.dstConnectionInstance->select(e|e.source.oclIsTypeOf(AADLI!ComponentInstance))
+		else
+			Sequence{}
+		endif
+	endif
+;
+
+helper context AADLI!FeatureInstance def : getConnectionEndInMode(mode: AADLI!Mode): Sequence(AADLI!ComponentInstance) = 
+	self.srcConnectionInstance->select(e|e.connectionReference->exists(f|f.connection.inModeOrTransition->includes(mode)))->collect(e|e.destination)
+	->union(	
+		self.dstConnectionInstance->select(e|e.connectionReference->exists(f|f.connection.inModeOrTransition->includes(mode)))->collect(e|e.source)
+	)
+;
+		
+helper context AADLI!FeatureInstance def : isConnectedToDataComponent(data: AADLI!ComponentInstance) : Boolean =
+	(not self.srcConnectionInstance->isEmpty() and self.srcConnectionInstance->exists(e|e.destination = data))
+	or
+	(not self.dstConnectionInstance->isEmpty() and self.dstConnectionInstance->exists(e|e.source = data))
+;
+
 helper context AADLI!FeatureInstance def : connectedInMode(mode: AADLI!Mode) : Boolean =
-	let remainingModes: Sequence(AADLI!Mode) = self.getComponentInstance().inMode->select(e|not (e.mode=mode)) in
-	if(self.getComponentInstance().inMode->isEmpty()
-			or not remainingModes->isEmpty())
-	then
+--	let remainingModes: Sequence(AADLI!Mode) = self.getComponentInstance().inMode->select(e|not (e.mode=mode)) in
+--	if(self.getComponentInstance().inMode->isEmpty()
+--			or not remainingModes->isEmpty())
+--	then
 		self.srcConnectionInstance->exists(e|e.connectionReference->exists(f|f.connection.inModeOrTransition->includes(mode)))
 		or
 		self.dstConnectionInstance->exists(e|e.connectionReference->exists(f|f.connection.inModeOrTransition->includes(mode)))
-	else
-		false
-	endif
+--	else
+--		false
+--	endif
 ;
 
 helper context AADLI!FeatureInstance def : isIntraProcessFeatureInstance(): Boolean =
@@ -288,6 +327,7 @@ helper context AADLI!FeatureInstance def : isIntraProcessFeatureInstance(): Bool
 	and
 	not self.dstConnectionInstance->exists(e| not (e.source.getProcess() = self.getProcess()))
 ;
+
 
 helper context AADLI!InstanceObject def : getProcess(): AADLI!ComponentInstance =
 	if(self.getComponentInstance().category=#process) then
@@ -547,6 +587,9 @@ helper context AADLI!ComponentInstance def: getOSMaxPriority() : Integer =
 helper context AADLI!ComponentInstance def: getThreadsInMode(m: AADLI!ModeInstance) : Sequence(AADLI!ComponentInstance) =
 	self.componentInstance->select(e | e.category = #thread)
 		->select(e|e.inMode->includes(m))
+;
+helper context AADLI!ComponentInstance def: getThreads() : Sequence(AADLI!ComponentInstance) =
+	self.componentInstance->select(e | e.category = #thread)
 ;
 
 helper context OclAny def:minus(i: OclAny) : OclAny =

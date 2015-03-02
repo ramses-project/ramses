@@ -1,0 +1,87 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+module SharedRules_No_Mutex;
+create OUT : MM_ATL2PM from IN : AADLI;
+
+-- @extends m_PeriodicDelayed_Port,m_Output_Port_ComputeEntrypointCallSequence
+rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  cnxRef : AADLI!PortConnection
+  (
+   behavior.isComputeEntryPointOf(fi.getComponentInstance())
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, cnxRef},
+   value <- 'SharedRules_No_Mutex.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput'
+  )
+} -- @extends m_PeriodicDelayed_Port,m_Thread_Input_Port_Instance
+-- @extends m_PeriodicDelayed_Port,m_Thread_Input_Port_Instance
+rule m_Input_PeriodicDelayed_Port_No_Mutex {
+ from
+  fi : AADLI!FeatureInstance
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'SharedRules_No_Mutex.m_Input_PeriodicDelayed_Port_No_Mutex'
+  )
+} -- @extends m_Thread_Output_PeriodicDelayed_Port
+-- @extends m_Thread_Output_PeriodicDelayed_Port
+rule m_Thread_Output_PeriodicDelayed_Port_No_Mutex {
+ from
+  fi : AADLI!FeatureInstance,
+  cnxRef : AADLI!PortConnection
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, cnxRef},
+   value <- 'SharedRules_No_Mutex.m_Thread_Output_PeriodicDelayed_Port_No_Mutex'
+  )
+} -- @extends m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance,m_Thread_Output_PeriodicDelayed_Port_No_Mutex
+-- @extends m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance,m_Thread_Output_PeriodicDelayed_Port_No_Mutex
+rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_No_Mutex {
+ from
+  fi : AADLI!FeatureInstance,
+  cnxRef : AADLI!PortConnection
+  (
+   fi.isEventOrEventDataPort() and cnxRef.destination.connectionEnd.isThreadPort() or cnxRef.source.connectionEnd.isThreadPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, cnxRef},
+   value <- 'SharedRules_No_Mutex.m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_No_Mutex'
+  )
+} -- @extends m_PeriodicDelayed_Port,m_Input_EventDataPort_ComputeEntrypointCallSequence
+-- @extends m_PeriodicDelayed_Port,m_Input_EventDataPort_ComputeEntrypointCallSequence
+rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  paramCnx : AADLI!ParameterConnection
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, paramCnx},
+   value <- 'SharedRules_No_Mutex.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue'
+  )
+}

@@ -1,145 +1,20 @@
 package test_network_rtl8029_remote_communications_refined_model
 public
-with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_driver,test_network_rtl8029_remote_communications,PeriodicDelayed_runtime,arinc653_runtime;
-  process implementation the_cpu1_system_part_comProcess.impl
-    subcomponents
-      the_cpu1_system_part_comProcess_the_proc1_p_outglobalVariable: data arinc653_runtime::Queuing_Port_Id_Type;
-      system_part_comm: thread the_cpu1_system_part_comProcess_system_part_comm.impl {
-        Period => 1000 ms;
-        Priority => 5;
-        Initialize_Entrypoint_Call_Sequence => reference(the_cpu1_initCallSequence);
-        Dispatch_Protocol => Periodic;
-        Compute_Entrypoint_Call_Sequence => reference(main_call);
-        };
-      the_cpu1_system_part_comm: thread the_cpu1_system_part_comProcess_the_cpu1_system_part_comm.impl {
-        Period => 1000 ms;
-        Priority => 8;
-        Initialize_Entrypoint_Call_Sequence => reference(system_part_initPollCallSequence);
-        Dispatch_Protocol => Periodic;
-        Compute_Entrypoint_Call_Sequence => reference(main_call);
-        };
-    connections
-      Id_instance_to_system_part_comm_p_out: data access the_cpu1_system_part_comProcess_the_proc1_p_outglobalVariable -> system_part_comm.p_out;
-  end the_cpu1_system_part_comProcess.impl;
-  
-  process implementation the_cpu2_system_part_comProcess.impl
-    subcomponents
-      the_cpu2_system_part_comProcess_the_proc2_p_in_globalVariable: data arinc653_runtime::Queuing_Port_Id_Type;
-      system_part_comm: thread the_cpu2_system_part_comProcess_system_part_comm.impl {
-        Period => 1000 ms;
-        Priority => 5;
-        Initialize_Entrypoint_Call_Sequence => reference(the_cpu2_initCallSequence);
-        Dispatch_Protocol => Periodic;
-        Compute_Entrypoint_Call_Sequence => reference(main_call);
-        };
-      the_cpu2_system_part_comm: thread the_cpu2_system_part_comProcess_the_cpu2_system_part_comm.impl {
-        Period => 1000 ms;
-        Priority => 8;
-        Initialize_Entrypoint_Call_Sequence => reference(system_part_initPollCallSequence);
-        Dispatch_Protocol => Periodic;
-        Compute_Entrypoint_Call_Sequence => reference(main_call);
-        };
-    connections
-      the_proc2_p_in_cnx_the_proc2_p_in_to_globalVariable: data access the_cpu2_system_part_comProcess_the_proc2_p_in_globalVariable -> system_part_comm.the_proc2_p_in_cnx_p_in;
-  end the_cpu2_system_part_comProcess.impl;
-  
-  process implementation proc1.impl
-    subcomponents
-      the_proc1_p_out_globalVariable: data arinc653_runtime::Queuing_Port_Id_Type;
-      the_sender: thread the_proc1_the_sender.impl {
-        Period => 2000 ms;
-        Priority => 5;
-        Dispatch_Protocol => Periodic;
-        Data_Size => 40000 Bytes;
-        Compute_Execution_Time => 0 ms .. 1 ms;
-        Stack_Size => 40000 Bytes;
-        Code_Size => 40 Bytes;
-        Compute_Entrypoint_Call_Sequence => reference(main_call);
-        };
-    connections
-      cnx_p_out_to_globalVariable: data access the_proc1_p_out_globalVariable -> the_sender.cnx_p_out;
-  end proc1.impl;
-  
-  process implementation proc2.impl
-    subcomponents
-      the_proc2_p_inglobalVariable: data arinc653_runtime::Queuing_Port_Id_Type;
-      the_receiver: thread the_proc2_the_receiver.impl {
-        Period => 1000 ms;
-        Priority => 10;
-        Dispatch_Protocol => Periodic;
-        Data_Size => 40000 Bytes;
-        Compute_Execution_Time => 0 ms .. 1 ms;
-        Stack_Size => 40000 Bytes;
-        Code_Size => 40 Bytes;
-        Compute_Entrypoint_Call_Sequence => reference(main_call);
-        };
-    connections
-      Id_instance_to_the_receiver_p_in: data access the_proc2_p_inglobalVariable -> the_receiver.p_in;
-  end proc2.impl;
-  
-  processor implementation connected_cpu.with_system_partition
-    subcomponents
-      the_part: virtual processor part {
-        Scheduling_Protocol => (Round_Robin_Protocol);
-        ARINC653::HM_Error_ID_Actions => ([
-          ErrorIdentifier=> 3;
-          Description=> "Restart process";
-          Action=> "Cold_Restart";
-        ], [
-          ErrorIdentifier=> 4;
-          Description=> "Warm partition restart";
-          Action=> "Warm_Restart";
-        ]);
-        Period => 1000 ms;
-        ARINC653::Partition_Identifier => 1;
-        POK::Additional_Features => (libc_stdio, console);
-        };
-      system_part: virtual processor part {
-        Scheduling_Protocol => (Round_Robin_Protocol);
-        ARINC653::HM_Error_ID_Actions => ([
-          ErrorIdentifier=> 3;
-          Description=> "Restart process";
-          Action=> "Cold_Restart";
-        ], [
-          ErrorIdentifier=> 4;
-          Description=> "Warm partition restart";
-          Action=> "Warm_Restart";
-        ]);
-        Period => 1000 ms;
-        ARINC653::Partition_Identifier => 1;
-        POK::Additional_Features => (libc_stdio, console);
-        ARINC653::System_Partition => true;
-        };
-  end connected_cpu.with_system_partition;
-  
-  memory implementation mem.two_partitions
-    subcomponents
-      part1_mem: memory part_mem {
-        Memory_Size => 150000 Bytes;
-        Memory_Protocol => read_write;
-        ARINC653::Memory_Type => (Data_Memory);
-        };
-      part2_mem: memory part_mem {
-        Memory_Size => 150000 Bytes;
-        Memory_Protocol => read_write;
-        ARINC653::Memory_Type => (Data_Memory);
-        };
-  end mem.two_partitions;
-  
+with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,test_network_rtl8029,RAMSES_processors,rtl8029_driver,test_network_rtl8029_remote_communications,arinc653_runtime;
   system implementation refined_model.impl
     subcomponents
-      the_bus: bus rtl8029;
-      the_mem1: memory mem.two_partitions {
+      the_bus: bus test_network_rtl8029_remote_communications::rtl8029;
+      the_mem1: memory the_mem1.impl {
         Memory_Size => 200000 Bytes;
         };
-      the_mem2: memory mem.two_partitions {
+      the_mem2: memory the_mem2.impl {
         Memory_Size => 200000 Bytes;
         };
       the_cpu1_system_part_comProcess: process the_cpu1_system_part_comProcess.impl;
       the_cpu2_system_part_comProcess: process the_cpu2_system_part_comProcess.impl;
-      the_proc1: process proc1.impl;
-      the_proc2: process proc2.impl;
-      the_cpu1: processor connected_cpu.with_system_partition {
+      the_proc1: process the_proc1.impl;
+      the_proc2: process the_proc2.impl;
+      the_cpu1: processor the_cpu1.impl {
         POK::Address => "00:1F:C6:BF:74:06";
         ARINC653::Module_Major_Frame => 2000 ms;
         Scheduling_Protocol => (ARINC653);
@@ -187,7 +62,7 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
         POK::Architecture => x86;
         POK::BSP => x86_qemu;
         };
-      the_cpu2: processor connected_cpu.with_system_partition {
+      the_cpu2: processor the_cpu2.impl {
         POK::Address => "00:1E:A5:32:DE:32";
         ARINC653::Module_Major_Frame => 2000 ms;
         Scheduling_Protocol => (ARINC653);
@@ -235,9 +110,6 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
         POK::Architecture => x86;
         POK::BSP => x86_qemu;
         };
-    connections
-      bus_to_cpu1: bus access the_cpu1.bus_access -> the_bus;
-      bus_to_cpu2: bus access the_cpu2.bus_access -> the_bus;
     properties
       Actual_Processor_Binding => (reference(the_cpu1.system_part)) applies to the_cpu1_system_part_comProcess;
       Actual_Memory_Binding => (reference(the_mem1.part2_mem)) applies to the_cpu1_system_part_comProcess;
@@ -285,37 +157,234 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
       Actual_Memory_Binding => (reference(the_mem2.part1_mem)) applies to the_proc2.the_receiver;
   end refined_model.impl;
   
-  bus rtl8029
-  end rtl8029;
+  system refined_model
+  end refined_model;
   
-  processor connected_cpu
+  memory implementation the_mem1.impl
+    subcomponents
+      part1_mem: memory the_mem1_part1_mem.impl {
+        Memory_Size => 150000 Bytes;
+        Memory_Protocol => read_write;
+        ARINC653::Memory_Type => (Data_Memory);
+        };
+      part2_mem: memory the_mem1_part2_mem.impl {
+        Memory_Size => 150000 Bytes;
+        Memory_Protocol => read_write;
+        ARINC653::Memory_Type => (Data_Memory);
+        };
+  end the_mem1.impl;
+  
+  memory the_mem1
+  end the_mem1;
+  
+  memory implementation the_mem1_part1_mem.impl
+  end the_mem1_part1_mem.impl;
+  
+  memory the_mem1_part1_mem
+  end the_mem1_part1_mem;
+  
+  memory implementation the_mem1_part2_mem.impl
+  end the_mem1_part2_mem.impl;
+  
+  memory the_mem1_part2_mem
+  end the_mem1_part2_mem;
+  
+  memory implementation the_mem2.impl
+    subcomponents
+      part1_mem: memory the_mem2_part1_mem.impl {
+        Memory_Size => 150000 Bytes;
+        Memory_Protocol => read_write;
+        ARINC653::Memory_Type => (Data_Memory);
+        };
+      part2_mem: memory the_mem2_part2_mem.impl {
+        Memory_Size => 150000 Bytes;
+        Memory_Protocol => read_write;
+        ARINC653::Memory_Type => (Data_Memory);
+        };
+  end the_mem2.impl;
+  
+  memory the_mem2
+  end the_mem2;
+  
+  memory implementation the_mem2_part1_mem.impl
+  end the_mem2_part1_mem.impl;
+  
+  memory the_mem2_part1_mem
+  end the_mem2_part1_mem;
+  
+  memory implementation the_mem2_part2_mem.impl
+  end the_mem2_part2_mem.impl;
+  
+  memory the_mem2_part2_mem
+  end the_mem2_part2_mem;
+  
+  processor the_cpu1
     features
-      bus_access: requires bus access rtl8029;
-  end connected_cpu;
+      bus_access: requires bus access test_network_rtl8029_remote_communications::rtl8029;
+  end the_cpu1;
   
-  virtual processor part
-  end part;
+  processor implementation the_cpu1.impl
+    subcomponents
+      the_part: virtual processor test_network_rtl8029_remote_communications::part {
+        Scheduling_Protocol => (Round_Robin_Protocol);
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 3;
+          Description=> "Restart process";
+          Action=> "Cold_Restart";
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Warm partition restart";
+          Action=> "Warm_Restart";
+        ]);
+        Period => 1000 ms;
+        ARINC653::Partition_Identifier => 1;
+        POK::Additional_Features => (libc_stdio, console);
+        };
+      system_part: virtual processor test_network_rtl8029_remote_communications::part {
+        Scheduling_Protocol => (Round_Robin_Protocol);
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 3;
+          Description=> "Restart process";
+          Action=> "Cold_Restart";
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Warm partition restart";
+          Action=> "Warm_Restart";
+        ]);
+        Period => 1000 ms;
+        ARINC653::Partition_Identifier => 1;
+        POK::Additional_Features => (libc_stdio, console);
+        ARINC653::System_Partition => true;
+        };
+  end the_cpu1.impl;
   
-  memory mem
-  end mem;
+  processor the_cpu2
+    features
+      bus_access: requires bus access test_network_rtl8029_remote_communications::rtl8029;
+  end the_cpu2;
   
-  memory part_mem
-  end part_mem;
-  
-  process proc1
-  end proc1;
-  
-  process proc2
-  end proc2;
+  processor implementation the_cpu2.impl
+    subcomponents
+      the_part: virtual processor test_network_rtl8029_remote_communications::part {
+        Scheduling_Protocol => (Round_Robin_Protocol);
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 3;
+          Description=> "Restart process";
+          Action=> "Cold_Restart";
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Warm partition restart";
+          Action=> "Warm_Restart";
+        ]);
+        Period => 1000 ms;
+        ARINC653::Partition_Identifier => 1;
+        POK::Additional_Features => (libc_stdio, console);
+        };
+      system_part: virtual processor test_network_rtl8029_remote_communications::part {
+        Scheduling_Protocol => (Round_Robin_Protocol);
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 3;
+          Description=> "Restart process";
+          Action=> "Cold_Restart";
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Warm partition restart";
+          Action=> "Warm_Restart";
+        ]);
+        Period => 1000 ms;
+        ARINC653::Partition_Identifier => 1;
+        POK::Additional_Features => (libc_stdio, console);
+        ARINC653::System_Partition => true;
+        };
+  end the_cpu2.impl;
   
   process the_cpu1_system_part_comProcess
   end the_cpu1_system_part_comProcess;
   
+  process implementation the_cpu1_system_part_comProcess.impl
+    subcomponents
+      the_cpu1_system_part_comProcess_the_proc1_p_outglobalVariable: data arinc653_runtime::Queuing_Port_Id_Type;
+      system_part_comm: thread the_cpu1_system_part_comProcess_system_part_comm.impl {
+        Period => 1000 ms;
+        Priority => 5;
+        Initialize_Entrypoint_Call_Sequence => reference(the_cpu1_initCallSequence);
+        Dispatch_Protocol => Periodic;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+      the_cpu1_system_part_comm: thread the_cpu1_system_part_comProcess_the_cpu1_system_part_comm.impl {
+        Period => 1000 ms;
+        Priority => 8;
+        Initialize_Entrypoint_Call_Sequence => reference(system_part_initPollCallSequence);
+        Dispatch_Protocol => Periodic;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+    connections
+      Id_instance_to_system_part_comm_p_out: data access the_cpu1_system_part_comProcess_the_proc1_p_outglobalVariable -> system_part_comm.p_out;
+  end the_cpu1_system_part_comProcess.impl;
+  
   process the_cpu2_system_part_comProcess
   end the_cpu2_system_part_comProcess;
   
-  system refined_model
-  end refined_model;
+  process implementation the_cpu2_system_part_comProcess.impl
+    subcomponents
+      the_cpu2_system_part_comProcess_the_proc2_p_in_globalVariable: data arinc653_runtime::Queuing_Port_Id_Type;
+      system_part_comm: thread the_cpu2_system_part_comProcess_system_part_comm.impl {
+        Period => 1000 ms;
+        Priority => 5;
+        Initialize_Entrypoint_Call_Sequence => reference(the_cpu2_initCallSequence);
+        Dispatch_Protocol => Periodic;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+      the_cpu2_system_part_comm: thread the_cpu2_system_part_comProcess_the_cpu2_system_part_comm.impl {
+        Period => 1000 ms;
+        Priority => 8;
+        Initialize_Entrypoint_Call_Sequence => reference(system_part_initPollCallSequence);
+        Dispatch_Protocol => Periodic;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+    connections
+      the_proc2_p_in_cnx_the_proc2_p_in_to_globalVariable: data access the_cpu2_system_part_comProcess_the_proc2_p_in_globalVariable -> system_part_comm.the_proc2_p_in_cnx_p_in;
+  end the_cpu2_system_part_comProcess.impl;
+  
+  process the_proc1
+  end the_proc1;
+  
+  process implementation the_proc1.impl
+    subcomponents
+      the_proc1_p_out_globalVariable: data arinc653_runtime::Queuing_Port_Id_Type;
+      the_sender: thread the_proc1_the_sender.impl {
+        Period => 2000 ms;
+        Priority => 5;
+        Dispatch_Protocol => Periodic;
+        Data_Size => 40000 Bytes;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+    connections
+      cnx_p_out_to_globalVariable: data access the_proc1_p_out_globalVariable -> the_sender.cnx_p_out;
+  end the_proc1.impl;
+  
+  process the_proc2
+  end the_proc2;
+  
+  process implementation the_proc2.impl
+    subcomponents
+      the_proc2_p_inglobalVariable: data arinc653_runtime::Queuing_Port_Id_Type;
+      the_receiver: thread the_proc2_the_receiver.impl {
+        Period => 1000 ms;
+        Priority => 10;
+        Dispatch_Protocol => Periodic;
+        Data_Size => 40000 Bytes;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+    connections
+      Id_instance_to_the_receiver_p_in: data access the_proc2_p_inglobalVariable -> the_receiver.p_in;
+  end the_proc2.impl;
   
   subprogram the_cpu1_system_part_comProcess_system_part_comm_entrypoint
     features

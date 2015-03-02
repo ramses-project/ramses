@@ -45,7 +45,11 @@ helper context AADLI!Classifier def : getConnectionsInstancesImg(connectionKind:
 helper context AADLI!ConnectionReference def: getConnectionsReferencesImg() : AADLBA!Connection =
 	thisModule.resolveMatchedSingleIfExists(self, 'cnxImg')
 ;
-	
+
+helper context Sequence(AADLI!ConnectionReference) def: getConnectionsReferencesImg() : Sequence(AADLBA!Connection) =
+	self->collect(e|thisModule.resolveMatchedSingleIfExists(e, 'cnxImg'))
+;
+
 abstract rule m_Connection_Reference
 {
 	from

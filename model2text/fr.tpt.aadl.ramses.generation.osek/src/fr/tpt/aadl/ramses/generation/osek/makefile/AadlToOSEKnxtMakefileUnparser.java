@@ -28,6 +28,7 @@ import java.util.Map ;
 import java.util.Set ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.core.runtime.Platform ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.ProcessImplementation ;
 import org.osate.aadl2.ProcessSubcomponent ;
@@ -47,24 +48,24 @@ public class AadlToOSEKnxtMakefileUnparser  extends AbstractAadlToCMakefileUnpar
 {
 
   private UnparseText unparserContent;
-  
+
   private List<ProcessSubcomponent> bindedProcess ;
 
   private static final String _C_OSEK_SUB_PATH = "/C_runtime/OSEK/" ;
-  
+
   // TODO set up ! 
   public static final String OSEK_NXT_ENV_VAR_NAME = "" ;
-  
+
   public AadlToOSEKnxtMakefileUnparser()
   {
     _ENV_VAR_NAME = OSEK_NXT_ENV_VAR_NAME ;
   }
-  
+
   @Override
   public void setupCommonDirs()
   {
     super.setupCommonDirs() ;
-    
+
     // Add Dir of C OSEK runtime
     File OSEKRuntimeDir = new File(RamsesConfiguration.getPredefinedResourceDir().getAbsolutePath() +
                                    _C_OSEK_SUB_PATH);
@@ -79,40 +80,41 @@ public class AadlToOSEKnxtMakefileUnparser  extends AbstractAadlToCMakefileUnpar
                       IProgressMonitor monitor) throws GenerationException
   {
     super.process(process, runtimeDir, outputDir, includeDirs, monitor);
-   	generateMakefile((NamedElement) process, outputDir) ;
+    generateMakefile((NamedElement) process, outputDir) ;
   }
 
   private void generateMakefile(NamedElement ne,
                                 File makeFile)
   {
-	  unparserContent = new UnparseText() ;
-	  process(ne) ;
-	  super.saveMakefile(unparserContent, makeFile) ;
+    unparserContent = new UnparseText() ;
+    process(ne) ;
+    super.saveMakefile(unparserContent, makeFile) ;
   }
+  
   @Override
   protected void initSwitches()
   {
     aadl2Switch = new Aadl2Switch<String>()
-    {
+        {
       @Override
       public String caseSystemImplementation(SystemImplementation object)
       {
         unparserContent.addOutputNewline("all:") ;
 
         for(ProcessorSubcomponent aProcessorSubcomponent : object
-              .getOwnedProcessorSubcomponents())
+            .getOwnedProcessorSubcomponents())
         {
           unparserContent.addOutputNewline("\t$(MAKE) -C " +
-                aProcessorSubcomponent.getName() + " all\n") ;
+              aProcessorSubcomponent.getName() + " all\n") ;
         }
 
         unparserContent.addOutputNewline("clean:") ;
 
         for(ProcessorSubcomponent aProcessorSubcomponent : object
-              .getOwnedProcessorSubcomponents())
+            .getOwnedProcessorSubcomponents())
         {
           unparserContent.addOutputNewline("\t$(MAKE) -C " +
-                aProcessorSubcomponent.getName() + " clean\n") ;
+              aProcessorSubcomponent.getName() + " clean\n") ;
         }
 
         return DONE ;
@@ -122,13 +124,19 @@ public class AadlToOSEKnxtMakefileUnparser  extends AbstractAadlToCMakefileUnpar
       public String caseProcessSubcomponent(ProcessSubcomponent object)
       {
         unparserContent.addOutputNewline("TARGET = " + object.getName() +
-              "_OSEK") ;
+            "_OSEK") ;
 
-		    unparserContent.addOutputNewline("TOPPERS_OSEK_OIL_SOURCE = ./"+object.getName()+".oil");
+        unparserContent.addOutputNewline("TOPPERS_OSEK_OIL_SOURCE = ./"+object.getName()+".oil");
 
         process(object.getComponentImplementation()) ;
         unparserContent.addOutputNewline("O_PATH ?= build");
-    		unparserContent.addOutputNewline("include "+_runtimePath+"/ecrobot/ecrobot.mak");
+        String path = _runtimePath.toString();
+        if (Platform.getOS().equalsIgnoreCase(Platform.OS_WIN32))
+        {
+          path = getCygwinPath(path);
+        }
+         
+        unparserContent.addOutputNewline("include "+path+"/ecrobot/ecrobot.mak");
         return DONE ;
       }
 
@@ -136,49 +144,62 @@ public class AadlToOSEKnxtMakefileUnparser  extends AbstractAadlToCMakefileUnpar
       public String caseProcessImplementation(ProcessImplementation object)
       {
         unparserContent
-              .addOutput("TARGET_SOURCES = main.c activity.c subprograms.c gtypes.c deployment.c ") ;
-        
+        .addOutput("TARGET_SOURCES = main.c activity.c subprograms.c gtypes.c deployment.c ") ;
+
         Set<File> sourceFileList;
-        
+
         sourceFileList = getListOfReferencedObjects(object);
         for(File sourceFile : sourceFileList)
         {
           String value = sourceFile.getAbsolutePath();
           if(value.endsWith(".c") || value.endsWith(".o"))
           {
-          value = value.substring(0,value.length()-2);  
-          value = value.concat(".c");
+            value = value.substring(0,value.length()-2);  
+            value = value.concat(".c");
           }
           else
-          continue;
+            continue;
+          if (Platform.getOS().equalsIgnoreCase(Platform.OS_WIN32))
+          {
+            value = getCygwinPath(value);
+          }
           unparserContent.addOutput( value + " ") ;
         }
-        
-		unparserContent.addOutput("\n") ;
-		
-		Iterator<File> it = new IncludeDirIterator() ;
-		File include ;
-		
-		if(it.hasNext())
-		{
-		  unparserContent.addOutput("export USER_INCLUDES=");
-		  while(it.hasNext())
-	    {
-		    include = it.next() ;
-		    unparserContent.addOutput(include.getAbsolutePath()+" ");
-		  }
-		  unparserContent.addOutput("\n") ;
-    }
-		return DONE ;
+
+        unparserContent.addOutput("\n") ;
+
+        Iterator<File> it = new IncludeDirIterator() ;
+        File include ;
+
+        if(it.hasNext())
+        {
+          unparserContent.addOutput("export USER_INCLUDES=");
+          while(it.hasNext())
+          {
+            include = it.next() ;
+            unparserContent.addOutput(include.getAbsolutePath()+" ");
+          }
+          unparserContent.addOutput("\n") ;
+        }
+        return DONE ;
       }
+      
+      String getCygwinPath(String path)
+      {
+        if(path.charAt(1)==':')
+          path = Character.toLowerCase(path.charAt(0))+path.substring(2);
+        path = path.replace("\\", "/");
+        return "/cygwin/"+path;
+      }
+
 
       @Override
       public String caseProcessorSubcomponent(ProcessorSubcomponent object)
       {
 
         bindedProcess =
-                GeneratorUtils.getBindedProcesses(object) ;
-        
+            GeneratorUtils.getBindedProcesses(object) ;
+
         process(object.getComponentImplementation()) ;
         return DONE ;
       }
@@ -189,13 +210,13 @@ public class AadlToOSEKnxtMakefileUnparser  extends AbstractAadlToCMakefileUnpar
 
         unparserContent.addOutput("\n") ;
         unparserContent
-              .addOutputNewline("all: partitions") ;
+        .addOutputNewline("all: partitions") ;
         unparserContent.addOutputNewline("partitions:") ;
 
         for(ProcessSubcomponent part:bindedProcess)
         {
           unparserContent.addOutputNewline("\t$(MAKE) -C " + part.getName() +
-                " all") ;
+              " all") ;
         }
 
         unparserContent.addOutputNewline("clean:") ;
@@ -203,43 +224,43 @@ public class AadlToOSEKnxtMakefileUnparser  extends AbstractAadlToCMakefileUnpar
         for(ProcessSubcomponent part:bindedProcess)
         {
           unparserContent.addOutputNewline("\t$(MAKE) -C " + part.getName() +
-                " clean") ;
+              " clean") ;
         }
 
         return DONE ;
       }
-    } ;
+        } ;
   }
-	// XXX: Not implemented, just used for conformance with the interface
-	// definition
+  // XXX: Not implemented, just used for conformance with the interface
+  // definition
 
-	@Override
-	public void process(SystemImplementation system,
-	                    File runtimeDir,
-	                    File outputDir,
-	                    File[] includeDirs,
-	                    IProgressMonitor monitor)
-	                                                    throws GenerationException
+  @Override
+  public void process(SystemImplementation system,
+                      File runtimeDir,
+                      File outputDir,
+                      File[] includeDirs,
+                      IProgressMonitor monitor)
+                          throws GenerationException
   {
-	  super.process(system, runtimeDir, outputDir, includeDirs, monitor);
-	  generateMakefile((NamedElement) system, outputDir) ;
-		super.executeMake(outputDir, runtimeDir, monitor);
-	}
+    super.process(system, runtimeDir, outputDir, includeDirs, monitor);
+    generateMakefile((NamedElement) system, outputDir) ;
+    super.executeMake(outputDir, runtimeDir, monitor);
+  }
 
-	@Override
-	public void process(ProcessorSubcomponent processor,
-	                    File runtimeDir,
+  @Override
+  public void process(ProcessorSubcomponent processor,
+                      File runtimeDir,
                       File outputDir,
                       File[] includeDirs,
                       IProgressMonitor monitor) throws GenerationException {
-	  super.process(processor, runtimeDir, outputDir, includeDirs, monitor);
-	  generateMakefile((NamedElement) processor, outputDir) ;
-	}
+    super.process(processor, runtimeDir, outputDir, includeDirs, monitor);
+    generateMakefile((NamedElement) processor, outputDir) ;
+  }
 
-	@Override
-	public void setParameters(Map<Enum<?>, Object> parameters) {
-		// TODO Do NOT use
-	}
+  @Override
+  public void setParameters(Map<Enum<?>, Object> parameters) {
+    // TODO Do NOT use
+  }
 
   @Override
   public boolean runtimePathChecker(File runtimePath)

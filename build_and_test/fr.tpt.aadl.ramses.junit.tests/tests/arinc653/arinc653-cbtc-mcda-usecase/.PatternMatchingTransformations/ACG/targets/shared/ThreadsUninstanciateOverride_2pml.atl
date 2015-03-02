@@ -1,0 +1,42 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+module ThreadsUninstanciateOverride;
+create OUT : MM_ATL2PM from IN : AADLI, AADL_RUNTIME : AADLBA, DATA_MODEL : AADLBA, PROGRAMMING_PROPERTIES : AADLBA, HOOKS : ATLHOOKS;
+
+helper context AADLI!ComponentImplementation def: getAllSubprogramCallSequence() : Sequence(AADLI!SubprogramCallSequence) =
+ self.getSelfPlusAllExtended()->collect(e |
+  e.ownedSubprogramCallSequence
+ )->excluding(OclUndefined)->flatten(); -- @extends m_Component_Instance
+-- @extends m_Component_Instance
+abstract rule m_create_Thread_BA {
+ from
+  c : AADLI!ComponentInstance
+  (
+   c.category = #thread
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {c},
+   value <- 'ThreadsUninstanciateOverride.m_create_Thread_BA'
+  )
+}

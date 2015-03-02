@@ -693,14 +693,14 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     {
       for(PropertyAssociation pa: ts.getOwnedPropertyAssociations())
       {
-    	if(pa.getProperty().getName().equalsIgnoreCase("Error_Handling"))
-    	{
-    	  BooleanLiteral bl = (BooleanLiteral) pa.
-    			  getOwnedValues().get(0).getOwnedValue();
-    	  foundHM = bl.getValue();
-    	  if(foundHM)
-    		break;
-    	}
+        if(pa.getProperty().getName().equalsIgnoreCase("Error_Handling"))
+        {
+          BooleanLiteral bl = (BooleanLiteral) pa.
+              getOwnedValues().get(0).getOwnedValue();
+          foundHM = bl.getValue();
+          if(foundHM)
+            break;
+        }
       }
       if(foundHM)
   		break;
@@ -1235,49 +1235,48 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     // Try to fetch POK properties: Additional_Features.
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
-      additionalFeatures = PropertyUtils.getStringListValue(vps,
-                                                            "Additional_Features") ;
-      if(additionalFeatures != null)
-      {
-        for(String s : additionalFeatures)
-        {
-          if(s.equalsIgnoreCase("console"))
-          {
-            // POK_NEEDS_CONSOLE has to be in both kernel's deployment.h
-            deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_CONSOLE 1") ;
-            _processorProp.consoleFound = true ;
-            break ;
-          }
-        }
+      additionalFeatures =
+          PropertyUtils.getStringListValue(vps, "Additional_Features") ;
+    	if(additionalFeatures!=null)
+    	{
+    		for(String s : additionalFeatures)
+    		{
+    			if(s.equalsIgnoreCase("console"))
+    			{
+    				// POK_NEEDS_CONSOLE has to be in both kernel's deployment.h
+    				deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_CONSOLE 1") ;
+    				_processorProp.consoleFound = true ;
+    				break ;
+    			}
+    		}
 
-        for(String s : additionalFeatures)
-        {
-          if(s.equalsIgnoreCase("libc_stdio"))
-          {
-            _processorProp.stdioFound = true ;
-            break ;
-          }
-        }
+    		for(String s : additionalFeatures)
+    		{
+    			if(s.equalsIgnoreCase("libc_stdio"))
+    			{
+    				_processorProp.stdioFound = true ;
+    				break ;
+    			}
+    		}
 
-        for(String s : additionalFeatures)
-        {
-          if(s.equalsIgnoreCase("libc_stdlib"))
-          {
-            _processorProp.stdlibFound = true ;
-            break ;
-          }
-        }
-      }
-      else
-      {
-        String errMsg = "cannot fetch the Additional_Features for \'" +
-                                                        vps.getName() + '\'' ;
-        _LOGGER.warn(errMsg) ;
-        ServiceProvider.SYS_ERR_REP.warning(errMsg, true) ;
-        // Nothing to do
-      }
+    		for(String s : additionalFeatures)
+    		{
+    			if(s.equalsIgnoreCase("libc_stdlib"))
+    			{
+    				_processorProp.stdlibFound = true ;
+    				break ;
+    			}
+    		}
+    	}
+    	else
+    	{
+    	  String errMsg = "cannot fecth Additional_Features for \'" +
+    	      vps.getName() + '\'' ;
+    	  _LOGGER.error(errMsg) ;
+    	  ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
+    	}
     }
-    
+
     String hwAddr = PropertyUtils.getStringValue(processor, "Address");
     if(hwAddr!=null && false==hwAddr.isEmpty())
       _processorProp.hwAdress = hwAddr;
@@ -1390,11 +1389,11 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
       if(pa!=null)
       {
         ModalPropertyValue v = pa.getOwnedValues().get(0);
-		ListValue lv = (ListValue) v.getOwnedValue();
-		NamedValue nv = (NamedValue) lv.getOwnedListElements().get(0);
-		EnumerationLiteral el = (EnumerationLiteral) nv.getNamedValue();
-		String requiredScheduler = el.getName();
-		if(requiredScheduler.equalsIgnoreCase("RMS") && foundSched == false)
+        ListValue lv = (ListValue) v.getOwnedValue();
+        NamedValue nv = (NamedValue) lv.getOwnedListElements().get(0);
+        EnumerationLiteral el = (EnumerationLiteral) nv.getNamedValue();
+        String requiredScheduler = el.getName();
+        if(requiredScheduler.equalsIgnoreCase("RMS") && foundSched == false)
         {
           foundSched = true ;
           deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_SCHED_RMS 1") ;
@@ -1573,10 +1572,8 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
 
     deploymentHeaderCode.addOutputNewline("}") ;
     
-    NamedElement rootSystem = getRootSystem((AadlPackage)
-                                            processor.getContainingClassifier().eContainer().eContainer());
     PropertyAssociation moduleSchedulePA = PropertyUtils.findPropertyAssociation
-                                                ("Module_Schedule", rootSystem);
+                                                ("Module_Schedule", processor);
     if(moduleSchedulePA == null)
     {
       String errMsg =  "cannot fetch Module_Schedule for \'"+
@@ -1624,7 +1621,8 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
         {
           ReferenceValue sAllocation = (ReferenceValue) bpa.getValue();
           int index = sAllocation.getContainmentPathElements().size()-1; 
-          int referencedComponentId = bindedVPS.indexOf(sAllocation.getContainmentPathElements().get(index).getNamedElement()) ;
+          NamedElement ne = sAllocation.getContainmentPathElements().get(index).getNamedElement();
+          int referencedComponentId = bindedVPS.indexOf(ne) ;
           
           deploymentHeaderCode.addOutput(Integer.toString(referencedComponentId)) ;
           if(idx != lv.getOwnedListElements().size() - 1)

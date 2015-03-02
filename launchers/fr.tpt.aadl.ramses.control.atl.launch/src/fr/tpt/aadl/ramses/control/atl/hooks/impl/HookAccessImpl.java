@@ -31,8 +31,12 @@ import java.util.Map ;
 import java.util.Set ;
 
 import org.apache.log4j.Logger ;
+import org.eclipse.core.resources.IProject ;
+import org.eclipse.core.resources.IWorkspaceRoot ;
+import org.eclipse.core.resources.ResourcesPlugin ;
 import org.eclipse.emf.common.util.BasicEList ;
 import org.eclipse.emf.common.util.EList ;
+import org.eclipse.emf.common.util.TreeIterator ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EClass ;
 import org.eclipse.emf.ecore.EObject ;
@@ -520,13 +524,40 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
     List<String> res = new BasicEList<String>();
     ListValue lv = (ListValue) pa.getOwnedValues().get(0).getOwnedValue();
     URI dirURI = pa.eResource().getURI();
+    
+    
     String path = "";
-    if(dirURI.isFile())
-      path = dirURI.toFileString();
+    if(OsateResourceUtil.USES_GUI)
+    {
+      IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+      String projectName = dirURI.toPlatformString(true).substring(1);
+      projectName = projectName.substring(0, projectName.indexOf("/"));
+      
+      IProject project = workspaceRoot.getProject(projectName);
+
+      path = project.getLocation().toOSString();
+      path = path.substring(0, path.lastIndexOf(File.separator));
+      path = path + dirURI.toPlatformString(true) ;
+    }
     else
-      path = dirURI.toString();
+    {
+      if(dirURI.isFile())
+        path = dirURI.toFileString();
+      else
+        path = dirURI.toString();
+    }
+    
     int index = path.lastIndexOf(File.separator);
     path = path.substring(0, index+1);
+    
+    
+//    String path = "";
+//    if(dirURI.isFile())
+//      path = dirURI.toFileString();
+//    else
+//      path = dirURI.toString();
+//    int index = path.lastIndexOf(File.separator);
+//    path = path.substring(0, index+1);
     
     for(PropertyExpression pe: lv.getOwnedListElements())
     {
@@ -609,5 +640,18 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   public PropertyAssociation getEnumerators(Classifier classifier)
   {
     return PropertyUtils.findPropertyAssociation(_ENUMERATORS, classifier);
+  }
+  
+  public List<EObject> allInstances(EObject ele, EClass type)
+  {
+    List<EObject> res = new ArrayList<EObject>();
+    TreeIterator<Element> treeIter = EcoreUtil2.getAllContents(ele, false);
+    while(treeIter.hasNext())
+    {
+      Element el = treeIter.next();
+      if(EcoreUtil2.isAssignableFrom(type, el.eClass()))
+        res.add(el);
+    }
+    return res;
   }
 } //HookAccessImpl

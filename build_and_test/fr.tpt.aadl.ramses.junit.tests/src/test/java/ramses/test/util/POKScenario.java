@@ -28,6 +28,9 @@ public abstract class POKScenario extends Scenario
 		if(aadlInspectorPath == null || aadlInspectorPath.equals(""))
 			aadlInspectorPath = System.getProperty("AADLINSPECTOR_PATH");
 		
+		IGNORE_FILES.add(".pid");
+		IGNORE_FILES.add("sizes.c");
+		
 	}
 	
 	@Override

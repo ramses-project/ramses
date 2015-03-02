@@ -178,6 +178,18 @@ public final class EGNode {
 	  return w;
 	}
 	
+	public boolean isNullWCET()
+  {
+    if(this.getWCET()>0.0)
+      return false;
+    for(EGNode n:nextNodes)
+    {
+      if(!n.isNullWCET())
+        return false;
+    }
+    return true;
+  }
+	
 	public List<EGNode> getAllNext()
 	{
 		return nextNodes;

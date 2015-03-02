@@ -1,0 +1,25 @@
+package plateform
+public
+    
+
+with OSEK;   
+with nxtBrick;
+
+processor arm extends nxtBrick::arm
+end arm;
+
+processor implementation arm.impl extends nxtBrick::arm.impl
+properties
+  Scheduling_Protocol => (RMS) ;
+  OSEK::SystemCounter_MaxAllowedValue => 2000;
+  OSEK::SystemCounter_TicksPerBase => 1;
+  OSEK::SystemCounter_MinCycle => 1;
+end arm.impl;
+
+memory nxt_mem extends nxtBrick::nxt_mem 
+end nxt_mem;  
+
+memory implementation nxt_mem.impl extends nxtBrick::nxt_mem.impl 
+end nxt_mem.impl;    
+    
+end plateform;

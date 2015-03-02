@@ -1,68 +1,15 @@
 package test_buffer_delayed_refined_model
 public
-with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime,PeriodicDelayedMutex_runtime;
-  process implementation proc.impl
-    subcomponents
-      the_receiver_p_in_Buffer: data bufferArrayImpl_the_receiver_p_in.impl;
-      the_sender: thread the_proc_the_sender.impl {
-        Dispatch_Protocol => Periodic;
-        Compute_Execution_Time => 0 ms .. 1 ms;
-        Period => 2000 ms;
-        Priority => 5;
-        Data_Size => 40000 Bytes;
-        Stack_Size => 40000 Bytes;
-        Code_Size => 40 Bytes;
-        Compute_Entrypoint_Call_Sequence => reference(main_call);
-        };
-      the_receiver: thread the_proc_the_receiver.impl {
-        Dispatch_Protocol => Periodic;
-        Compute_Execution_Time => 0 ms .. 1 ms;
-        Period => 1000 ms;
-        Priority => 10;
-        Data_Size => 40000 Bytes;
-        Stack_Size => 40000 Bytes;
-        Code_Size => 40 Bytes;
-        Compute_Entrypoint_Call_Sequence => reference(main_call);
-        };
-    connections
-      cnx_p_in_to_globalVariable: data access the_receiver_p_in_Buffer -> the_sender.cnx_p_out;
-      Id_instance_to_the_receiver_p_in: data access the_receiver_p_in_Buffer -> the_receiver.p_in;
-  end proc.impl;
-  
-  processor implementation cpu.impl
-    subcomponents
-      the_part: virtual processor part {
-        Period => 1000 ms;
-        ARINC653::HM_Error_ID_Actions => ([
-          ErrorIdentifier=> 3;
-          Description=> "Restart process";
-          Action=> "Cold_Restart";
-        ], [
-          ErrorIdentifier=> 4;
-          Description=> "Warm partition restart";
-          Action=> "Warm_Restart";
-        ]);
-        Scheduling_Protocol => (Round_Robin_Protocol);
-        ARINC653::Partition_Identifier => 1;
-        POK::Additional_Features => (libc_stdio, console);
-        };
-  end cpu.impl;
-  
-  memory implementation mem.impl
-  end mem.impl;
-  
-  memory implementation mem.two_partitions
-  end mem.two_partitions;
-  
+with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,PeriodicDelayedMutex_runtime,arinc653_runtime;
   system implementation refined_model.impl
     subcomponents
-      the_mem: memory mem.impl {
+      the_mem: memory the_mem.impl {
         Memory_Protocol => read_write;
         ARINC653::Memory_Type => (Data_Memory);
         Memory_Size => 200000 Bytes;
         };
-      the_proc: process proc.impl;
-      the_cpu: processor cpu.impl {
+      the_proc: process the_proc.impl;
+      the_cpu: processor the_cpu.impl {
         ARINC653::Module_Major_Frame => 1000 ms;
         ARINC653::HM_Error_ID_Levels => ([
           ErrorIdentifier=> 1;
@@ -122,17 +69,67 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
       Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_receiver;
   end refined_model.impl;
   
-  processor cpu
-  end cpu;
+  system refined_model
+  end refined_model;
   
-  virtual processor part
-  end part;
+  memory implementation the_mem.impl
+  end the_mem.impl;
   
-  memory mem
-  end mem;
+  memory the_mem
+  end the_mem;
   
-  process proc
-  end proc;
+  processor the_cpu
+  end the_cpu;
+  
+  processor implementation the_cpu.impl
+    subcomponents
+      the_part: virtual processor common_pkg::part {
+        Period => 1000 ms;
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 3;
+          Description=> "Restart process";
+          Action=> "Cold_Restart";
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Warm partition restart";
+          Action=> "Warm_Restart";
+        ]);
+        Scheduling_Protocol => (Round_Robin_Protocol);
+        ARINC653::Partition_Identifier => 1;
+        POK::Additional_Features => (libc_stdio, console);
+        };
+  end the_cpu.impl;
+  
+  process the_proc
+  end the_proc;
+  
+  process implementation the_proc.impl
+    subcomponents
+      the_receiver_p_in_Buffer: data bufferArrayImpl_the_receiver_p_in.impl;
+      the_sender: thread the_proc_the_sender.impl {
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 2000 ms;
+        Priority => 5;
+        Data_Size => 40000 Bytes;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+      the_receiver: thread the_proc_the_receiver.impl {
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 1000 ms;
+        Priority => 10;
+        Data_Size => 40000 Bytes;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+    connections
+      cnx_p_in_to_globalVariable: data access the_receiver_p_in_Buffer -> the_sender.cnx_p_out;
+      Id_instance_to_the_receiver_p_in: data access the_receiver_p_in_Buffer -> the_receiver.p_in;
+  end the_proc.impl;
   
   subprogram event_sender_spg
     features
@@ -150,9 +147,6 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
       Data_Model::Base_Type => (classifier(Base_Types::Unsigned_8));
       Source_Name => "__event_sender_spg_context";
   end event_sender_spg_context;
-  
-  system refined_model
-  end refined_model;
   
   subprogram Put_Value_the_proc_the_sender_p_out
     extends PeriodicDelayed_runtime::Put_Value

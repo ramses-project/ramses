@@ -1,0 +1,251 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright � 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+-- TODO: make iteration_counter a global variable
+module EventDataPorts_LowMFP;
+create OUT : MM_ATL2PM from IN : AADLI;
+
+helper def: Put_Value_LowFP_Name : String =
+ 'Put_Value_LowFP';
+
+helper def: Send_Output_Name : String =
+ 'Send_Output';
+
+helper def: Receive_Input_LowFP_Name : String =
+ 'Receive_Input_LowFP';
+
+helper def: Next_Value_Name : String =
+ 'Next_Value';
+
+helper def: Component_Instance_Type_Name : String =
+ 'component_instance_t.impl';
+
+helper def: Component_Instance_Array_Type_Name : String =
+ 'ComponentInstanceArrayDataType';
+
+helper def: Periodic_Delayed_Context_Type_Name : String =
+ 'periodic_delayed_context_t';
+
+helper def: Periodic_Delayed_Context_Impl_Name : String =
+ 'periodic_delayed_context_t.impl';
+
+helper def: collectPeriodicDelayed_GlobalVariables_LowMFP(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+ c.featureInstance->select(fi |
+  fi.isInputFeature() and fi.isEventOrEventDataPort() and fi.isIntraProcessFeatureInstance() and fi.isPeriodicDelayedPort()
+ )->collect(fi |
+  Sequence {thisModule.resolveLazySingleIfExists(fi, 'createContextSubcomponent', 'componentInstancesArray'), thisModule.resolveLazySingleIfExists(fi, 'createContextSubcomponent', 'contextSubcomponent')}
+ )->flatten();
+
+helper def: collectPeriodicDelayed_GlobalVariablesAccesses_LowMFP(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
+ c.featureInstance->select(fi |
+  fi.isInputFeature() and fi.isEventOrEventDataPort() and fi.isIntraProcessFeatureInstance() and fi.isPeriodicDelayedPort()
+ )->collect(fi |
+  thisModule.resolveMatchedSingleIfExists(fi, 'PeriodicDelayedContext_Access')
+ )->union(c.featureInstance->select(fi |
+  fi.isOutputFeature() and fi.isEventOrEventDataPort() and fi.isIntraProcessFeatureInstance() and fi.isPeriodicDelayedPort()
+ )->collect(fi |
+  fi.srcConnectionInstance->collect(cnxInst |
+   thisModule.resolveMatchedTupleIfExists(Sequence {fi, cnxInst.connectionReference->first().connection}, 'PeriodicDelayedContext_Access')
+  )
+ ));
+
+helper def: collectPeriodicDelayed_GlobalVariablesConnections_LowMFP(c : AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
+ c.featureInstance->select(fi |
+  fi.isInputFeature() and fi.isEventOrEventDataPort() and fi.isIntraProcessFeatureInstance() and fi.isPeriodicDelayedPort()
+ )->collect(fi |
+  thisModule.resolveMatchedSingleIfExists(fi, 'PeriodicDelayedContext_Connection')
+ )->union(c.featureInstance->select(fi |
+  fi.isOutputFeature() and fi.isEventOrEventDataPort() and fi.isIntraProcessFeatureInstance() and fi.isPeriodicDelayedPort()
+ )->collect(fi |
+  fi.srcConnectionInstance->collect(cnxInst |
+   thisModule.resolveMatchedTupleIfExists(Sequence {fi, cnxInst.connectionReference->first().connection}, 'PeriodicDelayedContext_Connection')
+  )
+ ));
+
+helper def: collectPeriodicDelayed_LocalVariablesAccesses_LowMFP(c : AADLI!ComponentInstance, behavior : AADLI!Element) : Sequence(AADLBA!DataAccess) =
+ c.featureInstance->select(fi |
+  fi.isInputFeature() and fi.isEventOrEventDataPort() and fi.isIntraProcessFeatureInstance() and fi.isPeriodicDelayedPort()
+ )->collect(fi |
+  thisModule.resolveMatchedTupleIfExists(Sequence {fi, behavior}, 'PeriodicDelayedContext_EntryPointAccess')
+ )->union(c.featureInstance->select(fi |
+  fi.isOutputFeature() and fi.isEventOrEventDataPort() and fi.isIntraProcessFeatureInstance() and fi.isPeriodicDelayedPort()
+ )->collect(fi |
+  fi.srcConnectionInstance->collect(cnxInst |
+   thisModule.resolveMatchedTupleIfExists(Sequence {fi, behavior, cnxInst.connectionReference->first().connection}, 'PeriodicDelayedContext_EntryPointAccess')
+  )
+ ));
+
+helper def: collectPeriodicDelayed_LocalVariablesConnections_LowMFP(c : AADLI!ComponentInstance, behavior : AADLI!Element) : Sequence(AADLBA!DataAccess) =
+ c.featureInstance->select(fi |
+  fi.isInputFeature() and fi.isEventOrEventDataPort() and fi.isIntraProcessFeatureInstance() and fi.isPeriodicDelayedPort()
+ )->collect(fi |
+  thisModule.resolveMatchedTupleIfExists(Sequence {fi, behavior}, 'PeriodicDelayedContext_EntryPointConnection')
+ )->union(c.featureInstance->select(fi |
+  fi.isOutputFeature() and fi.isEventOrEventDataPort() and fi.isIntraProcessFeatureInstance() and fi.isPeriodicDelayedPort()
+ )->collect(fi |
+  fi.srcConnectionInstance->collect(cnxInst |
+   thisModule.resolveMatchedTupleIfExists(Sequence {fi, behavior, cnxInst.connectionReference->first().connection}, 'PeriodicDelayedContext_EntryPointConnection')
+  )
+ ));
+
+helper def: collectPeriodicDelayed_LocalVariables_LowMFP(c : AADLI!ComponentInstance, behavior : AADLI!SubprogramCallSequence) : Sequence(AADLBA!DataSubcomponent) =
+ c.featureInstance->select(e |
+  e.direction = #out
+ )->collect(e |
+  e.srcConnectionInstance->collect(f |
+   thisModule.createThreadID(e, f.destination)
+  )
+ )->flatten();
+
+helper context AADLI!FeatureInstance def: initWriterContext() : String =
+ thisModule.concatToString(self.dstConnectionInstance->collect(e |
+  e.source.getComponentInstance()
+ )->asOrderedSet()->collect(e |
+  e.initWriterContext()
+ ));
+
+helper context AADLI!ComponentInstance def: initWriterContext() : String =
+ thisModule.structInitInitiator + self.getPeriod().toString() + ',' + self.getDeadline().toString() + thisModule.structInitTerminator;
+
+helper context AADLI!FeatureInstance def: computeThreadID(consumer : AADLI!FeatureInstance) : Integer =
+ let connections : Sequence(AADLI!ConnectionInstance) = consumer.dstConnectionInstance->select(e |
+  e.source = self
+ ) in
+ consumer.dstConnectionInstance.indexOf(connections->first());
+
+-- @extends m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_No_Mutex
+rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_LowMFP {
+ from
+  fi : AADLI!FeatureInstance,
+  cnxRef : AADLI!PortConnection
+  (
+   fi.isEventOrEventDataPort() and cnxRef.destination.connectionEnd.isThreadPort() or cnxRef.source.connectionEnd.isThreadPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, cnxRef},
+   value <- 'EventDataPorts_LowMFP.m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_LowMFP'
+  )
+} -- @extends m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput
+-- @extends m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput
+rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput_LowMFP {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  cnxRef : AADLI!PortConnection
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, cnxRef},
+   value <- 'EventDataPorts_LowMFP.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput_LowMFP'
+  )
+} -- @extends m_PeriodicDelayed_Port,m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
+-- @extends m_PeriodicDelayed_Port,m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
+rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_LowMFP {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  paramCnx : AADLI!ParameterConnection,
+  cnxRef : AADLI!PortConnection
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, paramCnx, cnxRef},
+   value <- 'EventDataPorts_LowMFP.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_LowMFP'
+  )
+}
+
+-- @extends m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance,m_Input_PeriodicDelayed_Port_No_Mutex
+rule m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance_LowMFP {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isEventOrEventDataPort() and fi.isIntraProcessFeatureInstance()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'EventDataPorts_LowMFP.m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance_LowMFP'
+  )
+} -- @extends m_Thread_IntraProcess_Input_DataPort_PeriodicDelayed_Instance
+-- @extends m_Thread_IntraProcess_Input_DataPort_PeriodicDelayed_Instance
+rule m_Thread_IntraProcess_Input_DataPort_PeriodicDelayed_Instance_LowMFP {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isDataPort() and fi.isIntraProcessFeatureInstance()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'EventDataPorts_LowMFP.m_Thread_IntraProcess_Input_DataPort_PeriodicDelayed_Instance_LowMFP'
+  )
+} -- @extends m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance,m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance_LowMFP
+-- @extends m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance,m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance_LowMFP
+rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_LowMFP {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isEventDataPort() and fi.isIntraProcessFeatureInstance()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'EventDataPorts_LowMFP.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_LowMFP'
+  )
+} -- @extends m_Thread_IntraProcess_Input_EventPort_PeriodicDelayed_Instance,m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance_LowMFP
+-- @extends m_Thread_IntraProcess_Input_EventPort_PeriodicDelayed_Instance,m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance_LowMFP
+rule m_Thread_IntraProcess_Input_EventPort_PeriodicDelayed_Instance_LowMFP {
+ from
+  fi : AADLI!FeatureInstance
+  (
+   fi.isEventPort() and fi.isIntraProcessFeatureInstance()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi},
+   value <- 'EventDataPorts_LowMFP.m_Thread_IntraProcess_Input_EventPort_PeriodicDelayed_Instance_LowMFP'
+  )
+} -- @extends m_Input_Port_ComputeEntrypointCallSequence,m_PeriodicDelayed_Port
+-- @extends m_Input_Port_ComputeEntrypointCallSequence,m_PeriodicDelayed_Port
+rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_ReceiveInputs_LowMFP {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence
+  (
+   behavior.isComputeEntryPointOf(fi.getComponentInstance()) and fi.isInputFeature() and fi.isEventPort() or fi.isEventDataPort()
+  )
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior},
+   value <- 'EventDataPorts_LowMFP.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_ReceiveInputs_LowMFP'
+  )
+} -- @extends m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue
+-- @extends m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue
+rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_LowMFP {
+ from
+  fi : AADLI!FeatureInstance,
+  behavior : AADLI!SubprogramCallSequence,
+  paramCnx : AADLI!ParameterConnection
+ to
+  t : MM_ATL2PM!ElementTransformationTuple (
+   key <:= Sequence {fi, behavior, paramCnx},
+   value <- 'EventDataPorts_LowMFP.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_LowMFP'
+  )
+}

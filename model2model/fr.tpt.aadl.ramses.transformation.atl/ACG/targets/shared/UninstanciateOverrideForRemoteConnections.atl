@@ -50,23 +50,45 @@ rule m_Data_Implementation {
  	impl : AADLI!DataImplementation
 }
 
-
-helper context AADLI!ComponentImplementation def: needsCopy(): Boolean =
-	self.isInstanciated() or self.oclIsKindOf(AADLI!SystemImplementation)
+helper context AADLI!ComponentType def: needsCopy() : Boolean =
+	not self.oclIsTypeOf(AADLI!ThreadType)
 ;
 
-helper context AADLI!ComponentType def: needsCopy(): Boolean =
-	self.isInstanciated() or self.oclIsKindOf(AADLI!SystemType)
+helper context AADLI!ComponentImplementation def: needsCopy() : Boolean =
+	not self.oclIsTypeOf(AADLI!ThreadImplementation)
 ;
 
-helper context AADLI!ComponentType def : isInstanciated() : Boolean =
-	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|not e.subcomponent.oclIsUndefined())
-		->exists(e| e.subcomponent.subcomponentType=self or if e.subcomponent.subcomponentType.oclIsKindOf(AADLI!ComponentImplementation) then e.subcomponent.subcomponentType.type=self else false endif)
-;
-helper context AADLI!ComponentImplementation def: isInstanciated() : Boolean =
-	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|not e.subcomponent.oclIsUndefined())
-		->exists(e| e.subcomponent.subcomponentType=self)
-;
+-- @extends m_Component_Instance
+rule m_Thread_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #thread)
+	using
+ 	{
+ 		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
+ 	}
+	to 
+		sub : AADLBA!ThreadSubcomponent
+		(
+			threadSubcomponentType <- implImg
+		),
+		implImg : AADLBA!ThreadImplementation (
+ 			name <- c.uniqueName().concat('.impl'), -- name thread implmentation
+			ownedRealization <- thisModule.Realization(typeImg),
+			ownedSubprogramSubcomponent 	<- c.componentInstance->select(e|e.category.getName() = 'subprogram'),
+			ownedDataSubcomponent 			<- c.componentInstance->select(e|e.category.getName() = 'data'),
+			ownedSubprogramCallSequence     <- impl.ownedSubprogramCallSequence,
+			ownedParameterConnection		<- impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->collect(e|thisModule.ParameterConnection(e)),
+			ownedAccessConnection			<- impl.ownedAccessConnection->collect(e|thisModule.AccessConnection(e))
+		),
+		typeImg : AADLBA!ThreadType (
+ 	 		name <- c.uniqueName(),
+			ownedEventDataPort <- c.featureInstance->select(e|e.category.getName() = 'eventDataPort'),
+			ownedDataPort <- c.featureInstance->select(e|e.category.getName() = 'dataPort'),
+			ownedEventPort <- c.featureInstance->select(e|e.category.getName() = 'eventPort'),
+			ownedDataAccess <- c.featureInstance->select(e|e.category.getName() = 'dataAccess'),
+	 		ownedSubprogramAccess <- c.featureInstance->select(e|e.category.getName() = 'subprogramAccess')
+		)
+}
 
 helper context AADLI!ConnectionReference def: needsCopy() : Boolean =
 	if self.source.isThreadPort()

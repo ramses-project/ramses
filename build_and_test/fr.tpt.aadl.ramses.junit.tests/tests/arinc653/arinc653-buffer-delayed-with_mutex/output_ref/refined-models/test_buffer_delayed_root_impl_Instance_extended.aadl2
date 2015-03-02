@@ -1,72 +1,15 @@
 package test_buffer_delayed_refined_model
 public
-with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime,PeriodicDelayedMutex_runtime;
-  process implementation proc.impl
-    subcomponents
-      the_receiver_p_in_globalVariable: data SharedStructType_the_receiver_p_in.impl;
-      the_proc_the_receiver_p_in_sem: data arinc653_runtime::Semaphore_Id_Type;
-      the_sender: thread the_proc_the_sender.impl {
-        Dispatch_Protocol => Periodic;
-        Compute_Execution_Time => 0 ms .. 1 ms;
-        Period => 2000 ms;
-        Priority => 5;
-        Data_Size => 40000 Bytes;
-        Stack_Size => 40000 Bytes;
-        Code_Size => 40 Bytes;
-        Compute_Entrypoint_Call_Sequence => reference(main_call);
-        };
-      the_receiver: thread the_proc_the_receiver.impl {
-        Dispatch_Protocol => Periodic;
-        Compute_Execution_Time => 0 ms .. 1 ms;
-        Period => 1000 ms;
-        Priority => 10;
-        Data_Size => 40000 Bytes;
-        Stack_Size => 40000 Bytes;
-        Code_Size => 40 Bytes;
-        Compute_Entrypoint_Call_Sequence => reference(main_call);
-        Initialize_Entrypoint_Call_Sequence => reference(initLikedList);
-        };
-    connections
-      cnx_p_in_to_globalVariable: data access the_receiver_p_in_globalVariable -> the_sender.cnx_p_out;
-      Id_instance_to_the_receiver_p_in: data access the_receiver_p_in_globalVariable -> the_receiver.p_in;
-      the_proc_the_sender_p_out_accessSemGlobalVariable: data access the_proc_the_receiver_p_in_sem -> the_sender.p_out_semAccess;
-      the_proc_the_receiver_p_in_accessSemGlobalVariable: data access the_proc_the_receiver_p_in_sem -> the_receiver.p_in_semAccess;
-  end proc.impl;
-  
-  processor implementation cpu.impl
-    subcomponents
-      the_part: virtual processor part {
-        Period => 1000 ms;
-        ARINC653::HM_Error_ID_Actions => ([
-          ErrorIdentifier=> 3;
-          Description=> "Restart process";
-          Action=> "Cold_Restart";
-        ], [
-          ErrorIdentifier=> 4;
-          Description=> "Warm partition restart";
-          Action=> "Warm_Restart";
-        ]);
-        Scheduling_Protocol => (Round_Robin_Protocol);
-        ARINC653::Partition_Identifier => 1;
-        POK::Additional_Features => (libc_stdio, console);
-        };
-  end cpu.impl;
-  
-  memory implementation mem.impl
-  end mem.impl;
-  
-  memory implementation mem.two_partitions
-  end mem.two_partitions;
-  
+with PeriodicDelayedMutex_runtime,Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime;
   system implementation refined_model.impl
     subcomponents
-      the_mem: memory mem.impl {
+      the_mem: memory the_mem.impl {
         Memory_Protocol => read_write;
         ARINC653::Memory_Type => (Data_Memory);
         Memory_Size => 200000 Bytes;
         };
-      the_proc: process proc.impl;
-      the_cpu: processor cpu.impl {
+      the_proc: process the_proc.impl;
+      the_cpu: processor the_cpu.impl {
         ARINC653::Module_Major_Frame => 1000 ms;
         ARINC653::HM_Error_ID_Levels => ([
           ErrorIdentifier=> 1;
@@ -126,17 +69,71 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
       Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_receiver;
   end refined_model.impl;
   
-  processor cpu
-  end cpu;
+  system refined_model
+  end refined_model;
   
-  virtual processor part
-  end part;
+  memory implementation the_mem.impl
+  end the_mem.impl;
   
-  memory mem
-  end mem;
+  memory the_mem
+  end the_mem;
   
-  process proc
-  end proc;
+  processor the_cpu
+  end the_cpu;
+  
+  processor implementation the_cpu.impl
+    subcomponents
+      the_part: virtual processor common_pkg::part {
+        Period => 1000 ms;
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 3;
+          Description=> "Restart process";
+          Action=> "Cold_Restart";
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Warm partition restart";
+          Action=> "Warm_Restart";
+        ]);
+        Scheduling_Protocol => (Round_Robin_Protocol);
+        ARINC653::Partition_Identifier => 1;
+        POK::Additional_Features => (libc_stdio, console);
+        };
+  end the_cpu.impl;
+  
+  process the_proc
+  end the_proc;
+  
+  process implementation the_proc.impl
+    subcomponents
+      the_receiver_p_in_globalVariable: data SharedStructType_the_receiver_p_in.impl;
+      the_proc_the_receiver_p_in_sem: data arinc653_runtime::Semaphore_Id_Type;
+      the_sender: thread the_proc_the_sender.impl {
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 2000 ms;
+        Priority => 5;
+        Data_Size => 40000 Bytes;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+      the_receiver: thread the_proc_the_receiver.impl {
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 1000 ms;
+        Priority => 10;
+        Data_Size => 40000 Bytes;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        Initialize_Entrypoint_Call_Sequence => reference(initLikedList);
+        };
+    connections
+      cnx_p_in_to_globalVariable: data access the_receiver_p_in_globalVariable -> the_sender.cnx_p_out;
+      Id_instance_to_the_receiver_p_in: data access the_receiver_p_in_globalVariable -> the_receiver.p_in;
+      the_proc_the_sender_p_out_accessSemGlobalVariable: data access the_proc_the_receiver_p_in_sem -> the_sender.p_out_semAccess;
+      the_proc_the_receiver_p_in_accessSemGlobalVariable: data access the_proc_the_receiver_p_in_sem -> the_receiver.p_in_semAccess;
+  end the_proc.impl;
   
   subprogram event_sender_spg
     features
@@ -155,9 +152,6 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
       Source_Name => "__event_sender_spg_context";
   end event_sender_spg_context;
   
-  system refined_model
-  end refined_model;
-  
   subprogram implementation Put_Value_the_sender_p_out.impl
     extends PeriodicDelayedMutex_runtime::Put_Value.impl
   end Put_Value_the_sender_p_out.impl;
@@ -166,45 +160,6 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
     extends PeriodicDelayedMutex_runtime::Put_Value
     (t_data => data common_pkg::Integer,t_buffer => data SharedStructType_the_receiver_p_in.impl)
   end Put_Value_the_sender_p_out;
-  
-  subprogram implementation Next_Value_the_receiver_p_in.impl
-    extends PeriodicDelayedMutex_runtime::Next_Value.impl
-  end Next_Value_the_receiver_p_in.impl;
-  
-  subprogram implementation Receive_Input_mutex_the_receiver_p_in.impl
-    extends PeriodicDelayedMutex_runtime::Receive_Input.impl
-  end Receive_Input_mutex_the_receiver_p_in.impl;
-  
-  data SharedStructType_the_receiver_p_in
-    extends PeriodicDelayedMutex_runtime::SharedStructure
-  end SharedStructType_the_receiver_p_in;
-  
-  data implementation SharedStructType_the_receiver_p_in.impl
-    extends PeriodicDelayedMutex_runtime::SharedStructure.impl
-    (t_buffer => data QueueType_the_receiver_p_in)
-  end SharedStructType_the_receiver_p_in.impl;
-  
-  data QueueType_the_receiver_p_in
-    extends PeriodicDelayedMutex_runtime::BufferPrototype
-    properties
-      Data_Model::Base_Type => (classifier(Integer_Msg.impl));
-      Data_Model::Dimension => (10);
-  end QueueType_the_receiver_p_in;
-  
-  subprogram Receive_Input_mutex_the_receiver_p_in
-    extends PeriodicDelayedMutex_runtime::Receive_Input
-    (t_buffer => data SharedStructType_the_receiver_p_in.impl)
-  end Receive_Input_mutex_the_receiver_p_in;
-  
-  subprogram Next_Value_the_receiver_p_in
-    extends PeriodicDelayedMutex_runtime::Next_Value
-    (t_data => data common_pkg::Integer,t_buffer => data SharedStructType_the_receiver_p_in.impl)
-  end Next_Value_the_receiver_p_in;
-  
-  subprogram root_impl_Instance_the_proc_the_receiver_p_in_Init_Spg
-    extends PeriodicDelayedMutex_runtime::Init_Prototype
-    (t_buffer => data SharedStructType_the_receiver_p_in.impl)
-  end root_impl_Instance_the_proc_the_receiver_p_in_Init_Spg;
   
   subprogram the_proc_the_sender_entrypoint
     features
@@ -365,6 +320,45 @@ PeriodicDelayedMutex_runtime::Send_Output ! (PeriodValue, DeadlineValue, Current
       p_in: requires data access SharedStructType_the_receiver_p_in.impl;
       p_in_semAccess: requires data access arinc653_runtime::Semaphore_Id_Type;
   end the_proc_the_receiver;
+  
+  subprogram implementation Next_Value_the_receiver_p_in.impl
+    extends PeriodicDelayedMutex_runtime::Next_Value.impl
+  end Next_Value_the_receiver_p_in.impl;
+  
+  subprogram implementation Receive_Input_mutex_the_receiver_p_in.impl
+    extends PeriodicDelayedMutex_runtime::Receive_Input.impl
+  end Receive_Input_mutex_the_receiver_p_in.impl;
+  
+  data SharedStructType_the_receiver_p_in
+    extends PeriodicDelayedMutex_runtime::SharedStructure
+  end SharedStructType_the_receiver_p_in;
+  
+  data implementation SharedStructType_the_receiver_p_in.impl
+    extends PeriodicDelayedMutex_runtime::SharedStructure.impl
+    (t_buffer => data QueueType_the_receiver_p_in)
+  end SharedStructType_the_receiver_p_in.impl;
+  
+  data QueueType_the_receiver_p_in
+    extends PeriodicDelayedMutex_runtime::BufferPrototype
+    properties
+      Data_Model::Base_Type => (classifier(Integer_Msg.impl));
+      Data_Model::Dimension => (10);
+  end QueueType_the_receiver_p_in;
+  
+  subprogram Receive_Input_mutex_the_receiver_p_in
+    extends PeriodicDelayedMutex_runtime::Receive_Input
+    (t_buffer => data SharedStructType_the_receiver_p_in.impl)
+  end Receive_Input_mutex_the_receiver_p_in;
+  
+  subprogram Next_Value_the_receiver_p_in
+    extends PeriodicDelayedMutex_runtime::Next_Value
+    (t_data => data common_pkg::Integer,t_buffer => data SharedStructType_the_receiver_p_in.impl)
+  end Next_Value_the_receiver_p_in;
+  
+  subprogram root_impl_Instance_the_proc_the_receiver_p_in_Init_Spg
+    extends PeriodicDelayedMutex_runtime::Init_Prototype
+    (t_buffer => data SharedStructType_the_receiver_p_in.impl)
+  end root_impl_Instance_the_proc_the_receiver_p_in_Init_Spg;
   
   data implementation Integer_Msg.impl
     extends PeriodicDelayedMutex_runtime::MsgPrototype.impl

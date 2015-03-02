@@ -55,7 +55,13 @@ helper def: collectInitCallSubpgList(c: AADLI!ComponentInstance): Sequence(ADLBA
 										->excluding(OclUndefined);
 
 helper def: collectInitCallSequence(c: AADLI!ComponentInstance): AADLBA!SubprogramCallSequence =
-  let result: AADLBA!SubprogramCallSequence = thisModule.resolveMatchedSingleIfExists(c, 'initCallSequence') in
+  let result: AADLBA!SubprogramCallSequence = 
+  	if c.featureInstance->exists(e|e.isInputFeature() and e.isPeriodicDelayedPort()) then
+  		thisModule.createInitializeEntrypointPropertyAssociation(c)
+	else
+		OclUndefined
+	endif
+  in
   let subpgList: Sequence(ADLBA!SubprogramCall) =  thisModule.collectInitCallSubpgList(c) in
   if(not result.oclIsUndefined() and not subpgList->isEmpty()) then
 	result
@@ -84,13 +90,13 @@ helper def : collectPeriodicDelayed_ThreadVariables_Mutex(c: AADLI!ComponentInst
 helper def : collectPeriodicDelayed_LocalVariables_Mutex(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
 	Sequence
 	{
-		thisModule.resolveMatchedSingleIfExists(c, 'currentDeadlineSub'),
-		thisModule.resolveMatchedSingleIfExists(c, 'deadlineSub'),
-		thisModule.resolveMatchedSingleIfExists(c, 'periodSub'),
-		thisModule.resolveMatchedSingleIfExists(c, 'currentPeriodSub')
+		thisModule.resolveLazySingleIfExists(c, 'createPDPLocalVariables_Mutex', 'currentDeadlineSub'),
+		thisModule.resolveLazySingleIfExists(c, 'createPDPLocalVariables_Mutex', 'deadlineSub'),
+		thisModule.resolveLazySingleIfExists(c, 'createPDPLocalVariables_Mutex', 'periodSub'),
+		thisModule.resolveLazySingleIfExists(c, 'createPDPLocalVariables_Mutex', 'currentPeriodSub')
 	}
 	->union(if (c.featureInstance->exists(e|e.isOutputFeature() and e.isPeriodicDelayedPort()))
-			then Sequence{thisModule.resolveMatchedSingleIfExists(c, 'msgPrioritySub')}
+			then Sequence{thisModule.resolveLazySingleIfExists(c, 'createMsgPrioritySub', 'msgPrioritySub')}
 	        else Sequence{}
 	        endif)
 	->union(thisModule.collectPeriodicDelayed_LocalVariables_Mutex_PFSpec(c, behavior))
@@ -114,44 +120,30 @@ helper def : collectPeriodicDelayed_LocalVariables_Mutex_PFSpec(c: AADLI!Compone
 ;
 
 helper def : collectInitializationEntryPoint(c: AADLI!ComponentInstance): AADLBA!PropertyAssociation =
-  let result: AADLBA!SubprogramCallSequence = thisModule.resolveMatchedSingleIfExists(c, 'initCallSequence') in
+  let result: AADLBA!SubprogramCallSequence = 
+  	if c.featureInstance->exists(e|e.isInputFeature() and e.isPeriodicDelayedPort()) then
+  		thisModule.createInitializeEntrypointPropertyAssociation(c)
+	else
+		OclUndefined
+	endif
+  in
   let subpgList: Sequence(ADLBA!SubprogramCall) =  thisModule.collectInitCallSubpgList(c) in
   if(not result.oclIsUndefined() and not subpgList->isEmpty()) then
-	thisModule.resolveMatchedSingleIfExists(c, 'pa')
+	thisModule.resolveLazySingleIfExists(c, 'createInitializeEntrypointPropertyAssociation', 'pa')
   else
   	OclUndefined
   endif
 ;
 
--- @extends m_Thread_With_Output_PeriodicDelayed_Port,m_Thread_With_Input_PeriodicDelayed_Port
-rule m_Thread_With_Input_and_Output_PeriodicDelayed_Port
+unique lazy rule createMsgPrioritySub
 {
 	from
 		c: AADLI!ComponentInstance
-	to
-		sub: AADLBA!ThreadSubcomponent
-}
-
--- @extends m_Thread_With_Input_or_Output_PeriodicDelayed_Port
-rule m_Thread_With_Output_PeriodicDelayed_Port
-{
-	from
-		c: AADLI!ComponentInstance
-		(
-			c.category = #thread
-			and
-			c.featureInstance->exists(e|e.isOutputFeature() and e.isPeriodicDelayedPort())
-		)
 	using
 	{
 		msgPriorityValue : Integer = c.getMsgPriority();	
 	}
 	to
-		sub: AADLBA!ThreadSubcomponent,
-		periodSub : AADLBA!DataSubcomponent,
-		currentPeriodSub : AADLBA!DataSubcomponent,
-		currentDeadlineSub : AADLBA!DataSubcomponent,
-		deadlineSub : AADLBA!DataSubcomponent,
 		msgPrioritySub : AADLBA!DataSubcomponent (
 			name <- 'MsgPriority',
 			dataSubcomponentType <- 'Integer_16'.asDataType('BASE_TYPES'),
@@ -161,25 +153,18 @@ rule m_Thread_With_Output_PeriodicDelayed_Port
 							thisModule.CreateListValueFromString(msgPriorityValue.toString())
 						)}
 		)
+	do
+	{
+		msgPrioritySub;
+	}
 }
 
 
--- @extends m_Thread_With_Input_or_Output_PeriodicDelayed_Port
-rule m_Thread_With_Input_PeriodicDelayed_Port
+unique lazy rule createInitializeEntrypointPropertyAssociation
 {
 	from
 		c: AADLI!ComponentInstance
-		(
-			c.category = #thread
-			and
-			c.featureInstance->exists(e|e.isInputFeature() and e.isPeriodicDelayedPort())
-		)
 	to
-		sub: AADLBA!ThreadSubcomponent,
-		periodSub : AADLBA!DataSubcomponent,
-		currentPeriodSub : AADLBA!DataSubcomponent,
-		currentDeadlineSub : AADLBA!DataSubcomponent,
-		deadlineSub : AADLBA!DataSubcomponent,
 		pa: AADLBA!PropertyAssociation
 		(
 			property <- thisModule.getProperty('Initialize_Entrypoint_Call_Sequence'),  
@@ -205,17 +190,14 @@ rule m_Thread_With_Input_PeriodicDelayed_Port
 	do
 	{
 		thisModule.addImportedUnit(thisModule.public(), thisModule.PDC_MUTEX_RUNTIME_NAME.toUpper(), thisModule.PDC_MUTEX_RUNTIME_NAME);
+		initCallSequence;
 	}
 }
 
--- @extends m_PeriodicThread
-rule m_Thread_With_Input_or_Output_PeriodicDelayed_Port
+unique lazy rule createPDPLocalVariables_Mutex
 {
 	from
 		c: AADLI!ComponentInstance
-		(c.featureInstance->exists(e|e.isOutputFeature() and e.isPeriodicDelayedPort())
-			or 
-		 c.featureInstance->exists(e|e.isInputFeature() and e.isPeriodicDelayedPort()))
 	using
 	{
 		periodValue : Integer = c.getPropertyIntValue('Period');
@@ -307,6 +289,7 @@ rule m_Thread_Output_PeriodicDelayed_Port_Mutex
 		consummerPort: AADLI!FeatureInstance = cnxInst.destination;
 		Put_Value_PrototypeSpg: AADLBA!SubprogramType = 'Put_Value'.asSubprogramType(thisModule.PeriodicDelayedMutexRuntime_Name);
 		Array_Prototype : AADLBA!DataClassifier = 'ArrayDataType'.asDataType(thisModule.PeriodicDelayedMutexRuntime_Name);
+		tmp: AADLBA!ThreadSubcomponent = thisModule.createPDPLocalVariables_Mutex(fi.getComponentInstance());
 	}
 	to
 }
@@ -417,12 +400,12 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 --  	CurrentDeadline : in parameter Base_Types::Integer_16;
 		currentDeadlineHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'currentDeadlineSub')
+			element <- thisModule.resolveLazySingleIfExists(fi.getComponentInstance(), 'createPDPLocalVariables_Mutex', 'currentDeadlineSub')
 		),
 --  	Priority        : in parameter Base_Types::Integer_16;
 		priorityHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(),'msgPrioritySub')
+			element <- thisModule.createMsgPrioritySub(fi.getComponentInstance())
 		),
 		sizeHolder: AADLBA!ValueExpression
 		(
@@ -467,6 +450,7 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
   using
   {
 	portAbsoluteName: String = thisModule.getProgrammationLanguageIdentifier(fi.getComponentInstancePath());
+	tmp: AADLBA!ThreadSubcomponent = thisModule.createPDPLocalVariables_Mutex(fi.getComponentInstance());
   }
   to
   
@@ -485,11 +469,11 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	),
   	periodHolder: AADLBA!DataSubcomponentHolder
 	(
-		element <- thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'periodSub')
+		element <- thisModule.resolveLazySingleIfExists(fi.getComponentInstance(), 'createPDPLocalVariables_Mutex', 'periodSub')
 	),
   	currentPeriodHolder: AADLBA!DataSubcomponentHolder
 	(
-		element <- thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'currentPeriodSub')
+		element <- thisModule.resolveLazySingleIfExists(fi.getComponentInstance(), 'createPDPLocalVariables_Mutex', 'currentPeriodSub')
 	),
   	portVariableHolder: AADLBA!DataAccessHolder
 	(
@@ -701,7 +685,7 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 		),
 		currentPeriodHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'currentPeriodSub')
+			element <- thisModule.resolveLazySingleIfExists(fi.getComponentInstance(),'createPDPLocalVariables_Mutex', 'currentPeriodSub')
 		),
 		returnCodeHolder: AADLBA!DataSubcomponentHolder
 		(

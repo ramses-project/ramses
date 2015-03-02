@@ -1,0 +1,46 @@
+build/activity.o: activity.c activity.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/nxt_motors.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/mytypes.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/c/ecrobot_interface.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/mytypes.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/interrupts.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/aic.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/AT91SAM7.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/uart.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/systick.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/nxt_avr.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/twi.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/platform_hooks.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/javavm/types.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/platform_config.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/systime.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/javavm/classes.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/javavm/types.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/javavm/language.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/javavm/classes.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/javavm/memory.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/javavm/interpreter.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/javavm/constants.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/javavm/poll.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/nxt_lcd.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/sensors.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/display.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/i2c.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/bt.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/sound.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/udp.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/hs.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/c/ecrobot_types.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/c/ecrobot_bluetooth.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/c/ecrobot_usb.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/c/ecrobot_rs485.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/c/ecrobot_mindsensors.h \
+ subprograms.h /opt/sandbox/nxtOSEK-ramses/toppers_osek/include/kernel.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../toppers_osek/config/at91sam7s-gnu/lego_nxt/sys_defs.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../toppers_osek/config/at91sam7s-gnu/cpu_defs.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../toppers_osek/include/osek.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../toppers_osek/include/t_stddef.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../toppers_osek/config/at91sam7s-gnu/tool_defs.h \
+ /opt/sandbox/nxtOSEK-ramses/ecrobot/../toppers_osek/include/kernel.h \
+ /opt/sandbox/nxtOSEK-ramses/lejos_nxj/src/nxtvm/platform/nxt/nxt_motors.h \
+ gtypes.h main.h kernel_id.h

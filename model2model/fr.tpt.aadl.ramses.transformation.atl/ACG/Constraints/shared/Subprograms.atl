@@ -21,6 +21,7 @@
 
 -- @nsURI AADLI=http://aadl.info/AADL/2.0/instance
 -- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+
 -- @atlcompiler emftvm
 
 module Subprograms;
@@ -71,6 +72,250 @@ rule check_HasHeaderInSourceCode
 	  )
 }
 
+---------------------------------------------------------------------------------------------------
+
+-- @extends check_SubprogramCall
+abstract rule check_connections_between_calls_and_features
+{
+	from
+		obj: AADLI!SubprogramCall,
+		feature : AADLI!Feature,
+		component : AADLI!BehavioredImplementation
+		(
+			component.subprogramCall->includes(obj) and
+			not feature.connection_exists_between_call_and_feature(component)	
+		)
+	to
+	  err: CV!Error 	
+}		
+
+-- @extends check_connections_between_calls_and_features
+abstract rule check_connections_between_SubprogramAccess_and_features
+{
+	from
+		obj: AADLI!SubprogramCall,
+		feature : AADLI!Feature,
+		component : AADLI!BehavioredImplementation
+		(
+			obj.calledSubprogram.oclIsTypeOf(AADLI!SubprogramAccess) and
+			obj.calledSubprogram.subprogramFeatureClassifier.getOrderedFeature()->includes(feature)
+		 )
+	to
+	  err: CV!Error 
+}
+
+-- @extends check_connections_between_SubprogramAccess_and_features
+rule check_connections_between_SubprogramAccess_and_access
+{
+	from
+		obj: AADLI!SubprogramCall,
+		feature : AADLI!Access,
+		component : AADLI!BehavioredImplementation
+	to
+	  err: CV!Error
+	  (
+	  	message <- 'Missing connection(s) between subprogramCall of type SubprogramAccess '.concat(
+			obj.name+' with access feature '+feature.name+' and '+ obj.calledSubprogram.name+' subprogram access(es) in component '+ component.name +'\n'
+			)
+		)
+}
+-- @extends check_connections_between_SubprogramAccess_and_features
+rule check_connections_between_SubprogramAccess_and_directedFeature
+{
+	from
+		obj: AADLI!SubprogramCall,
+		feature : AADLI!DirectedFeature,
+		component : AADLI!BehavioredImplementation
+--		(not feature.oclIsTypeOf(AADLBA!EventPort))
+	to
+	  err: CV!Error
+	  (
+	  	message <- 'Missing connection(s) between subprogramCall of type SubprogramAccess '.concat(
+			obj.name+' with directed feature '+feature.name+' and '+ obj.calledSubprogram.name+' subprogram parameter(s) in component '+ component.name +'\n'
+			)
+		)
+}
+
+
+-- @extends check_connections_between_calls_and_features
+abstract rule check_connections_between_Subprogram_and_features
+{
+	from
+		obj: AADLI!SubprogramCall,
+		feature : AADLI!Feature,
+		component : AADLI!BehavioredImplementation
+		(obj.calledSubprogram.oclIsTypeOf(AADLI!Subprogram))
+	to
+	  err: CV!Error 	
+		
+}
+
+-- @extends check_connections_between_Subprogram_and_features
+abstract rule check_connections_between_SubprogramSubcomponent_and_features
+{
+	from
+		obj: AADLI!SubprogramCall,		
+		feature : AADLI!Feature,
+		component : AADLI!BehavioredImplementation
+		(
+			obj.calledSubprogram.oclIsTypeOf(AADLI!SubprogramSubcomponent) and
+			obj.classifier.classifierFeature->includes(feature) 
+		)
+	to
+	  err: CV!Error
+}
+
+-- @extends check_connections_between_SubprogramSubcomponent_and_features
+rule check_connections_between_SubprogramSubcomponent_and_access
+{
+	from
+		obj: AADLI!SubprogramCall,		
+		feature : AADLI!Access,
+		component : AADLI!BehavioredImplementation
+	to
+	  err: CV!Error
+	  (
+	  	message <- 'Missing connection(s) between subprogramCall of type SubprogramSubcomponent '.concat(
+			obj.name+' and '+ obj.calledSubprogram.name+' subprogram access(es)in component '+ component.name +'\n'
+			)
+		)
+}
+
+-- @extends check_connections_between_SubprogramSubcomponent_and_features
+rule check_connections_between_SubprogramSubcomponent_and_directedFeature
+{
+	from
+		obj: AADLI!SubprogramCall,		
+		feature : AADLI!DirectedFeature,
+		component : AADLI!BehavioredImplementation
+--		(not feature.oclIsTypeOf(AADLBA!EventPort))
+	to
+	  err: CV!Error
+	  (
+	  	message <- 'Missing connection(s) between subprogramCall of type SubprogramSubcomponent '.concat(
+			obj.name+' and '+ obj.calledSubprogram.name+' subprogram parameter(s) in component '+ component.name +'\n'
+			)
+		)
+}
+
+
+-- @extends check_connections_between_Subprogram_and_features
+abstract rule check_connections_between_SubprogramClassifier_and_features
+{
+	from
+		obj: AADLI!SubprogramCall,
+		feature : AADLI!Feature,
+		component : AADLI!BehavioredImplementation(
+			obj.calledSubprogram.oclIsTypeOf(AADLI!SubprogramClassifier) and
+			obj.classifierFeature->includes(feature)
+			
+		)
+	to
+	  err: CV!Error
+}
+
+-- @extends check_connections_between_SubprogramClassifier_and_features
+rule check_connections_between_SubprogramClassifier_and_access
+{
+	from
+		obj: AADLI!SubprogramCall,
+		feature : AADLI!Access,
+		component : AADLI!BehavioredImplementation
+	to
+	  err: CV!Error
+	  (
+	  	message <- 'Missing connection(s) between subprogramCall of type SubprogramClassifier '.concat(
+			obj.name+' and '+ obj.calledSubprogram.name+' subprogram access(es) in component '+ component.name +'\n'
+			)
+		)
+}
+
+-- @extends check_connections_between_SubprogramClassifier_and_features
+rule check_connections_between_SubprogramClassifier_and_directedFeature
+{
+	from
+		obj: AADLI!SubprogramCall,
+		feature : AADLI!DirectedFeature,
+		component : AADLI!BehavioredImplementation
+--		(not feature.oclIsTypeOf(AADLBA!EventPort))
+	to
+	  err: CV!Error
+	  (
+	  	message <- 'Missing connection(s) between subprogramCall of type SubprogramClassifier '.concat(
+			obj.name+' and '+ obj.calledSubprogram.name+' subprogram parameter(s) in component '+ component.name +'\n'
+			)
+		)
+}
+
+-- @extends check_connections_between_calls_and_features
+abstract rule check_connections_between_subprogramProxy_and_features
+{
+	from
+		obj: AADLI!SubprogramProxy,
+		feature : AADLI!Feature,
+		component : AADLI!BehavioredImplementation
+		(
+			obj.calledSubprogram.oclIsTypeOf(AADLI!SubprogramProxy) and
+			obj.subprogramClassifier.getOrderedFeature()->includes(feature)
+		 )
+	to
+	  err: CV!Error
+}
+
+-- @extends check_connections_between_subprogramProxy_and_features
+rule check_connections_between_subprogramProxy_and_access
+{
+	from
+		obj: AADLI!SubprogramProxy,
+		feature : AADLI!Access,
+		component : AADLI!BehavioredImplementation
+	to
+	  err: CV!Error
+	  (
+	  	message <- 'Missing connection(s) between subprogramCall of type SubprogramProxy '.concat(
+			obj.name+' and '+ obj.calledSubprogram.name+' subprogram access(es) in component '+ component.name +'\n'
+			)
+		)
+}
+
+-- @extends check_connections_between_subprogramProxy_and_features
+rule check_connections_between_subprogramProxy_and_directedFeature
+{
+	from
+		obj: AADLI!SubprogramProxy,
+		feature : AADLI!DirectedFeature,
+		component : AADLI!BehavioredImplementation
+--		(not feature.oclIsTypeOf(AADLBA!EventPort))
+	to
+	  err: CV!Error
+	  (
+	  	message <- 'Missing connection(s) between subprogramCall of type SubprogramProxy '.concat(
+			obj.name+' and '+ obj.calledSubprogram.name+' subprogram parameter(s) in component '+ component.name +'\n'
+			)
+		)
+}
+
+-- @extends check_connections_between_calls_and_features
+rule check_connections_between_Prototype_and_features
+{
+	from
+		obj: AADLI!SubprogramCall
+		(obj.calledSubprogram.oclIsTypeOf(AADLI!SubprogramPrototype))
+	to
+	  err: CV!Error
+	  (
+	  	message <- 'Call object is type of Prototype, not a concrete call.
+		Call object must be conrete : Subprogram or SubprogramAcess'
+		)
+}
+
+helper context AADLI!Feature  def : connection_exists_between_call_and_feature (comp : AADLI!ComponentImplementation) :Boolean = 	
+	let cnxs : Sequence(AADLI!Connection) = comp.ownedConnection in
+	cnxs->exists(c | (c.source.connectionEnd = self) or ( c.destination.connectionEnd = self) )
+	;
+---------------------------------------------------------------------------------------------------
+
+
 helper context AADLI!SubprogramCall def: hasSourceCode(): Boolean =
 	let spg: AADLBA!SubprogramClassifier = self.getSubprogramClassifier()
 	in
@@ -100,3 +345,4 @@ helper context AADLI!SubprogramClassifier def: hasBehaviorAnnex() : Boolean =
 helper context AADLI!SubprogramSubcomponent def: hasBehaviorAnnex() : Boolean =
 	self.subcomponentType.hasBehaviorAnnex()
 ;
+

@@ -49,6 +49,7 @@ import org.eclipse.m2m.atl.emftvm.Metamodel ;
 import org.eclipse.m2m.atl.emftvm.Model ;
 import org.eclipse.m2m.atl.emftvm.Module ;
 import org.eclipse.m2m.atl.emftvm.impl.resource.EMFTVMResourceImpl ;
+import org.eclipse.m2m.atl.emftvm.profiler.Profiler ;
 import org.eclipse.m2m.atl.emftvm.util.ModuleNotFoundException ;
 import org.eclipse.m2m.atl.emftvm.util.ModuleResolver ;
 import org.eclipse.m2m.atl.emftvm.util.StackFrame ;
@@ -57,6 +58,7 @@ import org.eclipse.m2m.atl.emftvm.util.VMMonitor ;
 import org.osate.aadl2.AadlPackage ;
 import org.osate.aadl2.PropertySet ;
 import org.osate.aadl2.instance.InstancePackage ;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.ba.aadlba.AadlBaPackage ;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksFactory ;
@@ -152,6 +154,9 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	protected Resource doTransformation(Resource inputResource,
 			String outputDirPathName, String resourceSuffix, final IProgressMonitor monitor) {
 		
+	  Profiler profiler = new Profiler();
+    env.setMonitor(profiler);
+	  
 		Resource outputResource = initTransformationOutput(inputResource, 
 				outputDirPathName, resourceSuffix);
 		
@@ -219,6 +224,12 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		try
 		{
 		  env.run(td);
+		  String profilingResult = profiler.toString();
+		  _LOGGER.trace(profilingResult);
+		  
+		  if(OsateResourceUtil.USES_GUI)
+	      monitor.subTask("Finished transformation.");
+		  
 		  td.finish();
 		}
 		catch(Exception e)
@@ -263,7 +274,9 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		
 		registerAdditionalTransformationsEMFTVM(transformationFileList, _moduleResolver);
 		
-		return doTransformation(inputResource, outputDirPathName, resourceSuffix, monitor);	
+		Resource result = doTransformation(inputResource, outputDirPathName, resourceSuffix, monitor);
+		
+		return result;
 	}
 	
 	

@@ -1,6 +1,42 @@
 package test_network_rtl8029_remote_communications
 public
-with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_driver;
+with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,test_network_rtl8029,RAMSES_processors,rtl8029_driver;
+  thread implementation the_proc1_the_sender.impl
+    calls
+      call:  {
+        c: subprogram common_pkg::sender_spg;
+        } 
+      ;
+    connections
+      cnx: parameter c.result -> p_out;
+  end the_proc1_the_sender.impl;
+  
+  thread the_proc1_the_sender
+    features
+      p_out: out event data port common_pkg::Integer;
+  end the_proc1_the_sender;
+  
+  thread implementation the_proc2_the_receiver.impl
+    calls
+      call:  {
+        c: subprogram common_pkg::receiver_spg;
+        } 
+      ;
+    connections
+      cnx: parameter p_in -> c.input;
+  end the_proc2_the_receiver.impl;
+  
+  thread the_proc2_the_receiver
+    features
+      p_in: in event data port common_pkg::Integer;
+  end the_proc2_the_receiver;
+  
+  processor implementation cpu.single_partition
+  end cpu.single_partition;
+  
+  processor implementation cpu.two_partitions
+  end cpu.two_partitions;
+  
   processor implementation connected_cpu.with_system_partition
     subcomponents
       the_part: virtual processor part {
@@ -36,6 +72,9 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
         };
   end connected_cpu.with_system_partition;
   
+  memory implementation mem.impl
+  end mem.impl;
+  
   memory implementation mem.two_partitions
     subcomponents
       part1_mem: memory part_mem {
@@ -52,7 +91,7 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
   
   process implementation proc1.impl
     subcomponents
-      the_sender: thread eventdata_sender.impl {
+      the_sender: thread the_proc1_the_sender.impl {
         Data_Size => 40000 Bytes;
         Compute_Entrypoint_Call_Sequence => reference(call);
         Dispatch_Protocol => Periodic;
@@ -68,7 +107,7 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
   
   process implementation proc2.impl
     subcomponents
-      the_receiver: thread eventdata_receiver.impl {
+      the_receiver: thread the_proc2_the_receiver.impl {
         Data_Size => 40000 Bytes;
         Compute_Entrypoint_Call_Sequence => reference(call);
         Dispatch_Protocol => Periodic;
@@ -82,28 +121,14 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
       cnx: port p_in -> the_receiver.p_in;
   end proc2.impl;
   
-  thread implementation eventdata_sender.impl
-    calls
-      call:  {
-        c: subprogram common_pkg::sender_spg;
-        } 
-      ;
-    connections
-      cnx: parameter c.result -> p_out;
-  end eventdata_sender.impl;
-  
-  thread implementation eventdata_receiver.impl
-    calls
-      call:  {
-        c: subprogram common_pkg::receiver_spg;
-        } 
-      ;
-    connections
-      cnx: parameter p_in -> c.input;
-  end eventdata_receiver.impl;
-  
   bus rtl8029
   end rtl8029;
+  
+  processor cpu_x86
+  end cpu_x86;
+  
+  processor cpu
+  end cpu;
   
   processor connected_cpu
     features
@@ -134,16 +159,6 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
         Queue_Processing_Protocol => Fifo;
         };
   end proc2;
-  
-  thread eventdata_sender
-    features
-      p_out: out event data port common_pkg::Integer;
-  end eventdata_sender;
-  
-  thread eventdata_receiver
-    features
-      p_in: in event data port common_pkg::Integer;
-  end eventdata_receiver;
   
   system remote_communications
   end remote_communications;

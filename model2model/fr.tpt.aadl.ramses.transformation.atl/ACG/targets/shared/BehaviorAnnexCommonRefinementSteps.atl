@@ -33,16 +33,13 @@ create OUT : AADLBA 	from 		IN : AADLI,
 -- List
 
 
+-- @extends m_ThreadPort_Filter,m_BA_Filter
 abstract rule m_Port_BehaviorAnnex
 {
 	from
 		fi: AADLI!FeatureInstance,
 		behavior: AADLI!AnnexSubclause
 		(
-			behavior.oclIsTypeOf(AADLBA!BehaviorAnnex)
-			and
-			fi.isThreadPort()
-			and
 			(fi.getComponentInstance().subcomponent.subcomponentType.getBA()=behavior)
 			and not fi.isPeriodicDelayedPort()
 		)
@@ -187,7 +184,7 @@ rule m_Input_Port_BehaviorAnnex
 	}
 }
 
--- @extends m_Port_BehaviorAnnex
+-- @extends m_Port_BehaviorAnnex,m_OutputFeature_Filter
 rule m_Output_Port_BehaviorAnnex
 {
 	from
@@ -195,8 +192,6 @@ rule m_Output_Port_BehaviorAnnex
 		behavior: AADLI!AnnexSubclause,
 		cnxRef: AADLI!PortConnection
 		(
-			fi.isOutputFeature()
-			and
 			fi.srcConnectionInstance->exists(e|e.connectionReference->exists(cnx| cnx.connection = cnxRef))
 		)
 	using
@@ -225,21 +220,17 @@ rule m_Output_Port_BehaviorAnnex
 	}
 }
 
+-- @extends m_Thread_Instance_Filter, m_BehavioredInstance
 rule m_Compute_EntryPoint_from_BA_dataAccess {
  from 
     c : AADLI!ComponentInstance,
-	behavior: AADLI!AnnexSubclause,
 	data: AADLI!ComponentInstance
 	(
-		c.category = #thread 
-		and
-		behavior.oclIsTypeOf(AADLBA!BehaviorAnnex)
-	  	and
-	  	c.subcomponent.classifier.getBA() = behavior
+	  	not c.subcomponent.classifier.getBA().oclIsUndefined()
 		and
 		data.eContainer()=c
 		and
-		AADLBA!DataSubcomponentHolder.allInstances()->exists(f|f.element = data.subcomponent)
+		AADLBA!ElementHolder.allInstances(c.subcomponent.classifier.getBA())->exists(f|f.element = data.subcomponent)
 	)
   to
   	dataAccess: AADLBA!DataAccess
@@ -254,15 +245,14 @@ rule m_Compute_EntryPoint_from_BA_dataAccess {
   }
 }
 
-
--- @extends m_ThreadBehavior
+-- @extends m_ThreadBehavior, m_BehavioredInstance
 rule m_Compute_EntryPoint_from_BA {
  from 
     c : AADLI!ComponentInstance,
 	behavior: AADLI!AnnexSubclause
-	( 	
-		c.category = #thread 
-		and
+	(
+        c.category = #thread 
+        and
 		behavior.oclIsTypeOf(AADLBA!BehaviorAnnex)
 	  	and
 	  	c.subcomponent.classifier.getBA() = behavior
@@ -279,10 +269,7 @@ rule m_Compute_EntryPoint_from_BA {
 	stateTypeID: String = c.uniqueName().concat('_currentState');
  }
  to 
-	behaviorAnnex: AADLBA!BehaviorAnnex
-	(
-		variables <- behavior.variables
-	),
+
 	stateType: AADLBA!DataType
 	(
 		name <- stateTypeID,
@@ -391,7 +378,7 @@ rule m_Compute_EntryPoint_from_BA {
 						thisModule.resolveMatchedTupleIfExists(Sequence{c,
 							behavior.transitions
 								->sortedBy(e| 0.longValue().minus(e.priority))
-								->first()},'ifStatement')
+								->first()},'target_BehaviorElement')
 						)
 				)
 	)
@@ -422,32 +409,40 @@ helper context OclAny def: resolve(c: AADLI!ComponentInstance): OclAny =
 	endif
 ;
 
+helper context  AADLBA!BehaviorVariable def: resolve(c: AADLI!ComponentInstance): AADLBA!BehaviorVariable =
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
+;
+
 helper context AADLBA!BehaviorActionBlock  def: resolve(c: AADLI!ComponentInstance): AADLBA!BehaviorActionBlock =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_actionBlock')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 helper context AADLBA!BehaviorActionSequence def: resolve(c: AADLI!ComponentInstance): AADLBA!BehaviorActionSequence =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_behaviorActionSequence')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 helper context AADLBA!AssignmentAction def: resolve(c: AADLI!ComponentInstance): AADLBA!SubprogramCallAction =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_assignmentAction')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 helper context AADLBA!SubprogramCallAction def: resolve(c: AADLI!ComponentInstance): AADLBA!SubprogramCallAction =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_communicationAction')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 helper context AADLBA!IfStatement def: resolve(c: AADLI!ComponentInstance): AADLBA!IfStatement =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_ifStatement')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
+;
+
+helper context AADLBA!ElseStatement def: resolve(c: AADLI!ComponentInstance): AADLBA!IfStatement =
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 helper context AADLBA!ElementHolder def: resolve(c: AADLI!ComponentInstance): AADLBA!ElementHolder =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_Holder')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 helper context AADLBA!PropertyElementHolder def: resolve(c: AADLI!ComponentInstance): AADLBA!ElementHolder =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_propertyElementHolder')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 lazy rule getValueComponentReference
@@ -485,56 +480,56 @@ helper context AADLBA!PortHolder def: resolve(c: AADLI!ComponentInstance): AADLB
 	if(fi.isUsedInFresh()) then 
 		thisModule.getValueComponentReference(fi)
 	else
-		thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_Holder')
+		thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 	endif
 ;
 
 helper context AADLBA!ClassifierPropertyReference def: resolve(c: AADLI!ComponentInstance): AADLBA!ClassifierPropertyReference =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_propertyReference')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 helper context AADLBA!PropertySetPropertyReference def: resolve(c: AADLI!ComponentInstance): AADLBA!PropertySetPropertyReference =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_propertySetPropertyReference')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 helper context AADLBA!PropertyNameHolder def: resolve(c: AADLI!ComponentInstance): AADLBA!PropertyNameHolder =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_propertyNameHolder')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 helper context AADLBA!UpperBound def: resolve(c: AADLI!ComponentInstance): AADLBA!UpperBound =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_upperBound')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 helper context AADLBA!LowerBound def: resolve(c: AADLI!ComponentInstance): AADLBA!LowerBound =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_lowerBound')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 helper context AADLBA!PortFreshValue def: resolve(c: AADLI!ComponentInstance): AADLBA!ElementHolder =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'isFresh')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 helper context AADLBA!Factor def: resolve(c: AADLI!ComponentInstance): AADLBA!ElementHolder =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_factor')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 helper context AADLBA!Term def: resolve(c: AADLI!ComponentInstance): AADLBA!ElementHolder =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_term')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 helper context AADLBA!BehaviorIntegerLiteral def: resolve(c: AADLI!ComponentInstance): AADLBA!BehaviorIntegerLiteral =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_behaviorIntegerLiteral')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 helper context AADLBA!ValueExpression def: resolve(c: AADLI!ComponentInstance): AADLBA!ValueExpression =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_valueExpression')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 helper context AADLBA!Relation def: resolve(c: AADLI!ComponentInstance): AADLBA!Relation =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_relation')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 helper context AADLBA!SimpleExpression def: resolve(c: AADLI!ComponentInstance): AADLBA!SimpleExpression =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_simpleExpression')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_BehaviorElement')
 ;
 
 helper context AADLBA!BehaviorTransition def: usedPortCount() : Sequence(AADLBA!Port) =
@@ -548,13 +543,16 @@ lazy rule createPortCountValueUpdate
 		fi: AADLI!FeatureInstance
 }
 
+-- @extends m_BehavioredInstance
 rule m_BehaviorActionsFromThread
 {
   from
 	c: AADLI!ComponentInstance,
 	src_transition: AADLBA!BehaviorTransition
 	(
-		c.category = #thread
+		c.category = #thread 
+		and 
+		c.subcomponent.subcomponentType.oclIsKindOf(AADLI!ComponentImplementation)
 		and
 		c.subcomponent.subcomponentType.getBA() = src_transition.eContainer()
 	)
@@ -567,7 +565,7 @@ rule m_BehaviorActionsFromThread
 	sortedTransitions: Sequence(AADLBA!BehaviorTransition) = ba.transitions->sortedBy(e| 0.longValue().minus(e.priority));
   }
   to
-	ifStatement: AADLBA!IfStatement
+	target_BehaviorElement: AADLBA!IfStatement
 	(
 		logicalValueExpression <- isStateSource,
 		elif <- if(sortedTransitions->first() = src_transition) then false else true endif,
@@ -575,7 +573,7 @@ rule m_BehaviorActionsFromThread
 		elseStatement <- let index: Integer = sortedTransitions->indexOf(src_transition) in 
 						if(index>0 and sortedTransitions->size() > index) then
 							thisModule.resolveMatchedTupleIfExists(Sequence{c,
-								sortedTransitions->at(index+1)}, 'ifStatement')
+								sortedTransitions->at(index+1)}, 'target_BehaviorElement')
 						else
 							OclUndefined
 						endif
@@ -828,169 +826,245 @@ unique lazy rule createFreshnessIndicatorUpdateAction
 }
 
 
-rule m_IfStatement
+
+abstract rule m_BehavioredInstance
 {
 	from
-		src_ifStatement: AADLBA!IfStatement,
 		c: AADLI!ComponentInstance
 		(
-			not src_ifStatement.oclIsTypeOf(AADLBA!ElseStatement)
+			(c.oclIsKindOf(AADLI!SystemInstance)
 			and
-			src_ifStatement.isThreadBehaviorElement()
-			and
-			src_ifStatement.isPartOfBehaviorAnnexOf(c)
+			not c.componentImplementation.getBA().oclIsUndefined())
+			or
+			(
+				not c.subcomponent.oclIsUndefined()
+				and
+				not c.subcomponent.subcomponentType.getBA().oclIsUndefined()
+			)
+		)
+}
+
+abstract rule m_BehaviorElement 
+{
+	from
+		src_BehaviorElement: AADLBA!BehaviorElement,
+		c: AADLI!ComponentInstance
+		(
+			src_BehaviorElement.isPartOfBehaviorAnnexOf(c)
 		)
 	to
-		target_ifStatement: AADLBA!IfStatement
+		target_BehaviorElement: AADLBA!BehaviorElement
+}
+
+-- @extends m_BehaviorElement,m_BehavioredInstance
+rule m_ElseStatement
+{
+	from
+		src_BehaviorElement: AADLBA!ElseStatement,
+		c: AADLI!ComponentInstance
 		(
-			logicalValueExpression <- src_ifStatement.logicalValueExpression.resolve(c),
-			elif <- src_ifStatement.elif.resolve(c),
-			behaviorActions <- ifStatementActionSequence,
-			elseStatement <- src_ifStatement.elseStatement.resolve(c)
+			not src_BehaviorElement.oclIsTypeOf(AADLBA!IfStatement)
+			and
+			src_BehaviorElement.isThreadBehaviorElement()
+		)
+	to
+		target_BehaviorElement: AADLBA!ElseStatement
+		(
+			behaviorActions <- elseStatementActionSequence
 		),
-		ifStatementActionSequence: AADLBA!BehaviorActionSequence
+		elseStatementActionSequence: AADLBA!BehaviorActionSequence
 		(
-			actions <- if(src_ifStatement.behaviorActions.oclIsKindOf(AADLBA!BehaviorActionCollection)) then
-						src_ifStatement.behaviorActions.actions->collect( e| e.resolve(c))
+			actions <- if(src_BehaviorElement.behaviorActions.oclIsKindOf(AADLBA!BehaviorActionCollection)) then
+						src_BehaviorElement.behaviorActions.actions->collect( e| e.resolve(c))
 					   else
-					   	Sequence{src_ifStatement.behaviorActions.resolve(c)}
+					   	Sequence{src_BehaviorElement.behaviorActions.resolve(c)}
 					   endif
 		)
 }
 
+-- @extends m_BehaviorElement,m_BehavioredInstance
+rule m_IfStatement
+{
+	from
+		src_BehaviorElement: AADLBA!IfStatement,
+		c: AADLI!ComponentInstance
+		(
+			not src_BehaviorElement.oclIsTypeOf(AADLBA!ElseStatement)
+			and
+			src_BehaviorElement.isThreadBehaviorElement()
+		)
+	to
+		target_BehaviorElement: AADLBA!IfStatement
+		(
+			logicalValueExpression <- src_BehaviorElement.logicalValueExpression.resolve(c),
+			elif <- src_BehaviorElement.elif.resolve(c),
+			behaviorActions <- ifStatementActionSequence,
+			elseStatement <- src_BehaviorElement.elseStatement.resolve(c)
+		),
+		ifStatementActionSequence: AADLBA!BehaviorActionSequence
+		(
+			actions <- if(src_BehaviorElement.behaviorActions.oclIsKindOf(AADLBA!BehaviorActionCollection)) then
+						src_BehaviorElement.behaviorActions.actions->collect( e| e.resolve(c))
+					   else
+					   	Sequence{src_BehaviorElement.behaviorActions.resolve(c)}
+					   endif
+		)
+}
+
+-- @extends m_BehaviorElement,m_BehavioredInstance
 rule m_BehaviorActionBlock
 {
 	from
-		src_actionBlock: AADLBA!BehaviorActionBlock,
+		src_BehaviorElement: AADLBA!BehaviorActionBlock,
 		c: AADLI!ComponentInstance
 	to
-	    target_actionBlock: AADLBA!BehaviorActionBlock
+	    target_BehaviorElement: AADLBA!BehaviorActionBlock
 		(
-			content <- src_actionBlock.content.resolve(c)
+			content <- src_BehaviorElement.content.resolve(c)
 		)
 }
 
+-- @extends m_BehaviorElement,m_BehavioredInstance
 rule m_BehaviorActionSequence
 {
 	from
-		src_behaviorActionSequence: AADLBA!BehaviorActionSequence,
+		src_BehaviorElement: AADLBA!BehaviorActionSequence,
 		c: AADLI!ComponentInstance
 		(
-			src_behaviorActionSequence.isThreadBehaviorElement()
-			and
-			src_behaviorActionSequence.isPartOfBehaviorAnnexOf(c)
+			src_BehaviorElement.isThreadBehaviorElement()
 		)
 	to
-		target_behaviorActionSequence: AADLBA!BehaviorActionSequence
+		target_BehaviorElement: AADLBA!BehaviorActionSequence
 		(
-			actions <- src_behaviorActionSequence.actions->collect(e| e.resolve(c))
+			actions <- src_BehaviorElement.actions->collect(e| e.resolve(c))
 		)
 }
 
+-- @extends m_BehaviorElement,m_BehavioredInstance
 rule m_EventPortHolder
 {
 	from
-		src_Holder: AADLBA!EventPortHolder,
+		src_BehaviorElement: AADLBA!EventPortHolder,
 		c: AADLI!ComponentInstance
 		(
-			let f: AADLI!FeatureInstance = c.featureInstance->any(e|e.name=src_Holder.element.name) in 
-			c.featureInstance->exists(fi| fi.feature = src_Holder.element)
+			let f: AADLI!FeatureInstance = c.featureInstance->any(e|e.name=src_BehaviorElement.element.name) in 
+			c.featureInstance->exists(fi| fi.feature = src_BehaviorElement.element)
 		)
 	to
-		target_Holder: AADLBA!DataSubcomponentHolder
+		target_BehaviorElement: AADLBA!DataSubcomponentHolder
 		(
-			element<-thisModule.resolveMatchedSingleIfExists(c.featureInstance->any(e|e.name=src_Holder.element.name), 'localVariable')	
+			element<-thisModule.resolveMatchedSingleIfExists(c.featureInstance->any(e|e.name=src_BehaviorElement.element.name), 'localVariable')	
 		)
 }
 
+-- @extends m_BehaviorElement,m_BehavioredInstance
 rule m_EventDataPortHolder
 {
 	from
-		src_Holder:AADLBA!EventDataPortHolder,
+		src_BehaviorElement:AADLBA!EventDataPortHolder,
 		c: AADLI!ComponentInstance
 		(
-			let f: AADLI!FeatureInstance = c.featureInstance->any(e|e.name=src_Holder.element.name) in 
-			c.featureInstance->exists(fi| fi.feature = src_Holder.element)
+			let f: AADLI!FeatureInstance = c.featureInstance->any(e|e.name=src_BehaviorElement.element.name) in 
+			c.featureInstance->exists(fi| fi.feature = src_BehaviorElement.element)
 		)
 	to
-		target_Holder: AADLBA!DataSubcomponentHolder
+		target_BehaviorElement: AADLBA!DataSubcomponentHolder
 		(
-			element<-thisModule.resolveMatchedSingleIfExists(c.featureInstance->any(e|e.name=src_Holder.element.name), 'localVariable')	
+			element<-thisModule.resolveMatchedSingleIfExists(c.featureInstance->any(e|e.name=src_BehaviorElement.element.name), 'localVariable')	
 		)
 }
 
+-- @extends m_BehaviorElement,m_BehavioredInstance
 rule m_DataSubcomponentHolder
 {
 	from
-		src_Holder: AADLBA!DataSubcomponentHolder,
+		src_BehaviorElement: AADLBA!DataSubcomponentHolder,
 		c: AADLI!ComponentInstance
 		(
-			c.componentInstance->exists(e|e.subcomponent=src_Holder.element)
+			c.componentInstance->exists(e|e.subcomponent=src_BehaviorElement.element)
 		)
 	using
 	{
-		dataInstance: AADLI!ComponentInstance = c.componentInstance->any(e|e.subcomponent = src_Holder.element);
+		dataInstance: AADLI!ComponentInstance = c.componentInstance->any(e|e.subcomponent = src_BehaviorElement.element);
 		impl: AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
 	}
 	to
-		target_Holder: AADLBA!DataAccessHolder
+		target_BehaviorElement: AADLBA!DataAccessHolder
 		(
-			element<-thisModule.resolveMatchedTupleIfExists(Sequence{c,impl.getBA(),dataInstance}, 'dataAccess')
+			element<-thisModule.resolveMatchedTupleIfExists(Sequence{c,dataInstance}, 'dataAccess')
 		)
 }
 
+-- @extends m_BehaviorElement, m_BehavioredInstance
+rule m_BehaviorVariable
+{
+	from
+		src_BehaviorElement: AADLBA!BehaviorVariable,
+		c: AADLI!ComponentInstance
+		(src_BehaviorElement.isThreadBehaviorElement())
+	to
+		target_BehaviorElement: AADLBA!BehaviorVariable
+		(
+			name           <- src_BehaviorElement.name,
+			dataClassifier <- src_BehaviorElement.dataClassifier
+		)
+}
+
+-- @extends m_BehaviorElement, m_BehavioredInstance
 rule m_BehaviorVariableHolder
 {
 	from
-		src_Holder: AADLBA!BehaviorVariableHolder,
+		src_BehaviorElement: AADLBA!BehaviorVariableHolder,
 		c: AADLI!ComponentInstance
 	to
-		target_Holder: AADLBA!BehaviorVariableHolder
+		target_BehaviorElement: AADLBA!BehaviorVariableHolder
 		(
-			element <- src_Holder.element
+			element <- src_BehaviorElement.element.resolve(c)
 		)
 }
 
+-- @extends m_BehaviorElement, m_BehavioredInstance
 rule m_SubprogramHolder
 {
 	from
-		src_Holder: AADLBA!SubprogramHolder,
+		src_BehaviorElement: AADLBA!SubprogramHolder,
 		c: AADLI!ComponentInstance
 	to
-		target_Holder: AADLBA!SubprogramHolder
+		target_BehaviorElement: AADLBA!SubprogramHolder
 		(
-			element <- src_Holder.element
+			element <- src_BehaviorElement.element
 		)
 	do
 	{
-		thisModule.addImportedUnitFromInputModel(thisModule.public(), src_Holder.element);
+		thisModule.addImportedUnitFromInputModel(thisModule.public(), src_BehaviorElement.element);
 	}
 }
 
+-- @extends m_BehaviorElement, m_BehavioredInstance
 rule m_DataPortHolder_withFresh
 {
 	from
-		src_Holder:AADLBA!DataPortHolder,
+		src_BehaviorElement:AADLBA!DataPortHolder,
 		c: AADLI!ComponentInstance
 		(
-			let f: AADLI!FeatureInstance = c.featureInstance->any(e|e.feature.name=src_Holder.element.name) in 
-			c.featureInstance->exists(fi| fi.feature = src_Holder.element)
+			let f: AADLI!FeatureInstance = c.featureInstance->any(e|e.feature.name=src_BehaviorElement.element.name) in 
+			c.featureInstance->exists(fi| fi.feature = src_BehaviorElement.element)
 			and
 			f.isUsedInFresh()
 		)
 	to
-		target_Holder: AADLBA!DataComponentReference
+		target_BehaviorElement: AADLBA!DataComponentReference
 		(
 			data <- Sequence{dataSubcomponentHolder,functionalPartHolder}
 		),
 		dataSubcomponentHolder: AADLBA!DataSubcomponentHolder
 		(
-			element<-thisModule.resolveMatchedSingleIfExists(c.featureInstance->any(e|e.name=src_Holder.element.name), 'localVariable')
+			element<-thisModule.resolveMatchedSingleIfExists(c.featureInstance->any(e|e.name=src_BehaviorElement.element.name), 'localVariable')
 		),
 		functionalPartHolder: AADLBA!DataSubcomponentHolder
 	do
 	{
-		functionalPartHolder.element<-thisModule.resolveLazySingleIfExists(c.featureInstance->any(e|e.name=src_Holder.element.name).feature.dataFeatureClassifier, 'createFreshnessDataStructure','struct_functional_data_subcomponent');
+		functionalPartHolder.element<-thisModule.resolveLazySingleIfExists(c.featureInstance->any(e|e.name=src_BehaviorElement.element.name).feature.dataFeatureClassifier, 'createFreshnessDataStructure','struct_functional_data_subcomponent');
 	}
 }
 		
@@ -998,18 +1072,18 @@ rule m_DataPortHolder_withFresh
 rule m_DataPortHolder
 {
 	from
-		src_Holder:AADLBA!DataPortHolder,
+		src_BehaviorElement:AADLBA!DataPortHolder,
 		c: AADLI!ComponentInstance
 		(
-			let f: AADLI!FeatureInstance = c.featureInstance->any(e|e.name=src_Holder.element.name) in 
-			c.featureInstance->exists(fi| fi.feature = src_Holder.element)
+			let f: AADLI!FeatureInstance = c.featureInstance->any(e|e.name=src_BehaviorElement.element.name) in 
+			c.featureInstance->exists(fi| fi.feature = src_BehaviorElement.element)
 			and
 			not f.isUsedInFresh()
 		)
 	to
-		target_Holder: AADLBA!DataSubcomponentHolder
+		target_BehaviorElement: AADLBA!DataSubcomponentHolder
 		(
-			element<-thisModule.resolveMatchedSingleIfExists(c.featureInstance->any(e|e.name=src_Holder.element.name), 'localVariable')	
+			element<-thisModule.resolveMatchedSingleIfExists(c.featureInstance->any(e|e.name=src_BehaviorElement.element.name), 'localVariable')	
 		)
 }
 
@@ -1017,35 +1091,33 @@ rule m_DataPortHolder
 rule m_PortCountValue
 {
 	from
-		src_Holder:AADLBA!PortCountValue,
+		src_BehaviorElement:AADLBA!PortCountValue,
 		c: AADLI!ComponentInstance
 		(
-			let f: AADLI!FeatureInstance = c.featureInstance->any(e|e.name=src_Holder.element.name) in 
-			c.featureInstance->exists(fi| fi.feature = src_Holder.element)
+			let f: AADLI!FeatureInstance = c.featureInstance->any(e|e.name=src_BehaviorElement.element.name) in 
+			c.featureInstance->exists(fi| fi.feature = src_BehaviorElement.element)
 		)
 	using
 	{
-		fi: AADLI!FeatureInstance = c.featureInstance->any(e|e.name=src_Holder.element.name);
+		fi: AADLI!FeatureInstance = c.featureInstance->any(e|e.name=src_BehaviorElement.element.name);
 	}
 	to
-		target_Holder: AADLBA!DataSubcomponentHolder
+		target_BehaviorElement: AADLBA!DataSubcomponentHolder
 		(
 			element <- thisModule.createPortCountSubcomponent(fi)
 		)
 }
 
+-- @extends m_BehaviorElement, m_BehavioredInstance
 abstract rule m_PropertyReference
 {
 	from
-		src_propertyReference: AADLBA!PropertyReference,
+		src_BehaviorElement: AADLBA!PropertyReference,
 		c: AADLI!ComponentInstance
-		(
-			src_propertyReference.isPartOfBehaviorAnnexOf(c)
-		)
 	to
-		target_propertyReference: AADLBA!PropertyReference
+		target_BehaviorElement: AADLBA!PropertyReference
 		(
-			properties <- src_propertyReference.properties->collect(propertyname| propertyname.resolve(c))
+			properties <- src_BehaviorElement.properties->collect(propertyname| propertyname.resolve(c))
 		)
 }
 
@@ -1053,12 +1125,12 @@ abstract rule m_PropertyReference
 rule m_ClassifierPropertyReference
 {
 	from
-		src_propertyReference: AADLBA!ClassifierPropertyReference,
+		src_BehaviorElement: AADLBA!ClassifierPropertyReference,
 		c: AADLI!ComponentInstance
 	to
-		target_propertyReference: AADLBA!ClassifierPropertyReference
+		target_BehaviorElement: AADLBA!ClassifierPropertyReference
 		(
-			classifier <- src_propertyReference.classifier
+			classifier <- src_BehaviorElement.classifier
 		)
 }
 
@@ -1066,49 +1138,47 @@ rule m_ClassifierPropertyReference
 rule m_PropertySetPropertyReference
 {
 	from
-		src_propertyReference: AADLBA!PropertySetPropertyReference,
+		src_BehaviorElement: AADLBA!PropertySetPropertyReference,
 		c: AADLI!ComponentInstance
 	to
-		target_propertyReference: AADLBA!PropertySetPropertyReference
+		target_BehaviorElement: AADLBA!PropertySetPropertyReference
 		(
-			propertyset <- src_propertyReference.propertyset
+			propertyset <- src_BehaviorElement.propertyset
 		)
 }
 
+-- @extends m_BehaviorElement, m_BehavioredInstance
 rule m_PropertyNameHolder
 {
 	from
-		src_propertyNameHolder: AADLBA!PropertyNameHolder,
+		src_BehaviorElement: AADLBA!PropertyNameHolder,
 		c: AADLI!ComponentInstance
-		(
-			src_propertyNameHolder.isPartOfBehaviorAnnexOf(c)
-		)
 	to
-		target_propertyNameHolder: AADLBA!PropertyNameHolder
+		target_BehaviorElement: AADLBA!PropertyNameHolder
 		(
-			property <- src_propertyNameHolder.property.resolve(c),
+			property <- src_BehaviorElement.property.resolve(c),
 			
-			field <- if src_propertyNameHolder.field.oclIsUndefined() then 
+			field <- if src_BehaviorElement.field.oclIsUndefined() then 
 						OclUndefined
 					else 
-						src_propertyNameHolder.field.resolve(c)
+						src_BehaviorElement.field.resolve(c)
 					endif
 		)
 }
 
--- Indexes not supported yet.
+-- @extends m_BehaviorElement, m_BehavioredInstance
 abstract rule m_PropertyElementHolder
 {
 	from
-		src_propertyElementHolder: AADLBA!PropertyElementHolder,
+		src_BehaviorElement: AADLBA!PropertyElementHolder,
 		c: AADLI!ComponentInstance
 		(
-			src_propertyElementHolder.isPartOfBehaviorAnnexOf(c)	
+			src_BehaviorElement.isPartOfBehaviorAnnexOf(c) 
 		)
 	to
-		target_propertyElementHolder: AADLBA!PropertyElementHolder
+		target_BehaviorElement: AADLBA!PropertyElementHolder
 		(
-			element <- src_propertyElementHolder.element
+			element <- src_BehaviorElement.element
 		)
 }
 
@@ -1116,243 +1186,233 @@ abstract rule m_PropertyElementHolder
 rule m_EnumLiteralHolder
 {
 	from
-		src_propertyElementHolder: AADLBA!EnumLiteralHolder,
+		src_BehaviorElement: AADLBA!EnumLiteralHolder,
 		c: AADLI!ComponentInstance
 	to
-		target_propertyElementHolder: AADLBA!EnumLiteralHolder
+		target_BehaviorElement: AADLBA!EnumLiteralHolder
 }
 
 -- @extends m_PropertyElementHolder
 rule m_PropertyExpressionHolder
 {
 	from
-		src_propertyElementHolder: AADLBA!PropertyExpressionHolder,
+		src_BehaviorElement: AADLBA!PropertyExpressionHolder,
 		c: AADLI!ComponentInstance
 	to
-		target_propertyElementHolder: AADLBA!PropertyExpressionHolder
+		target_BehaviorElement: AADLBA!PropertyExpressionHolder
 }
 
 -- @extends m_PropertyElementHolder
 rule m_PropertyAssociationHolder
 {
 	from
-		src_propertyElementHolder: AADLBA!PropertyAssociationHolder,
+		src_BehaviorElement: AADLBA!PropertyAssociationHolder,
 		c: AADLI!ComponentInstance
 	to
-		target_propertyElementHolder: AADLBA!PropertyAssociationHolder
+		target_BehaviorElement: AADLBA!PropertyAssociationHolder
 }
 
+-- @extends m_BehaviorElement, m_BehavioredInstance
 rule m_UpperBound
 {
 	from
-		src_upperBound: AADLBA!UpperBound,
+		src_BehaviorElement: AADLBA!UpperBound,
 		c: AADLI!ComponentInstance
-		(
-			src_upperBound.isPartOfBehaviorAnnexOf(c)
-		)
 	to
-		target_upperBound: AADLBA!UpperBound
+		target_BehaviorElement: AADLBA!UpperBound
 }
 
+-- @extends m_BehaviorElement, m_BehavioredInstance
 rule m_LowerBound
 {
 	from
-		src_lowerBound: AADLBA!LowerBound,
+		src_BehaviorElement: AADLBA!LowerBound,
 		c: AADLI!ComponentInstance
-		(
-			src_lowerBound.isPartOfBehaviorAnnexOf(c)
-		)
 	to
-		target_LowerBound: AADLBA!LowerBound
+		target_BehaviorElement: AADLBA!LowerBound
 }
 
--- @extends m_CommunicationAction
+-- @extends m_CommunicationAction, m_BehavioredInstance
 rule m_SubprogramCallAction
 {
 	from
-		src_communicationAction: AADLBA!SubprogramCallAction,
+		src_BehaviorElement: AADLBA!SubprogramCallAction,
 		c: AADLI!ComponentInstance
 		(
-			src_communicationAction.isPartOfBehaviorAnnexOf(c)
+			src_BehaviorElement.isPartOfBehaviorAnnexOf(c)
 		)
 	to
-		target_communicationAction: AADLBA!SubprogramCallAction
+		target_BehaviorElement: AADLBA!SubprogramCallAction
 		(
-			subprogram <- src_communicationAction.subprogram.resolve(c),
-			parameterLabels <- src_communicationAction.parameterLabels
+			subprogram <- src_BehaviorElement.subprogram.resolve(c),
+			parameterLabels <- src_BehaviorElement.parameterLabels
 								->collect(param | param.resolve(c)),
-			proxy <- src_communicationAction.proxy.resolve(c)
+			proxy <- src_BehaviorElement.proxy.resolve(c)
 		)
 }
 
+-- @extends m_BehaviorElement, m_BehavioredInstance
 rule m_AssignmentAction
 {
 	from
-		src_assignmentAction: AADLBA!AssignmentAction,
+		src_BehaviorElement: AADLBA!AssignmentAction,
 		c: AADLI!ComponentInstance
 		(
-			src_assignmentAction.isThreadBehaviorElement() and
-			src_assignmentAction.isPartOfBehaviorAnnexOf(c)
+			src_BehaviorElement.isThreadBehaviorElement()
 		)
 	to
-		target_assignmentAction: AADLBA!AssignmentAction
+		target_BehaviorElement: AADLBA!AssignmentAction
 		(
-			target <- src_assignmentAction.target.resolve(c),
-			valueExpression <- src_assignmentAction.valueExpression.resolve(c)
+			target <- src_BehaviorElement.target.resolve(c),
+			valueExpression <- src_BehaviorElement.valueExpression.resolve(c)
 		)
 }
 
+-- @extends m_BehaviorElement, m_BehavioredInstance
 rule m_Term {
 	from
-		src_term: AADLBA!Term,
+		src_BehaviorElement: AADLBA!Term,
 		c: AADLI!ComponentInstance
 		(	
-			src_term.isThreadBehaviorElement()
-			and
-			src_term.isPartOfBehaviorAnnexOf(c)
+			src_BehaviorElement.isThreadBehaviorElement()
 		)
 	to
-		target_term: AADLBA!Term
+		target_BehaviorElement: AADLBA!Term
 		(
-			factors <- src_term.factors->collect(factor| factor.resolve(c)),
-			multiplyingOperators <- src_term.multiplyingOperators
+			factors <- src_BehaviorElement.factors->collect(factor| factor.resolve(c)),
+			multiplyingOperators <- src_BehaviorElement.multiplyingOperators
 		)
 }
 
-
+-- @extends m_BehaviorElement, m_BehavioredInstance
 rule m_Factor {
 	from
-		src_factor: AADLBA!Factor,
+		src_BehaviorElement: AADLBA!Factor,
 		c: AADLI!ComponentInstance
 		(
-			src_factor.isThreadBehaviorElement()
-			and
-			src_factor.isPartOfBehaviorAnnexOf(c)
+			src_BehaviorElement.isThreadBehaviorElement()
 		)
 	to
-		target_factor: AADLBA!Factor
+		target_BehaviorElement: AADLBA!Factor
 		(
-			firstValue <- src_factor.firstValue.resolve(c),
-			secondValue <- src_factor.secondValue.resolve(c),
-			binaryNumericOperator <- src_factor.binaryNumericOperator,
-			unaryNumericOperator <- src_factor.unaryNumericOperator,
-			unaryBooleanOperator <- src_factor.unaryBooleanOperator
+			firstValue <- src_BehaviorElement.firstValue.resolve(c),
+			secondValue <- src_BehaviorElement.secondValue.resolve(c),
+			binaryNumericOperator <- src_BehaviorElement.binaryNumericOperator,
+			unaryNumericOperator <- src_BehaviorElement.unaryNumericOperator,
+			unaryBooleanOperator <- src_BehaviorElement.unaryBooleanOperator
 		)
 }
 
+-- @extends m_BehaviorElement, m_BehavioredInstance
 rule m_BehaviorIntegerLiteral
 {
 	from
-		src_behaviorIntegerLiteral: AADLBA!BehaviorIntegerLiteral,
+		src_BehaviorElement: AADLBA!BehaviorIntegerLiteral,
 		c: AADLI!ComponentInstance
 		(
-			src_behaviorIntegerLiteral.isThreadBehaviorElement()
-			and
-			src_behaviorIntegerLiteral.isPartOfBehaviorAnnexOf(c)
+			src_BehaviorElement.isThreadBehaviorElement()
 		)
 	to
-		target_behaviorIntegerLiteral: AADLBA!BehaviorIntegerLiteral
+		target_BehaviorElement: AADLBA!BehaviorIntegerLiteral
 		(
-			base <- src_behaviorIntegerLiteral.base,
-			value <- src_behaviorIntegerLiteral.value
+			base <- src_BehaviorElement.base,
+			value <- src_BehaviorElement.value
 		)
 }
 
+-- @extends m_BehaviorElement, m_BehavioredInstance
 rule m_ValueExpression
 {
 	from
-		src_valueExpression: AADLBA!ValueExpression,
+		src_BehaviorElement: AADLBA!ValueExpression,
 		c: AADLI!ComponentInstance
 		(
-			src_valueExpression.isThreadBehaviorElement()
-			and
-			src_valueExpression.isPartOfBehaviorAnnexOf(c)
+			src_BehaviorElement.isThreadBehaviorElement()
 		)
 	to
-		target_valueExpression: AADLBA!ValueExpression
+		target_BehaviorElement: AADLBA!ValueExpression
 		(
-			relations <- src_valueExpression.relations->collect(e|e.resolve(c)),
-			logicalOperators <- src_valueExpression.logicalOperators
+			relations <- src_BehaviorElement.relations->collect(e|e.resolve(c)),
+			logicalOperators <- src_BehaviorElement.logicalOperators
 		)
 }
 
+-- @extends m_BehaviorElement, m_BehavioredInstance
 rule m_Relation
 {
 	from
-		src_relation: AADLBA!Relation,
+		src_BehaviorElement: AADLBA!Relation,
 		c: AADLI!ComponentInstance
 		(
-			src_relation.isThreadBehaviorElement()
-			and
-			src_relation.isPartOfBehaviorAnnexOf(c)
+			src_BehaviorElement.isThreadBehaviorElement()
 		)
 	to
-		target_relation: AADLBA!Relation
+		target_BehaviorElement: AADLBA!Relation
 		(
-			firstExpression <- src_relation.firstExpression.resolve(c),
-			relationalOperator <- src_relation.relationalOperator,
-			secondExpression <- src_relation.secondExpression.resolve(c)
+			firstExpression <- src_BehaviorElement.firstExpression.resolve(c),
+			relationalOperator <- src_BehaviorElement.relationalOperator,
+			secondExpression <- src_BehaviorElement.secondExpression.resolve(c)
 		)
 }
 
+-- @extends m_BehaviorElement, m_BehavioredInstance
 rule m_SimpleExpression {
 	from
-		src_simpleExpression : AADLBA!SimpleExpression,
+		src_BehaviorElement : AADLBA!SimpleExpression,
 		c: AADLI!ComponentInstance
 		(
-			src_simpleExpression.isThreadBehaviorElement()
-			and
-			src_simpleExpression.isPartOfBehaviorAnnexOf(c)
+			src_BehaviorElement.isThreadBehaviorElement()
 		)
 	to 
-		target_simpleExpression : AADLBA!SimpleExpression
+		target_BehaviorElement : AADLBA!SimpleExpression
 		(
-			unaryAddingOperator <- src_simpleExpression.unaryAddingOperator,
-			terms <- src_simpleExpression.terms->collect(e|e.resolve(c)),
-			binaryAddingOperators <- src_simpleExpression.binaryAddingOperators
+			unaryAddingOperator <- src_BehaviorElement.unaryAddingOperator,
+			terms <- src_BehaviorElement.terms->collect(e|e.resolve(c)),
+			binaryAddingOperators <- src_BehaviorElement.binaryAddingOperators
 		)
 }
 
+-- @extends m_BehaviorElement, m_BehavioredInstance
 rule m_DataAccessHolder
 {
 	from
-		src_Holder:AADLBA!DataAccessHolder,
+		src_BehaviorElement:AADLBA!DataAccessHolder,
 		c: AADLI!ComponentInstance
-		(src_Holder.isPartOfBehaviorAnnexOf(c))
 	to
-		target_Holder: AADLBA!DataAccessHolder
+		target_BehaviorElement: AADLBA!DataAccessHolder
 		(
-			element<-c.featureInstance->any(e|e.name=src_Holder.element.name)	
+			element<-c.featureInstance->any(e|e.name=src_BehaviorElement.element.name)	
 		)
 }
 
+-- @extends m_BehaviorElement, m_BehavioredInstance
 rule m_ParameterHolder
 {
 	from
-		src_Holder:AADLBA!ParameterHolder,
+		src_BehaviorElement:AADLBA!ParameterHolder,
 		c: AADLI!ComponentInstance
-		(src_Holder.isPartOfBehaviorAnnexOf(c))
 	to
-		target_Holder: AADLBA!ParameterHolder
+		target_BehaviorElement: AADLBA!ParameterHolder
 		(
-			element<-c.featureInstance->any(e|e.name=src_Holder.element.name)	
+			element<-c.featureInstance->any(e|e.name=src_BehaviorElement.element.name)	
 		)
 }
 
+-- @extends m_BehaviorElement, m_BehavioredInstance
 rule m_PortFreshValue
 {
 	from
-		src_PortFreshValue: AADLBA!PortFreshValue,
+		src_BehaviorElement: AADLBA!PortFreshValue,
 		c: AADLI!ComponentInstance
-		(c.featureInstance->exists(e| e.feature = src_PortFreshValue.element))
+		(c.featureInstance->exists(e| e.feature = src_BehaviorElement.element))
 	using
 	{
 		portImgSubcomponent: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(
-							c.featureInstance->any(e|e.name = src_PortFreshValue.element.name), 'localVariable'
+							c.featureInstance->any(e|e.name = src_BehaviorElement.element.name), 'localVariable'
 						);
 	}
 	to
-		isFresh: AADLBA!ValueExpression
+		target_BehaviorElement: AADLBA!ValueExpression
 		(
 			relations <- Sequence{comparisonRelation}
 		),
@@ -1397,14 +1457,14 @@ rule m_PortFreshValue
 		portImgFreshPrevAccessHolder: AADLBA!DataAccessHolder
 		(
 			element <- thisModule.createFreshnessIndicatorAccess(
-							c.featureInstance->any(e|e.feature = src_PortFreshValue.element)
+							c.featureInstance->any(e|e.feature = src_BehaviorElement.element)
 						)
 		),
 		portImgFreshPrevSubcomponentHolder: AADLBA!DataSubcomponentHolder
 	do
 	{
 		portImgFreshPrevSubcomponentHolder.element <- thisModule.resolveLazySingleIfExists(
-							c.featureInstance->any(e|e.feature = src_PortFreshValue.element).feature.dataFeatureClassifier, 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent'
+							c.featureInstance->any(e|e.feature = src_BehaviorElement.element).feature.dataFeatureClassifier, 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent'
 						);
 	}
 }

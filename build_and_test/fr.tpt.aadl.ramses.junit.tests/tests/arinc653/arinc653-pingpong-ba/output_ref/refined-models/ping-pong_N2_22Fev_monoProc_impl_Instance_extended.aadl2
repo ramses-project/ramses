@@ -1,7 +1,141 @@
 package PingPong_refined_model
 public
-with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thread_Properties,Programming_Properties,Deployment_Properties,ARINC653,COAL,POK,Generation_Properties,PingPong,PingPong_refined_model,arinc653_runtime,PeriodicDelayed_runtime;
-  process implementation S1.impl
+with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thread_Properties,Programming_Properties,Deployment_Properties,ARINC653,COAL,POK,Generation_Properties,PingPong,PingPong_refined_model,arinc653_runtime;
+  system implementation refined_model.impl
+    subcomponents
+      root_main_memory_inst: memory root_main_memory_inst.impl {
+        Memory_Size => 250000 Bytes;
+        Base_Address => 8704;
+        Word_Size => 10000 Bytes;
+        Memory_Protocol => read_write;
+        ARINC653::Memory_Type => (Data_Memory, Code_Memory, IO_Memory);
+        };
+      S1_memory_inst: memory S1_memory_inst.impl {
+        Memory_Size => 10000 Bytes;
+        Base_Address => 12800;
+        Word_Size => 1 Bytes;
+        Memory_Protocol => read_write;
+        ARINC653::Memory_Type => (Data_Memory, Code_Memory);
+        };
+      S2_memory_inst: memory S2_memory_inst.impl {
+        Memory_Size => 10000 Bytes;
+        Base_Address => 16896;
+        Word_Size => 1 Bytes;
+        Memory_Protocol => read_write;
+        ARINC653::Memory_Type => (Data_Memory, Code_Memory);
+        };
+      S1_inst: process S1_inst.impl {
+        Data_Size => 200 KByte;
+        Code_Size => 200 KByte;
+        };
+      S2_inst: process S2_inst.impl {
+        Data_Size => 200 KByte;
+        Code_Size => 200 KByte;
+        };
+      root_inst: processor root_inst.impl {
+        Thread_Swap_Execution_Time => 5 ms .. 10 ms;
+        ARINC653::Module_Major_Frame => 1000 ms;
+        ARINC653::Module_Version => "1.0";
+        ARINC653::Module_Identifier => "ping-pong.root";
+        Process_Swap_Execution_Time => 5 ms .. 10 ms;
+        Scheduling_Protocol => (ARINC653);
+        POK::Module_Minor_Frame => 1 ms;
+        POK::Ports_Flush_Time => Minor_Frame_Switch;
+        POK::Architecture => x86;
+        POK::BSP => x86_qemu;
+        };
+    properties
+      Actual_Processor_Binding => (reference(root_inst.VP_S1_inst)) applies to S1_inst;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst;
+      Actual_Processor_Binding => (reference(root_inst.VP_S2_inst)) applies to S2_inst;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S2_inst;
+      ARINC653::Module_Schedule => ([
+        Partition=> reference(root_inst.VP_S1_inst);
+        Duration=> 500 ms;
+        Periodic_Processing_Start=> true;
+      ], [
+        Partition=> reference(root_inst.VP_S2_inst);
+        Duration=> 500 ms;
+        Periodic_Processing_Start=> true;
+      ]) applies to root_inst;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.State_baKeywords;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.seqNb;
+      Actual_Processor_Binding => (reference(root_inst.VP_S1_inst)) applies to S1_inst.Monitor_changeState;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.Monitor_changeState;
+      Actual_Processor_Binding => (reference(root_inst.VP_S1_inst)) applies to S1_inst.Monitor_delayed_error_C2;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.Monitor_delayed_error_C2;
+      Actual_Processor_Binding => (reference(root_inst.VP_S1_inst)) applies to S1_inst.IPingOrPong_Cping_ping;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.IPingOrPong_Cping_ping;
+      Actual_Processor_Binding => (reference(root_inst.VP_S1_inst)) applies to S1_inst.IPingOrPong_Cping_delayed_PongIn;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.IPingOrPong_Cping_delayed_PongIn;
+      Actual_Processor_Binding => (reference(root_inst.VP_S1_inst)) applies to S1_inst.IPingOrPong_Cpong_pong;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.IPingOrPong_Cpong_pong;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.Monitor_changeState.Monitor_delayed_error_C1;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.Monitor_changeState.Monitor_changeState;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.Monitor_delayed_error_C2.Monitor_delayed_error_C2;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.IPingOrPong_Cping_ping.IPingOrPong_Cping_ping;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.IPingOrPong_Cping_delayed_PongIn.IPingOrPong_Cping_delayed_PongIn;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.IPingOrPong_Cpong_pong.IPingOrPong_Cpong_pong;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S2_inst.seqNb;
+      Actual_Processor_Binding => (reference(root_inst.VP_S2_inst)) applies to S2_inst.IPingOrPong_Cping_ping;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S2_inst.IPingOrPong_Cping_ping;
+      Actual_Processor_Binding => (reference(root_inst.VP_S2_inst)) applies to S2_inst.IPingOrPong_Cping_delayed_PongIn;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S2_inst.IPingOrPong_Cping_delayed_PongIn;
+      Actual_Processor_Binding => (reference(root_inst.VP_S2_inst)) applies to S2_inst.IPingOrPong_Cpong_pong;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S2_inst.IPingOrPong_Cpong_pong;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S2_inst.IPingOrPong_Cping_ping.IPingOrPong_Cping_ping;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S2_inst.IPingOrPong_Cping_delayed_PongIn.IPingOrPong_Cping_delayed_PongIn;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S2_inst.IPingOrPong_Cpong_pong.IPingOrPong_Cpong_pong;
+  end refined_model.impl;
+  
+  system refined_model
+  end refined_model;
+  
+  memory implementation root_main_memory_inst.impl
+  end root_main_memory_inst.impl;
+  
+  memory root_main_memory_inst
+  end root_main_memory_inst;
+  
+  memory implementation S1_memory_inst.impl
+  end S1_memory_inst.impl;
+  
+  memory S1_memory_inst
+  end S1_memory_inst;
+  
+  memory implementation S2_memory_inst.impl
+  end S2_memory_inst.impl;
+  
+  memory S2_memory_inst
+  end S2_memory_inst;
+  
+  processor root_inst
+  end root_inst;
+  
+  processor implementation root_inst.impl
+    subcomponents
+      VP_S1_inst: virtual processor PingPong::VP_S1.impl {
+        Scheduling_Protocol => (Round_Robin_Protocol);
+        Period => 1000 ms;
+        ARINC653::Partition_Identifier => 1;
+        ARINC653::Partition_Name => "S1";
+        ARINC653::System_Partition => false;
+        POK::Additional_Features => (libc_stdio, console);
+        };
+      VP_S2_inst: virtual processor PingPong::VP_S2.impl {
+        Scheduling_Protocol => (Round_Robin_Protocol);
+        Period => 1000 ms;
+        ARINC653::Partition_Identifier => 2;
+        ARINC653::Partition_Name => "S2";
+        ARINC653::System_Partition => false;
+        POK::Additional_Features => (libc_stdio, console);
+        };
+  end root_inst.impl;
+  
+  process S1_inst
+  end S1_inst;
+  
+  process implementation S1_inst.impl
     subcomponents
       State_baKeywords: data PingPong::TYPE_aadlKeywords {
         Data_Model::Data_Representation => Enum;
@@ -119,9 +253,12 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
       IPingOrPong_Cping_ping_CNX_CURRENT_STATE_BA: data access IPingOrPong_Cping_ping.Parent_BA_currentState_Access -> IPingOrPong_Cping_pingParent_BA_currentState;
       IPingOrPong_Cping_delayed_PongIn_CNX_CURRENT_STATE_BA: data access IPingOrPong_Cping_delayed_PongIn.Parent_BA_currentState_Access -> IPingOrPong_Cping_delayed_PongInParent_BA_currentState;
       IPingOrPong_Cpong_pong_CNX_CURRENT_STATE_BA: data access IPingOrPong_Cpong_pong.Parent_BA_currentState_Access -> IPingOrPong_Cpong_pongParent_BA_currentState;
-  end S1.impl;
+  end S1_inst.impl;
   
-  process implementation S2.impl
+  process S2_inst
+  end S2_inst;
+  
+  process implementation S2_inst.impl
     subcomponents
       seqNb: data PingPong::SEQ {
         Source_Language => (C);
@@ -185,212 +322,7 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
       IPingOrPong_Cping_ping_CNX_CURRENT_STATE_BA: data access IPingOrPong_Cping_ping.Parent_BA_currentState_Access -> IPingOrPong_Cping_pingParent_BA_currentState;
       IPingOrPong_Cping_delayed_PongIn_CNX_CURRENT_STATE_BA: data access IPingOrPong_Cping_delayed_PongIn.Parent_BA_currentState_Access -> IPingOrPong_Cping_delayed_PongInParent_BA_currentState;
       IPingOrPong_Cpong_pong_CNX_CURRENT_STATE_BA: data access IPingOrPong_Cpong_pong.Parent_BA_currentState_Access -> IPingOrPong_Cpong_pongParent_BA_currentState;
-  end S2.impl;
-  
-  processor implementation root.impl
-    subcomponents
-      VP_S1_inst: virtual processor VP_S1.impl {
-        Scheduling_Protocol => (Round_Robin_Protocol);
-        Period => 1000 ms;
-        ARINC653::Partition_Identifier => 1;
-        ARINC653::Partition_Name => "S1";
-        ARINC653::System_Partition => false;
-        POK::Additional_Features => (libc_stdio, console);
-        };
-      VP_S2_inst: virtual processor VP_S2.impl {
-        Scheduling_Protocol => (Round_Robin_Protocol);
-        Period => 1000 ms;
-        ARINC653::Partition_Identifier => 2;
-        ARINC653::Partition_Name => "S2";
-        ARINC653::System_Partition => false;
-        POK::Additional_Features => (libc_stdio, console);
-        };
-  end root.impl;
-  
-  virtual processor implementation VP_S1.impl
-  end VP_S1.impl;
-  
-  virtual processor implementation VP_S2.impl
-  end VP_S2.impl;
-  
-  memory implementation root_main_memory.impl
-  end root_main_memory.impl;
-  
-  memory implementation S1_memory.impl
-  end S1_memory.impl;
-  
-  memory implementation S2_memory.impl
-  end S2_memory.impl;
-  
-  system implementation refined_model.impl
-    subcomponents
-      root_main_memory_inst: memory root_main_memory.impl {
-        Memory_Size => 250000 Bytes;
-        Base_Address => 8704;
-        Word_Size => 10000 Bytes;
-        Memory_Protocol => read_write;
-        ARINC653::Memory_Type => (Data_Memory, Code_Memory, IO_Memory);
-        };
-      S1_memory_inst: memory S1_memory.impl {
-        Memory_Size => 10000 Bytes;
-        Base_Address => 12800;
-        Word_Size => 1 Bytes;
-        Memory_Protocol => read_write;
-        ARINC653::Memory_Type => (Data_Memory, Code_Memory);
-        };
-      S2_memory_inst: memory S2_memory.impl {
-        Memory_Size => 10000 Bytes;
-        Base_Address => 16896;
-        Word_Size => 1 Bytes;
-        Memory_Protocol => read_write;
-        ARINC653::Memory_Type => (Data_Memory, Code_Memory);
-        };
-      S1_inst: process S1.impl {
-        Data_Size => 200 KByte;
-        Code_Size => 200 KByte;
-        };
-      S2_inst: process S2.impl {
-        Data_Size => 200 KByte;
-        Code_Size => 200 KByte;
-        };
-      root_inst: processor root.impl {
-        Thread_Swap_Execution_Time => 5 ms .. 10 ms;
-        ARINC653::Module_Major_Frame => 1000 ms;
-        ARINC653::Module_Version => "1.0";
-        ARINC653::Module_Identifier => "ping-pong.root";
-        Process_Swap_Execution_Time => 5 ms .. 10 ms;
-        Scheduling_Protocol => (ARINC653);
-        POK::Module_Minor_Frame => 1 ms;
-        POK::Ports_Flush_Time => Minor_Frame_Switch;
-        POK::Architecture => x86;
-        POK::BSP => x86_qemu;
-        };
-    properties
-      Actual_Processor_Binding => (reference(root_inst.VP_S1_inst)) applies to S1_inst;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst;
-      Actual_Processor_Binding => (reference(root_inst.VP_S2_inst)) applies to S2_inst;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S2_inst;
-      ARINC653::Module_Schedule => ([
-        Partition=> reference(root_inst.VP_S1_inst);
-        Duration=> 500 ms;
-        Periodic_Processing_Start=> true;
-      ], [
-        Partition=> reference(root_inst.VP_S2_inst);
-        Duration=> 500 ms;
-        Periodic_Processing_Start=> true;
-      ]) applies to root_inst;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.State_baKeywords;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.seqNb;
-      Actual_Processor_Binding => (reference(root_inst.VP_S1_inst)) applies to S1_inst.Monitor_changeState;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.Monitor_changeState;
-      Actual_Processor_Binding => (reference(root_inst.VP_S1_inst)) applies to S1_inst.Monitor_delayed_error_C2;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.Monitor_delayed_error_C2;
-      Actual_Processor_Binding => (reference(root_inst.VP_S1_inst)) applies to S1_inst.IPingOrPong_Cping_ping;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.IPingOrPong_Cping_ping;
-      Actual_Processor_Binding => (reference(root_inst.VP_S1_inst)) applies to S1_inst.IPingOrPong_Cping_delayed_PongIn;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.IPingOrPong_Cping_delayed_PongIn;
-      Actual_Processor_Binding => (reference(root_inst.VP_S1_inst)) applies to S1_inst.IPingOrPong_Cpong_pong;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.IPingOrPong_Cpong_pong;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.Monitor_changeState.Monitor_delayed_error_C1;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.Monitor_changeState.Monitor_changeState;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.Monitor_delayed_error_C2.Monitor_delayed_error_C2;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.IPingOrPong_Cping_ping.IPingOrPong_Cping_ping;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.IPingOrPong_Cping_delayed_PongIn.IPingOrPong_Cping_delayed_PongIn;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.IPingOrPong_Cpong_pong.IPingOrPong_Cpong_pong;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S2_inst.seqNb;
-      Actual_Processor_Binding => (reference(root_inst.VP_S2_inst)) applies to S2_inst.IPingOrPong_Cping_ping;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S2_inst.IPingOrPong_Cping_ping;
-      Actual_Processor_Binding => (reference(root_inst.VP_S2_inst)) applies to S2_inst.IPingOrPong_Cping_delayed_PongIn;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S2_inst.IPingOrPong_Cping_delayed_PongIn;
-      Actual_Processor_Binding => (reference(root_inst.VP_S2_inst)) applies to S2_inst.IPingOrPong_Cpong_pong;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S2_inst.IPingOrPong_Cpong_pong;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S2_inst.IPingOrPong_Cping_ping.IPingOrPong_Cping_ping;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S2_inst.IPingOrPong_Cping_delayed_PongIn.IPingOrPong_Cping_delayed_PongIn;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S2_inst.IPingOrPong_Cpong_pong.IPingOrPong_Cpong_pong;
-  end refined_model.impl;
-  
-  processor root
-  end root;
-  
-  virtual processor VP_S1
-  end VP_S1;
-  
-  virtual processor VP_S2
-  end VP_S2;
-  
-  memory root_main_memory
-  end root_main_memory;
-  
-  memory S1_memory
-  end S1_memory;
-  
-  memory S2_memory
-  end S2_memory;
-  
-  process S1
-  end S1;
-  
-  process S2
-  end S2;
-  
-  system refined_model
-  end refined_model;
-  
-  data S1_inst_Monitor_changeState_currentState
-    properties
-      Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("switch");
-      Data_Model::Initial_Value => ("PingPong_refined_model__S1_inst_Monitor_changeState_currentState_switch");
-  end S1_inst_Monitor_changeState_currentState;
-  
-  data S1_inst_Monitor_delayed_error_C2_currentState
-    properties
-      Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("switch");
-      Data_Model::Initial_Value => ("PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_currentState_switch");
-  end S1_inst_Monitor_delayed_error_C2_currentState;
-  
-  data S1_inst_IPingOrPong_Cping_ping_currentState
-    properties
-      Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("switch");
-      Data_Model::Initial_Value => ("PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_currentState_switch");
-  end S1_inst_IPingOrPong_Cping_ping_currentState;
-  
-  data S1_inst_IPingOrPong_Cping_delayed_PongIn_currentState
-    properties
-      Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("switch");
-      Data_Model::Initial_Value => ("PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_currentState_switch");
-  end S1_inst_IPingOrPong_Cping_delayed_PongIn_currentState;
-  
-  data S1_inst_IPingOrPong_Cpong_pong_currentState
-    properties
-      Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("switch");
-      Data_Model::Initial_Value => ("PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_currentState_switch");
-  end S1_inst_IPingOrPong_Cpong_pong_currentState;
-  
-  data S2_inst_IPingOrPong_Cping_ping_currentState
-    properties
-      Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("switch");
-      Data_Model::Initial_Value => ("PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_currentState_switch");
-  end S2_inst_IPingOrPong_Cping_ping_currentState;
-  
-  data S2_inst_IPingOrPong_Cping_delayed_PongIn_currentState
-    properties
-      Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("switch");
-      Data_Model::Initial_Value => ("PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_currentState_switch");
-  end S2_inst_IPingOrPong_Cping_delayed_PongIn_currentState;
-  
-  data S2_inst_IPingOrPong_Cpong_pong_currentState
-    properties
-      Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("switch");
-      Data_Model::Initial_Value => ("PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_currentState_switch");
-  end S2_inst_IPingOrPong_Cpong_pong_currentState;
+  end S2_inst.impl;
   
   subprogram S1_inst_Monitor_changeState_entrypoint
     features
@@ -498,10 +430,7 @@ Write_Sampling_Message_ROLE ! (PortCnx8_mode_C2, mode_C2_localVariable, mode_C2_
       delayed_error_C2: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx1_mode_C1: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx2_mode_C1: requires data access arinc653_runtime::Blackboard_Id_Type;
-      PortCnx3_mode_C1: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Source_Name => "ROLE";
-        Source_Text => ("business-code/PingPong_module.h");
-        };
+      PortCnx3_mode_C1: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx8_mode_C2: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       Parent_BA_currentState_Access: requires data access S1_inst_Monitor_changeState_currentState;
   end S1_inst_Monitor_changeState;
@@ -574,10 +503,7 @@ Display_Blackboard_Exception ! (PortCnx11_delayed_error_C2, delayed_error_C2_loc
     features
       State_baKeywords: requires data access PingPong::TYPE_aadlKeywords;
       error_C2: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx11_delayed_error_C2: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Source_Name => "Exception";
-        Source_Text => ("business-code/PingPong_module.h");
-        };
+      PortCnx11_delayed_error_C2: requires data access arinc653_runtime::Blackboard_Id_Type;
       Parent_BA_currentState_Access: requires data access S1_inst_Monitor_delayed_error_C2_currentState;
   end S1_inst_Monitor_delayed_error_C2;
   
@@ -685,10 +611,7 @@ Display_Blackboard_Exception ! (PortCnx4_badSequenceNumber, badSequenceNumber_lo
       delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type;
       mode_aadlKeywords: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx9_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx4_badSequenceNumber: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Source_Name => "Exception";
-        Source_Text => ("business-code/PingPong_module.h");
-        };
+      PortCnx4_badSequenceNumber: requires data access arinc653_runtime::Blackboard_Id_Type;
       Parent_BA_currentState_Access: requires data access S1_inst_IPingOrPong_Cping_ping_currentState;
   end S1_inst_IPingOrPong_Cping_ping;
   
@@ -775,10 +698,7 @@ Display_Blackboard_PingPongMessage ! (PortCnx12_delayed_PongIn, delayed_PongIn_l
       seqNb: requires data access PingPong::SEQ;
       PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       mode_aadlKeywords: requires data access arinc653_runtime::Blackboard_Id_Type;
-      PortCnx12_delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Source_Name => "PingPongMessage";
-        Source_Text => ("business-code/PingPong_module.h");
-        };
+      PortCnx12_delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type;
       Parent_BA_currentState_Access: requires data access S1_inst_IPingOrPong_Cping_delayed_PongIn_currentState;
   end S1_inst_IPingOrPong_Cping_delayed_PongIn;
   
@@ -981,14 +901,8 @@ Write_Sampling_Message_Exception ! (PortCnx8_badSequenceNumber, badSequenceNumbe
       seqNb: requires data access PingPong::SEQ;
       delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type;
       mode_aadlKeywords: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx6_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
-        Source_Name => "PingPongMessage";
-        Source_Text => ("business-code/PingPong_module.h");
-        };
-      PortCnx8_badSequenceNumber: requires data access arinc653_runtime::Sampling_Port_Id_Type {
-        Source_Name => "Exception";
-        Source_Text => ("business-code/PingPong_module.h");
-        };
+      PortCnx6_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      PortCnx8_badSequenceNumber: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       Parent_BA_currentState_Access: requires data access S2_inst_IPingOrPong_Cping_ping_currentState;
   end S2_inst_IPingOrPong_Cping_ping;
   
@@ -1073,10 +987,7 @@ Display_Blackboard_PingPongMessage ! (PortCnx9_delayed_PongIn, delayed_PongIn_lo
       seqNb: requires data access PingPong::SEQ;
       PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       mode_aadlKeywords: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx9_delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Source_Name => "PingPongMessage";
-        Source_Text => ("business-code/PingPong_module.h");
-        };
+      PortCnx9_delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type;
       Parent_BA_currentState_Access: requires data access S2_inst_IPingOrPong_Cping_delayed_PongIn_currentState;
   end S2_inst_IPingOrPong_Cping_delayed_PongIn;
   
@@ -1172,12 +1083,65 @@ Write_Sampling_Message_PingPongMessage ! (PortCnx7_PongOut, PongOut_localVariabl
       seqNb: requires data access PingPong::SEQ;
       PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       mode_aadlKeywords: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx7_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
-        Source_Name => "PingPongMessage";
-        Source_Text => ("business-code/PingPong_module.h");
-        };
+      PortCnx7_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       Parent_BA_currentState_Access: requires data access S2_inst_IPingOrPong_Cpong_pong_currentState;
   end S2_inst_IPingOrPong_Cpong_pong;
+  
+  data S1_inst_Monitor_changeState_currentState
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("switch");
+      Data_Model::Initial_Value => ("PingPong_refined_model__S1_inst_Monitor_changeState_currentState_switch");
+  end S1_inst_Monitor_changeState_currentState;
+  
+  data S1_inst_Monitor_delayed_error_C2_currentState
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("switch");
+      Data_Model::Initial_Value => ("PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_currentState_switch");
+  end S1_inst_Monitor_delayed_error_C2_currentState;
+  
+  data S1_inst_IPingOrPong_Cping_ping_currentState
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("switch");
+      Data_Model::Initial_Value => ("PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_currentState_switch");
+  end S1_inst_IPingOrPong_Cping_ping_currentState;
+  
+  data S1_inst_IPingOrPong_Cping_delayed_PongIn_currentState
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("switch");
+      Data_Model::Initial_Value => ("PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_currentState_switch");
+  end S1_inst_IPingOrPong_Cping_delayed_PongIn_currentState;
+  
+  data S1_inst_IPingOrPong_Cpong_pong_currentState
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("switch");
+      Data_Model::Initial_Value => ("PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_currentState_switch");
+  end S1_inst_IPingOrPong_Cpong_pong_currentState;
+  
+  data S2_inst_IPingOrPong_Cping_ping_currentState
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("switch");
+      Data_Model::Initial_Value => ("PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_currentState_switch");
+  end S2_inst_IPingOrPong_Cping_ping_currentState;
+  
+  data S2_inst_IPingOrPong_Cping_delayed_PongIn_currentState
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("switch");
+      Data_Model::Initial_Value => ("PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_currentState_switch");
+  end S2_inst_IPingOrPong_Cping_delayed_PongIn_currentState;
+  
+  data S2_inst_IPingOrPong_Cpong_pong_currentState
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("switch");
+      Data_Model::Initial_Value => ("PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_currentState_switch");
+  end S2_inst_IPingOrPong_Cpong_pong_currentState;
   
   data PingPongMessage_freshness_t
     properties

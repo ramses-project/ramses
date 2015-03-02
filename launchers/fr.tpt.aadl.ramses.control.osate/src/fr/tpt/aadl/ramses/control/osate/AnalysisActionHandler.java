@@ -1,6 +1,7 @@
 package fr.tpt.aadl.ramses.control.osate;
 
 import java.io.File ;
+import java.io.IOException ;
 
 import org.apache.log4j.Logger ;
 import org.eclipse.core.commands.ExecutionEvent ;
@@ -36,7 +37,7 @@ public abstract class AnalysisActionHandler extends RamsesActionHandler
 {
 
   private static Logger _LOGGER = Logger.getLogger(AnalysisActionHandler.class) ;
-  private RamsesConfiguration _config = new RamsesConfiguration() ;
+  protected RamsesConfiguration _config = new RamsesConfiguration() ;
   
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException
@@ -107,35 +108,11 @@ public abstract class AnalysisActionHandler extends RamsesActionHandler
       throw new OperationCanceledException(msg) ;
     }
     
-    String projectPathString = _currentProject.getLocation().toOSString();
-    String resultFilePath = projectPathString+"/analysis_results.ares";
-    File resultFile = new File(resultFilePath);
-    
-//    projectPathString = projectPathString.substring(0, projectPathString.lastIndexOf('/'));
-//    if(resultFilePath.contains(projectPathString))
-//      resultFilePath = resultFilePath.substring(projectPathString.length()+1,resultFilePath.length());
-    URI resultFileURI =
-        URI.createFileURI(resultFilePath);
-    
-    Resource r = _sysInst.getComponentImplementation().eResource()
-        .getResourceSet()
-        .getResource(resultFileURI, 
-                     resultFile.exists());
-    if(r==null)
-      r =  _sysInst.getComponentImplementation().eResource()
-          .getResourceSet().createResource(resultFileURI);
-    
     AnalysisArtifact aa = analysis(_sysInst, monitor);
-    if(r.getContents().isEmpty())
-      r.getContents().add(aa);
-    else
-    {
-      AnalysisArtifact existingAa = 
-        (AnalysisArtifact) r.getContents().get(0);
-      AnalysisUtils.updateAnalysisArtifact(existingAa, aa);
-    }
     
-    r.save(null);
+    updateAnalysisResults(aa);
+    
+    
     
     if(monitor.isCanceled())
     {

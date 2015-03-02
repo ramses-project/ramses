@@ -36,33 +36,21 @@ create OUT : AADLBA 	from 		IN : AADLI,
 ---              BLACKBOARD              ---
 --------------------------------------------
 
--- @extends m_Not_PeriodicDelayed_Port
+-- @extends m_DataPort_Filter,m_Not_PeriodicDelayed_Port
 abstract rule m_BlackBoard
 {
 	from
-		fi: AADLI!FeatureInstance,
-		behavior: AADLI!Element
+		fi: AADLI!FeatureInstance
 		(
-			fi.isDataPort()
-			and
 			fi.isIntraProcessFeatureInstance()
-			and
-			(
-				behavior.oclIsKindOf(AADLBA!SubprogramCallSequence)
-				or
-				behavior.oclIsKindOf(AADLBA!BehaviorAnnex)
-			)
 		)
-	to
-		call: AADLBA!BehaviorAction
 }
 
 -- @extends m_BlackBoard
 abstract rule m_Input_BlackBoard
 {
 	from
-		fi: AADLI!FeatureInstance,
-		behavior: AADLI!Element
+		fi: AADLI!FeatureInstance
 	using
 	{
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
@@ -111,6 +99,7 @@ rule m_Input_BlackBoard_ComputeEntrypointCallSequence
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.CreateReturnSubcomponentFromPort(fi);
 	}
 	to
+		call: AADLBA!SubprogramCallAction,
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 		(
 			element <- RETURN_CODE
@@ -128,6 +117,7 @@ rule m_Input_BlackBoard_BehaviorAnnex
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
 	}
 	to
+		call: AADLBA!SubprogramCallAction,
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 		(
 			element <- RETURN_CODE
@@ -139,7 +129,6 @@ abstract rule m_Output_BlackBoard
 {
 	from
 		fi: AADLI!FeatureInstance,
-		behavior: AADLI!Element,
 		cnxRef: AADLI!PortConnection
 	using
 	{
@@ -169,7 +158,7 @@ abstract rule m_Output_BlackBoard
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 }
 
--- @extends m_Output_BlackBoard,m_Output_DataPort_ComputeEntrypointCallSequence
+-- @extends m_Output_DataPort_ComputeEntrypointCallSequence,m_Output_BlackBoard
 rule m_Output_BlackBoard_ComputeEntrypointCallSequence
 {
 	from
@@ -184,13 +173,14 @@ rule m_Output_BlackBoard_ComputeEntrypointCallSequence
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
 	}
 	to
+		call: AADLBA!SubprogramCallAction,
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 		(
 			element <- RETURN_CODE
 		)
 }
 
--- @extends m_Output_BlackBoard,m_Output_Port_BehaviorAnnex
+-- @extends m_Output_Port_BehaviorAnnex,m_Output_BlackBoard
 rule m_Output_BlackBoard_BehaviorAnnex
 {
 	from
@@ -202,6 +192,7 @@ rule m_Output_BlackBoard_BehaviorAnnex
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
 	}
 	to
+		call: AADLBA!SubprogramCallAction,
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 		(
 			element <- RETURN_CODE

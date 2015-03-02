@@ -175,7 +175,7 @@ rule m_Process_Output_EventPort_Instance
 helper context AADLI!FeatureInstance def: collectPortGlobalVariableImg() : Sequence(AADLBA!DataSubcomponent) =
 	if(self.getProcess().modeInstance->exists(mi| self.connectedInMode(mi.mode))) then
 		self.getProcess().modeInstance->collect(mi |
-			Sequence{
+		Sequence{
 			thisModule.resolveMatchedTupleIfExists(Sequence{self, mi.mode}, 'globalVariableValue'), 
 			thisModule.resolveMatchedTupleIfExists(Sequence{self, mi.mode}, 'globalVariable')
 		})->flatten()
@@ -184,19 +184,22 @@ helper context AADLI!FeatureInstance def: collectPortGlobalVariableImg() : Seque
 	endif
 ;
 
--- @extends m_Thread_IntraProcess_Input_DataPort_Instance,m_Thread_DataOrEventDataPort_Input_Instance,m_Not_PeriodicDelayed_Port
+-- @extends m_Thread_IntraProcess_Input_DataPort_Instance
 rule m_Thread_IntraProcess_Input_DataPort_Instance_to_DataSubcomponent
 {
   	from
 		fi: AADLI!FeatureInstance
 		(
+			fi.dstConnectionInstance->size()=1
+			and
+			not fi.dstConnectionInstance->exists(e|e.connectionReference->exists(f|f.connection.inModeOrTransition.size()>0))
+			and
 			fi.connectedToDataComponent()
 		)
   	to
-		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
-		f_entrypoint: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
+		f: AADLBA!DataAccess,
+		f_entrypoint: AADLBA!DataAccess,
+		localVariable:AADLBA!DataSubcomponent,
 		globalVariable:AADLBA!DataSubcomponent
 		(
 			dataSubcomponentType <- 'DataPortType'.asDataType('OSEK_RUNTIME'),
@@ -207,7 +210,6 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance_to_DataSubcomponent
 												)
 									    }
 		),
-		localVariable:AADLBA!DataSubcomponent,
 		GvInit: AADLBA!ListValue
 	do
 	{
@@ -221,19 +223,21 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance_to_DataSubcomponent
 	}
 }
 
-
--- @extends m_Thread_IntraProcess_Input_Port_Instance,m_Thread_DataOrEventDataPort_Input_Instance,m_Not_PeriodicDelayed_Port
-rule m_Thread_IntraProcess_Input_DataPort_Instance
+-- @extends m_Thread_IntraProcess_Input_DataPort_Instance
+rule m_Thread_IntraProcess_Input_DataPort_Instance_not_to_DataSubcomponent
 {
   	from
 		fi: AADLI!FeatureInstance
-		(fi.isDataPort()
+		(
+			fi.dstConnectionInstance->size()=1
+			and
+			not fi.dstConnectionInstance->exists(e|e.connectionReference->exists(f|f.connection.inModeOrTransition.size()>0))
+			and
+			not fi.connectedToDataComponent()
 		)
   	to
-  		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
-		f_entrypoint: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
+		f: AADLBA!DataAccess,
+		f_entrypoint: AADLBA!DataAccess,
 		localVariable:AADLBA!DataSubcomponent,
 		globalVariable:AADLBA!DataSubcomponent
 		(
@@ -263,15 +267,100 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance
 	}
 }
 
--- @extends m_Thread_IntraProcess_Input_Port_Instance_Mode,m_Thread_IntraProcess_Input_DataPort_Instance
+-- @extends m_Thread_DataOrEventDataPort_Input_Instance,m_Thread_IntraProcess_Input_Port_Instance,m_Not_PeriodicDelayed_Port
+rule m_Thread_IntraProcess_Input_DataPort_Instance
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(fi.isDataPort())
+	to
+		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
+		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
+		localVariable:AADLBA!DataSubcomponent,
+	    globalVariable:AADLBA!DataSubcomponent
+
+}
+
+-- @extends m_Thread_IntraProcess_Input_Port_Instance_Mode
+rule m_Thread_IntraProcess_Input_DataPort_Instance_Mode_To_DataComponent
+{
+	from
+		fi: AADLI!FeatureInstance,
+		mode: AADLI!Mode
+		(
+			fi.connectedToDataComponentInMode(mode)
+		)
+	to
+		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
+		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
+		globalVariable:AADLBA!DataSubcomponent
+		(
+			dataSubcomponentType <- 'DataPortType'.asDataType('OSEK_RUNTIME'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													GvInit
+												)
+									    }
+		),
+		GvInit: AADLBA!ListValue
+	do
+	{
+		GvInit.ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
+								thisModule.structInitInitiator+'&'+
+								globalVariable.name+'_rez, &'+
+								fi.getConnectionEndInMode(mode)->first().name+', '+ thisModule.getSizeOfType(fi.getLengthInitialValue())+
+								thisModule.structInitTerminator		
+							)
+						};
+	}
+}
+
+-- @extends m_Thread_IntraProcess_Input_Port_Instance_Mode
 rule m_Thread_IntraProcess_Input_DataPort_Instance_Mode
 {
 	from
 		fi: AADLI!FeatureInstance,
 		mode: AADLI!Mode
+		(
+			fi.connectedInMode(mode)
+			and
+			not fi.connectedToDataComponentInMode(mode)
+		)
 	to
-		f: AADLBA!DataAccess,
+		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
+		globalVariable:AADLBA!DataSubcomponent
+		(
+			dataSubcomponentType <- 'DataPortType'.asDataType('OSEK_RUNTIME'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													GvInit
+												)
+									    }
+		),
+		globalVariableValue: AADLBA!DataSubcomponent
+		(
+			name <- fi.getComponentInstance().name+'_'+fi.name+'_'+mode.name+'_value'
+		),
+		GvInit: AADLBA!ListValue
+	do
+	{
+		GvInit.ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
+								thisModule.structInitInitiator+'&'+
+								globalVariable.name+'_rez, &'+
+								globalVariableValue.name+', '+ thisModule.getSizeOfType(fi.getLengthInitialValue())+
+								thisModule.structInitTerminator		
+							)
+						};
+	}
 }
 
 -- @extends m_Not_PeriodicDelayed_Port,m_Thread_DataOrEventDataPort_Input_Instance,m_Thread_IntraProcess_Input_Port_Instance

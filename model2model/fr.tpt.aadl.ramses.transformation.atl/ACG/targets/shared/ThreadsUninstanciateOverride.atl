@@ -29,16 +29,6 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									PROGRAMMING_PROPERTIES: AADLBA,
 									HOOKS: ATLHOOKS;
 
-rule m_Thread_Type {
- from
-   type : AADLI!ThreadType 
-}
-
-rule m_Thread_Implementation {
-  from
- 	impl : AADLI!ThreadImplementation
-}
-
 helper context AADLI!ComponentImplementation def: getAllSubprogramCallSequence() :Sequence(AADLI!SubprogramCallSequence) =
 	self.getSelfPlusAllExtended()
 	->collect(e|e.ownedSubprogramCallSequence)
@@ -288,7 +278,7 @@ unique lazy rule createAccessConnectionForBA
 		),
 		sourceCE: AADLBA!ConnectedElement
 		(
-			connectionEnd <- thisModule.resolveMatchedTupleIfExists(Sequence{c,impl.getBA(),dataInstance}, 'dataAccess')
+			connectionEnd <- thisModule.resolveMatchedTupleIfExists(Sequence{c,dataInstance}, 'dataAccess')
 		),
 		destinationCE: AADLBA!ConnectedElement
 		(

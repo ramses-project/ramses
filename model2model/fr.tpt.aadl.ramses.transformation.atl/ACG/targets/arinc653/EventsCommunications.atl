@@ -161,12 +161,6 @@ rule m_EventSubprogramCall
 		paramCnx: AADLI!ParameterConnection
 		(
 			false -- NOT CLEAR YET WHEN TO USE ARINC653/EVENT; PROBABLY FOR SPORADIC/APERIODIC/TIMED/HYBRID TASKS?
-			
---			fi.isEventPort()
---			and
---			callSequence.isComputeEntryPointOf(fi.getComponentInstance())
---			and
---			fi.isIntraProcessFeatureInstance()
 		)
 	using
 	{

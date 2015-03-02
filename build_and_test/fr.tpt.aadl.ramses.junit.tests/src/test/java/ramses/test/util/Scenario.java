@@ -4,6 +4,7 @@ import static org.junit.Assert.fail ;
 
 import java.io.File ;
 import java.io.IOException ;
+import java.util.ArrayList;
 import java.util.Calendar ;
 import java.util.HashMap ;
 import java.util.Iterator ;
@@ -21,7 +22,10 @@ import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
 public abstract class Scenario
 {
-
+  protected ArrayList<String> IGNORE_FILES = new ArrayList<String>() ;
+  protected ArrayList<String> IGNORE_DIR = new ArrayList<String>() ;
+  
+  
   protected String input;
   protected String ramses_dir;
   protected String output;
@@ -30,7 +34,7 @@ public abstract class Scenario
   protected String runtimePath="";
   protected String workflowPath="";
   protected String aadlInspectorPath="";
-  protected String target="";
+  protected String target="pok";
   protected String includeList="";
   protected Map<String, Object> parameters = new HashMap<String, Object>();
   
@@ -114,16 +118,19 @@ public abstract class Scenario
         args.append(" -m ") ;
         args.append(input) ;
 
-        args.append(" -g pok") ;
+        args.append(" -g ") ;
+        args.append(target) ;
 
         args.append(" -s ") ;
         args.append(system_impl) ;
-
+        
         args.append(" -o ") ;
         args.append(output) ;
-
-        args.append(" -r ") ;
-        args.append(runtimePath) ;
+        
+        if (runtimePath != null && runtimePath != ""){
+        	args.append(" -r ") ;
+        	args.append(runtimePath) ;
+        }
 
         if(includeList != null && includeList!="")
         {
@@ -158,6 +165,7 @@ public abstract class Scenario
         ramsesProcess = runtime.exec(line) ;
         new Thread(ft).start() ;
         ft.get(codeGenerationTimeout, TimeUnit.MINUTES) ;
+       
         displayProcessMessages(ramsesProcess, 1) ;
       }
       catch(TimeoutException ee)
@@ -217,7 +225,10 @@ public abstract class Scenario
         Boolean same = false ;
         ramses.test.util.CompareDirectory cm = new ramses.test.util.
                                                     CompareDirectory(output_ref,
-                                                                     output) ;
+                                                                     output,
+                                                                     IGNORE_FILES,
+                                                                     IGNORE_DIR
+                                                                     ) ;
         same = cm.evaluate() ;
 
         String emph ;
@@ -282,28 +293,38 @@ public abstract class Scenario
   
   protected void displayProcessMessages(Process process, int step) throws IOException
   {
-    if(process.exitValue() == 0)
-    {
-      System.out.println("") ;
-      System.out.println("*************************************************************") ;
-      System.out.println("******************* FINISH step " + step + " normally ******************") ;
-      System.out.println("*************************************************************") ;
-      System.out.println(Calendar.getInstance().getTime()) ;
-      System.out.println("") ;
-      
-      displayMessages(process, step, false) ;
-    }
-    else
-    {
-      System.out.println("") ;
-      System.out.println("***************************************************************") ;
-      System.out.println("******************* FINISH step " + step + " abnormally ******************") ;
-      System.out.println("***************************************************************") ;
-      System.out.println(Calendar.getInstance().getTime()) ;
-      System.out.println("") ;
-      
-      displayMessages(process, step, true) ;
-    }
+	if(process == null){
+		System.out.println("") ;
+	    System.out.println("*************************************************************") ;
+	    System.out.println("******************* FINISH step " + step + " normally with no execution ******************") ;
+	    System.out.println("*************************************************************") ;
+	    System.out.println(Calendar.getInstance().getTime()) ;
+	    System.out.println("") ;
+//	    displayMessages(process, step, false) ;
+	}else{
+		if(process.exitValue() == 0)
+		{
+			System.out.println("") ;
+			System.out.println("*************************************************************") ;
+			System.out.println("******************* FINISH step " + step + " normally ******************") ;
+			System.out.println("*************************************************************") ;
+			System.out.println(Calendar.getInstance().getTime()) ;
+			System.out.println("") ;
+
+			displayMessages(process, step, false) ;
+		}
+		else
+		{
+			System.out.println("") ;
+			System.out.println("***************************************************************") ;
+			System.out.println("******************* FINISH step " + step + " abnormally ******************") ;
+			System.out.println("***************************************************************") ;
+			System.out.println(Calendar.getInstance().getTime()) ;
+			System.out.println("") ;
+
+			displayMessages(process, step, true) ;
+		}
+	}
   }
   
   protected void displayMessages(Process process, int step,

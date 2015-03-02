@@ -1,0 +1,57 @@
+#include "activity.h"
+#include "main.h"
+
+extern thread_queue_t the_proc_modes_mode_m1_globalQueue;
+extern thread_queue_t the_proc_modes_mode_m2_globalQueue;
+void* test_osek_modes_modes_refined_refined_model__the_proc_modes_the_sender_impl_Job()
+{
+  while (1) {
+    test_osek_modes_modes_refined_refined_model__the_proc_modes_the_sender_entrypoint_impl (&the_proc_modes_mode_m1_globalQueue, &the_proc_modes_mode_m2_globalQueue);
+  }
+  return 0;
+}
+extern data_port_t the_receiver_input_data_globalVariable_m1;
+extern data_port_t the_receiver_input_data_globalVariable_m2;
+void* test_osek_modes_modes_refined_refined_model__the_proc_modes_the_receiver_impl_Job()
+{
+  while (1) {
+    test_osek_modes_modes_refined_refined_model__the_proc_modes_the_receiver_entrypoint_impl (&the_receiver_input_data_globalVariable_m1, &the_receiver_input_data_globalVariable_m2);
+  }
+  return 0;
+}
+extern data_port_t the_receiver_m1_input_data_globalVariable_m1;
+void* test_osek_modes_modes_refined_refined_model__the_proc_modes_the_receiver_m1_impl_Job()
+{
+  while (1) {
+    test_osek_modes_modes_refined_refined_model__the_proc_modes_the_receiver_m1_entrypoint_impl (&the_receiver_m1_input_data_globalVariable_m1);
+  }
+  return 0;
+}
+extern data_port_t the_receiver_m2_input_data_globalVariable_m2;
+void* test_osek_modes_modes_refined_refined_model__the_proc_modes_the_receiver_m2_impl_Job()
+{
+  while (1) {
+    test_osek_modes_modes_refined_refined_model__the_proc_modes_the_receiver_m2_entrypoint_impl (&the_receiver_m2_input_data_globalVariable_m2);
+  }
+  return 0;
+}
+extern thread_queue_t the_proc_modes_mode_m1_globalQueue;
+extern test_osek_modes_modes_refined_refined_model__the_proc_modes_the_proc_modes_mode_m1_currentState the_proc_modes_mode_m1Parent_BA_currentState;
+void* test_osek_modes_modes_refined_refined_model__the_proc_modes_the_proc_modes_mode_m1_impl_Job()
+{
+  AppModeType test_osek_modes_modes_refined_refined_model__the_proc_modes_the_proc_modes_mode_m1_impl_targetModeValue;
+  while (1) {
+    test_osek_modes_modes_refined_refined_model__the_proc_modes_the_proc_modes_mode_m1_entrypoint_impl (&the_proc_modes_mode_m1_globalQueue, &test_osek_modes_modes_refined_refined_model__the_proc_modes_the_proc_modes_mode_m1_impl_targetModeValue, &the_proc_modes_mode_m1Parent_BA_currentState);
+  }
+  return 0;
+}
+extern thread_queue_t the_proc_modes_mode_m2_globalQueue;
+extern test_osek_modes_modes_refined_refined_model__the_proc_modes_the_proc_modes_mode_m2_currentState the_proc_modes_mode_m2Parent_BA_currentState;
+void* test_osek_modes_modes_refined_refined_model__the_proc_modes_the_proc_modes_mode_m2_impl_Job()
+{
+  AppModeType test_osek_modes_modes_refined_refined_model__the_proc_modes_the_proc_modes_mode_m2_impl_targetModeValue;
+  while (1) {
+    test_osek_modes_modes_refined_refined_model__the_proc_modes_the_proc_modes_mode_m2_entrypoint_impl (&the_proc_modes_mode_m2_globalQueue, &test_osek_modes_modes_refined_refined_model__the_proc_modes_the_proc_modes_mode_m2_impl_targetModeValue, &the_proc_modes_mode_m2Parent_BA_currentState);
+  }
+  return 0;
+}

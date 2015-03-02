@@ -32,7 +32,11 @@ import org.osate.ba.aadlba.BehaviorActionSequence ;
 import org.osate.ba.aadlba.BehaviorAnnex ;
 import org.osate.ba.aadlba.BehaviorTransition ;
 import org.osate.ba.aadlba.BehaviorVariable ;
+import org.osate.ba.aadlba.DataRepresentation ;
 import org.osate.ba.aadlba.SubprogramCallAction ;
+import org.osate.ba.analyzers.TypeHolder ;
+import org.osate.ba.utils.AadlBaUtils ;
+import org.osate.ba.utils.DimensionException ;
 import org.osate.utils.Aadl2Utils ;
 import org.osate.utils.PropertyUtils ;
 
@@ -41,7 +45,9 @@ import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory ;
 import fr.tpt.aadl.ramses.analysis.AnalysisSource ;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult ;
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 public class MemoryFootprintAnalysis
 {
@@ -233,7 +239,8 @@ public class MemoryFootprintAnalysis
             Parameter p = (Parameter) f;
             
             if(Aadl2Utils.isInOutParameter(p) || Aadl2Utils.isOutParameter(p) ||
-                Aadl2Utils.getParameterUsage(p).equalsIgnoreCase("by_reference"))
+                Aadl2Utils.getParameterUsage(p).equalsIgnoreCase("by_reference")
+                || isArray(p))
               consumption+=getWordSize(currentMemory);
             else
             {
@@ -245,7 +252,8 @@ public class MemoryFootprintAnalysis
           {
             DataAccess da = (DataAccess) f;
             if(Aadl2Utils.isReadWriteDataAccess(da) ||
-                Aadl2Utils.isWriteOnlyDataAccess(da))
+                Aadl2Utils.isWriteOnlyDataAccess(da)
+                || isArray(da))
               consumption+=getWordSize(currentMemory);
             else
             {
@@ -329,18 +337,47 @@ public class MemoryFootprintAnalysis
   }
 
   
+  private boolean isArray(Feature f) {
+    DataSubcomponentType dst = null;
+    if(f instanceof Parameter)
+    {
+      Parameter p = (Parameter) f;
+      dst = p.getDataFeatureClassifier();
+    }
+    else if(f instanceof DataAccess)
+    {
+      DataAccess da = (DataAccess) f;
+      dst = da.getDataFeatureClassifier();
+    }
+    TypeHolder dataTypeHolder = null ;
+
+    try
+    {
+      dataTypeHolder = AadlBaUtils.getTypeHolder(dst) ;
+    }
+    catch(DimensionException e)
+    {
+      // This is an internal error, to be logged and displayed
+      String errMsg =  RamsesException.formatRethrowMessage("cannot fetch the type of \'" +
+          dst + '\'', e) ;
+      _LOGGER.error(errMsg, e);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+    }
+    return dataTypeHolder.dataRep.equals(DataRepresentation.ARRAY);
+  }
+
   private double getProcessComponentMargin(ComponentInstance processComponent)
   {
     final double procCodeSize = getComponentCodeMemory(processComponent);
     final double procCodeConsumption=getSubcomponentsConsumption(processComponent, CODE_SIZE);
-    
+
     double marginCode=2;
     if(procCodeSize!=0)
       marginCode = (procCodeSize-procCodeConsumption)/procCodeSize;
-    
+
     final double procDataSize = getComponentDataMemory(processComponent);
     final double procDataConsumption=getSubcomponentsConsumption(processComponent, DATA_SIZE);
-    
+
     double marginData=2;
     if(procDataSize!=0)
       marginData = (procDataSize-procDataConsumption)/procDataSize;
@@ -351,7 +388,7 @@ public class MemoryFootprintAnalysis
     else
       return marginCode;
   }
-  
+
   private double getMemoryComponentMargin(ComponentInstance memoryComponent)
   {
     final double memSize = getMemorySize(memoryComponent);

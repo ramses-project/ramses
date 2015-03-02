@@ -37,11 +37,12 @@ abstract rule m_Feature_Instance
 	to
 		f: AADLBA!Feature
 		(
-			name <- fi.feature.name,
-			ownedPropertyAssociation <- fi.collectSelfPropertyAssociationImg()
+			name <- fi.feature.name
 		)
 	do
 	{
+		f.ownedPropertyAssociation <- fi.ownedPropertyAssociation.collectSelfPropertyAssociationImg()
+										->select(e|e.isApplicableTo(f));
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
 	}
 }

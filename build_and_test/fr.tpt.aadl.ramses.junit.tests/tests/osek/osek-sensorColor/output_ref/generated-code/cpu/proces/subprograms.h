@@ -1,0 +1,29 @@
+#ifndef __GENERATED_SUBPROGRAMS_H__
+#define __GENERATED_SUBPROGRAMS_H__
+#include "diplay.h"
+#include "ecrobot/c/ecrobot_interface.h"
+#include "toppers_osek/include/kernel.h"
+#include "kernel.h"
+#include "gtypes.h"
+#include "main.h"
+void readColor_refined_model__proces_th_entrypoint_impl(int *  cc0_portId);
+
+typedef enum {
+  readColor_refined_model__proces_th_entrypoint_impl_BA_entrypoint_init_state,
+  readColor_refined_model__proces_th_entrypoint_impl_BA_entrypoint_wait_dispatch_state,
+  readColor_refined_model__proces_th_entrypoint_impl_BA_entrypoint_exec_state,
+  readColor_refined_model__proces_th_entrypoint_impl_BA_entrypoint_final_state
+} readColor_refined_model__proces_th_entrypoint_impl_BA_State_t;
+
+void readColor_refined_model__proces_bg_entrypoint_impl();
+
+typedef enum {
+  readColor_refined_model__proces_bg_entrypoint_impl_BA_entrypoint_init_state,
+  readColor_refined_model__proces_bg_entrypoint_impl_BA_entrypoint_wait_dispatch_state,
+  readColor_refined_model__proces_bg_entrypoint_impl_BA_entrypoint_exec_state,
+  readColor_refined_model__proces_bg_entrypoint_impl_BA_entrypoint_final_state
+} readColor_refined_model__proces_bg_entrypoint_impl_BA_State_t;
+
+
+#endif
+

@@ -1,7 +1,130 @@
 package cbtc_refined_model
 public
-with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thread_Properties,Programming_Properties,Deployment_Properties,ARINC653,COAL,POK,Generation_Properties,cbtc_refined_model,cbtc,arinc653_runtime,PeriodicDelayed_runtime;
-  process implementation train.impl
+with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thread_Properties,Programming_Properties,Deployment_Properties,ARINC653,COAL,POK,Generation_Properties,cbtc_refined_model,cbtc,arinc653_runtime;
+  system implementation refined_model.impl
+    subcomponents
+      root_main_memory_inst: memory root_main_memory_inst.impl {
+        Memory_Size => 250000 Bytes;
+        Base_Address => 8704;
+        Word_Size => 10000 Bytes;
+        ARINC653::Memory_Type => (Data_Memory, Code_Memory, IO_Memory);
+        };
+      train_inst: process train_inst.impl {
+        Data_Size => 200 KByte;
+        Code_Size => 200 KByte;
+        };
+      railway_inst: process railway_inst.impl {
+        Data_Size => 200 KByte;
+        Code_Size => 200 KByte;
+        };
+      root_inst: processor root_inst.impl {
+        Thread_Swap_Execution_Time => 5 ms .. 10 ms;
+        ARINC653::Module_Major_Frame => 600 ms;
+        ARINC653::HM_Error_ID_Levels => ([
+          ErrorIdentifier=> 1;
+          Description=> "Module configuration error";
+          ErrorLevel=> Module_Level;
+          ErrorCode=> Module_Config;
+        ]);
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 1;
+          Description=> "Ignore";
+          Action=> "Ignore";
+        ]);
+        ARINC653::Module_Version => "1.0";
+        ARINC653::Module_Identifier => "cbtc.root";
+        Process_Swap_Execution_Time => 5 ms .. 10 ms;
+        Scheduling_Protocol => (ARINC653);
+        POK::Ports_Flush_Time => Partition_Slot_Switch;
+        POK::Architecture => x86;
+        POK::BSP => x86_qemu;
+        };
+    properties
+      Actual_Processor_Binding => (reference(root_inst.VP_train_inst)) applies to train_inst;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst;
+      Actual_Processor_Binding => (reference(root_inst.VP_railway_inst)) applies to railway_inst;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst;
+      ARINC653::Module_Schedule => ([
+        Partition=> reference(root_inst.VP_railway_inst);
+        Duration=> 300 ms;
+        Periodic_Processing_Start=> true;
+      ], [
+        Partition=> reference(root_inst.VP_train_inst);
+        Duration=> 300 ms;
+        Periodic_Processing_Start=> true;
+      ]) applies to root_inst;
+      Actual_Processor_Binding => (reference(root_inst.VP_train_inst)) applies to train_inst.TrainPpu_odometerAcquisition;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.TrainPpu_odometerAcquisition;
+      Actual_Processor_Binding => (reference(root_inst.VP_train_inst)) applies to train_inst.TrainPpu_trainTraction;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.TrainPpu_trainTraction;
+      Actual_Processor_Binding => (reference(root_inst.VP_train_inst)) applies to train_inst.VobcTrainPositionEstimation_vobcTrainPositionEstimation;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.VobcTrainPositionEstimation_vobcTrainPositionEstimation;
+      Actual_Processor_Binding => (reference(root_inst.VP_train_inst)) applies to train_inst.TrainSpeedAccelCompute_trainSpeedAccelCompute;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.TrainSpeedAccelCompute_trainSpeedAccelCompute;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.TrainPpu_odometerAcquisition.TrainPpu_odometerAcquisition;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.TrainPpu_odometerAcquisition.WheelAngleAcquisition_wheelAngleAcquisition;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.TrainPpu_trainTraction.TrainPpu_trainTraction;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.VobcTrainPositionEstimation_vobcTrainPositionEstimation.VobcTrainPositionEstimation_delayed_additionalTrainPositionOffset;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.VobcTrainPositionEstimation_vobcTrainPositionEstimation.VobcTrainPositionEstimation_vobcTrainPositionEstimation;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.VobcTrainPositionEstimation_vobcTrainPositionEstimation.VobcTrainPositionSending_vobcTrainPositionSending;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.TrainSpeedAccelCompute_trainSpeedAccelCompute.TrainSpeedAccelCompute_trainSpeedAccelCompute;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.TrainSpeedAccelCompute_trainSpeedAccelCompute.AccelerationSending_accelerationSending;
+      Actual_Processor_Binding => (reference(root_inst.VP_railway_inst)) applies to railway_inst.TrainPositionsCorrelation_trainPositionsCorrelation;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainPositionsCorrelation_trainPositionsCorrelation;
+      Actual_Processor_Binding => (reference(root_inst.VP_railway_inst)) applies to railway_inst.ViuTrainPositionEstimation_viuTrainPositionEstimation;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.ViuTrainPositionEstimation_viuTrainPositionEstimation;
+      Actual_Processor_Binding => (reference(root_inst.VP_railway_inst)) applies to railway_inst.TrainSimu_trainSimulation;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainSimu_trainSimulation;
+      Actual_Processor_Binding => (reference(root_inst.VP_railway_inst)) applies to railway_inst.TrainSimu_delayed_trainDataIn;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainSimu_delayed_trainDataIn;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainPositionsCorrelation_trainPositionsCorrelation.TrainPositionsCorrelation_trainPositionsCorrelation;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainPositionsCorrelation_trainPositionsCorrelation.TrainPositionsCorrelation_store_trainPositionMauOut;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainPositionsCorrelation_trainPositionsCorrelation.EndOfAuthorityComputation_endOfAuthorityComputation;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainPositionsCorrelation_trainPositionsCorrelation.EoaSending_eoaSending;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.ViuTrainPositionEstimation_viuTrainPositionEstimation.ViuTrainPositionEstimation_viuTrainPositionEstimation;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.ViuTrainPositionEstimation_viuTrainPositionEstimation.ViuTrainPositionSending_viuTrainPositionSending;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainSimu_trainSimulation.TrainSimu_trainSimulation;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainSimu_trainSimulation.TrackPpu_cdvAcquisition;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainSimu_trainSimulation.TrackAcquisition_trackAcquisition;
+      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainSimu_delayed_trainDataIn.TrainSimu_delayed_trainDataIn;
+  end refined_model.impl;
+  
+  system refined_model
+  end refined_model;
+  
+  memory implementation root_main_memory_inst.impl
+  end root_main_memory_inst.impl;
+  
+  memory root_main_memory_inst
+  end root_main_memory_inst;
+  
+  processor root_inst
+  end root_inst;
+  
+  processor implementation root_inst.impl
+    subcomponents
+      VP_train_inst: virtual processor cbtc::VP_train.impl {
+        Scheduling_Protocol => (Round_Robin_Protocol);
+        Period => 600 ms;
+        ARINC653::Partition_Identifier => 2;
+        ARINC653::Partition_Name => "train";
+        ARINC653::System_Partition => false;
+        POK::Additional_Features => (libc_stdio, console);
+        };
+      VP_railway_inst: virtual processor cbtc::VP_railway.impl {
+        Scheduling_Protocol => (Round_Robin_Protocol);
+        Period => 600 ms;
+        ARINC653::Partition_Identifier => 3;
+        ARINC653::Partition_Name => "railway";
+        ARINC653::System_Partition => false;
+        POK::Additional_Features => (libc_stdio, console);
+        };
+  end root_inst.impl;
+  
+  process train_inst
+  end train_inst;
+  
+  process implementation train_inst.impl
     subcomponents
       TrainPpu_odometerAcquisitionParent_BA_currentState: data train_inst_TrainPpu_odometerAcquisition_currentState;
       TrainPpu_trainTractionParent_BA_currentState: data train_inst_TrainPpu_trainTraction_currentState;
@@ -77,9 +200,12 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
       TrainPpu_trainTraction_CNX_CURRENT_STATE_BA: data access TrainPpu_trainTraction.Parent_BA_currentState_Access -> TrainPpu_trainTractionParent_BA_currentState;
       VobcTrainPositionEstimation_vobcTrainPositionEstimation_CNX_CURRENT_STATE_BA: data access VobcTrainPositionEstimation_vobcTrainPositionEstimation.Parent_BA_currentState_Access -> VobcTrainPositionEstimation_vobcTrainPositionEstimationParent_BA_currentState;
       TrainSpeedAccelCompute_trainSpeedAccelCompute_CNX_CURRENT_STATE_BA: data access TrainSpeedAccelCompute_trainSpeedAccelCompute.Parent_BA_currentState_Access -> TrainSpeedAccelCompute_trainSpeedAccelComputeParent_BA_currentState;
-  end train.impl;
+  end train_inst.impl;
   
-  process implementation railway.impl
+  process railway_inst
+  end railway_inst;
+  
+  process implementation railway_inst.impl
     subcomponents
       TrainPositionsCorrelation_trainPositionsCorrelationParent_BA_currentState: data railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState;
       ViuTrainPositionEstimation_viuTrainPositionEstimationParent_BA_currentState: data railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState;
@@ -149,201 +275,7 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
       ViuTrainPositionEstimation_viuTrainPositionEstimation_CNX_CURRENT_STATE_BA: data access ViuTrainPositionEstimation_viuTrainPositionEstimation.Parent_BA_currentState_Access -> ViuTrainPositionEstimation_viuTrainPositionEstimationParent_BA_currentState;
       TrainSimu_trainSimulation_CNX_CURRENT_STATE_BA: data access TrainSimu_trainSimulation.Parent_BA_currentState_Access -> TrainSimu_trainSimulationParent_BA_currentState;
       TrainSimu_delayed_trainDataIn_CNX_CURRENT_STATE_BA: data access TrainSimu_delayed_trainDataIn.Parent_BA_currentState_Access -> TrainSimu_delayed_trainDataInParent_BA_currentState;
-  end railway.impl;
-  
-  processor implementation root.impl
-    subcomponents
-      VP_train_inst: virtual processor VP_train.impl {
-        Scheduling_Protocol => (Round_Robin_Protocol);
-        Period => 600 ms;
-        ARINC653::Partition_Identifier => 2;
-        ARINC653::Partition_Name => "train";
-        ARINC653::System_Partition => false;
-        POK::Additional_Features => (libc_stdio, console);
-        };
-      VP_railway_inst: virtual processor VP_railway.impl {
-        Scheduling_Protocol => (Round_Robin_Protocol);
-        Period => 600 ms;
-        ARINC653::Partition_Identifier => 3;
-        ARINC653::Partition_Name => "railway";
-        ARINC653::System_Partition => false;
-        POK::Additional_Features => (libc_stdio, console);
-        };
-  end root.impl;
-  
-  virtual processor implementation VP_train.impl
-  end VP_train.impl;
-  
-  virtual processor implementation VP_railway.impl
-  end VP_railway.impl;
-  
-  memory implementation root_main_memory.impl
-  end root_main_memory.impl;
-  
-  system implementation refined_model.impl
-    subcomponents
-      root_main_memory_inst: memory root_main_memory.impl {
-        Memory_Size => 250000 Bytes;
-        Base_Address => 8704;
-        Word_Size => 10000 Bytes;
-        ARINC653::Memory_Type => (Data_Memory, Code_Memory, IO_Memory);
-        };
-      train_inst: process train.impl {
-        Data_Size => 200 KByte;
-        Code_Size => 200 KByte;
-        };
-      railway_inst: process railway.impl {
-        Data_Size => 200 KByte;
-        Code_Size => 200 KByte;
-        };
-      root_inst: processor root.impl {
-        Thread_Swap_Execution_Time => 5 ms .. 10 ms;
-        ARINC653::Module_Major_Frame => 600 ms;
-        ARINC653::HM_Error_ID_Levels => ([
-          ErrorIdentifier=> 1;
-          Description=> "Module configuration error";
-          ErrorLevel=> Module_Level;
-          ErrorCode=> Module_Config;
-        ]);
-        ARINC653::HM_Error_ID_Actions => ([
-          ErrorIdentifier=> 1;
-          Description=> "Ignore";
-          Action=> "Ignore";
-        ]);
-        ARINC653::Module_Version => "1.0";
-        ARINC653::Module_Identifier => "cbtc.root";
-        Process_Swap_Execution_Time => 5 ms .. 10 ms;
-        Scheduling_Protocol => (ARINC653);
-        POK::Ports_Flush_Time => Partition_Slot_Switch;
-        POK::Architecture => x86;
-        POK::BSP => x86_qemu;
-        };
-    properties
-      Actual_Processor_Binding => (reference(root_inst.VP_train_inst)) applies to train_inst;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst;
-      Actual_Processor_Binding => (reference(root_inst.VP_railway_inst)) applies to railway_inst;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst;
-      ARINC653::Module_Schedule => ([
-        Partition=> reference(root_inst.VP_railway_inst);
-        Duration=> 300 ms;
-        Periodic_Processing_Start=> true;
-      ], [
-        Partition=> reference(root_inst.VP_train_inst);
-        Duration=> 300 ms;
-        Periodic_Processing_Start=> true;
-      ]) applies to root_inst;
-      Actual_Processor_Binding => (reference(root_inst.VP_train_inst)) applies to train_inst.TrainPpu_odometerAcquisition;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.TrainPpu_odometerAcquisition;
-      Actual_Processor_Binding => (reference(root_inst.VP_train_inst)) applies to train_inst.TrainPpu_trainTraction;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.TrainPpu_trainTraction;
-      Actual_Processor_Binding => (reference(root_inst.VP_train_inst)) applies to train_inst.VobcTrainPositionEstimation_vobcTrainPositionEstimation;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.VobcTrainPositionEstimation_vobcTrainPositionEstimation;
-      Actual_Processor_Binding => (reference(root_inst.VP_train_inst)) applies to train_inst.TrainSpeedAccelCompute_trainSpeedAccelCompute;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.TrainSpeedAccelCompute_trainSpeedAccelCompute;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.TrainPpu_odometerAcquisition.TrainPpu_odometerAcquisition;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.TrainPpu_odometerAcquisition.WheelAngleAcquisition_wheelAngleAcquisition;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.TrainPpu_trainTraction.TrainPpu_trainTraction;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.VobcTrainPositionEstimation_vobcTrainPositionEstimation.VobcTrainPositionEstimation_delayed_additionalTrainPositionOffset;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.VobcTrainPositionEstimation_vobcTrainPositionEstimation.VobcTrainPositionEstimation_vobcTrainPositionEstimation;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.VobcTrainPositionEstimation_vobcTrainPositionEstimation.VobcTrainPositionSending_vobcTrainPositionSending;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.TrainSpeedAccelCompute_trainSpeedAccelCompute.TrainSpeedAccelCompute_trainSpeedAccelCompute;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.TrainSpeedAccelCompute_trainSpeedAccelCompute.AccelerationSending_accelerationSending;
-      Actual_Processor_Binding => (reference(root_inst.VP_railway_inst)) applies to railway_inst.TrainPositionsCorrelation_trainPositionsCorrelation;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainPositionsCorrelation_trainPositionsCorrelation;
-      Actual_Processor_Binding => (reference(root_inst.VP_railway_inst)) applies to railway_inst.ViuTrainPositionEstimation_viuTrainPositionEstimation;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.ViuTrainPositionEstimation_viuTrainPositionEstimation;
-      Actual_Processor_Binding => (reference(root_inst.VP_railway_inst)) applies to railway_inst.TrainSimu_trainSimulation;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainSimu_trainSimulation;
-      Actual_Processor_Binding => (reference(root_inst.VP_railway_inst)) applies to railway_inst.TrainSimu_delayed_trainDataIn;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainSimu_delayed_trainDataIn;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainPositionsCorrelation_trainPositionsCorrelation.TrainPositionsCorrelation_trainPositionsCorrelation;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainPositionsCorrelation_trainPositionsCorrelation.TrainPositionsCorrelation_store_trainPositionMauOut;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainPositionsCorrelation_trainPositionsCorrelation.EndOfAuthorityComputation_endOfAuthorityComputation;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainPositionsCorrelation_trainPositionsCorrelation.EoaSending_eoaSending;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.ViuTrainPositionEstimation_viuTrainPositionEstimation.ViuTrainPositionEstimation_viuTrainPositionEstimation;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.ViuTrainPositionEstimation_viuTrainPositionEstimation.ViuTrainPositionSending_viuTrainPositionSending;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainSimu_trainSimulation.TrainSimu_trainSimulation;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainSimu_trainSimulation.TrackPpu_cdvAcquisition;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainSimu_trainSimulation.TrackAcquisition_trackAcquisition;
-      Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst.TrainSimu_delayed_trainDataIn.TrainSimu_delayed_trainDataIn;
-  end refined_model.impl;
-  
-  processor root
-  end root;
-  
-  virtual processor VP_train
-  end VP_train;
-  
-  virtual processor VP_railway
-  end VP_railway;
-  
-  memory root_main_memory
-  end root_main_memory;
-  
-  process train
-  end train;
-  
-  process railway
-  end railway;
-  
-  system refined_model
-  end refined_model;
-  
-  data train_inst_TrainPpu_odometerAcquisition_currentState
-    properties
-      Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("switch");
-      Data_Model::Initial_Value => ("cbtc_refined_model__train_inst_TrainPpu_odometerAcquisition_currentState_switch");
-  end train_inst_TrainPpu_odometerAcquisition_currentState;
-  
-  data train_inst_TrainPpu_trainTraction_currentState
-    properties
-      Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("switch");
-      Data_Model::Initial_Value => ("cbtc_refined_model__train_inst_TrainPpu_trainTraction_currentState_switch");
-  end train_inst_TrainPpu_trainTraction_currentState;
-  
-  data train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState
-    properties
-      Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("switch");
-      Data_Model::Initial_Value => ("cbtc_refined_model__train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState_switch");
-  end train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState;
-  
-  data train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState
-    properties
-      Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("switch");
-      Data_Model::Initial_Value => ("cbtc_refined_model__train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState_switch");
-  end train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState;
-  
-  data railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState
-    properties
-      Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("switch");
-      Data_Model::Initial_Value => ("cbtc_refined_model__railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState_switch");
-  end railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState;
-  
-  data railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState
-    properties
-      Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("switch");
-      Data_Model::Initial_Value => ("cbtc_refined_model__railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState_switch");
-  end railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState;
-  
-  data railway_inst_TrainSimu_trainSimulation_currentState
-    properties
-      Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("switch");
-      Data_Model::Initial_Value => ("cbtc_refined_model__railway_inst_TrainSimu_trainSimulation_currentState_switch");
-  end railway_inst_TrainSimu_trainSimulation_currentState;
-  
-  data railway_inst_TrainSimu_delayed_trainDataIn_currentState
-    properties
-      Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("switch");
-      Data_Model::Initial_Value => ("cbtc_refined_model__railway_inst_TrainSimu_delayed_trainDataIn_currentState_switch");
-  end railway_inst_TrainSimu_delayed_trainDataIn_currentState;
+  end railway_inst.impl;
   
   subprogram train_inst_TrainPpu_odometerAcquisition_entrypoint
     features
@@ -437,10 +369,7 @@ Display_Blackboard_OdometerData ! (PortCnx1_wheelAngleOut, wheelAngleOut_localVa
   thread train_inst_TrainPpu_odometerAcquisition
     features
       trainDataIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx1_wheelAngleOut: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Source_Name => "OdometerData";
-        Source_Text => ("business-code/cbtc_module.h");
-        };
+      PortCnx1_wheelAngleOut: requires data access arinc653_runtime::Blackboard_Id_Type;
       Parent_BA_currentState_Access: requires data access train_inst_TrainPpu_odometerAcquisition_currentState;
   end train_inst_TrainPpu_odometerAcquisition;
   
@@ -547,10 +476,7 @@ Write_Sampling_Message_TrainData ! (PortCnx9_trainDataOut, trainDataOut_localVar
     features
       tractionIn: requires data access arinc653_runtime::Blackboard_Id_Type;
       trainDataIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx2_additionalTrainPositionOffset: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Source_Name => "TrainPositionOffset";
-        Source_Text => ("business-code/cbtc_module.h");
-        };
+      PortCnx2_additionalTrainPositionOffset: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx9_trainDataOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       Parent_BA_currentState_Access: requires data access train_inst_TrainPpu_trainTraction_currentState;
   end train_inst_TrainPpu_trainTraction;
@@ -666,10 +592,7 @@ Display_Blackboard_VobcData ! (PortCnx3_trainPositionOut_F, trainPositionOut_F_l
     features
       additionalTrainPositionOffset: requires data access arinc653_runtime::Blackboard_Id_Type;
       wheelAngleIn: requires data access arinc653_runtime::Blackboard_Id_Type;
-      PortCnx3_trainPositionOut_F: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Source_Name => "VobcData";
-        Source_Text => ("business-code/cbtc_module.h");
-        };
+      PortCnx3_trainPositionOut_F: requires data access arinc653_runtime::Blackboard_Id_Type;
       Parent_BA_currentState_Access: requires data access train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState;
   end train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation;
   
@@ -800,10 +723,7 @@ Display_Blackboard_TractionData ! (PortCnx4_tractionOut, tractionOut_localVariab
       eoaIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       trainPositionIn: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx8_trainPositionForMauOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx4_tractionOut: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Source_Name => "TractionData";
-        Source_Text => ("business-code/cbtc_module.h");
-        };
+      PortCnx4_tractionOut: requires data access arinc653_runtime::Blackboard_Id_Type;
       Parent_BA_currentState_Access: requires data access train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState;
   end train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute;
   
@@ -931,10 +851,7 @@ Write_Sampling_Message_EndOfAuthority ! (PortCnx7_eoaForVobcOut, eoaForVobcOut_l
     features
       trainPositionVobcForMauIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       trainPositionViuForMauIn: requires data access arinc653_runtime::Blackboard_Id_Type;
-      PortCnx7_eoaForVobcOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
-        Source_Name => "EndOfAuthority";
-        Source_Text => ("business-code/cbtc_module.h");
-        };
+      PortCnx7_eoaForVobcOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       Parent_BA_currentState_Access: requires data access railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState;
   end railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation;
   
@@ -1032,10 +949,7 @@ Display_Blackboard_ViuData ! (PortCnx1_trainPositionForMauOut, trainPositionForM
   thread railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation
     features
       trackIn: requires data access arinc653_runtime::Blackboard_Id_Type;
-      PortCnx1_trainPositionForMauOut: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Source_Name => "ViuData";
-        Source_Text => ("business-code/cbtc_module.h");
-        };
+      PortCnx1_trainPositionForMauOut: requires data access arinc653_runtime::Blackboard_Id_Type;
       Parent_BA_currentState_Access: requires data access railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState;
   end railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation;
   
@@ -1148,14 +1062,8 @@ Display_Blackboard_CdvData ! (PortCnx3_trackOut, trackOut_localVariable, trackOu
   thread railway_inst_TrainSimu_trainSimulation
     features
       delayed_trainDataIn: requires data access arinc653_runtime::Blackboard_Id_Type;
-      PortCnx6_trainDataOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
-        Source_Name => "TrainData";
-        Source_Text => ("business-code/cbtc_module.h");
-        };
-      PortCnx3_trackOut: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Source_Name => "CdvData";
-        Source_Text => ("business-code/cbtc_module.h");
-        };
+      PortCnx6_trainDataOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      PortCnx3_trackOut: requires data access arinc653_runtime::Blackboard_Id_Type;
       Parent_BA_currentState_Access: requires data access railway_inst_TrainSimu_trainSimulation_currentState;
   end railway_inst_TrainSimu_trainSimulation;
   
@@ -1224,34 +1132,65 @@ Display_Blackboard_TrainData ! (PortCnx2_delayed_trainDataIn, delayed_trainDataI
   thread railway_inst_TrainSimu_delayed_trainDataIn
     features
       trainDataIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx2_delayed_trainDataIn: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Source_Name => "TrainData";
-        Source_Text => ("business-code/cbtc_module.h");
-        };
+      PortCnx2_delayed_trainDataIn: requires data access arinc653_runtime::Blackboard_Id_Type;
       Parent_BA_currentState_Access: requires data access railway_inst_TrainSimu_delayed_trainDataIn_currentState;
   end railway_inst_TrainSimu_delayed_trainDataIn;
   
-  data TrainData_freshness_t
+  data train_inst_TrainPpu_odometerAcquisition_currentState
     properties
-      Data_Model::Data_Representation => Struct;
-  end TrainData_freshness_t;
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("switch");
+      Data_Model::Initial_Value => ("cbtc_refined_model__train_inst_TrainPpu_odometerAcquisition_currentState_switch");
+  end train_inst_TrainPpu_odometerAcquisition_currentState;
   
-  data implementation TrainData_freshness_t.impl
-    subcomponents
-      pvalue: data cbtc::TrainData;
-      fresh_ba: data Base_Types::Integer_16;
-  end TrainData_freshness_t.impl;
-  
-  data TractionData_freshness_t
+  data train_inst_TrainPpu_trainTraction_currentState
     properties
-      Data_Model::Data_Representation => Struct;
-  end TractionData_freshness_t;
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("switch");
+      Data_Model::Initial_Value => ("cbtc_refined_model__train_inst_TrainPpu_trainTraction_currentState_switch");
+  end train_inst_TrainPpu_trainTraction_currentState;
   
-  data implementation TractionData_freshness_t.impl
-    subcomponents
-      pvalue: data cbtc::TractionData;
-      fresh_ba: data Base_Types::Integer_16;
-  end TractionData_freshness_t.impl;
+  data train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("switch");
+      Data_Model::Initial_Value => ("cbtc_refined_model__train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState_switch");
+  end train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState;
+  
+  data train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("switch");
+      Data_Model::Initial_Value => ("cbtc_refined_model__train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState_switch");
+  end train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState;
+  
+  data railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("switch");
+      Data_Model::Initial_Value => ("cbtc_refined_model__railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState_switch");
+  end railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState;
+  
+  data railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("switch");
+      Data_Model::Initial_Value => ("cbtc_refined_model__railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState_switch");
+  end railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState;
+  
+  data railway_inst_TrainSimu_trainSimulation_currentState
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("switch");
+      Data_Model::Initial_Value => ("cbtc_refined_model__railway_inst_TrainSimu_trainSimulation_currentState_switch");
+  end railway_inst_TrainSimu_trainSimulation_currentState;
+  
+  data railway_inst_TrainSimu_delayed_trainDataIn_currentState
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("switch");
+      Data_Model::Initial_Value => ("cbtc_refined_model__railway_inst_TrainSimu_delayed_trainDataIn_currentState_switch");
+  end railway_inst_TrainSimu_delayed_trainDataIn_currentState;
   
   data OdometerData_freshness_t
     properties
@@ -1264,17 +1203,6 @@ Display_Blackboard_TrainData ! (PortCnx2_delayed_trainDataIn, delayed_trainDataI
       fresh_ba: data Base_Types::Integer_16;
   end OdometerData_freshness_t.impl;
   
-  data EndOfAuthority_freshness_t
-    properties
-      Data_Model::Data_Representation => Struct;
-  end EndOfAuthority_freshness_t;
-  
-  data implementation EndOfAuthority_freshness_t.impl
-    subcomponents
-      pvalue: data cbtc::EndOfAuthority;
-      fresh_ba: data Base_Types::Integer_16;
-  end EndOfAuthority_freshness_t.impl;
-  
   data VobcData_freshness_t
     properties
       Data_Model::Data_Representation => Struct;
@@ -1286,6 +1214,28 @@ Display_Blackboard_TrainData ! (PortCnx2_delayed_trainDataIn, delayed_trainDataI
       fresh_ba: data Base_Types::Integer_16;
   end VobcData_freshness_t.impl;
   
+  data TractionData_freshness_t
+    properties
+      Data_Model::Data_Representation => Struct;
+  end TractionData_freshness_t;
+  
+  data implementation TractionData_freshness_t.impl
+    subcomponents
+      pvalue: data cbtc::TractionData;
+      fresh_ba: data Base_Types::Integer_16;
+  end TractionData_freshness_t.impl;
+  
+  data EndOfAuthority_freshness_t
+    properties
+      Data_Model::Data_Representation => Struct;
+  end EndOfAuthority_freshness_t;
+  
+  data implementation EndOfAuthority_freshness_t.impl
+    subcomponents
+      pvalue: data cbtc::EndOfAuthority;
+      fresh_ba: data Base_Types::Integer_16;
+  end EndOfAuthority_freshness_t.impl;
+  
   data ViuData_freshness_t
     properties
       Data_Model::Data_Representation => Struct;
@@ -1296,6 +1246,17 @@ Display_Blackboard_TrainData ! (PortCnx2_delayed_trainDataIn, delayed_trainDataI
       pvalue: data cbtc::ViuData;
       fresh_ba: data Base_Types::Integer_16;
   end ViuData_freshness_t.impl;
+  
+  data TrainData_freshness_t
+    properties
+      Data_Model::Data_Representation => Struct;
+  end TrainData_freshness_t;
+  
+  data implementation TrainData_freshness_t.impl
+    subcomponents
+      pvalue: data cbtc::TrainData;
+      fresh_ba: data Base_Types::Integer_16;
+  end TrainData_freshness_t.impl;
   
   data CdvData_freshness_t
     properties

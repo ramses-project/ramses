@@ -105,9 +105,6 @@ public class EGAnalyzer extends AbstractAnalyzer
 	    EGModels models2 = models.clone();
 	    Map<ComponentInstance, List<EGNode>> wcetMap = models2.reduce();
 	    
-	    //EG2DOT eg2dot2 = new EG2DOT ("/home/fabien/execution_graphs/reduced/", DOTLayout.dot);
-	    //eg2dot2.launch(models2,systemInstance);
-	    
 	    /** Print WCET overhead */
 	    
 	    for(ComponentInstance thread: models2.getThreads())

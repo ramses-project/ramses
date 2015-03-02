@@ -1,0 +1,505 @@
+package nxt_use_case
+public
+
+with Data_Model;
+with OSEK, Generation_Properties;
+
+----------
+-- Data --
+----------
+
+data Int
+properties
+  Data_Model::Data_Representation => integer;
+end Int;
+
+data Robot_state
+properties
+  Data_Model::Data_Representation => Enum;
+  Data_Model::Enumerators => ("FORWARD", "BACKWARD", "STOP");
+  Source_name => "Robot_state";
+  Source_Text => ("in_robot.h");
+end Robot_state;
+
+data Color
+properties
+  Data_Model::Data_Representation => Enum;
+  Data_Model::Enumerators => ("NXT_COLOR_BLACK", "NXT_COLOR_RED", "NXT_COLOR_BLUE");
+  Source_name => "COLOR_TYPE";
+  Source_Text => ("ecrobot_interface.h");
+end Color;
+
+data LandMap
+end LandMap;
+
+-----------------
+-- Subprograms --
+-----------------
+
+subprogram computePID
+features
+  currentColor : in parameter Int;
+  colorToFollow: in parameter Color;
+  angle : out parameter Int;
+properties
+  Source_language => (C);
+  Source_text => ("in_robot.h", "in_robot.c");
+  Source_name => "computePID";
+end computePID;
+
+subprogram computeSpeed
+features
+  angle       : in parameter Int;
+  speedl      : out parameter Int;
+  speedr      : out parameter Int;
+  s : requires data access Robot_state;
+properties
+  Source_language => (C);
+  Source_text => ("in_robot.h");
+  Source_name => "computeSpeed";
+  OSEK::Source_Location => "in_robot.c";
+end computeSpeed;
+
+subprogram select_State
+features
+  distance : in parameter Int;
+  s : requires data access Robot_state;
+properties
+  Source_language => (C);
+  Source_text => ("in_robot.h");
+  Source_name => "selectState";
+  OSEK::Source_Location => "in_robot.c";
+end select_State;
+  
+  
+subprogram getSonarMove
+features
+  count: in parameter Int;
+  speed: out parameter Int;
+  brake: out parameter Int;
+properties
+  Source_language => (C);
+  Source_text => ("in_robot.h");
+  Source_name => "getSonarMove";
+  OSEK::Source_Location => "in_robot.c";
+end getSonarMove;
+
+-------------
+-- Threads --
+-------------
+
+thread ContrThread
+features
+  s : requires data access Robot_state;
+  colorToFollow : in data port Color;
+  getColor: requires subprogram access ecrobotGetColorId;
+  setSpeedLeft: requires subprogram access nxtMotorSetSpeedLib;
+  setSpeedRight: requires subprogram access nxtMotorSetSpeedLib;
+  ReachedNext: out event port;
+end ContrThread;
+
+thread implementation ContrThread.Impl
+  subcomponents
+    rightSpeedPort: data Int {Data_Model::Initial_Value => ("NXT_PORT_C");};
+    rightBrake: data Int {Data_Model::Initial_Value => ("0");};
+    leftSpeedPort: data Int {Data_Model::Initial_Value => ("NXT_PORT_A");};
+    leftBrake: data Int {Data_Model::Initial_Value => ("0");};
+    colorPortNb: data Int {Data_Model::Initial_Value => ("NXT_PORT_S1");};
+    colorSensorMode: data Int{Data_Model::Initial_Value => ("NXT_COLORSENSOR");};
+  calls 
+    call1:
+    {
+      cl   : subprogram getColor;
+      cp   : subprogram computePID;
+      cs   : subprogram computeSpeed;
+      ssL  : subprogram setSpeedLeft;
+      ssR  : subprogram setSpeedRight;
+    };
+    init:
+    {
+      i    : subprogram ecrobotInitColorSensor;
+    };
+connections
+  cc0 : parameter cl.color -> cp.currentColor;
+  cc01: parameter cl.portId -> colorPortNb;
+  cc1 : parameter cp.angle -> cs.angle;
+  cc12: parameter cp.colorToFollow -> colorToFollow;
+  cc2 : parameter cs.speedL -> ssL.speed;
+  cc3 : parameter cs.speedR -> ssR.speed;
+  cc4 : data access s -> cs.s;
+  cc5 : parameter ssL.portNb -> leftSpeedPort;
+  cc6 : parameter ssL.brake -> leftBrake;
+  cc7 : parameter ssR.portNb -> rightSpeedPort;
+  cc8 : parameter ssR.brake -> rightBrake;
+  cc9 : parameter i.portNb -> colorPortNb;
+  cc10 : parameter i.sensorMode -> colorSensorMode;
+properties
+  Dispatch_Protocol                  => periodic;
+  Period                             => 100 ms;
+  Compute_Execution_time             => 0 ms .. 100 ms; -- arbitraire... mais a son importance si mecanisme de detection d'overrrun. 
+  Deadline                           => 50 ms;
+  Priority                           => 2;
+  Compute_Entrypoint_Call_Sequence => reference (call1);
+  Initialize_Entrypoint_Call_Sequence => reference (init);
+  POSIX_Scheduling_Policy => SCHED_FIFO;
+end ContrThread.Impl;
+
+thread PathComputationThread
+features
+  map: requires data access LandMap;
+  initial_point: in data port Int;
+  target_point: in data port Int;
+  blue_mode: out event port;
+  red_mode: out event port;
+end PathComputationThread;
+
+thread implementation PathComputationThread.impl
+end PathComputationThread.impl;
+
+thread FindNextDirection
+features
+  colorOfDirection: in data port Color;
+  found: out event port; 
+end FindNextDirection;
+
+thread implementation FindNextDirection.impl
+end FindNextDirection.impl;
+
+thread EventThread
+features
+  s        : requires data access Robot_state;
+  getDistance: requires subprogram access ecrobotGetSonarSensorLib;
+  moveSonar: requires subprogram access nxtMotorSetSpeedLib;
+  getCountSonarEngine: requires subprogram access nxtMotorGetCountLib;
+  setCountSonarEngine: requires subprogram access nxtMotorSetCountLib;
+end EventThread;
+
+thread implementation EventThread.Impl
+  subcomponents
+    DistancePortNb: data Int {Data_Model::Initial_Value => ("NXT_PORT_S4");}; 
+    motorPortNb:data Int {Data_Model::Initial_Value => ("NXT_PORT_B");};
+    brake: data Int {Data_Model::Initial_Value => ("0");};
+    zeroCount: data Int {Data_Model::Initial_Value => ("0");};
+  calls  
+    call2:
+    {
+      getCount: subprogram getCountSonarEngine;
+      getMove: subprogram getSonarMove;
+      m : subprogram moveSonar;
+      d : subprogram getDistance;
+      se : subprogram select_State;
+    };
+--    init:
+--    {
+--  	  i: subprogram setCountSonarEngine;
+--    };
+connections
+  ce1 : parameter d.distance -> se.distance;
+  ce2 : parameter d.portNb -> DistancePortNb;
+  ce3 : data access s -> se.s;
+--  ce4: parameter motorPortNb -> i.portNb;
+--  ce41: parameter zeroCount -> i.count;
+  ce5 : parameter getMove.speed -> m.speed;
+  ce51: parameter brake -> getMove.brake;
+  ce52: parameter getCount.count -> getMove.count;
+  ce53: parameter motorPortNb -> getCount.portNb;
+  ce6: parameter motorPortNb -> m.portNb;
+  ce7: parameter brake -> m.brake;
+properties
+  Dispatch_Protocol                  => periodic;
+  Period                             => 50 ms;
+  Compute_Execution_time             => 0 ms .. 25 ms;
+  Deadline                           => 50 ms;
+  Priority                           => 3;
+  Compute_Entrypoint_Call_Sequence => reference (call2);
+--  Initialize_Entrypoint_Call_Sequence => reference (init);
+  POSIX_Scheduling_Policy => SCHED_FIFO;
+end EventThread.Impl;
+
+
+thread SensorValuePolling
+end SensorValuePolling;
+
+thread implementation SensorValuePolling.Impl
+calls
+  poll:
+  {
+  	color: subprogram bgColorSensor;
+  };
+properties
+  Dispatch_Protocol                  => periodic;
+  Period                             => 10 ms;
+  Compute_Execution_time             => 0 ms .. 25 ms;
+  Deadline                           => 50 ms;
+  Priority                           => 1;
+  Compute_Entrypoint_Call_Sequence => reference (poll);
+end SensorValuePolling.Impl;
+
+---------------
+-- Processes --
+---------------
+
+process Proc
+features
+  getColor: requires subprogram access ecrobotGetColorId;
+  getDistance: requires subprogram access ecrobotGetSonarSensorLib;
+  setSpeedLeft: requires subprogram access nxtMotorSetSpeedLib;
+  setSpeedRight: requires subprogram access nxtMotorSetSpeedLib;
+  moveSonar: requires subprogram access nxtMotorSetSpeedLib;
+  getCountSonarEngine: requires subprogram access nxtMotorGetCountLib;
+  setCountSonarEngine: requires subprogram access nxtMotorSetCountLib;
+end Proc;
+
+process implementation Proc.Impl
+subcomponents
+  Comp_Path: thread PathComputationThread.impl in modes (compute_path);
+  Starting_Point: data Int {Data_Model::Initial_Value=>("1");};
+  Target_Point: data Int {Data_Model::Initial_Value=>("2");};
+  LandMap: data LandMap {source_name=>"tp_land_map"; source_text=>("in_robot.h");};
+  
+  Find_Path: thread FindNextDirection.impl in modes (find_blue, find_red);
+  
+  Update_Map: thread FindNextDirection.impl in modes (go_previous);
+  
+  C_Th   : thread ContrThread.Impl in modes (follow_blue, follow_red);
+  
+  E_Th   : thread EventThread.Impl in modes (follow_blue, follow_red);
+  Bg_Th  : thread SensorValuePolling.Impl in modes (follow_blue, follow_red, find_blue, find_red);
+  S      : data Robot_state;
+  
+  Black_Color: data Color {Data_Model::Initial_Value=>("NXT_COLOR_BLACK");};
+  Red_Color: data Color {Data_Model::Initial_Value=>("NXT_COLOR_RED");};
+  Blue_Color: data Color {Data_Model::Initial_Value=>("NXT_COLOR_BLUE");};
+  
+connections
+  cp1 : data access C_Th.s -> S;
+  cp2 : data access E_Th.s -> S;
+  cp3 : subprogram access getDistance -> E_Th.getDistance;
+  cp4 : subprogram access getColor -> C_Th.getColor;
+  cp5 : subprogram access setSpeedLeft -> C_Th.setSpeedLeft;
+  cp6 : subprogram access setSpeedRight -> C_Th.setSpeedRight;
+  cp7 : subprogram access moveSonar -> E_Th.moveSonar;
+  cp8 : subprogram access getCountSonarEngine -> E_Th.getCountSonarEngine;
+  cp9 : subprogram access setCountSonarEngine-> E_Th.setCountSonarEngine;
+  cp10: port Black_Color -> C_Th.colorToFollow in modes (find_blue);
+  cp11: port Blue_Color -> C_Th.colorToFollow in modes (follow_blue);
+  cp12: port Red_Color -> C_Th.colorToFollow in modes (follow_red);
+  
+  cp13: data access LandMap -> Comp_Path.Map; 
+  cp14: port Starting_Point -> Comp_Path.initial_point;
+  cp15: port Target_Point -> Comp_Path.target_point;
+  
+modes
+  compute_path: initial mode;
+  find_blue: mode;
+  find_red: mode;
+  follow_blue: mode;
+  follow_red: mode;
+  go_previous: mode;
+  
+  -- transitions
+  compute_path -[Comp_Path.blue_mode]-> find_blue;
+  compute_path -[Comp_Path.red_mode]-> find_red;
+  
+  find_blue -[Find_Path.found]-> follow_blue;
+  find_red -[Find_Path.found]-> follow_red;
+  
+  follow_blue -[C_Th.ReachedNext]-> compute_path;
+  follow_red -[C_Th.ReachedNext]-> compute_path;
+  
+  
+end Proc.Impl;
+
+---------------
+-- Processor --
+---------------
+
+processor arm
+end arm;
+
+processor implementation arm.impl
+properties
+  Scheduling_Protocol => (RMS) ;
+  OSEK::SystemCounter_MaxAllowedValue => 2000;
+  OSEK::SystemCounter_TicksPerBase => 1;
+  OSEK::SystemCounter_MinCycle => 1;
+end arm.impl;
+
+---------------
+--   Memory  --
+---------------
+
+memory nxt_mem
+end nxt_mem;
+
+memory implementation nxt_mem.impl
+end nxt_mem.impl;
+
+-------------
+-- NXT LIB --
+-------------
+
+-- Devices
+
+-- Light Sensor
+
+subprogram ecrobotGetColorId
+features
+  portId: in parameter Int;
+  color : out parameter Int {Generation_Properties::Return_Parameter => true;};
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot_interface.h");
+  Source_name => "ecrobot_get_nxtcolorsensor_id";
+end ecrobotGetColorId;
+
+subprogram ecrobotInitColorSensor
+features
+  portNb: in parameter Int;
+  sensorMode: in parameter Int;
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot_interface.h");
+  Source_name => "ecrobot_init_nxtcolorsensor";
+end ecrobotInitColorSensor;
+
+subprogram bgColorSensor
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot_interface.h");
+  Source_name => "ecrobot_process_bg_nxtcolorsensor";
+end bgColorSensor;
+
+subprogram ecrobotSetLightSensorInactiveLib
+features
+  portNb: in parameter Int;
+  sensorMode: in parameter Int;
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot_interface.h");
+  Source_name => "ecrobot_init_nxtcolorsensor";
+end ecrobotSetLightSensorInactiveLib;
+
+device ColorSensor
+features
+  getColor: provides subprogram access ecrobotGetColorId;
+--properties
+--  Initialize_Entrypoint => classifier (ecrobotInitColorSensor);
+--  Finalize_Entrypoint => classifier (ecrobotSetLightSensorInactiveLib);      
+end ColorSensor;
+
+-- SONAR
+
+device Sonar
+features
+  getDistance: provides subprogram access ecrobotGetSonarSensorLib;
+--properties
+--  Initialize_Entrypoint => classifier (ecrobotInitSonarSensorLib);
+--  Finalize_Entrypoint => classifier (ecrobotTermSonarSensorLib);
+end Sonar;
+
+subprogram ecrobotGetSonarSensorLib
+features
+  portNb: in parameter Int;
+  distance : out parameter Int {Generation_Properties::Return_Parameter => true;};
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot_interface.h");
+  Source_name => "ecrobot_get_sonar_sensor";
+  Compute_Execution_Time => 0 ms .. 1 ms;
+end ecrobotGetSonarSensorLib;
+
+subprogram ecrobotInitSonarSensorLib
+features
+  portNb: in parameter Int;
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot_interface.h");
+  Source_name => "ecrobot_init_sonar_sensor";
+  Compute_Execution_Time => 1 ms .. 2 ms;
+end ecrobotInitSonarSensorLib;
+
+subprogram ecrobotTermSonarSensorLib
+features
+  portNb: in parameter Int ;
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot_interface.h");
+  Source_name => "ecrobot_term_sonar_sensor";
+  Compute_Execution_Time => 2 ms .. 3 ms;
+end ecrobotTermSonarSensorLib;
+
+-- MOTOR
+
+device Motor
+features
+  setSpeed: provides subprogram access nxtMotorSetSpeedLib;
+  setCount: provides subprogram access nxtMotorSetCountLib;
+  getCount: provides subprogram access nxtMotorGetCountLib;
+end Motor;
+
+subprogram nxtMotorSetSpeedLib
+features
+  portNb: in parameter Int;
+  speed : in parameter Int;
+  brake : in parameter Int;
+properties
+  Source_language => (C);
+  Source_text => ("nxt_motors.h");
+  Source_name => "nxt_motor_set_speed";
+  Compute_Execution_Time => 1 ms .. 2 ms;
+end nxtMotorSetSpeedLib;
+
+
+
+subprogram nxtMotorGetCountLib
+features
+  portNb: in parameter Int;
+  count : out parameter Int {Generation_Properties::Return_Parameter => true;};
+properties
+  Source_language => (C);
+  Source_text => ("nxt_motors.h");
+  Source_name => "nxt_motor_get_count";
+end nxtMotorGetCountLib;
+
+subprogram nxtMotorSetCountLib
+features
+  portNb: in parameter Int;
+  count : in parameter Int;
+properties
+  Source_language => (C);
+  Source_text => ("nxt_motors.h");
+  Source_name => "nxt_motor_set_count";
+end nxtMotorSetCountLib;
+------------
+-- System --
+------------
+
+system nxt
+end nxt;
+
+system implementation nxt.Impl
+subcomponents 
+  nxt_cpu      :  processor arm.impl;
+  nxt_mem	:	memory nxt_mem.impl;
+  PROC     :  process Proc.Impl; 
+  ColorSensor: device ColorSensor;
+  DistanceSensor: device Sonar;
+  SonarEngine: device Motor;
+  LeftEngine: device Motor;
+  RightEngine: device Motor;
+connections
+  light: subprogram access  PROC.getColor -> ColorSensor.getColor;
+  distance: subprogram access PROC.getDistance -> DistanceSensor.getDistance;
+  speedLeft: subprogram access PROC.setSpeedLeft -> LeftEngine.setSpeed; 
+  speedRight: subprogram access PROC.setSpeedRight -> RightEngine.setSpeed;
+  getCountSonarMotor: subprogram access PROC.getCountSonarEngine -> SonarEngine.getCount;
+  setCountSonarMotor: subprogram access PROC.setCountSonarEngine -> SonarEngine.setCount;
+  speedSonarMotor: subprogram access PROC.moveSonar -> SonarEngine.setSpeed;
+properties
+  Actual_Processor_Binding => (reference (nxt_cpu)) applies to PROC;
+  Actual_Memory_Binding => (reference (nxt_mem)) applies to PROC;
+  Actual_Processor_Binding => (reference (nxt_cpu)) applies to ColorSensor;
+end nxt.Impl;
+
+end nxt_use_case;

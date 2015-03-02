@@ -1,92 +1,14 @@
 package PingPong_refined_model
 public
-with ARINC653,POK,Base_Types,Data_Model,PingPong,PeriodicDelayed_runtime,arinc653_runtime;
-  process implementation S1.impl
-    subcomponents
-      state_baKeywords: data PingPong::TYPE_aadlKeywords {
-        Data_Model::Data_Representation => String;
-        Data_Model::Enumerators => ("PING", "PONG");
-        Source_Name => "TYPE";
-        Source_Language => (C);
-        Source_Text => ("pingpong.h");
-        };
-      S1_inst_Mon_mode_C2_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
-      S1_inst_C1_PingOut_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
-      S1_inst_C1_PongOut_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
-      S1_inst_C1_PingInglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
-      S1_inst_C1_PongInglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
-      S1_inst_Mon_error_C2globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
-      a1_inst: thread S1_inst_a1_inst.impl {
-        Dispatch_Protocol => Periodic;
-        Stack_Size => 100 KByte;
-        Priority => 1;
-        Period => 2000 ms;
-        Compute_Entrypoint_Call_Sequence => reference(main_call);
-        };
-    connections
-      mode_implicit_cnx_Mon_mode_C2_to_globalVariable: data access S1_inst_Mon_mode_C2_globalVariable -> a1_inst.mode_implicit_cnx_Mon_mode_C2;
-      C1_ping_implicit_cnx_C1_PingOut_to_globalVariable: data access S1_inst_C1_PingOut_globalVariable -> a1_inst.C1_ping_implicit_cnx_C1_PingOut;
-      C1_pong_implicit_cnx_C1_PongOut_to_globalVariable: data access S1_inst_C1_PongOut_globalVariable -> a1_inst.C1_pong_implicit_cnx_C1_PongOut;
-      Id_instance_to_a1_inst_C1_PingIn: data access S1_inst_C1_PingInglobalVariable -> a1_inst.C1_PingIn;
-      Id_instance_to_a1_inst_C1_PongIn: data access S1_inst_C1_PongInglobalVariable -> a1_inst.C1_PongIn;
-      Id_instance_to_a1_inst_Mon_error_C2: data access S1_inst_Mon_error_C2globalVariable -> a1_inst.Mon_error_C2;
-  end S1.impl;
-  
-  process implementation S2.impl
-    subcomponents
-      S2_inst_C2_modeglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
-      S2_inst_C2_PingInglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
-      S2_inst_C2_PongInglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
-      S2_inst_C2_PingOut_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
-      S2_inst_C2_PongOut_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
-      S2_inst_C2_badSequenceNumber_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
-      a2_inst: thread S2_inst_a2_inst.impl {
-        Dispatch_Protocol => Periodic;
-        Stack_Size => 100 KByte;
-        Priority => 2;
-        Period => 2000 ms;
-        Compute_Entrypoint_Call_Sequence => reference(main_call);
-        };
-    connections
-      C2_ping_implicit_cnx_C2_PingOut_to_globalVariable: data access S2_inst_C2_PingOut_globalVariable -> a2_inst.C2_ping_implicit_cnx_C2_PingOut;
-      C2_pong_implicit_cnx_C2_PongOut_to_globalVariable: data access S2_inst_C2_PongOut_globalVariable -> a2_inst.C2_pong_implicit_cnx_C2_PongOut;
-      C2_error_implicit_cnx_C2_badSequenceNumber_to_globalVariable: data access S2_inst_C2_badSequenceNumber_globalVariable -> a2_inst.C2_error_implicit_cnx_C2_badSequenceNumber;
-      Id_instance_to_a2_inst_C2_mode: data access S2_inst_C2_modeglobalVariable -> a2_inst.C2_mode;
-      Id_instance_to_a2_inst_C2_PingIn: data access S2_inst_C2_PingInglobalVariable -> a2_inst.C2_PingIn;
-      Id_instance_to_a2_inst_C2_PongIn: data access S2_inst_C2_PongInglobalVariable -> a2_inst.C2_PongIn;
-  end S2.impl;
-  
-  processor implementation node_1.impl
-    subcomponents
-      VP_S1_inst: virtual processor VP_S1.impl {
-        Period => 1000 ms;
-        Scheduling_Protocol => (Round_Robin_Protocol);
-        POK::Additional_Features => (console);
-        };
-      VP_S2_inst: virtual processor VP_S2.impl {
-        Period => 1000 ms;
-        Scheduling_Protocol => (Round_Robin_Protocol);
-        POK::Additional_Features => (console);
-        };
-  end node_1.impl;
-  
-  virtual processor implementation VP_S1.impl
-  end VP_S1.impl;
-  
-  virtual processor implementation VP_S2.impl
-  end VP_S2.impl;
-  
-  memory implementation node1_main_memory.impl
-  end node1_main_memory.impl;
-  
+with ARINC653,POK,Base_Types,Data_Model,PingPong,arinc653_runtime;
   system implementation refined_model.impl
     subcomponents
-      node1_main_memory_inst: memory node1_main_memory.impl {
+      node1_main_memory_inst: memory node1_main_memory_inst.impl {
         Memory_Size => 90 KByte;
         };
-      S1_inst: process S1.impl;
-      S2_inst: process S2.impl;
-      node_1_inst: processor node_1.impl {
+      S1_inst: process S1_inst.impl;
+      S2_inst: process S2_inst.impl;
+      node_1_inst: processor node_1_inst.impl {
         Scheduling_Protocol => (ARINC653);
         ARINC653::Module_Major_Frame => 2000 ms;
         POK::Architecture => x86;
@@ -116,26 +38,92 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,PeriodicDelayed_runtime,arinc65
       Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S2_inst.a2_inst.seqNb;
   end refined_model.impl;
   
-  processor node_1
-  end node_1;
-  
-  virtual processor VP_S1
-  end VP_S1;
-  
-  virtual processor VP_S2
-  end VP_S2;
-  
-  memory node1_main_memory
-  end node1_main_memory;
-  
-  process S1
-  end S1;
-  
-  process S2
-  end S2;
-  
   system refined_model
   end refined_model;
+  
+  memory implementation node1_main_memory_inst.impl
+  end node1_main_memory_inst.impl;
+  
+  memory node1_main_memory_inst
+  end node1_main_memory_inst;
+  
+  processor node_1_inst
+  end node_1_inst;
+  
+  processor implementation node_1_inst.impl
+    subcomponents
+      VP_S1_inst: virtual processor PingPong::VP_S1.impl {
+        Period => 1000 ms;
+        Scheduling_Protocol => (Round_Robin_Protocol);
+        POK::Additional_Features => (console);
+        };
+      VP_S2_inst: virtual processor PingPong::VP_S2.impl {
+        Period => 1000 ms;
+        Scheduling_Protocol => (Round_Robin_Protocol);
+        POK::Additional_Features => (console);
+        };
+  end node_1_inst.impl;
+  
+  process S1_inst
+  end S1_inst;
+  
+  process implementation S1_inst.impl
+    subcomponents
+      state_baKeywords: data PingPong::TYPE_aadlKeywords {
+        Data_Model::Data_Representation => String;
+        Data_Model::Enumerators => ("PING", "PONG");
+        Source_Name => "TYPE";
+        Source_Language => (C);
+        Source_Text => ("pingpong.h");
+        };
+      S1_inst_Mon_mode_C2_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
+      S1_inst_C1_PingOut_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
+      S1_inst_C1_PongOut_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
+      S1_inst_C1_PingInglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
+      S1_inst_C1_PongInglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
+      S1_inst_Mon_error_C2globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
+      a1_inst: thread S1_inst_a1_inst.impl {
+        Dispatch_Protocol => Periodic;
+        Stack_Size => 100 KByte;
+        Priority => 1;
+        Period => 2000 ms;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+    connections
+      mode_implicit_cnx_Mon_mode_C2_to_globalVariable: data access S1_inst_Mon_mode_C2_globalVariable -> a1_inst.mode_implicit_cnx_Mon_mode_C2;
+      C1_ping_implicit_cnx_C1_PingOut_to_globalVariable: data access S1_inst_C1_PingOut_globalVariable -> a1_inst.C1_ping_implicit_cnx_C1_PingOut;
+      C1_pong_implicit_cnx_C1_PongOut_to_globalVariable: data access S1_inst_C1_PongOut_globalVariable -> a1_inst.C1_pong_implicit_cnx_C1_PongOut;
+      Id_instance_to_a1_inst_C1_PingIn: data access S1_inst_C1_PingInglobalVariable -> a1_inst.C1_PingIn;
+      Id_instance_to_a1_inst_C1_PongIn: data access S1_inst_C1_PongInglobalVariable -> a1_inst.C1_PongIn;
+      Id_instance_to_a1_inst_Mon_error_C2: data access S1_inst_Mon_error_C2globalVariable -> a1_inst.Mon_error_C2;
+  end S1_inst.impl;
+  
+  process S2_inst
+  end S2_inst;
+  
+  process implementation S2_inst.impl
+    subcomponents
+      S2_inst_C2_modeglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
+      S2_inst_C2_PingInglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
+      S2_inst_C2_PongInglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
+      S2_inst_C2_PingOut_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
+      S2_inst_C2_PongOut_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
+      S2_inst_C2_badSequenceNumber_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
+      a2_inst: thread S2_inst_a2_inst.impl {
+        Dispatch_Protocol => Periodic;
+        Stack_Size => 100 KByte;
+        Priority => 2;
+        Period => 2000 ms;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+    connections
+      C2_ping_implicit_cnx_C2_PingOut_to_globalVariable: data access S2_inst_C2_PingOut_globalVariable -> a2_inst.C2_ping_implicit_cnx_C2_PingOut;
+      C2_pong_implicit_cnx_C2_PongOut_to_globalVariable: data access S2_inst_C2_PongOut_globalVariable -> a2_inst.C2_pong_implicit_cnx_C2_PongOut;
+      C2_error_implicit_cnx_C2_badSequenceNumber_to_globalVariable: data access S2_inst_C2_badSequenceNumber_globalVariable -> a2_inst.C2_error_implicit_cnx_C2_badSequenceNumber;
+      Id_instance_to_a2_inst_C2_mode: data access S2_inst_C2_modeglobalVariable -> a2_inst.C2_mode;
+      Id_instance_to_a2_inst_C2_PingIn: data access S2_inst_C2_PingInglobalVariable -> a2_inst.C2_PingIn;
+      Id_instance_to_a2_inst_C2_PongIn: data access S2_inst_C2_PongInglobalVariable -> a2_inst.C2_PongIn;
+  end S2_inst.impl;
   
   subprogram S1_inst_a1_inst_entrypoint
     features
@@ -371,14 +359,8 @@ Write_Sampling_Message_Exception ! (C2_error_implicit_cnx_C2_badSequenceNumber, 
       C2_mode: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       C2_PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       C2_PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      C2_ping_implicit_cnx_C2_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
-        Source_Name => "PingPongMessage";
-        Source_Text => ("pingpong.h");
-        };
-      C2_pong_implicit_cnx_C2_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
-        Source_Name => "PingPongMessage";
-        Source_Text => ("pingpong.h");
-        };
+      C2_ping_implicit_cnx_C2_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      C2_pong_implicit_cnx_C2_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       C2_error_implicit_cnx_C2_badSequenceNumber: requires data access arinc653_runtime::Sampling_Port_Id_Type;
   end S2_inst_a2_inst;
   

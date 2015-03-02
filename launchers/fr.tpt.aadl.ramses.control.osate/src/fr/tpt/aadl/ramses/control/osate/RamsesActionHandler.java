@@ -1,5 +1,8 @@
 package fr.tpt.aadl.ramses.control.osate;
 
+import java.io.File ;
+import java.io.IOException ;
+
 import org.apache.log4j.Logger ;
 import org.eclipse.core.commands.AbstractHandler ;
 import org.eclipse.core.commands.ExecutionEvent ;
@@ -14,6 +17,7 @@ import org.eclipse.core.runtime.NullProgressMonitor ;
 import org.eclipse.core.runtime.OperationCanceledException ;
 import org.eclipse.core.runtime.Status ;
 import org.eclipse.core.runtime.jobs.Job ;
+import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.emf.transaction.TransactionalCommandStack ;
@@ -44,7 +48,9 @@ import org.osate.ui.dialogs.Dialog ;
 
 import com.google.inject.Inject ;
 
+import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils ;
 import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
 import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
@@ -136,7 +142,12 @@ public abstract class RamsesActionHandler extends AbstractHandler {
           if (targetElement != null) {
               ComponentImplementation cc = ((Element) targetElement).getContainingComponentImpl();
                 try {
-                  _sysInst = InstantiateModel.buildInstanceModelFile(cc);
+                  URI uri = OsateResourceUtil.getInstanceModelURI(cc);
+                  Resource res = OsateResourceUtil.getResource(uri);
+                  if(res!=null && !res.getContents().isEmpty())
+                	_sysInst = (SystemInstance) res.getContents().get(0);
+                  else
+                	_sysInst = InstantiateModel.buildInstanceModelFile(cc);
                 } catch (UnsupportedOperationException uoe) {
                   Dialog.showError("Model Instantiate",
                                    "Operation is not supported: " + uoe.getMessage());
@@ -324,5 +335,35 @@ public abstract class RamsesActionHandler extends AbstractHandler {
 	    {
 	      _LOGGER.error("Error when refreshing project", e);
 	    }
+	  }
+	  
+	  protected void updateAnalysisResults(AnalysisArtifact aa) throws IOException
+	  {
+	    String projectPathString = _currentProject.getLocation().toOSString();
+	    String resultFilePath = projectPathString+"/analysis_results.ares";
+	    File resultFile = new File(resultFilePath);
+	    
+	    URI resultFileURI =
+	        URI.createFileURI(resultFilePath);
+	    
+	    Resource r = _sysInst.getComponentImplementation().eResource()
+	        .getResourceSet()
+	        .getResource(resultFileURI, 
+	                     resultFile.exists());
+	    if(r==null)
+	      r =  _sysInst.getComponentImplementation().eResource()
+	          .getResourceSet().createResource(resultFileURI);
+	    
+	    
+	    if(r.getContents().isEmpty())
+	      r.getContents().add(aa);
+	    else
+	    {
+	      AnalysisArtifact existingAa = 
+	        (AnalysisArtifact) r.getContents().get(0);
+	      AnalysisUtils.updateAnalysisArtifact(existingAa, aa);
+	    }
+	    
+	    r.save(null);
 	  }
 }

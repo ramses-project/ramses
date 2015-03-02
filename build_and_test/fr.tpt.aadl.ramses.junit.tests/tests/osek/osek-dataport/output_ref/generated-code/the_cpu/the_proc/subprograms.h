@@ -1,0 +1,28 @@
+#ifndef __GENERATED_SUBPROGRAMS_H__
+#define __GENERATED_SUBPROGRAMS_H__
+#include "toppers_osek/include/kernel.h"
+#include "user_code.h"
+#include "osek_runtime.h"
+#include "gtypes.h"
+#include "main.h"
+void test_osek_dataports_refined_model__the_proc_the_sender_entrypoint_impl(data_port_t *  cnx_p);
+
+typedef enum {
+  test_osek_dataports_refined_model__the_proc_the_sender_entrypoint_impl_BA_entrypoint_init_state,
+  test_osek_dataports_refined_model__the_proc_the_sender_entrypoint_impl_BA_entrypoint_wait_dispatch_state,
+  test_osek_dataports_refined_model__the_proc_the_sender_entrypoint_impl_BA_entrypoint_exec_state,
+  test_osek_dataports_refined_model__the_proc_the_sender_entrypoint_impl_BA_entrypoint_final_state
+} test_osek_dataports_refined_model__the_proc_the_sender_entrypoint_impl_BA_State_t;
+
+void test_osek_dataports_refined_model__the_proc_the_receiver_entrypoint_impl(data_port_t *  p);
+
+typedef enum {
+  test_osek_dataports_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_init_state,
+  test_osek_dataports_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_wait_dispatch_state,
+  test_osek_dataports_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_exec_state,
+  test_osek_dataports_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_final_state
+} test_osek_dataports_refined_model__the_proc_the_receiver_entrypoint_impl_BA_State_t;
+
+
+#endif
+

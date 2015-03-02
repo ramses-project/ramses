@@ -38,18 +38,11 @@ create OUT : AADLBA 	from 		IN : AADLI,
 abstract rule m_BlackBoard
 {
 	from
-		fi: AADLI!FeatureInstance,
-		behavior: AADLI!Element
+		fi: AADLI!FeatureInstance
 		(
 			fi.isDataPort()
 			and
 			fi.isIntraProcessFeatureInstance()
-			and
-			(
-				behavior.oclIsKindOf(AADLBA!SubprogramCallSequence)
-				or
-				behavior.oclIsKindOf(AADLBA!BehaviorAnnex)
-			)
 		)
 	to
 		call: AADLBA!BehaviorAction
@@ -59,11 +52,10 @@ abstract rule m_BlackBoard
 abstract rule m_Input_BlackBoard
 {
 	from
-		fi: AADLI!FeatureInstance,
-		behavior: AADLI!Element
+		fi: AADLI!FeatureInstance
+		(fi.isInputFeature())
 	using
 	{
-		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		LENGTH_HOLDER: AADLBA!ElementHolder = thisModule.GetOrCreateLengthDataSubcomponentHolder(fi);
 		spg: AADLBA!SubprogramType = 'GetValueDataPort'.asSubprogramType('OSEK_RUNTIME');
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
@@ -85,7 +77,7 @@ abstract rule m_Input_BlackBoard
 		),
 		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
 		(
-			element <- MESSAGE_ADDR
+			element <- fi.retreiveMessageAddress()
 		),
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 	do
@@ -94,13 +86,16 @@ abstract rule m_Input_BlackBoard
 	}
 }
 
--- @extends m_Input_BlackBoard_ComputeEntrypointCallSequence,m_Input_Port_ComputeEntrypointCallSequence_Mode
+-- @extends m_Input_Port_ComputeEntrypointCallSequence_Mode,m_Input_BlackBoard_ComputeEntrypointCallSequence
 rule m_Input_BlackBoard_ComputeEntrypointCallSequence_mode
 {
 	from
 		fi: AADLI!FeatureInstance,
 		behavior: AADLI!SubprogramCallSequence,
 		mode: AADLI!Mode
+		(
+			 not fi.getProcess().modeInstance->isEmpty()
+		)
 	to
 		call: AADLBA!SubprogramCallAction,
 		BLACKBOARD_ID_HOLDER: AADLBA!DataAccessHolder
@@ -203,8 +198,8 @@ abstract rule m_Output_BlackBoard
 {
 	from
 		fi: AADLI!FeatureInstance,
-		behavior: AADLI!Element,
 		cnxRef: AADLI!PortConnection
+		(fi.isOutputFeature())
 	using
 	{
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
@@ -233,7 +228,7 @@ abstract rule m_Output_BlackBoard
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 }
 
--- @extends m_Output_BlackBoard,m_Output_DataPort_ComputeEntrypointCallSequence
+-- @extends m_Output_DataPort_ComputeEntrypointCallSequence,m_Output_BlackBoard
 rule m_Output_BlackBoard_ComputeEntrypointCallSequence
 {
 	from

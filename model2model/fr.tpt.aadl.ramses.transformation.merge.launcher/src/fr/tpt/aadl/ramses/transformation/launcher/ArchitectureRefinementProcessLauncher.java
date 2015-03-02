@@ -270,25 +270,24 @@ public class ArchitectureRefinementProcessLauncher {
     
     String message = "End of HOT to produce pattern matching traces";
     _LOGGER.trace(message);
-    
+    Resource r = null;
     try {
         TipUtils.setCurrentIteration(TipUtils.getCurrentIteration()+1);
         message = "Start production of " + outputResourceID;
         _LOGGER.trace(message);
-        Resource r = this.runArchitectureRefinementIteration(trcSpec,
+        r = this.runArchitectureRefinementIteration(trcSpec,
                                                              systemInstance, 
                                                              config,
                                                              outputResourceID);
-        if(r==null)
-          return r;
-        message = "Finish production of " + outputResourceID;
+        if(r!=null)
+          message = "Finish production of " + outputResourceID;
         config.setRamsesOutputDir(outputPathSave.getAbsolutePath());
-        return r;
     }
     finally
     {
       RuleApplicationUtils.clean();
     }
+    return r;
   }
 
 
@@ -416,7 +415,12 @@ public class ArchitectureRefinementProcessLauncher {
     }
     finally
     {
-      resourceSet.getResources().addAll(intermediateRs.getResources());
+      List<Resource> resList = new ArrayList<Resource>();
+      for(Resource r: intermediateRs.getResources())
+        if(false==resourceSet.getResources().contains(r))
+          resList.add(r);
+      
+      resourceSet.getResources().addAll(resList);
     }
 
 
@@ -439,7 +443,12 @@ public class ArchitectureRefinementProcessLauncher {
     {
       Resource identification = t.getIdentificationResult();
       if(identification==null)
+      {
+        String message = "Identification of alternatives failed";
+        _LOGGER.error(message);
+        ServiceProvider.SYS_ERR_REP.error(message, true);
         return null;
+      }
       outputResource.getContents().addAll(identification.getContents());
       identification.delete(null);
     }
@@ -480,7 +489,12 @@ public class ArchitectureRefinementProcessLauncher {
     this.transformationSelection.selectTransformation(patternMatchingMap, tuplesToApply);
     
     if(tuplesToApply.isEmpty())
+    {
+      String message = "Selection of alternatives failed";
+      _LOGGER.error(message);
+      ServiceProvider.SYS_ERR_REP.error(message, true);
       return null;
+    }
     
     // store the result of the selection: generate TIP
     String tipPath = outputPathSave+"/"+getTipId();
@@ -632,6 +646,9 @@ public class ArchitectureRefinementProcessLauncher {
       e.printStackTrace(pw);
       _LOGGER.fatal(sw.toString());
     }
+    String message = "Execution of specialized transformations failed";
+    _LOGGER.error(message);
+    ServiceProvider.SYS_ERR_REP.error(message, true);
     return null ;
 
 

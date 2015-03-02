@@ -622,23 +622,19 @@ lazy rule ModalPropertyValueRule {
 --			StringLiteral
 
 helper context AADLI!ListValue def: PropertyExpression() : AADLBA!ListValue =
-	let elements : Sequence(AADLBA!PropertyExpression) = self.ownedListElement->collect(e|e.PropertyExpression())
-						->select(e| not e.oclIsUndefined()) in 
-	if(not elements->isEmpty()) then
-		thisModule.ListValue(self, elements)
-	else
-		OclUndefined
-	endif
+	thisModule.ListValue(self, self.ownedListElement)
 ;
 
-rule ListValue (l : AADLI!ListValue,
-		elts: Sequence(AADLBA!PropertyExpression))
+
+
+rule ListValue (l : AADLI!ListValue, elts: Sequence(AADLBA!PropertyExpression))
 {
 	to
-		l2 : AADLBA!ListValue (
-			ownedListElement <- elts->select(e|e.isSimpleValueType())->collect(e|e.PropertyExpression().debug(' ListValue Element '))
-								->union(elts->select(e|not e.isSimpleValueType()).debug(' ListValue Elements '))
-		)
+	l2 : AADLBA!ListValue (
+		ownedListElement <- elts->select(e|e.isSimpleValueType())->collect(e|e.PropertyExpression().debug(' ListValue Element '))
+		->union(elts->select(e|not e.isSimpleValueType().debug(' ListValue Elements ')))
+		->excluding(OclUndefined)	
+	)
 	do { l2; }
 }
 
