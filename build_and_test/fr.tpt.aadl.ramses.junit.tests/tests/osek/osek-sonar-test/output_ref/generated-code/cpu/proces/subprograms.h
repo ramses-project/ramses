@@ -3,7 +3,6 @@
 #include "ecrobot/c/ecrobot_interface.h"
 #include "show.h"
 #include "toppers_osek/include/kernel.h"
-#include "kernel.h"
 #include "gtypes.h"
 #include "main.h"
 void sonarTest_refined_model__proces_th_entrypoint_impl(int *  cc5_portNb);
