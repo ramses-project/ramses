@@ -1,0 +1,3 @@
+property set OSEKNXT is
+  nxtport : aadlstring applies to (subprogram);
+end OSEKNXT;
