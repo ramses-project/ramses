@@ -1,31 +1,12 @@
 package sonarTest_refined_model
 public
-with Data_Model,OSEK,nxtTypes,sonar,plateform,sonarTest,arinc653_runtime,PeriodicDelayed_runtime,OSEK_runtime;
-  process implementation Proc.Impl
-    subcomponents
-      th: thread proces_th.impl {
-        Compute_Execution_Time => 0 ms .. 100 ms;
-        Dispatch_Protocol => Periodic;
-        Period => 100 ms;
-        Deadline => 50 ms;
-        Priority => 2;
-        POSIX_Scheduling_Policy => SCHED_FIFO;
-        Compute_Entrypoint_Call_Sequence => reference(main_call);
-        };
-  end Proc.Impl;
-  
-  processor implementation arm.impl
-  end arm.impl;
-  
-  memory implementation mem.impl
-  end mem.impl;
-  
+with Data_Model,OSEK,nxtTypes,sonar,plateform,sonarTest,OSEK_runtime;
   system implementation refined_model.impl
     subcomponents
-      echo: device Sonar;
+      echo: device sonar::Sonar;
       mem: memory mem.impl;
-      proces: process Proc.Impl;
-      cpu: processor arm.impl {
+      proces: process proces.impl;
+      cpu: processor cpu.impl {
         Scheduling_Protocol => (RMS);
         OSEK::SystemCounter_MaxAllowedValue => 2000;
         OSEK::SystemCounter_TicksPerBase => 1;
@@ -40,20 +21,36 @@ with Data_Model,OSEK,nxtTypes,sonar,plateform,sonarTest,arinc653_runtime,Periodi
       Actual_Memory_Binding => (reference(mem)) applies to proces.th.batPort;
   end refined_model.impl;
   
-  device Sonar
-  end Sonar;
+  system refined_model
+  end refined_model;
   
-  processor arm
-  end arm;
+  memory implementation mem.impl
+  end mem.impl;
   
   memory mem
   end mem;
   
-  process proc
-  end proc;
+  processor cpu
+  end cpu;
   
-  system refined_model
-  end refined_model;
+  processor implementation cpu.impl
+  end cpu.impl;
+  
+  process proces
+  end proces;
+  
+  process implementation proces.impl
+    subcomponents
+      th: thread proces_th.impl {
+        Compute_Execution_Time => 0 ms .. 100 ms;
+        Dispatch_Protocol => Periodic;
+        Period => 100 ms;
+        Deadline => 50 ms;
+        Priority => 2;
+        POSIX_Scheduling_Policy => SCHED_FIFO;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+  end proces.impl;
   
   subprogram proces_th_entrypoint
     features
@@ -92,7 +89,6 @@ sonarTest::display ! (cc6_localVariable)} ;
       batPort: data nxtTypes::nxt_sensor_port {
         Source_Text => ("ecrobot/c/ecrobot_interface.h");
         Source_Name => "int";
-        Priority => 2;
         Data_Model::Initial_Value => ("NXT_PORT_S4");
         Data_Model::Data_Representation => Enum;
         Data_Model::Enumerators => ("NXT_PORT_S1", "NXT_PORT_S2", "NXT_PORT_S3", "NXT_PORT_S4");
