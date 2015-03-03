@@ -1,1 +1,184 @@
+package test_osek_modes_modes_refined
 public
+with OSEK,Data_Model,test_osek_modes,Base_Types,OSEK_runtime;
+  system implementation modes_refined.impl
+    subcomponents
+      the_mem: memory the_mem.impl;
+      the_proc_modes: process the_proc_modes.impl;
+      the_cpu: processor the_cpu.impl {
+        Scheduling_Protocol => (RMS);
+        OSEK::SystemCounter_MaxAllowedValue => 2000;
+        OSEK::SystemCounter_TicksPerBase => 1;
+        OSEK::SystemCounter_MinCycle => 1;
+        };
+    properties
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.c11;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.c22;
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes.the_sender;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_sender;
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes.the_receiver;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_receiver;
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes.the_receiver_m1;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_receiver_m1;
+      Actual_Processor_Binding => (reference(the_cpu)) applies to the_proc_modes.the_receiver_m2;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc_modes.the_receiver_m2;
+  end modes_refined.impl;
+  
+  system modes_refined
+  end modes_refined;
+  
+  memory implementation the_mem.impl
+  end the_mem.impl;
+  
+  memory the_mem
+  end the_mem;
+  
+  processor the_cpu
+  end the_cpu;
+  
+  processor implementation the_cpu.impl
+  end the_cpu.impl;
+  
+  subprogram sender_spg
+    features
+      context: requires data access sender_spg_context;
+    properties
+      Source_Name => "send";
+      Source_Language => (C);
+      Source_Text => ("/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/osek/osek-modes/input/user_send.h", "/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/osek/osek-modes/input/user_send.c");
+  end sender_spg;
+  
+  data sender_spg_context
+    properties
+      Data_Model::Data_Representation => Struct;
+      Data_Model::Element_Names => ("result");
+      Data_Model::Base_Type => (classifier(Base_Types::Unsigned_8));
+      Source_Name => "__sender_spg_context";
+  end sender_spg_context;
+  
+  process implementation the_proc_modes.impl
+    subcomponents
+      c11: data test_osek_modes::Integer {
+        Data_Model::Initial_Value => ("11");
+        Data_Model::Data_Representation => Integer;
+        };
+      c22: data test_osek_modes::Integer {
+        Data_Model::Initial_Value => ("22");
+        Data_Model::Data_Representation => Integer;
+        };
+      the_sender: thread test_osek_modes::sender.impl {
+        Compute_Entrypoint_Call_Sequence => reference(call);
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 1000 ms;
+        Priority => 10;
+        Data_Size => 4000 Bytes;
+        Stack_Size => 512 Bytes;
+        Code_Size => 40 Bytes;
+        };
+      the_receiver: thread test_osek_modes::receiver.impl {
+        Compute_Entrypoint_Call_Sequence => reference(call);
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 2000 ms;
+        Priority => 5;
+        Data_Size => 4000 Bytes;
+        Stack_Size => 512 Bytes;
+        Code_Size => 40 Bytes;
+        };
+      the_receiver_m1: thread test_osek_modes::receiver.impl {
+        Compute_Entrypoint_Call_Sequence => reference(call);
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 2000 ms;
+        Priority => 5;
+        Data_Size => 4000 Bytes;
+        Stack_Size => 512 Bytes;
+        Code_Size => 40 Bytes;
+        } in modes (m1);
+      the_receiver_m2: thread test_osek_modes::receiver.impl {
+        Compute_Entrypoint_Call_Sequence => reference(call);
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 2000 ms;
+        Priority => 5;
+        Data_Size => 4000 Bytes;
+        Stack_Size => 512 Bytes;
+        Code_Size => 40 Bytes;
+        } in modes (m2);
+      the_proc_modes_mode_m1: thread the_proc_modes_mode_m1_modeSwitchManager.impl in modes (m1);
+      the_proc_modes_mode_m2: thread the_proc_modes_mode_m2_modeSwitchManager.impl in modes (m2);
+    connections
+      cnx2: port c11 -> the_receiver_m1.input_data in modes (m1);
+      cnx_m1: port c11 -> the_receiver.input_data in modes (m1);
+      cnx3: port c22 -> the_receiver_m2.input_data in modes (m2);
+      cnx_m2: port c22 -> the_receiver.input_data in modes (m2);
+      m1_the_sender_p_m2: port the_sender.p -> the_proc_modes_mode_m1.p;
+      m2_the_sender_p_m1: port the_sender.p -> the_proc_modes_mode_m2.p;
+    modes
+      m1: initial mode ;
+      m2: mode ;
+  end the_proc_modes.impl;
+  
+  data the_proc_modes_modeDataClassifier
+    extends OSEK_runtime::AppModeType
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("m1", "m2");
+  end the_proc_modes_modeDataClassifier;
+  
+  process the_proc_modes
+  end the_proc_modes;
+  
+  thread implementation the_proc_modes_mode_m1_modeSwitchManager.impl
+    subcomponents
+      targetModeValue: data the_proc_modes_modeDataClassifier;
+    annex behavior_specification {**
+      states
+  ModeSwitch_init_state : initial complete state ;
+  ModeSwitch_final_state : final state ;
+transitions
+  dispatchTransition : ModeSwitch_init_state -[on dispatch]-> ModeSwitch_init_state {if (p' count != 0) {targetModeValue := the_proc_modes_modeDataClassifier#Enumerators.m2 ;
+OSEK_runtime::StartOS ! (targetModeValue)} end if
+  } ;
+**};
+  end the_proc_modes_mode_m1_modeSwitchManager.impl;
+  
+  thread the_proc_modes_mode_m1_modeSwitchManager
+    features
+      p: in event port  {
+        Queue_Size => 2;
+        };
+    properties
+      Dispatch_Protocol => Periodic;
+      Period => 2000 ms;
+      Priority => 9;
+  end the_proc_modes_mode_m1_modeSwitchManager;
+  
+  thread implementation the_proc_modes_mode_m2_modeSwitchManager.impl
+    subcomponents
+      targetModeValue: data the_proc_modes_modeDataClassifier;
+    annex behavior_specification {**
+      states
+  ModeSwitch_init_state : initial complete state ;
+  ModeSwitch_final_state : final state ;
+transitions
+  dispatchTransition : ModeSwitch_init_state -[on dispatch]-> ModeSwitch_init_state {if (p' count != 0) {targetModeValue := the_proc_modes_modeDataClassifier#Enumerators.m1 ;
+OSEK_runtime::StartOS ! (targetModeValue)} end if
+  } ;
+**};
+  end the_proc_modes_mode_m2_modeSwitchManager.impl;
+  
+  thread the_proc_modes_mode_m2_modeSwitchManager
+    features
+      p: in event port  {
+        Queue_Size => 2;
+        };
+    properties
+      Dispatch_Protocol => Periodic;
+      Period => 2000 ms;
+      Priority => 9;
+  end the_proc_modes_mode_m2_modeSwitchManager;
+end test_osek_modes_modes_refined;

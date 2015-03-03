@@ -155,10 +155,7 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 			String outputDirPathName, String resourceSuffix, final IProgressMonitor monitor) {
 		
 	  Profiler profiler = new Profiler();
-    if(RamsesConfiguration.IS_DEBUG_MODE)
-    {
-      env.setMonitor(profiler);
-    }
+    env.setMonitor(profiler);
 	  
 		Resource outputResource = initTransformationOutput(inputResource, 
 				outputDirPathName, resourceSuffix);
@@ -227,11 +224,8 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		try
 		{
 		  env.run(td);
-		  if(RamsesConfiguration.IS_DEBUG_MODE)
-	    {
-	      String profilingResult = profiler.toString();
-	      _LOGGER.trace(profilingResult);
-	    }
+		  String profilingResult = profiler.toString();
+		  _LOGGER.trace(profilingResult);
 		  
 		  if(OsateResourceUtil.USES_GUI)
 	      monitor.subTask("Finished transformation.");

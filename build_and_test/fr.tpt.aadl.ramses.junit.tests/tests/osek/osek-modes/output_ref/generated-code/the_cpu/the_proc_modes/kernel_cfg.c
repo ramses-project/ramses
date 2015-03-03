@@ -1,8 +1,8 @@
 /*
  *  kernel_cfg.c
- *  Mon Feb 02 14:26:28 2015
+ *  Mon Feb 23 11:13:58 2015
  *  SG Version 2.00
- *  sg.exe ./the_proc_modes.oil -os=ECC2 -I/opt/sandbox/nxtOSEK-ramses/ecrobot/../toppers_osek/sg/impl_oil -template=/opt/sandbox/nxtOSEK-ramses/ecrobot/../toppers_osek/sg/lego_nxt.sgt
+ *  sg.exe ./the_proc_modes.oil -os=ECC2 -I/data/packages/nxtOSEK/ecrobot/../toppers_osek/sg/impl_oil -template=/data/packages/nxtOSEK/ecrobot/../toppers_osek/sg/lego_nxt.sgt
  */
 #include "osek_kernel.h"
 #include "kernel_id.h"
@@ -150,8 +150,8 @@ const ResourceType the_proc_modes_mode_m1_globalQueue_rez = 0;
 const ResourceType the_proc_modes_mode_m2_globalQueue_rez = 1;
 const ResourceType the_receiver_input_data_globalVariable_m1_rez = 2;
 const ResourceType the_receiver_input_data_globalVariable_m2_rez = 3;
-const ResourceType the_receiver_m1_input_data_globalVariable_rez = 4;
-const ResourceType the_receiver_m2_input_data_globalVariable_rez = 5;
+const ResourceType the_receiver_m1_input_data_globalVariable_m1_rez = 4;
+const ResourceType the_receiver_m2_input_data_globalVariable_m2_rez = 5;
 
 const Priority resinib_ceilpri[TNUM_RESOURCE] = { TPRI_MINTASK + 10, TPRI_MINTASK + 10, TPRI_MINTASK + 5, TPRI_MINTASK + 5, TPRI_MINTASK + 5, TPRI_MINTASK + 5, };
 
