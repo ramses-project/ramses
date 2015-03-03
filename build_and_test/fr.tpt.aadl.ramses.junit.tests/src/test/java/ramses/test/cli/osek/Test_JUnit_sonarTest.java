@@ -13,12 +13,21 @@ public class Test_JUnit_sonarTest extends OSGIOSEKScenario{
 		
 		
 	}
+// tests/osek/osek-lego-devices-commons/nxtTypes.aadl,tests/osek/osek-lego-devices-commons/sonar.aadl,tests/osek/osek-lego-devices-commons/nxtBrick.aadl,tests/osek/osek-sonar-test/input/plateform.aadl,tests/osek/osek-sonar-test/input/model.aadl -g osek -s root.impl -o tests/osek/osek-sonar-test/output -r /data/packages/nxtOSEK -i tests/osek/osek-lego-devices-commons/,tests/osek/osek-sonar-test/input/ --parameter debug=true
 
 	@Test
 	public void Test_JUnit_sonarTest_exec() {
 		String project = "osek-sonar-test";
 		String root_path = "tests/osek/"+project;
-		input = root_path+"/input/model.aadl,";
+		String common_path = "tests/osek/osek-lego-devices-commons/";
+	
+		input = common_path+"nxtTypes.aadl,"+
+				common_path+"sonar.aadl,"+
+				common_path+"nxtBrick.aadl,"+
+				root_path+"/input/plateform.aadl,"+
+				root_path+"/input/model.aadl";
+
+		
 		includeList = "tests/osek/osek-lego-devices-commons";
 		ramses_dir = System.getProperty("RAMSES_DIR");
 		output = root_path+"/output";
