@@ -1197,6 +1197,30 @@ public class AadlBaToCUnparser extends AadlBaUnparser
               if(isReturnParam)
               {
                 returnParameter = p;
+                if(pl instanceof DataAccessHolder)
+                {
+                	DataAccessHolder dah = (DataAccessHolder)pl;
+                	DataAccess da = dah.getDataAccess();
+                	if(da.getKind().equals(AccessType.REQUIRES))
+                	{
+                		if(Aadl2Utils.isReadWriteDataAccess(da)
+                				|| Aadl2Utils.isWriteOnlyDataAccess(da))
+                		{
+                			_cFileContent.addOutput("*") ;
+                		}
+                	}
+                }
+                else if(pl instanceof ParameterHolder)
+                {
+                	ParameterHolder ph = (ParameterHolder) pl;
+                	Parameter p2 = ph.getParameter();
+                	String paramUsage = Aadl2Utils.getParameterUsage(p2) ;
+                	if(Aadl2Utils.isInOutParameter(p2) || Aadl2Utils.isOutParameter(p2) ||
+                			paramUsage.equalsIgnoreCase("by_reference"))
+                	{
+                		_cFileContent.addOutput("*") ;
+                	}
+                }
                 process(pl);
                 _cFileContent.addOutput(" = ") ;
                 break;
