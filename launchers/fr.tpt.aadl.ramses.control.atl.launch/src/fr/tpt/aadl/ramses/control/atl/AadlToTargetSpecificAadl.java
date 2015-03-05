@@ -178,7 +178,6 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
             outputAbsolutePath.substring(outputPathHeaderIndex) ;
       }
 
-
       if (Platform.getOS().equalsIgnoreCase(Platform.OS_WIN32))
       {
         workspaceLocation = workspaceLocation.substring(1, workspaceLocation.length());
