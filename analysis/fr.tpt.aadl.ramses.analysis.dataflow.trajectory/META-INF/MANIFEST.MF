@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Trajectory
+Bundle-SymbolicName: fr.tpt.aadl.ramses.analysis.dataflow.trajectory;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Export-Package: fr.tpt.aadl.ramses.analysis.dataflow.trajectory.control,
+ fr.tpt.aadl.ramses.analysis.dataflow.trajectory.exceptions,
+ fr.tpt.aadl.ramses.analysis.dataflow.trajectory.model
+Bundle-ClassPath: lib/commons-math-2.1.jar,
+ .
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.10.0",
+ org.apache.log4j;bundle-version="1.2.15",
+ org.osate.aadl2,
+ org.osate.aadl2.modelsupport,
+ org.osate.utils,
+ fr.tpt.aadl.ramses.control.support;bundle-version="1.0.0",
+ fr.tpt.aadl.ramses.analysis.result
