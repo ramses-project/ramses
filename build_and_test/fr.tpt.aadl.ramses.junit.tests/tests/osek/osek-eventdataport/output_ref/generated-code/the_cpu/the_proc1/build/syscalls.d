@@ -1,23 +1,22 @@
-build/syscalls.o: \
- /home/castella/sandbox/nxtOSEK-ramses/ecrobot/../ecrobot/c/syscalls.c \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/stdlib.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/machine/ieeefp.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/_ansi.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/newlib.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/config.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/include/stddef.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/reent.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/_ansi.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/_types.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/machine/_types.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/machine/_default_types.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/lock.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/machine/stdlib.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/alloca.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/reent.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/machine/types.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/stat.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/time.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/machine/time.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/types.h \
- /home/castella/tools/gcc-4.4.4-mindstorms-nxt_soft_floating_point_x86_64-unknown-linux-gnu_bin/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/features.h
+build/syscalls.o: /data/packages/nxtOSEK/ecrobot/../ecrobot/c/syscalls.c \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/stdlib.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/machine/ieeefp.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/_ansi.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/newlib.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/config.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/include/stddef.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/reent.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/_ansi.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/_types.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/machine/_types.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/machine/_default_types.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/lock.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/machine/stdlib.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/alloca.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/reent.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/machine/types.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/stat.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/time.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/machine/time.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/types.h \
+ /data/packages/x86_64/gcc-4.4.4-mindstorms-nxt_soft_floating_point/bin/../lib/gcc/arm-elf/4.4.4/../../../../arm-elf/sys-include/sys/features.h
