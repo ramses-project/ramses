@@ -75,6 +75,9 @@ public class Names
   public static final String MEMORY_ANALYSIS_PLUGIN_NAME = "RAMSES-MemoryFootprintAnalysis";
   public final static String MEMORY_SENSITIVITY_NAME = "MemoryFootprint";
   
+  public static final String SWITCHED_NETWORK_ANALYSIS_PLUGIN_NAME = "RAMSES-SwitchedNetworkLatencyAnalysis";
+  public final static String SWITCHED_NETWORK_SENSITIVITY_NAME = "SwitchedNetworkLatency";
+  
   public static final String MAINTAINABILITY_ANALYSIS_PLUGIN_NAME = "RAMSES-MaintainabilityAnalysis";
   
   public final static String MAINTENANCE_QA = "Maintenance";
