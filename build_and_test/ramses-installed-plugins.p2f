@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?p2f version='1.0.0'?>
+<p2f version='1.0.0'>
+  <ius size='2'>
+    <iu id='org.eclipse.m2m.atl.feature.group' name='ATL - ATLAS Transformation Language' version='3.5.0.v201408282041'>
+      <repositories size='3'>
+        <repository location='http://simpleocl.eclipselabs.org.codespot.com/git.updatesite'/>
+        <repository location='https://hudson.eclipse.org/hudson/job/m2m-atl-master/lastSuccessfulBuild/artifact/releng/org.eclipse.m2m.atl.update/target/repository/'/>
+        <repository location='http://simplegt.eclipselabs.org.codespot.com/git.updatesite'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.m2m.atl.emftvm.feature.group' name='ATL EMFTVM' version='3.5.0.v201408282041'>
+      <repositories size='3'>
+        <repository location='http://simpleocl.eclipselabs.org.codespot.com/git.updatesite'/>
+        <repository location='https://hudson.eclipse.org/hudson/job/m2m-atl-master/lastSuccessfulBuild/artifact/releng/org.eclipse.m2m.atl.update/target/repository/'/>
+        <repository location='http://simplegt.eclipselabs.org.codespot.com/git.updatesite'/>
+      </repositories>
+    </iu>
+  </ius>
+</p2f>
