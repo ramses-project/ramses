@@ -239,6 +239,7 @@ public abstract class AtlTransfoLauncher
 	fileNameList.add("/uninstanciate/Implementations") ;
 	fileNameList.add("/uninstanciate/Properties") ;
 	fileNameList.add("/uninstanciate/Modes") ;
+	fileNameList.add("/uninstanciate/Flows") ;
 	fileNameList.add("/uninstanciate/Types") ;
 	fileNameList.add("/uninstanciate/Connections") ;
 	fileNameList.add("/uninstanciate/Modes") ;
