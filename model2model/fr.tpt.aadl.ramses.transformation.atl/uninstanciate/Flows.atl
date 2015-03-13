@@ -63,7 +63,7 @@ rule m_FlowSegment
   to
     target_flowSegment: AADLBA!FlowSegment
 	(
-		flowElement <- source_flowSegment.flowSegment,
+		flowElement <- source_flowSegment.flowElement,
 		context <- source_flowSegment.context
 	)
 }
