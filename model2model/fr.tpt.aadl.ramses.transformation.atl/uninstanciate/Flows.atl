@@ -92,3 +92,15 @@ rule m_EndToEndFlowSegment
 	)
 }
 
+rule m_FlowImplementation
+{
+  from
+    source_FlowImplementation: AADLI!FlowImplementation
+  to
+    target_FlowImplementation: AADLBA!FlowImplementation
+	(
+		kind <- source_FlowImplementation.kind,
+		specification <- source_FlowImplementation.specification,
+		ownedFlowSegment <- source_FlowImplementation.ownedFlowSegment
+	)
+}
