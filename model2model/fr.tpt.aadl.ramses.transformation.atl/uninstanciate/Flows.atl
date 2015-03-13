@@ -37,6 +37,7 @@ rule m_FlowSpecification
   to
     target_flowSpec: AADLBA!FlowSpecification
 	(
+		name <- source_flowSpec.name,
 		refined <- source_flowSpec.refined,
 		kind <- source_flowSpec.kind,
 		outEnd <- source_flowSpec.outEnd,
@@ -75,6 +76,7 @@ rule m_EndToEndFlow
   to
     target_EndToEndFlow: AADLBA!EndToEndFlow
 	(
+		name <- source_EndToEndFlow.name,
 		refined <- source_EndToEndFlow.refined,
 		ownedEndToEndFlowSegment <- source_EndToEndFlow.ownedEndToEndFlowSegment
 	)
@@ -99,6 +101,7 @@ rule m_FlowImplementation
   to
     target_FlowImplementation: AADLBA!FlowImplementation
 	(
+		name <- source_FlowImplementation.name,
 		kind <- source_FlowImplementation.kind,
 		specification <- source_FlowImplementation.specification,
 		ownedFlowSegment <- source_FlowImplementation.ownedFlowSegment
