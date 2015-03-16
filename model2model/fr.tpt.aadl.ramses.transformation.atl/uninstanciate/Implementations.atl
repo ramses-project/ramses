@@ -63,7 +63,9 @@ abstract rule m_Component_Implementation {
 		ownedRealization 			<- thisModule.Realization(impl.type.resolve()),
 		-- should be in a factorized rule for Classifier
 		ownedMode                   <- impl.getModesInstancesImg(),
-		ownedModeTransition         <- impl.getModesTransitionInstancesImg()
+		ownedModeTransition         <- impl.getModesTransitionInstancesImg(),
+		ownedFlowImplementation     <- impl.ownedFlowImplementation,
+		ownedEndToEndFlow           <- impl.ownedEndToEndFlow
  	)
  do
  {

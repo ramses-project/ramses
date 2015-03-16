@@ -35,7 +35,9 @@ import java.util.concurrent.TimeUnit ;
 import java.util.concurrent.TimeoutException ;
 
 import org.apache.log4j.Logger ;
+import org.eclipse.core.resources.IProject ;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot ;
 import org.eclipse.core.resources.ResourcesPlugin ;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor ;
@@ -170,12 +172,19 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
       if(outputPathHeaderIndex > 0)
       {
         String inputURI = inputResource.getURI().toString() ;
+        
+        IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+        projectName =
+            inputURI.substring(inputURI.indexOf("resource") + 9) ;
+        projectName = projectName.substring(0, projectName.indexOf("/"));
+        IProject project = workspaceRoot.getProject(projectName);
+        String filePath = project.getLocation().toOSString();
+        
         projectName =
             inputURI.substring(inputURI.indexOf("resource") + 9) ;
         projectName = projectName.substring(0, projectName.indexOf('/')) ;
-        outputPathHeaderIndex = outputAbsolutePath.indexOf(projectName) ;
         outputPlatformRelativePath =
-            outputAbsolutePath.substring(outputPathHeaderIndex) ;
+            outputAbsolutePath.substring(filePath.length()+1) ;
       }
 
       if (Platform.getOS().equalsIgnoreCase(Platform.OS_WIN32))
@@ -187,7 +196,7 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
         outputPlatformRelativePath = outputPlatformRelativePath.replace("\\", "/");
       }
 
-      uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true) ;
+      uri = URI.createPlatformResourceURI(projectName+"/"+outputPlatformRelativePath, true) ;
 
       OsateResourceUtil.refreshResourceSet();
       ResourceSet rs = OsateResourceUtil.getResourceSet() ;

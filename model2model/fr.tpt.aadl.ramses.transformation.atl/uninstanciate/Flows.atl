@@ -1,0 +1,109 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLI=http:///AADL2/instance
+-- @atlcompiler emftvm
+
+module Flows;
+
+create 
+	OUT 			: AADLBA
+from 
+	IN 				: AADLI;
+
+
+rule m_FlowSpecification
+{
+  from
+	source_flowSpec: AADLI!FlowSpecification
+  to
+    target_flowSpec: AADLBA!FlowSpecification
+	(
+		name <- source_flowSpec.name,
+		refined <- source_flowSpec.refined,
+		kind <- source_flowSpec.kind,
+		outEnd <- source_flowSpec.outEnd,
+		InEnd <- source_flowSpec.InEnd
+	)
+}
+
+rule m_FlowEnd
+{
+  from
+	source_flowEnd: AADLI!FlowEnd
+  to
+    target_flowSpec: AADLBA!FlowEnd
+	(
+		context <- source_flowEnd.context,
+		feature <- source_flowEnd.feature
+	)
+}
+
+rule m_FlowSegment
+{
+  from
+    source_flowSegment: AADLI!FlowSegment
+  to
+    target_flowSegment: AADLBA!FlowSegment
+	(
+		flowElement <- source_flowSegment.flowElement,
+		context <- source_flowSegment.context
+	)
+}
+
+rule m_EndToEndFlow
+{
+  from
+    source_EndToEndFlow: AADLI!EndToEndFlow
+  to
+    target_EndToEndFlow: AADLBA!EndToEndFlow
+	(
+		name <- source_EndToEndFlow.name,
+		refined <- source_EndToEndFlow.refined,
+		ownedEndToEndFlowSegment <- source_EndToEndFlow.ownedEndToEndFlowSegment
+	)
+}
+
+rule m_EndToEndFlowSegment
+{
+  from
+    source_EndToEndFlowSegment: AADLI!EndToEndFlowSegment
+  to
+    target_EndToEndFlowSegment: AADLBA!EndToEndFlowSegment
+	(
+		flowElement <- source_EndToEndFlowSegment.flowElement,
+		context <- source_EndToEndFlowSegment.context
+	)
+}
+
+rule m_FlowImplementation
+{
+  from
+    source_FlowImplementation: AADLI!FlowImplementation
+  to
+    target_FlowImplementation: AADLBA!FlowImplementation
+	(
+		name <- source_FlowImplementation.name,
+		kind <- source_FlowImplementation.kind,
+		specification <- source_FlowImplementation.specification,
+		ownedFlowSegment <- source_FlowImplementation.ownedFlowSegment
+	)
+}

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension
+         point="fr.tpt.aadl.ramses.control.support.analyzer">
+      <analyzer
+            analysisName="RAMSES-SwitchedNetworkAnalysis"
+            class="fr.tpt.aadl.ramses.analysis.dataflow.trajectory.control.LatencyAnalysisFactory"
+            id="fr.tpt.aadl.ramses.analysis.dataflow.trajectory">
+      </analyzer>
+   </extension>
+
+  
+</plugin>
