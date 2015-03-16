@@ -322,8 +322,9 @@ rule m_ThreadEntrypoint {
 	using
 	{
 		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
-		callSequences: Sequence(AADLBA!SubprogramCallSequence) = if(not c.needsToMapBehaviorAnnex()) then impl.ownedSubprogramCallSequence->select(e|e.isComputeEntryPointOf(c))
-																 else Sequence{} endif;
+		callSequences: Sequence(AADLBA!SubprogramCallSequence) = if(not c.needsToMapBehaviorAnnex()) then 
+																	impl.ownedSubprogramCallSequence->select(e|e.isComputeEntryPointOf(c)) 
+																	else Sequence{} endif;
 		property_association: AADLBA!PropertyAssociation = thisModule.createComponentBehaviorEnumerators(c);
 	}
 	to
@@ -522,7 +523,7 @@ rule m_ThreadEntrypoint {
 										->append(whichPortActionBlock)
 									),
 			variables   <- if(not c.subcomponent.classifier.getBA().oclIsUndefined()) then
-								c.subcomponent.classifier.getBA().variables->collect(e|e.resolve(c).debug('LLLLL'))
+								c.subcomponent.classifier.getBA().variables->collect(e|e.resolve(c))
 							else
 								Sequence{}
 							endif
@@ -1650,6 +1651,8 @@ lazy rule populateParameterLabels
 		intermediateParameterLabelList: Sequence(AADLBA!ElementHolder) = Sequence{};
 		orderedFeatures: Sequence(AADLBA!Feature) = Sequence{};
 		d: AADLBA!DataSubcomponent = OclUndefined;
+		cnxs : Sequence(AADLI!ParameterConnection) = Sequence{};
+		
 	}
 	do
 	{
@@ -1667,13 +1670,13 @@ lazy rule populateParameterLabels
 	  	
 	  	for(sc in behavior.ownedSubprogramCall)
 	  	{
-	  		-- if context is needed we reuse the context
---	  		if(sc.getSubprogramClassifier().needsContext())
 	  		if(sc.getSubprogramClassifier()=spgClassifier and spgClassifier.needsContext())
 	  		{
 	  			intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateDataSubcomponentHolder(thisModule.createSubprogramCallContext(sc,c)));
 	  		}
 	  	}
+
+	  	-- 
   		for(feature in orderedFeatures)
   		{
   			if(feature.oclIsTypeOf(AADLI!DataAccess))
@@ -1685,32 +1688,55 @@ lazy rule populateParameterLabels
   				for(cnx in impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!AccessConnection) )->select(e | e.accessCategory = #data and e.destination.connectionEnd = feature and behavior.ownedSubprogramCall->exists(f | e.destination.context = f)))
 				{
   					intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateDataAccessHolder(thisModule.resolveMatchedTupleIfExists(Sequence{c,behavior, cnx}, 'dataAccess')));
-				}
-  			}
+				}  			
+  			} -- end dataaccess
+			
   			else if(feature.oclIsKindOf(AADLI!Parameter))
   			{
-  				for(cnx in impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select(e | e.source.connectionEnd = feature and e.source.context = subprogramCall))
+  				
+  				
+  				
+				
+				--We get all the parameter connections with specific source and subprogram context ; in order to fill the subprogram call with out parameter
+				cnxs <- impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select(e | e.source.connectionEnd = feature and e.source.context = subprogramCall);
+  				--We suppress all the parameter connections that have the same source to keep just one ; in order to generate only one local variable
+  				cnxs <- cnxs -> iterate ( c ; list : Sequence(AADLI!ParameterConnection) = Sequence{} |
+  					if ( not (list -> collect ( l | l.source.connectionEnd) -> exists (ce | ce = c.source.connectionEnd ))) 
+  						then 
+							list.append(c)
+						else
+							list
+					endif
+  				);
+  				
+  				for(cnx in cnxs)
 				{
 					if(cnx.destination.connectionEnd.oclIsTypeOf(AADLI!Parameter))
 					{
-						intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.Parameter_to_Parameter_Connection(c, behavior, cnx));
+						intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.Parameter_to_Parameter_Connection_ends(c, behavior, cnx.source.connectionEnd));
 					}
 					else if(cnx.destination.connectionEnd.oclIsTypeOf(AADLI!DataSubcomponent))
 					{
+						
 						d <- thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(e|cnx.destination.connectionEnd = e.subcomponent), behavior, cnx}, 'featureImg');
 						if(not d.oclIsUndefined())
 							intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateParameterHolder(d));
+						
 					}
 					else if(cnx.destination.connectionEnd.oclIsKindOf(AADLI!Port))
 					{
 						intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.resolveMatchedTupleIfExists(Sequence{c.featureInstance->any(e|e.feature = cnx.destination.connectionEnd), behavior, cnx}, 'holder'));
 					}
 				}
-  				for(cnx in impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select(e | e.destination.connectionEnd = feature and e.destination.context = subprogramCall))
+  				
+  				-- We get all the parameter connections with specific destination and context ; in order to fill the called subprogram with in parameter
+  				cnxs <- impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select(e | e.destination.connectionEnd = feature and e.destination.context = subprogramCall);
+  				
+  				for(cnx in cnxs)
 				{
 					if(cnx.source.connectionEnd.oclIsTypeOf(AADLI!Parameter))
-					{
-						intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.Parameter_to_Parameter_Connection(c, behavior, cnx));
+					{						
+							intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.Parameter_to_Parameter_Connection_ends(c, behavior, cnx.source.connectionEnd));
 					}
 					else if(cnx.source.connectionEnd.oclIsTypeOf(AADLI!DataSubcomponent))
 					{
@@ -1723,9 +1749,11 @@ lazy rule populateParameterLabels
 						intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.resolveMatchedTupleIfExists(Sequence{c.featureInstance->any(e|e.feature = cnx.source.connectionEnd), behavior, cnx}, 'holder'));
 					}
 				}
+  				
   			}
   			
   		}
+	
 		intermediateParameterLabelList;
 	}
 }
@@ -1756,7 +1784,7 @@ rule m_PortSubprogramCall {
   do
   {
 	intermediateParameterLabelList <- thisModule.populateParameterLabels(subprogramCall, behavior, c);
-  	subprogramCallAction.parameterLabels <- intermediateParameterLabelList;	
+  	subprogramCallAction.parameterLabels <- intermediateParameterLabelList->excluding(OclUndefined);	
   }
 }
 
@@ -1784,7 +1812,7 @@ rule m_ComponentSubprogramCall {
   do
   {
   	intermediateParameterLabelList <- thisModule.populateParameterLabels(subprogramCall, behavior, c);
-  	subprogramCallAction.parameterLabels <- intermediateParameterLabelList->excluding(OclUndefined);
+  	subprogramCallAction.parameterLabels <- intermediateParameterLabelList;
   }
 }
 
@@ -2049,28 +2077,75 @@ rule m_Access_to_DataInstance_Connection
 		
 }
 
+helper context AADLI!ConnectionEnd def: belongsToParamToParamConnection(): Boolean =
+	let paramCnx : Sequence (AADLI!ParameterConnection) =  AADLI!ParameterConnection.allInstances()-> select(c | c.source.connectionEnd = self) in
+	self.oclIsTypeOf(AADLI!Parameter) and paramCnx -> forAll ( c | c.destination.connectionEnd.oclIsTypeOf(AADLI!Parameter) )
+	;
+
+--helper context AADLI!ConnectedElement def: belongsToParamToParamConnection(): Boolean =
+--	let paramCnx : Sequence (AADLI!ParameterConnection) =  AADLI!ParameterConnection.allInstances()-> select(c | c.source.connectionEnd = self.connectionEnd) in
+--	self.oclIsTypeOf(AADLI!Parameter) and paramCnx -> forAll ( c | c.destination.connectionEnd.oclIsTypeOf(AADLI!Parameter) )
+--	;
+
+helper context AADLI!ConnectionEnd def: isPartOfCallSequence(behavior: AADLI!Element): Boolean =
+	let paramCnx : Sequence (AADLI!ParameterConnection) =  AADLI!ParameterConnection.allInstances()-> select(c | c.source.connectionEnd = self) in
+	
+	if(behavior.oclIsKindOf(AADLI!SubprogramCallSequence)) then
+		paramCnx -> forAll ( c | behavior.ownedSubprogramCall->exists(e|c.source.context = e or c.destination.context = e))
+	else
+		false
+	endif
+;
+
+
+helper context AADLI!SubprogramCallSequence def: isComputeEntryPointOf(c: AADLI!InstanceObject): Boolean =
+	c.ownedPropertyAssociation->exists(
+				e | 
+				e.property.name = 'Compute_Entrypoint_Call_Sequence'
+				and
+				e.ownedValue->exists(f|f.ownedValue.containmentPathElement->first().namedElement=self)
+			)
+;
+
 rule m_Parameter_to_Parameter_Connection
+{
+	from 
+		c: AADLI!ComponentInstance, 
+		behavior: AADLI!SubprogramCallSequence,
+		cnxE_src : AADLI!ConnectionEnd
+		(			 
+			cnxE_src.belongsToParamToParamConnection() and
+			cnxE_src.isPartOfCallSequence(behavior) and
+			behavior.isComputeEntryPointOf(c)
+		)
+
+	to
+		paramCnxVariable: AADLBA!DataSubcomponent
+		(
+			name <- cnxE_src.name+'_localVariable',
+			dataSubcomponentType <- cnxE_src.dataFeatureClassifier
+		)
+}
+
+lazy rule Parameter_to_Parameter_Connection_ends
 {
 	from
 		c: AADLI!ComponentInstance,
 		behavior: AADLI!SubprogramCallSequence,
-		paramCnx: AADLI!ParameterConnection
+		cnxE_src : AADLI!ConnectionEnd
 		(
-			paramCnx.isParamToParamConnection()
-			and
-			paramCnx.isPartOfCallSequence(behavior)
-			and
+			cnxE_src.belongsToParamToParamConnection() and
+			cnxE_src.isPartOfCallSequence(behavior) and
 			behavior.isComputeEntryPointOf(c)
 		)
 	to
-		paramCnxVariable: AADLBA!DataSubcomponent
+		holder: AADLBA!DataSubcomponentHolder
 		(
-			name <- paramCnx.uniqueName()+'_localVariable',
-			dataSubcomponentType <- paramCnx.source.connectionEnd.dataFeatureClassifier
+			element <- thisModule.resolveMatchedTupleIfExists(Sequence{c,behavior,cnxE_src}, 'paramCnxVariable')
 		)
 	do
 	{
-		thisModule.addImportedUnitFromInputModel(thisModule.public(), paramCnx.source.connectionEnd.dataFeatureClassifier);
+		holder;
 	}
 }
 
@@ -2090,13 +2165,15 @@ lazy rule Parameter_to_Parameter_Connection
 	to
 		holder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveMatchedTupleIfExists(Sequence{c,behavior,paramCnx}, 'paramCnxVariable')
+			element <- thisModule.resolveMatchedTupleIfExists(Sequence{c,behavior,paramCnx.source.connectionEnd}, 'paramCnxVariable')
 		)
 	do
 	{
 		holder;
 	}
 }
+
+
 
 --  	- m_Port_ComputeEntrypointCallSequence: for each pair (call sequence, feature instance)
 --  		such that:
