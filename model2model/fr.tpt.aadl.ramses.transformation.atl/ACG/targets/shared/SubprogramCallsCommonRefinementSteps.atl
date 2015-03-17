@@ -2111,18 +2111,18 @@ rule m_Parameter_to_Parameter_Connection
 {
 	from 
 		c: AADLI!ComponentInstance, 
-		behavior: AADLI!SubprogramCallSequence,
+		behavior: AADLI!SubprogramCallSequence,		
 		cnxE_src : AADLI!ConnectionEnd
-		(			 
+		(			
 			cnxE_src.belongsToParamToParamConnection() and
 			cnxE_src.isPartOfCallSequence(behavior) and
-			behavior.isComputeEntryPointOf(c)
+			behavior.isComputeEntryPointOf(c)		
 		)
 
 	to
 		paramCnxVariable: AADLBA!DataSubcomponent
 		(
-			name <- cnxE_src.name+'_localVariable',
+			name <- ((cnxE_src.qualifiedName.replaceAll('::', '_').replaceAll('\\.', '_')).concat('_localVariable')),
 			dataSubcomponentType <- cnxE_src.dataFeatureClassifier
 		)
 }
