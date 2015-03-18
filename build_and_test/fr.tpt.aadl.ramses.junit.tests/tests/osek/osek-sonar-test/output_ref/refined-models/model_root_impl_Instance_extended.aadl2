@@ -60,7 +60,7 @@ with Data_Model,OSEK,nxtTypes,sonar,plateform,sonarTest,OSEK_runtime;
   subprogram implementation proces_th_entrypoint.impl
     subcomponents
       proces_th_runtime_call_ret: data OSEK_runtime::StatusType;
-      cc6_localVariable: data nxtTypes::S32;
+      sonar_ecrobotGetSonarSensor_distance_localVariable: data nxtTypes::S32;
     annex behavior_specification {**
       variables
   whichPortActivated : sonarTest_refined_model::proces_th_behaviorIdentifier_enum ;
@@ -70,8 +70,8 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  call1 [0] : BA_entrypoint_exec_state -[whichPortActivated = proces_th_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {sonar::ecrobotGetSonarSensor ! (cc5_portNb, cc6_localVariable) ;
-sonarTest::display ! (cc6_localVariable)} ;
+  call1 [0] : BA_entrypoint_exec_state -[whichPortActivated = proces_th_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {sonar::ecrobotGetSonarSensor ! (cc5_portNb, sonar_ecrobotGetSonarSensor_distance_localVariable) ;
+sonarTest::display ! (sonar_ecrobotGetSonarSensor_distance_localVariable)} ;
   which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := proces_th_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {OSEK_runtime::TerminateTask !} ;
 **};
