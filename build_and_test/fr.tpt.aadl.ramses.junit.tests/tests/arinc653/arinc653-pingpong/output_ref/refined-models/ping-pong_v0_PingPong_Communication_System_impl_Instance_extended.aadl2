@@ -176,8 +176,8 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,arinc653_runtime;
       C1_PingIn_Validity: data arinc653_runtime::Validity_Type;
       C1_PongIn_Validity: data arinc653_runtime::Validity_Type;
       Mon_error_C2_Validity: data arinc653_runtime::Validity_Type;
-      cnx7_localVariable: data PingPong::Exception;
-      cnx9_localVariable: data PingPong::ROLE;
+      PingPong_IPingOrPong_mode_badSequenceNumber_localVariable: data PingPong::Exception;
+      PingPong_Monitor_activate_mode_C1_localVariable: data PingPong::ROLE;
     annex behavior_specification {**
       variables
   whichPortActivated : PingPong_refined_model::S1_inst_a1_inst_behaviorIdentifier_enum ;
@@ -190,9 +190,9 @@ transitions
   call_seq [0] : BA_entrypoint_exec_state -[whichPortActivated = S1_inst_a1_inst_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {Read_Sampling_Message_PingPongMessage ! (C1_PingIn, C1_PingIn_localVariable, C1_PingIn_Length, C1_PingIn_Validity, C1_PingIn_ErrorCode) ;
 Read_Sampling_Message_PingPongMessage ! (C1_PongIn, C1_PongIn_localVariable, C1_PongIn_Length, C1_PongIn_Validity, C1_PongIn_ErrorCode) ;
 Read_Sampling_Message_Exception ! (Mon_error_C2, Mon_error_C2_localVariable, Mon_error_C2_Length, Mon_error_C2_Validity, Mon_error_C2_ErrorCode) ;
-if (Mon_error_C2_ErrorCode = 0) PingPong::Monitor_activate ! (call_seq_state_baKeywords_entrypoint, cnx7_localVariable, Mon_error_C2_localVariable, cnx9_localVariable, Mon_mode_C2_localVariable) end if
+if (Mon_error_C2_ErrorCode = 0) PingPong::Monitor_activate ! (call_seq_state_baKeywords_entrypoint, PingPong_IPingOrPong_mode_badSequenceNumber_localVariable, Mon_error_C2_localVariable, PingPong_Monitor_activate_mode_C1_localVariable, Mon_mode_C2_localVariable) end if
    ;
-if (C1_PingIn_ErrorCode = 0 and C1_PongIn_ErrorCode = 0) PingPong::IPingOrPong_mode ! (call_seq_seqNb_entrypoint, C1_PingIn_localVariable, C1_PingOut_localVariable, C1_PongIn_localVariable, C1_PongOut_localVariable, cnx7_localVariable, cnx9_localVariable) end if
+if (C1_PingIn_ErrorCode = 0 and C1_PongIn_ErrorCode = 0) PingPong::IPingOrPong_mode ! (call_seq_seqNb_entrypoint, C1_PingIn_localVariable, C1_PingOut_localVariable, C1_PongIn_localVariable, C1_PongOut_localVariable, PingPong_IPingOrPong_mode_badSequenceNumber_localVariable, PingPong_Monitor_activate_mode_C1_localVariable) end if
    ;
 Write_Sampling_Message_ROLE ! (mode_implicit_cnx_Mon_mode_C2, Mon_mode_C2_localVariable, Mon_mode_C2_Length, S1_inst_a1_inst_runtime_call_ret) ;
 Write_Sampling_Message_PingPongMessage ! (C1_ping_implicit_cnx_C1_PingOut, C1_PingOut_localVariable, C1_PingOut_Length, S1_inst_a1_inst_runtime_call_ret) ;
