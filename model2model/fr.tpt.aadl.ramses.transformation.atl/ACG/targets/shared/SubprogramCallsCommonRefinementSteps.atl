@@ -1812,7 +1812,7 @@ rule m_ComponentSubprogramCall {
   do
   {
   	intermediateParameterLabelList <- thisModule.populateParameterLabels(subprogramCall, behavior, c);
-  	subprogramCallAction.parameterLabels <- intermediateParameterLabelList;
+  	subprogramCallAction.parameterLabels <- intermediateParameterLabelList->excluding(OclUndefined);
   }
 }
 
@@ -2077,18 +2077,13 @@ rule m_Access_to_DataInstance_Connection
 		
 }
 
-helper context AADLI!ConnectionEnd def: belongsToParamToParamConnection(): Boolean =
-	let paramCnx : Sequence (AADLI!ParameterConnection) =  AADLI!ParameterConnection.allInstances()-> select(c | c.source.connectionEnd = self) in
-	self.oclIsTypeOf(AADLI!Parameter) and paramCnx -> forAll ( c | c.destination.connectionEnd.oclIsTypeOf(AADLI!Parameter) )
+helper context AADLI!ConnectionEnd def: belongsToParamToParamConnection(c_inst :  AADLI!ComponentInstance ): Boolean =
+	let paramCnx : Sequence (AADLI!ParameterConnection) =  c_inst.subcomponent.getSubcomponentType().ownedParameterConnection-> select(c | c.source.connectionEnd = self) in
+	self.oclIsTypeOf(AADLI!Parameter) and paramCnx -> exists ( c | c.destination.connectionEnd.oclIsTypeOf(AADLI!Parameter) )
 	;
 
---helper context AADLI!ConnectedElement def: belongsToParamToParamConnection(): Boolean =
---	let paramCnx : Sequence (AADLI!ParameterConnection) =  AADLI!ParameterConnection.allInstances()-> select(c | c.source.connectionEnd = self.connectionEnd) in
---	self.oclIsTypeOf(AADLI!Parameter) and paramCnx -> forAll ( c | c.destination.connectionEnd.oclIsTypeOf(AADLI!Parameter) )
---	;
-
-helper context AADLI!ConnectionEnd def: isPartOfCallSequence(behavior: AADLI!Element): Boolean =
-	let paramCnx : Sequence (AADLI!ParameterConnection) =  AADLI!ParameterConnection.allInstances()-> select(c | c.source.connectionEnd = self) in
+helper context AADLI!ConnectionEnd def: isPartOfCallSequence(behavior: AADLI!Element,c_inst :  AADLI!ComponentInstance): Boolean =
+	let paramCnx : Sequence (AADLI!ParameterConnection) =  c_inst.subcomponent.getSubcomponentType().ownedParameterConnection-> select(c | c.source.connectionEnd = self) in
 	
 	if(behavior.oclIsKindOf(AADLI!SubprogramCallSequence)) then
 		paramCnx -> forAll ( c | behavior.ownedSubprogramCall->exists(e|c.source.context = e or c.destination.context = e))
@@ -2113,10 +2108,10 @@ rule m_Parameter_to_Parameter_Connection
 		c: AADLI!ComponentInstance, 
 		behavior: AADLI!SubprogramCallSequence,		
 		cnxE_src : AADLI!ConnectionEnd
-		(			
-			cnxE_src.belongsToParamToParamConnection() and
-			cnxE_src.isPartOfCallSequence(behavior) and
-			behavior.isComputeEntryPointOf(c)		
+		(						
+			behavior.isComputeEntryPointOf(c) and 
+			cnxE_src.isPartOfCallSequence(behavior,c) and			
+			cnxE_src.belongsToParamToParamConnection(c)
 		)
 
 	to
@@ -2134,9 +2129,10 @@ lazy rule Parameter_to_Parameter_Connection_ends
 		behavior: AADLI!SubprogramCallSequence,
 		cnxE_src : AADLI!ConnectionEnd
 		(
-			cnxE_src.belongsToParamToParamConnection() and
-			cnxE_src.isPartOfCallSequence(behavior) and
-			behavior.isComputeEntryPointOf(c)
+			behavior.isComputeEntryPointOf(c) and 
+			cnxE_src.belongsToParamToParamConnection(c) and
+			cnxE_src.isPartOfCallSequence(behavior,c) 
+			
 		)
 	to
 		holder: AADLBA!DataSubcomponentHolder
