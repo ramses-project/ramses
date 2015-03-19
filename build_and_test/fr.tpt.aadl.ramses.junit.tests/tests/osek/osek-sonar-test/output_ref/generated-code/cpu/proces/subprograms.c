@@ -4,7 +4,7 @@ sonarTest_refined_model__proces_th_entrypoint_impl_BA_State_t proces_th_entrypoi
 void sonarTest_refined_model__proces_th_entrypoint_impl(int *  cc5_portNb)
 {
   StatusType sonarTest_refined_model__proces_th_entrypoint_impl_proces_th_runtime_call_ret;
-  S32 sonarTest_refined_model__proces_th_entrypoint_impl_cc6_localVariable;
+  S32 sonarTest_refined_model__proces_th_entrypoint_impl_sonar_ecrobotGetSonarSensor_distance_localVariable;
   sonarTest_refined_model__proces_th_behaviorIdentifier_enum whichPortActivated = sonarTest_refined_model__proces_th_behaviorIdentifier_enum_default_behavior;
 while(1)
 {
@@ -31,8 +31,8 @@ while(1)
     if(whichPortActivated == sonarTest_refined_model__proces_th_behaviorIdentifier_enum_default_behavior)
     {
       proces_th_entrypoint_impl_current_state = sonarTest_refined_model__proces_th_entrypoint_impl_BA_entrypoint_wait_dispatch_state;
-      sonarTest_refined_model__proces_th_entrypoint_impl_cc6_localVariable = ecrobot_get_sonar_sensor (*cc5_portNb);
-      show (sonarTest_refined_model__proces_th_entrypoint_impl_cc6_localVariable);
+      sonarTest_refined_model__proces_th_entrypoint_impl_sonar_ecrobotGetSonarSensor_distance_localVariable = ecrobot_get_sonar_sensor (*cc5_portNb);
+      show (sonarTest_refined_model__proces_th_entrypoint_impl_sonar_ecrobotGetSonarSensor_distance_localVariable);
       break;
     }
   }
