@@ -615,3 +615,7 @@ helper def : getStringLiteral(pa: AADLBA!PropertyAssociation, stringLiteralValue
 helper context AADLI!Classifier def: getEnumerators() : AADLI!PropertyValue =
 	thisModule.theHOOK.getEnumerators(self)
 ;
+
+helper context  AADLI!NamedElement def : qualified_name() : String = 
+	self.qualifiedName.replaceAll('\\.', '_').replaceAll('::', '_')
+	;

@@ -1891,7 +1891,7 @@ rule m_Parameter_to_DataAccess_SourceConnection
 	to
 		dataAccess: AADLBA!DataAccess
 		(
-			name <- behavior.name+'_'+callAccess.name+'_entrypoint',
+			name <- behavior.qualified_name()+'_'+callAccess.qualified_name()+'_entrypoint',
 			dataFeatureClassifier <- callAccess.dataFeatureClassifier
 		),
 		accessConnection: AADLBA!AccessConnection
@@ -1927,7 +1927,7 @@ rule m_Parameter_to_DataAccess_DestinationConnection
 	to
 		dataAccess: AADLBA!DataAccess
 		(
-			name <- behavior.name+'_'+callAccess.name+'_entrypoint',
+			name <- behavior.qualified_name()+'_'+callAccess.qualified_name()+'_entrypoint',
 			dataFeatureClassifier <- callAccess.dataFeatureClassifier
 		),
 		accessConnection: AADLBA!AccessConnection
@@ -2117,7 +2117,7 @@ rule m_Parameter_to_Parameter_Connection
 	to
 		paramCnxVariable: AADLBA!DataSubcomponent
 		(
-			name <- ((cnxE_src.qualifiedName.replaceAll('::', '_').replaceAll('\\.', '_')).concat('_localVariable')),
+			name <- cnxE_src.qualified_name()+'_localVariable',
 			dataSubcomponentType <- cnxE_src.dataFeatureClassifier
 		)
 }
