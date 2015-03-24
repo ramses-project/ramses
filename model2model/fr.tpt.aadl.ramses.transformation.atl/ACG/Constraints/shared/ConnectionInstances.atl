@@ -1,0 +1,97 @@
+
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @nsURI AADLI=http://aadl.info/AADL/2.0/instance
+-- @atlcompiler emftvm
+
+
+module ConnectionInstances;
+
+create OUT : CV 	from 		IN : AADLI;
+
+
+abstract rule check_Connection_Instance {
+	from
+		obj: AADLI!ConnectionInstance,
+		cnx : AADLI!Connection
+		(
+		obj.connectionReference->collect(c|c.connection)->includes(cnx)	
+		)
+	to
+		  err: CV!Error
+	  (
+	  	object <:= obj
+	  )
+}
+
+
+
+-- @extends check_Connection_Instance 
+rule check_AccessConnection_connected_to_data {
+	from
+		obj: AADLI!ConnectionInstance,
+		cnx : AADLI!AccessConnection(			
+			not obj.hasDataSubcomponentTypeEnd()
+		)
+	to
+		  err: CV!Error
+	  (
+	  		message <- 'Connection '.concat(cnx.name+' is not in a connection instance that have a datasubcomponent connection end')	
+	  )
+}
+
+helper context AADLI!ConnectionInstance def : hasDataSubcomponentTypeEnd() : Boolean =
+	let cnxs : AADL!Connection = self.connectionReference -> collect ( c | c.connection) in
+	cnxs-> exists ( c | c.source.connectionEnd.oclIsTypeOf(AADLI!DataSubcomponent) or c.destination.connectionEnd.oclIsTypeOf(AADLI!DataSubcomponent))
+	 ;
+helper context AADLI!ConnectionInstance def : hasAccessConnection() : Boolean =
+	let cnxs : AADL!Connection = self.connectionReference -> collect ( c | c.connection) in
+	cnxs-> exists ( c | c.oclIsTypeOf(AADLI!AccessConnection))
+	 ;
+
+helper context AADLI!Connection def : plop() : AADLI!Connection =
+	self.debug(
+	'\tpotop'+'::'+self.name+'::'+self.source.connectionEnd.name+'->'+self.destination.connectionEnd.name+'\n'	
+	)
+	;
+
+---- @extends check_Connection_Instance
+--rule check_Connection_Instance_ends {
+--	from
+--		obj: AADLI!ConnectionInstance (
+--		not (obj.source.direction.isInput() and obj.destination.direction.isOutput()) 
+--		)
+--	to
+--		  err: CV!Error
+--	  (
+--	  	message <- 'Connection '.concat(obj.name+' has a wrong direction connectionEnds : direction of connection source or destination is not well specified')	
+--	  )
+--}
+--
+helper context AADLI!ConnectionEnd   def : isInput () : Boolean = 
+	self.direction = #"in" or self.direction = #inOut
+	;
+
+helper context AADLI!ConnectionEnd  def : isOutput () : Boolean = 
+	self.direction = #out or self.direction = #inOut
+	;
