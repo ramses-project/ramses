@@ -69,11 +69,6 @@ helper context AADLI!ConnectionInstance def : hasAccessConnection() : Boolean =
 	cnxs-> exists ( c | c.oclIsTypeOf(AADLI!AccessConnection))
 	 ;
 
-helper context AADLI!Connection def : plop() : AADLI!Connection =
-	self.debug(
-	'\tpotop'+'::'+self.name+'::'+self.source.connectionEnd.name+'->'+self.destination.connectionEnd.name+'\n'	
-	)
-	;
 
 ---- @extends check_Connection_Instance
 --rule check_Connection_Instance_ends {
