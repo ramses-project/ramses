@@ -1,4 +1,4 @@
-package fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.util;
+package fr.tpt.aadl.ramses.control.support.utils;
 
 import java.util.ArrayList ;
 import java.util.Iterator ;
@@ -8,7 +8,6 @@ import java.util.Map.Entry ;
 
 import org.eclipse.emf.ecore.EObject ;
 
-import fr.tpt.aadl.ramses.control.support.utils.TrcUtils ;
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyArc ;
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyGraph ;
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyNode ;
