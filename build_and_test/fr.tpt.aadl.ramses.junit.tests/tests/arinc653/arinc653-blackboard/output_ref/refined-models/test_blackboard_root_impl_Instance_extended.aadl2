@@ -94,7 +94,7 @@ with POK,Data_Model,ARINC653,RAMSES_processors,common_pkg,Base_Types,arinc653_ru
           Description=> "Warm partition restart";
           Action=> "Warm_Restart";
         ]);
-        Scheduling_Protocol => (Round_Robin_Protocol);
+        Scheduling_Protocol => (RMS);
         ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
         };

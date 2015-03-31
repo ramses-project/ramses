@@ -54,12 +54,12 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,arinc653_runtime;
     subcomponents
       VP_S1_inst: virtual processor PingPong::VP_S1.impl {
         Period => 1000 ms;
-        Scheduling_Protocol => (Round_Robin_Protocol);
+        Scheduling_Protocol => (RMS);
         POK::Additional_Features => (console);
         };
       VP_S2_inst: virtual processor PingPong::VP_S2.impl {
         Period => 1000 ms;
-        Scheduling_Protocol => (Round_Robin_Protocol);
+        Scheduling_Protocol => (RMS);
         POK::Additional_Features => (console);
         };
   end node_1_inst.impl;

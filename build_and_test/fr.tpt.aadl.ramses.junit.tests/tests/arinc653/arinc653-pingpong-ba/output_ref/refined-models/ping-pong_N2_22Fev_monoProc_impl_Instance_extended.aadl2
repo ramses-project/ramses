@@ -115,7 +115,7 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
   processor implementation root_inst.impl
     subcomponents
       VP_S1_inst: virtual processor PingPong::VP_S1.impl {
-        Scheduling_Protocol => (Round_Robin_Protocol);
+        Scheduling_Protocol => (RMS);
         Period => 1000 ms;
         ARINC653::Partition_Identifier => 1;
         ARINC653::Partition_Name => "S1";
@@ -123,7 +123,7 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
         POK::Additional_Features => (libc_stdio, console);
         };
       VP_S2_inst: virtual processor PingPong::VP_S2.impl {
-        Scheduling_Protocol => (Round_Robin_Protocol);
+        Scheduling_Protocol => (RMS);
         Period => 1000 ms;
         ARINC653::Partition_Identifier => 2;
         ARINC653::Partition_Name => "S2";

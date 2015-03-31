@@ -94,7 +94,7 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,Perio
           Description=> "Warm partition restart";
           Action=> "Warm_Restart";
         ]);
-        Scheduling_Protocol => (Round_Robin_Protocol);
+        Scheduling_Protocol => (RMS);
         ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
         };

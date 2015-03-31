@@ -151,12 +151,12 @@ end SEQ;
   
   virtual processor implementation VP_S1.impl
     properties
-      Scheduling_Protocol => (Round_Robin_Protocol);
+      Scheduling_Protocol => (RMS);
   end VP_S1.impl;
   
   virtual processor implementation VP_S2.impl
     properties
-      Scheduling_Protocol => (Round_Robin_Protocol);
+      Scheduling_Protocol => (RMS);
   end VP_S2.impl;
   
   process S1
