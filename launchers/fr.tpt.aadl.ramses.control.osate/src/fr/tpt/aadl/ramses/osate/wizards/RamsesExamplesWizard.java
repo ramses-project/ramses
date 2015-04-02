@@ -59,7 +59,7 @@ public class RamsesExamplesWizard extends AadlBaAbstractWizard
       {
         rootExamplePath = Aadl2Utils.getPluginFile(Activator.PLUGIN_ID,
                                                           _EXAMPLE_ROOT_PATH) ;
-        String[][] items = new String[][]{{"arinc653", "common-components", "osek"}} ;
+        String[][] items = new String[][]{{"arinc653", "common-components", "osek", "workflows"}} ;
         
         super.setSelectedItems(items, rootExamplePath);
       }
