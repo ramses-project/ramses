@@ -71,9 +71,13 @@ public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 			String resourceSuffix,
 			IProgressMonitor monitor)
 			{
-	  if(rs.getResources().isEmpty())
-	    rs.getResources().addAll(inputResource.getResourceSet().getResources());
-		Resource wcetResource = wcetModel.eResource();
+	  
+	    if(rs.getResources().isEmpty())
+	      synchronized(rs)
+	      {
+	        rs.getResources().addAll(inputResource.getResourceSet().getResources());
+	      }
+	  Resource wcetResource = wcetModel.eResource();
 		if(wcetResource==null)
 		{
 		  URI uri = inputResource.getURI();
