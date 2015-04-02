@@ -78,21 +78,12 @@ public class AadlModelsManagerImpl implements AadlModelInstantiatior {
 	                                         false) ;
 	  
 	  SystemInstance instance = null;
-	  if(aadlResource != null)
+	  if(aadlResource != null && 
+	      aadlResource.getContents().get(0) instanceof SystemInstance)
 	  {
-	    try
-	    {
-	      instance = InstantiateModel.buildInstanceModelFile(si);
-	      aadlResource.load(null);
-	    }
-	    catch(Exception e)
-	    {
-	      String errMsg =  "cannot delete the previous AADL resource set" ;
-	      _LOGGER.fatal(errMsg, e);
-	      throw new RuntimeException(errMsg, e) ;
-	    }
+	    instance = (SystemInstance) aadlResource.getContents().get(0);
 	  }
-	  else
+	  else if(aadlResource == null)
 	  {
 	    aadlResource = rs.createResource(instanceURI);
 	    instance = _instantiateModel.createSystemInstanceInt(si,
