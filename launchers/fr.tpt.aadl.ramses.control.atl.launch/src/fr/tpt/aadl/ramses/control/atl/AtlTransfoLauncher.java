@@ -84,22 +84,8 @@ public abstract class AtlTransfoLauncher
   private final static String ERROR_REPORTER_URI = 
 			"http://fr.tpt.aadl.ramses.constraints.vilation.reporter";
   
-  private static boolean initialized=false;
-  
-  private static Map<String, ExecEnvPool> _ramsesExecEnvPoolMap = 
-		  new HashMap<String, ExecEnvPool>();
-  
-  public static ExecEnvPool getRamsesExecEnv(String target)
+  public ExecEnvPool getRamsesExecEnv(String target)
   {
-	  return _ramsesExecEnvPoolMap.get(target);
-  }
-  
-  public static void initTransformation()
-  {
-    if(initialized)
-      return ;
-    initialized = true ;
-
     EPackage.Registry.INSTANCE.put(AADL2_MM_URI,
                                    org.osate.aadl2.Aadl2Package.eINSTANCE) ;
     EPackage.Registry.INSTANCE.put(ATLHOOKS_MM_URI, AtlHooksPackage.eINSTANCE) ;
@@ -125,32 +111,35 @@ public abstract class AtlTransfoLauncher
     ServiceRegistry sr = ServiceProvider.getServiceRegistry() ;
     for(String generatorName : sr.getAvailableGeneratorNames())
     {
-      Generator g = sr.getGenerator(generatorName) ;
-      List<String> moduleList = g.getTransformationModuleList() ;
-      ExecEnvPool pool = new ExecEnvPool() ;
-      loadMetaModels(pool) ;
-      ModuleResolverFactory mrf = new RamsesModuleResolverFactory() ;
-      pool.setModuleResolverFactory(mrf) ;
-      for(String moduleName : moduleList)
+      if(target.equals(generatorName))
       {
-        pool.loadModule(moduleName) ;
+        Generator g = sr.getGenerator(generatorName) ;
+        List<String> moduleList = g.getTransformationModuleList() ;
+        ExecEnvPool pool = new ExecEnvPool() ;
+        loadMetaModels(pool) ;
+        ModuleResolverFactory mrf = new RamsesModuleResolverFactory() ;
+        pool.setModuleResolverFactory(mrf) ;
+        for(String moduleName : moduleList)
+        {
+          pool.loadModule(moduleName) ;
+        }
+        return pool ;
       }
-      _ramsesExecEnvPoolMap.put(generatorName, pool) ;
-
-      moduleList = g.getValidationModuleList() ;
-      pool = new ExecEnvPool() ;
-      loadMetaModels(pool) ;
-      mrf = new RamsesModuleResolverFactory() ;
-      pool.setModuleResolverFactory(mrf) ;
-      for(String moduleName : moduleList)
+      else if(target.equals(generatorName + Names.VALIDATOR_SUFFIX))
       {
-        pool.loadModule(moduleName) ;
+        Generator g = sr.getGenerator(generatorName) ;
+        List<String> moduleList = g.getValidationModuleList() ;
+        ExecEnvPool pool = new ExecEnvPool() ;
+        loadMetaModels(pool) ;
+        ModuleResolverFactory mrf = new RamsesModuleResolverFactory() ;
+        pool.setModuleResolverFactory(mrf) ;
+        for(String moduleName : moduleList)
+        {
+          pool.loadModule(moduleName) ;
+        }
+        return pool;
       }
-      _ramsesExecEnvPoolMap.put(generatorName + Names.VALIDATOR_SUFFIX, pool) ;
-
     }
-
-    // init validators
 
     for(String analyzerName : sr.getAvailableAnalysisNames())
     {
@@ -166,12 +155,12 @@ public abstract class AtlTransfoLauncher
       {
         pool.loadModule(moduleName) ;
       }
-      _ramsesExecEnvPoolMap.put(analyzerName, pool) ;
+      return pool ;
     }
-
+    return null;
   }
     
-  private static void loadMetaModels(ExecEnvPool pool)
+  private void loadMetaModels(ExecEnvPool pool)
   {
 	  // Load metamodels
 	  // Load aadl instance metamodel 

@@ -49,12 +49,12 @@ public abstract class EMFTVMTransfoLauncher
 
   protected static File resourcesDir = null ;
 
-  protected static final EMFInjector injector = new EMFInjector() ;
+  protected final EMFInjector injector = new EMFInjector() ;
   //  private static final EMFExtractor extractor = new EMFExtractor() ;
 
   // Load the input file resource
-  private static final EMFModelFactory factory = new EMFModelFactory() ;
-  protected static EMFReferenceModel aadlbaMetamodel ;
+  private final EMFModelFactory factory = new EMFModelFactory() ;
+  protected EMFReferenceModel aadlbaMetamodel ;
 
 
   /*

@@ -87,7 +87,7 @@ public class ArchitectureRefinementProcessLauncher {
   TrcSpecification trcSpec;
 
   
-  private static ResourceSet intermediateRs = new ResourceSetImpl();
+  private ResourceSet intermediateRs = new ResourceSetImpl();
   
   private final File outputPathSave ;
 
@@ -342,7 +342,8 @@ public class ArchitectureRefinementProcessLauncher {
           new PatternMatchingTransformationThread(app,
                                                   transfo,
                                                   sinst,
-                                                  outputResourceID+"_"+threadsIter);
+                                                  outputResourceID+"_"+threadsIter,
+                                                  intermediateRs);
       threadsIter++;
     }
 
@@ -420,7 +421,7 @@ public class ArchitectureRefinementProcessLauncher {
       for(Resource r: intermediateRs.getResources())
         if(false==resourceSet.getResources().contains(r))
           resList.add(r);
-      
+      intermediateRs.getResources().clear();
       resourceSet.getResources().addAll(resList);
     }
 
@@ -702,13 +703,13 @@ public class ArchitectureRefinementProcessLauncher {
     return options;
   }
 
-  private void killThreads(Thread[] aadlInspectorThreads)
+  private void killThreads(Thread[] threads)
   {
-    for(Thread t : aadlInspectorThreads)
+    for(Thread t : threads)
       t.interrupt();
   }
   
-  static class PatternMatchingTransformationThread extends Thread
+  class PatternMatchingTransformationThread extends Thread
   {
     private Transformation transfo;
     private String patternMatchingOutputDir;
@@ -717,17 +718,20 @@ public class ArchitectureRefinementProcessLauncher {
     private String outputResourceID;
     
     private Resource result;
+    private ResourceSet resourceSet ;
     
     public PatternMatchingTransformationThread(ArchitectureRefinementProcessLauncher initiator, 
                                                Transformation transfo,
                                                SystemInstance sinst,
-                                               String outputResourceID)
+                                               String outputResourceID,
+                                               ResourceSet rs)
     {
       this.initiator = initiator;
       this.transfo = transfo;
       this.sinst = sinst;
       patternMatchingOutputDir = initiator.getPatternMatchingOutputDir();
       this.outputResourceID = outputResourceID;
+      this.resourceSet = rs;
     }
 
     @Override
@@ -746,16 +750,14 @@ public class ArchitectureRefinementProcessLauncher {
         File f = new File(patternMatchingOutputDir+modulePath);
         emftvmFiles.add(f);
       }
-
-      AtlTransfoLauncher.initTransformation();
       
       
       ResourceSet existingRs = sinst.eResource().getResourceSet();
       
       synchronized(sinst)
       {
-        intermediateRs.getResources().addAll(existingRs.getResources());
-        pmtl.setResourceSet(intermediateRs);
+        resourceSet.getResources().addAll(existingRs.getResources());
+        pmtl.setResourceSet(resourceSet);
       }
       
       result = pmtl.doTransformation(emftvmFiles, 

@@ -2,6 +2,8 @@ package fr.tpt.aadl.ramses.control.osate;
 
 import java.io.File ;
 import java.io.IOException ;
+import java.util.concurrent.ExecutorService ;
+import java.util.concurrent.Executors ;
 
 import org.apache.log4j.Logger ;
 import org.eclipse.core.commands.AbstractHandler ;
@@ -210,104 +212,57 @@ public abstract class RamsesActionHandler extends AbstractHandler {
 	        
 	        try
 	        {
-	          final TransactionalEditingDomain domain = TransactionalEditingDomain.
-	              Registry.INSTANCE.
-	              getEditingDomain("org.osate.aadl2.ModelEditingDomain") ;
-	          // We execute this command on the command stack because otherwise, we will
-	          // not have write permissions on the editing domain.
-	          RecordingCommandWithException cmd = new RecordingCommandWithException(domain)
-	          {
-	            protected void doExecute()
-	            {
-	              try
-	              {
-	                ProgressMonitorWrapper monitorWrapper = new ProgressMonitorWrapper(
-	                                                                      monitor) ;
-	                // Make sure that this xtext editor is saved.
-	                IEditorPart editor = HandlerUtil.getActiveEditor(_event) ;
-	                if(editor!=null)
-	                  WorkbenchUtils.saveEditor(editor);
-	                
-	                
-	                jobCore(monitorWrapper) ;
-	                
-	                this.setLabel(_OK_STATUS) ;
-	              }
-	              catch(OperationCanceledException e)
-	              {
-	                _LOGGER.info(cancelMsg(e));
-	                this.setLabel(_CANCEL_STATUS);
-	              }
-	              catch(VMException e)
-	              {
-	                if(e.getCause() instanceof OperationCanceledException)
-	                {
-	                  _LOGGER.info(cancelMsg((OperationCanceledException) e.getCause()));
-	                  this.setLabel(_CANCEL_STATUS);
-	                }
-	                else
-	                {
-	                  _LOGGER.fatal("", e) ;
-	                  fatal(e) ;
-	                }
-	              }
-	              catch(Exception e)
-	              {
-	                _LOGGER.fatal("", e) ;
-	                fatal(e) ;
-	              }
-	            }
+//	          final TransactionalEditingDomain domain = TransactionalEditingDomain.
+//	              Registry.INSTANCE.
+//	              getEditingDomain("org.osate.aadl2.ModelEditingDomain") ;
+//	          // We execute this command on the command stack because otherwise, we will
+//	          // not have write permissions on the editing domain.
+//	          RecordingCommandWithException cmd = new RecordingCommandWithException(domain)
+//	          {
+//	            protected void doExecute()
+//	            {
+//	              
+	              ProgressMonitorWrapper monitorWrapper = new ProgressMonitorWrapper(
+	                                                                                 monitor) ;
+	              // Make sure that this xtext editor is saved.
+	              IEditorPart editor = HandlerUtil.getActiveEditor(_event) ;
+	              if(editor!=null)
+	                WorkbenchUtils.saveEditor(editor);
 
-	            private void fatal(Exception e)
-	            {
-	              // Don't report error to the user.
-	              // Eclipse will open an error dialog thanks to the status.
-	              this.setLabel(_ABORT_STATUS) ;
-	              this.exceptionCaught = e ;
-	            }
-
-	            private String cancelMsg(OperationCanceledException e)
-	            {
-	              StringBuilder sb = new StringBuilder() ;
-	              sb.append(Names.NEW_LINE) ;
-	              sb.append(Names.NEW_LINE) ;
-	              sb.append("********************************************************************************") ;
-	              sb.append(Names.NEW_LINE) ;
-	              if(! (e.getMessage() == null || e.getMessage().isEmpty()))
-	              {
-	                sb.append(e.getMessage()) ;
+	              ExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+	              OneShotThread th = new OneShotThread(monitorWrapper); 
+	              executor.execute(th);
+	              executor.shutdown();
+	              while (!executor.isTerminated()) {
 	              }
-	              else
-	              {
-	                sb.append("User has canceled") ;
-	              }
-	              sb.append(Names.NEW_LINE) ;
-	              sb.append("********************************************************************************") ;
-	              sb.append(Names.NEW_LINE) ;
+	              result = th.getResult();
 	              
-	              return sb.toString() ;
-	            }
-	          } ;
-
-	          ((TransactionalCommandStack) domain.getCommandStack()).execute(cmd,
-	                                                                         null) ;
-	          if(_ABORT_STATUS.equals(cmd.getLabel()))
-	          {
-	            result = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-	                                "FATAL ERROR", cmd.exceptionCaught) ;
-	          }
-	          else
-	          {
-	            // Don't show error if any exception has been raised: escape side effects.
-	            if(_OK_STATUS.equals(cmd.getLabel()))
-	            {
-	              result = Status.OK_STATUS ;
-	            }
-	            else
-	            {
-	              result = Status.CANCEL_STATUS ;
-	            }
-	          }
+	              
+//
+//	              this.setLabel(_OK_STATUS) ;
+//	            }
+//
+//	          } ;
+//
+//	          ((TransactionalCommandStack) domain.getCommandStack()).execute(cmd,
+//	                                                                         null) ;
+//	          if(_ABORT_STATUS.equals(cmd.getLabel()))
+//	          {
+//	            result = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+//	                                "FATAL ERROR", cmd.exceptionCaught) ;
+//	          }
+//	          else
+//	          {
+//	            // Don't show error if any exception has been raised: escape side effects.
+//	            if(_OK_STATUS.equals(cmd.getLabel()))
+//	            {
+//	              result = Status.OK_STATUS ;
+//	            }
+//	            else
+//	            {
+//	              result = Status.CANCEL_STATUS ;
+//	            }
+//	          }
 	        }
 	        catch(Exception e)
 	        {
@@ -318,7 +273,7 @@ public abstract class RamsesActionHandler extends AbstractHandler {
 	        {
 	          HookAccessImpl.cleanupTransformationTrace() ;
 	        }
-	        
+	        cancel();
 	        return result ;
 	      }
 	    };
@@ -366,4 +321,88 @@ public abstract class RamsesActionHandler extends AbstractHandler {
 	    
 	    r.save(null);
 	  }
+	  
+	  public class OneShotThread implements Runnable {
+
+	    private ProgressMonitorWrapper monitorWrapper;
+	    private RecordingCommandWithException recordingCommandWithException;
+	    private IStatus result;
+	    
+	    public OneShotThread(ProgressMonitorWrapper monitorWrapper){
+	        this.monitorWrapper=monitorWrapper;
+	    }
+
+	    public IStatus getResult()
+      {
+        return result ;
+      }
+
+      @Override
+	    public void run() {
+	      try
+        {
+          jobCore(monitorWrapper);
+          result = Status.OK_STATUS;
+        }
+	      catch(OperationCanceledException e)
+        {
+          _LOGGER.info(cancelMsg(e));
+          result = Status.CANCEL_STATUS;
+//          recordingCommandWithException.setLabel(_CANCEL_STATUS);
+        }
+        catch(VMException e)
+        {
+          if(e.getCause() instanceof OperationCanceledException)
+          {
+            _LOGGER.info(cancelMsg((OperationCanceledException) e.getCause()));
+            result = Status.CANCEL_STATUS;
+//            recordingCommandWithException.setLabel(_CANCEL_STATUS);
+          }
+          else
+          {
+            _LOGGER.fatal("", e) ;
+            fatal(e) ;
+          }
+        }
+        catch(Exception e)
+        {
+          _LOGGER.fatal("", e) ;
+          fatal(e) ;
+        }
+	    }
+	    
+	    private void fatal(Exception e)
+      {
+	      result = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+	                          "FATAL ERROR", e) ;
+	      
+	      // KEEP OLD VERSION BELLOW
+	      // Don't report error to the user.
+	      // Eclipse will open an error dialog thanks to the status.
+	      //	      recordingCommandWithException.setLabel(_ABORT_STATUS) ;
+	      //	      recordingCommandWithException.exceptionCaught = e ;
+      }
+
+      private String cancelMsg(OperationCanceledException e)
+      {
+        StringBuilder sb = new StringBuilder() ;
+        sb.append(Names.NEW_LINE) ;
+        sb.append(Names.NEW_LINE) ;
+        sb.append("********************************************************************************") ;
+        sb.append(Names.NEW_LINE) ;
+        if(! (e.getMessage() == null || e.getMessage().isEmpty()))
+        {
+          sb.append(e.getMessage()) ;
+        }
+        else
+        {
+          sb.append("User has canceled") ;
+        }
+        sb.append(Names.NEW_LINE) ;
+        sb.append("********************************************************************************") ;
+        sb.append(Names.NEW_LINE) ;
+        
+        return sb.toString() ;
+      }
+	}
 }

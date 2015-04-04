@@ -33,6 +33,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.emf.ecore.util.EcoreUtil ;
 import org.eclipse.m2m.atl.emftvm.EmftvmFactory;
+import org.eclipse.m2m.atl.emftvm.ExecEnv ;
 import org.eclipse.m2m.atl.emftvm.Model;
 import org.eclipse.m2m.atl.emftvm.util.ExecEnvPool;
 import org.eclipse.xtext.EcoreUtil2;
@@ -63,7 +64,6 @@ public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 	{
 		super(modelInstantiator, predefinedResourcesManager) ;
 	    wcetModel = model;
-		initTransformation();
 		this.cpuList = cpuList;
 	}
 	
@@ -102,19 +102,19 @@ public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 		// Load models
 		Model inModel = EmftvmFactory.eINSTANCE.createModel();
 		inModel.setResource(wcetResource);
-		ExecEnvPool pool = AtlTransfoLauncher.getRamsesExecEnv(AADLInspectorSchedulingAnalysis.PLUGIN_NAME);
-		env = pool.getExecEnv();
+		ExecEnvPool pool = getRamsesExecEnv(AADLInspectorSchedulingAnalysis.PLUGIN_NAME);
+		ExecEnv env = pool.getExecEnv();
 		env.registerInputModel("WCET", inModel);
 		
 		
-		super.initTransformationInputs(inputResource);
+		super.initTransformationInputs(env, inputResource);
 		
 		getAtlHook().resetCpuToIgnore(cpuList);
-		Resource res = super.doTransformation(inputResource,
+		Resource res = super.doTransformation(env, inputResource,
 				outputDirPathName, resourceSuffix, monitor);
 		
 		pool.returnExecEnv(env);
-		
+		env = null;
 		return res;
 	}
 	

@@ -473,7 +473,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
   }
 
   
-  static class TransformationRuleSelectionThread extends Thread
+  class TransformationRuleSelectionThread extends Thread
   {
     
     private TrcSpecification trc;

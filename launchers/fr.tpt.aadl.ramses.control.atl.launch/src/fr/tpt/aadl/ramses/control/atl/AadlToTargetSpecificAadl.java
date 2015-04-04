@@ -49,6 +49,7 @@ import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.emf.ecore.util.EcoreUtil ;
+import org.eclipse.m2m.atl.emftvm.util.ExecEnvPool ;
 import org.eclipse.xtext.nodemodel.ICompositeNode ;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils ;
 import org.osate.aadl2.Aadl2Package ;
@@ -96,14 +97,14 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
                             File outputDir,
                             IProgressMonitor monitor) throws TransformationException
   {
-	Aadl2AadlEMFTVMLauncher atlLauncher =
-			new Aadl2AadlEMFTVMLauncher(_modelInstantiator,
-					_predefinedAadlModels) ;
-	atlLauncher.setOutputPackageName("refined_model") ;
-	AtlTransfoLauncher.initTransformation();
-	if(AtlTransfoLauncher.getRamsesExecEnv(targetId)!=null)
-		return atlLauncher.generationEntryPoint(inputResource,
-				targetId, outputDir, monitor) ;
+    Aadl2AadlEMFTVMLauncher atlLauncher =
+        new Aadl2AadlEMFTVMLauncher(_modelInstantiator,
+                                    _predefinedAadlModels) ;
+    atlLauncher.setOutputPackageName("refined_model") ;
+    ExecEnvPool pool = atlLauncher.getRamsesExecEnv(targetId);
+    if(pool!=null)
+      return atlLauncher.generationEntryPoint(inputResource,
+                                              targetId, outputDir, monitor) ;
     initAtlFileNameList(RamsesConfiguration.getAtlResourceDir()) ;
 
     {
@@ -111,7 +112,7 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
 
       for(String fileName : AtlTransfoLauncher.getUninstanciateTransformationModuleList())
       {
-    	atlFiles.add(new File(RamsesConfiguration.getAtlResourceDir() + File.separator + fileName)) ;
+        atlFiles.add(new File(RamsesConfiguration.getAtlResourceDir() + File.separator + fileName)) ;
       }
       for(String fileName : _atlFileNames)
       {
@@ -362,12 +363,13 @@ abstract public void setParameters(Map<Enum<?>, Object> parameters);
 	Aadl2AadlEMFTVMLauncher atlLauncher =
 	        new Aadl2AadlEMFTVMLauncher(_modelInstantiator, _predefinedAadlModels) ;
 	atlLauncher.setOutputPackageName(outputPackageName) ;
-	  
-	AtlTransfoLauncher.initTransformation();
-	if(transformationId!=null && AtlTransfoLauncher.getRamsesExecEnv(transformationId)!=null)
-	  return atlLauncher.generationEntryPoint(inputResource,
-			  transformationId, outputDir, monitor) ;
-	
+	if(transformationId!=null)
+	{
+	  ExecEnvPool pool = atlLauncher.getRamsesExecEnv(transformationId);
+	  if(pool!=null)
+	    return atlLauncher.generationEntryPoint(inputResource,
+	                                            transformationId, outputDir, monitor) ;
+	}
 	ArrayList<File> atlFiles = new ArrayList<File>() ;
 	for(String s : AtlTransfoLauncher.getUninstanciateTransformationModuleList())
 	{
