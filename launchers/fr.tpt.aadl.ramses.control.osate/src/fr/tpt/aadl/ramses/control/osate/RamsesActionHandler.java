@@ -209,71 +209,13 @@ public abstract class RamsesActionHandler extends AbstractHandler {
 	      protected IStatus run(final IProgressMonitor monitor)
 	      {
 	        IStatus result = null ;
-	        
-	        try
-	        {
-//	          final TransactionalEditingDomain domain = TransactionalEditingDomain.
-//	              Registry.INSTANCE.
-//	              getEditingDomain("org.osate.aadl2.ModelEditingDomain") ;
-//	          // We execute this command on the command stack because otherwise, we will
-//	          // not have write permissions on the editing domain.
-//	          RecordingCommandWithException cmd = new RecordingCommandWithException(domain)
-//	          {
-//	            protected void doExecute()
-//	            {
-//	              
-	              ProgressMonitorWrapper monitorWrapper = new ProgressMonitorWrapper(
-	                                                                                 monitor) ;
-	              // Make sure that this xtext editor is saved.
-	              IEditorPart editor = HandlerUtil.getActiveEditor(_event) ;
-	              if(editor!=null)
-	                WorkbenchUtils.saveEditor(editor);
-
-	              ExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-	              OneShotThread th = new OneShotThread(monitorWrapper); 
-	              executor.execute(th);
-	              executor.shutdown();
-	              while (!executor.isTerminated()) {
-	              }
-	              result = th.getResult();
-	              
-	              
-//
-//	              this.setLabel(_OK_STATUS) ;
-//	            }
-//
-//	          } ;
-//
-//	          ((TransactionalCommandStack) domain.getCommandStack()).execute(cmd,
-//	                                                                         null) ;
-//	          if(_ABORT_STATUS.equals(cmd.getLabel()))
-//	          {
-//	            result = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-//	                                "FATAL ERROR", cmd.exceptionCaught) ;
-//	          }
-//	          else
-//	          {
-//	            // Don't show error if any exception has been raised: escape side effects.
-//	            if(_OK_STATUS.equals(cmd.getLabel()))
-//	            {
-//	              result = Status.OK_STATUS ;
-//	            }
-//	            else
-//	            {
-//	              result = Status.CANCEL_STATUS ;
-//	            }
-//	          }
+	        ExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+	        OneShotThread th = new OneShotThread(monitor); 
+	        executor.execute(th);
+	        executor.shutdown();
+	        while (!executor.isTerminated()) {
 	        }
-	        catch(Exception e)
-	        {
-	          _LOGGER.fatal("", e);
-	          result = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "FATAL ERROR", e) ;
-	        }
-	        finally
-	        {
-	          HookAccessImpl.cleanupTransformationTrace() ;
-	        }
-	        cancel();
+	        result = th.getResult();
 	        return result ;
 	      }
 	    };
@@ -324,63 +266,119 @@ public abstract class RamsesActionHandler extends AbstractHandler {
 	  
 	  public class OneShotThread implements Runnable {
 
-	    private ProgressMonitorWrapper monitorWrapper;
-	    private RecordingCommandWithException recordingCommandWithException;
 	    private IStatus result;
+	    private IProgressMonitor monitor;
 	    
-	    public OneShotThread(ProgressMonitorWrapper monitorWrapper){
-	        this.monitorWrapper=monitorWrapper;
-	    }
-
 	    public IStatus getResult()
       {
         return result ;
       }
 
+	    
+	    public OneShotThread(IProgressMonitor monitor)
+	    {
+	      this.monitor = monitor;
+	    }
+	    
       @Override
-	    public void run() {
-	      try
+      public void run() {
+        final TransactionalEditingDomain domain = TransactionalEditingDomain.
+            Registry.INSTANCE.
+            getEditingDomain("org.osate.aadl2.ModelEditingDomain") ;
+        // We execute this command on the command stack because otherwise, we will
+        // not have write permissions on the editing domain.
+        RecordingCommandWithException cmd = new RecordingCommandWithException(domain)
         {
-          jobCore(monitorWrapper);
-          result = Status.OK_STATUS;
-        }
-	      catch(OperationCanceledException e)
-        {
-          _LOGGER.info(cancelMsg(e));
-          result = Status.CANCEL_STATUS;
-//          recordingCommandWithException.setLabel(_CANCEL_STATUS);
-        }
-        catch(VMException e)
-        {
-          if(e.getCause() instanceof OperationCanceledException)
+          protected void doExecute()
           {
-            _LOGGER.info(cancelMsg((OperationCanceledException) e.getCause()));
-            result = Status.CANCEL_STATUS;
-//            recordingCommandWithException.setLabel(_CANCEL_STATUS);
+
+            ProgressMonitorWrapper monitorWrapper = new ProgressMonitorWrapper(monitor) ;
+            // Make sure that this xtext editor is saved.
+            IEditorPart editor = HandlerUtil.getActiveEditor(_event) ;
+            if(editor!=null)
+              WorkbenchUtils.saveEditor(editor);
+
+            try
+            {
+
+
+              jobCore(monitorWrapper);
+
+              this.setLabel(_OK_STATUS) ;
+            }
+            catch(OperationCanceledException e)
+            {
+              _LOGGER.info(cancelMsg(e));
+              result = Status.CANCEL_STATUS;
+              this.setLabel(_CANCEL_STATUS) ;
+            }
+            catch(VMException e)
+            {
+              if(e.getCause() instanceof OperationCanceledException)
+              {
+                _LOGGER.info(cancelMsg((OperationCanceledException) e.getCause()));
+                result = Status.CANCEL_STATUS;
+                this.setLabel(_CANCEL_STATUS) ;
+              }
+              else
+              {
+                _LOGGER.fatal("", e) ;
+                fatal(e) ;
+              }
+            }
+            catch(Exception e)
+            {
+              _LOGGER.fatal("", e) ;
+              fatal(e) ;
+            }
+          }
+
+        } ;
+
+        try
+        {
+          ((TransactionalCommandStack) domain.getCommandStack()).execute(cmd,
+                                                                         null) ;
+          if(_ABORT_STATUS.equals(cmd.getLabel()))
+          {
+            result = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                                "FATAL ERROR", cmd.exceptionCaught) ;
           }
           else
           {
-            _LOGGER.fatal("", e) ;
-            fatal(e) ;
+            // Don't show error if any exception has been raised: escape side effects.
+            if(_OK_STATUS.equals(cmd.getLabel()))
+            {
+              result = Status.OK_STATUS ;
+            }
+            else
+            {
+              result = Status.CANCEL_STATUS ;
+            }
           }
         }
         catch(Exception e)
         {
-          _LOGGER.fatal("", e) ;
-          fatal(e) ;
+          _LOGGER.fatal("", e);
+          result = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "FATAL ERROR", e) ;
         }
-	    }
-	    
-	    private void fatal(Exception e)
+        finally
+        {
+          HookAccessImpl.cleanupTransformationTrace() ;
+        }
+        
+      }
+
+      private void fatal(Exception e)
       {
-	      result = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-	                          "FATAL ERROR", e) ;
-	      
-	      // KEEP OLD VERSION BELLOW
-	      // Don't report error to the user.
-	      // Eclipse will open an error dialog thanks to the status.
-	      //	      recordingCommandWithException.setLabel(_ABORT_STATUS) ;
-	      //	      recordingCommandWithException.exceptionCaught = e ;
+        result = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                            "FATAL ERROR", e) ;
+
+        // KEEP OLD VERSION BELLOW
+        // Don't report error to the user.
+        // Eclipse will open an error dialog thanks to the status.
+        //	      recordingCommandWithException.setLabel(_ABORT_STATUS) ;
+        //	      recordingCommandWithException.exceptionCaught = e ;
       }
 
       private String cancelMsg(OperationCanceledException e)
@@ -401,8 +399,8 @@ public abstract class RamsesActionHandler extends AbstractHandler {
         sb.append(Names.NEW_LINE) ;
         sb.append("********************************************************************************") ;
         sb.append(Names.NEW_LINE) ;
-        
+
         return sb.toString() ;
       }
-	}
+	  }
 }
