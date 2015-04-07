@@ -412,6 +412,24 @@ rule m_ThreadEntrypoint {
 										endif
 										
 									)
+									->union
+									(
+										impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )
+										->select(e|e.source.connectionEnd.oclIsKindOf(AADLI!DataAccess))
+											->collect(e|
+												callSequences->collect(behavior |
+												thisModule.resolveMatchedTupleIfExists(Sequence{c, behavior, e.source.connectionEnd},'dataAccess'))
+												)
+									)
+									->union
+									(
+										impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )
+										->select(e|e.destination.connectionEnd.oclIsKindOf(AADLI!DataAccess))
+											->collect(e|
+												callSequences->collect(behavior |
+												thisModule.resolveMatchedTupleIfExists(Sequence{c, behavior, e.destination.connectionEnd},'dataAccess'))
+												)
+									)
 									->flatten()->excluding(OclUndefined)->asSet(),
 			ownedParameter <- impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )
 								->select(e|e.source.connectionEnd.oclIsKindOf(AADLI!DataSubcomponent))
@@ -1715,6 +1733,12 @@ lazy rule populateParameterLabels
 					{
 						intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.Parameter_to_Parameter_Connection_ends(c, behavior, cnx.source.connectionEnd));
 					}
+					else if(cnx.destination.connectionEnd.oclIsTypeOf(AADLI!DataAccess))
+					{
+						d <- thisModule.resolveMatchedTupleIfExists(Sequence{c, behavior, cnx.destination.connectionEnd}, 'dataAccess');
+						if(not d.oclIsUndefined())
+							intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateDataAccessHolder(d));
+					}
 					else if(cnx.destination.connectionEnd.oclIsTypeOf(AADLI!DataSubcomponent))
 					{
 						
@@ -1737,6 +1761,12 @@ lazy rule populateParameterLabels
 					if(cnx.source.connectionEnd.oclIsTypeOf(AADLI!Parameter))
 					{						
 							intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.Parameter_to_Parameter_Connection_ends(c, behavior, cnx.source.connectionEnd));
+					}
+					else if(cnx.source.connectionEnd.oclIsTypeOf(AADLI!DataAccess))
+					{
+						d <- thisModule.resolveMatchedTupleIfExists(Sequence{c, behavior, cnx.source.connectionEnd}, 'dataAccess');
+						if(not d.oclIsUndefined())
+							intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateDataAccessHolder(d));
 					}
 					else if(cnx.source.connectionEnd.oclIsTypeOf(AADLI!DataSubcomponent))
 					{
@@ -2076,6 +2106,89 @@ rule m_Access_to_DataInstance_Connection
 		
 		
 }
+
+rule m_Parameter_to_DataAccess_Connection_sub
+{
+	from 
+		c: AADLI!ComponentInstance, 
+		behavior: AADLI!SubprogramCallSequence,		
+		cnxE_src : AADLI!ConnectionEnd
+		(						
+			behavior.isComputeEntryPointOf(c) and 
+			cnxE_src.isPartOfCallSequence(behavior,c) and			
+			cnxE_src.belongsToParamToDataConnection(c) 
+			
+		)
+	to
+		dataAccess : AADLBA!DataAccess (
+			name <- cnxE_src.name,
+			dataFeatureClassifier <- cnxE_src.dataFeatureClassifier,
+			kind <- #requires
+		),
+		accessConnection: AADLBA!AccessConnection (
+			accessCategory <- #data,
+			name <- cnxE_src.name+'_cnx',
+			source <- ce_src,
+			destination <- ce_dest
+		),
+		ce_src : AADLBA!ConnectedElement (
+			context <- thisModule.resolveMatchedSingleIfExists(c, 'callEntryPoint'),
+			connectionEnd <- dataAccess	
+		),
+		ce_dest : AADLBA!ConnectedElement (			
+			connectionEnd <- dataAccess	
+		)
+		do{
+		dataAccess.debug('plop2::'+c.name);	
+		}
+}
+
+rule m_DataAccess_to_Parameter_Connection_sub
+{
+	from 
+		c: AADLI!ComponentInstance, 
+		behavior: AADLI!SubprogramCallSequence,		
+		cnxE_src : AADLI!ConnectionEnd
+		(						
+			behavior.isComputeEntryPointOf(c) and 
+			cnxE_src.isPartOfCallSequence(behavior,c) and			
+			cnxE_src.belongsToDataToParamConnection(c)
+		)
+
+	to
+		dataAccess : AADLBA!DataAccess (
+			name <- cnxE_src.name,
+			dataFeatureClassifier <- cnxE_src.dataFeatureClassifier,
+			kind <- #requires
+		),
+		accessConnection: AADLBA!AccessConnection (
+			accessCategory <- #data,
+			name <- cnxE_src.name+'_cnx',
+			source <- ce_src,
+			destination <- ce_dest
+		),
+		ce_src : AADLBA!ConnectedElement (
+			connectionEnd <- dataAccess	
+		),
+		ce_dest : AADLBA!ConnectedElement (
+			context <- thisModule.resolveMatchedSingleIfExists(c, 'callEntryPoint'),
+			connectionEnd <- dataAccess	
+		)
+	do
+	{
+		dataAccess.debug('plop::');
+	}
+}
+
+helper context AADLI!ConnectionEnd def: belongsToParamToDataConnection(c_inst :  AADLI!ComponentInstance ): Boolean =
+	let paramCnx : Sequence (AADLI!ParameterConnection) =  c_inst.subcomponent.getSubcomponentType().ownedParameterConnection-> select(c | c.destination.connectionEnd = self) in
+	self.oclIsTypeOf(AADLI!DataAccess) and paramCnx -> exists ( c | c.source.connectionEnd.oclIsTypeOf(AADLI!Parameter) )
+	;
+
+helper context AADLI!ConnectionEnd def: belongsToDataToParamConnection(c_inst :  AADLI!ComponentInstance ): Boolean =
+	let paramCnx : Sequence (AADLI!ParameterConnection) =  c_inst.subcomponent.getSubcomponentType().ownedParameterConnection-> select(c | c.source.connectionEnd = self) in
+	self.oclIsTypeOf(AADLI!DataAccess) and paramCnx -> exists ( c | c.destination.connectionEnd.oclIsTypeOf(AADLI!Parameter) )
+	;
 
 helper context AADLI!ConnectionEnd def: belongsToParamToParamConnection(c_inst :  AADLI!ComponentInstance ): Boolean =
 	let paramCnx : Sequence (AADLI!ParameterConnection) =  c_inst.subcomponent.getSubcomponentType().ownedParameterConnection-> select(c | c.source.connectionEnd = self) in
