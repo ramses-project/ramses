@@ -66,7 +66,7 @@ end ResourceType;
 subprogram GetResource
 features
   RES_ID: in parameter ResourceType;
-  STATUS: out parameter StatusType;
+  STATUS: out parameter StatusType{Generation_Properties::Return_Parameter => true;};
 properties
   Programming_Properties::Source_Name => "GetResource";
   Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
@@ -75,7 +75,7 @@ end GetResource;
 subprogram ReleaseResource
 features
   RES_ID: in parameter ResourceType;
-  STATUS: out parameter StatusType;
+  STATUS: out parameter StatusType{Generation_Properties::Return_Parameter => true;};
 properties
   Programming_Properties::Source_Name => "ReleaseResource";
   Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
@@ -98,7 +98,7 @@ subprogram SetEvent
 features
   TASK_ID: in parameter TaskType;
   MASK: in parameter EventMaskType;
-  STATUS: out parameter StatusType;
+  STATUS: out parameter StatusType{Generation_Properties::Return_Parameter => true;};
 properties
   Programming_Properties::Source_Name => "SetEvent";
   Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
@@ -107,7 +107,7 @@ end SetEvent;
 subprogram ClearEvent
 features
   MASK: in parameter EventMaskType;
-  STATUS: out parameter StatusType;
+  STATUS: out parameter StatusType{Generation_Properties::Return_Parameter => true;};
 properties
   Programming_Properties::Source_Name => "ClearEvent";
   Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
@@ -117,7 +117,7 @@ subprogram GetEvent
 features
   TASK_ID: in parameter TaskType;
   EVENT_REF: out parameter EventMaskRefType;
-  STATUS: out parameter StatusType;
+  STATUS: out parameter StatusType{Generation_Properties::Return_Parameter => true;};
 properties
   Programming_Properties::Source_Name => "GetEvent";
   Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
@@ -126,7 +126,7 @@ end GetEvent;
 subprogram WaitEvent
 features
   MASK: in parameter EventMaskType;
-  STATUS: out parameter StatusType;
+  STATUS: out parameter StatusType{Generation_Properties::Return_Parameter => true;};
 properties
   Programming_Properties::Source_Name => "WaitEvent";
   Programming_Properties::Source_Text => ("toppers_osek/include/kernel.h");
