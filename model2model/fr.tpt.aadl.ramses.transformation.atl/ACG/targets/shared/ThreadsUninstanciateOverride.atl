@@ -156,9 +156,25 @@ abstract rule m_create_Thread_BA
 														)
 														->collect(
 															accessCnx | thisModule.resolveMatchedTupleIfExists(Sequence{c, callSequence, accessCnx}, 'accessConnection')
+														)														
+													)
+												)	
+												->union(impl.getAllSubprogramCallSequence()
+													->collect(callSequence | c.subcomponent.classifier.ownedParameterConnection
+														-> select(accessCnx| 
+															accessCnx.isPartOfCallSequence(callSequence) and
+															callSequence.isComputeEntryPointOf(c) and
+															(accessCnx.source.connectionEnd.oclIsTypeOf(AADLI!DataAccess) or accessCnx.destination.connectionEnd.oclIsTypeOf(AADLI!DataAccess))
+															)
+															->collect(
+															accessCnx | Sequence{
+																thisModule.resolveMatchedTupleIfExists(Sequence{c, callSequence, accessCnx.source.connectionEnd}, 'accessConnection'),
+																thisModule.resolveMatchedTupleIfExists(Sequence{c, callSequence, accessCnx.destination.connectionEnd}, 'accessConnection')
+																}
+															)
 														)
 													)
-												)->flatten()
+												->flatten()
 												->union
 												(
 													if(not impl.getBA().oclIsUndefined()) then
