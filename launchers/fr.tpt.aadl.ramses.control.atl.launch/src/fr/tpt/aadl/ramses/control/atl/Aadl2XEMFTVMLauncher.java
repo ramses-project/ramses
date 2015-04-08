@@ -138,14 +138,19 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	                                 String resourceSuffix,
 	                                 IProgressMonitor monitor)
 	{
-		ExecEnvPool pool = getRamsesExecEnv(transformationId); 
-		ExecEnv env = pool.getExecEnv();
+		ExecEnvPool pool = getRamsesExecEnv(transformationId);
+		ExecEnv env = null;
+		if(pool!=null)
+		  env = pool.getExecEnv();
+		else
+		  env = EmftvmFactory.eINSTANCE.createExecEnv();
+		  
 		
 		initTransformationInputs(env, inputResource);
 		
 		Resource res = doTransformation(env, inputResource, outputDirPathName, resourceSuffix, monitor);
-		
-		pool.returnExecEnv(env);
+		if(pool!=null)
+		  pool.returnExecEnv(env);
 		
 		return res;
 
