@@ -2138,9 +2138,6 @@ rule m_Parameter_to_DataAccess_Connection_sub
 		ce_dest : AADLBA!ConnectedElement (			
 			connectionEnd <- dataAccess	
 		)
-		do{
-		dataAccess.debug('plop2::'+c.name);	
-		}
 }
 
 rule m_DataAccess_to_Parameter_Connection_sub
@@ -2173,11 +2170,7 @@ rule m_DataAccess_to_Parameter_Connection_sub
 		ce_dest : AADLBA!ConnectedElement (
 			context <- thisModule.resolveMatchedSingleIfExists(c, 'callEntryPoint'),
 			connectionEnd <- dataAccess	
-		)
-	do
-	{
-		dataAccess.debug('plop::');
-	}
+		)	
 }
 
 helper context AADLI!ConnectionEnd def: belongsToParamToDataConnection(c_inst :  AADLI!ComponentInstance ): Boolean =
