@@ -143,19 +143,22 @@ public abstract class AtlTransfoLauncher
 
     for(String analyzerName : sr.getAvailableAnalysisNames())
     {
-      Analyzer a = sr.getAnalyzer(analyzerName) ;
-      List<String> moduleList = a.getTransformationModuleList() ;
-      if(moduleList == null)
-        continue ;
-      ExecEnvPool pool = new ExecEnvPool() ;
-      loadMetaModels(pool) ;
-      ModuleResolverFactory mrf = new RamsesModuleResolverFactory() ;
-      pool.setModuleResolverFactory(mrf) ;
-      for(String moduleName : moduleList)
+      if(target.equals(analyzerName))
       {
-        pool.loadModule(moduleName) ;
+        Analyzer a = sr.getAnalyzer(analyzerName) ;
+        List<String> moduleList = a.getTransformationModuleList() ;
+        if(moduleList == null)
+          continue ;
+        ExecEnvPool pool = new ExecEnvPool() ;
+        loadMetaModels(pool) ;
+        ModuleResolverFactory mrf = new RamsesModuleResolverFactory() ;
+        pool.setModuleResolverFactory(mrf) ;
+        for(String moduleName : moduleList)
+        {
+          pool.loadModule(moduleName) ;
+        }
+        return pool ;
       }
-      return pool ;
     }
     return null;
   }
