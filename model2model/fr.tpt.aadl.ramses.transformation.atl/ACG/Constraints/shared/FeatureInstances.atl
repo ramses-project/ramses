@@ -1,3 +1,4 @@
+
 --
 -- AADL-RAMSES
 -- 
@@ -22,8 +23,13 @@
 -- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
 -- @atlcompiler emftvm
 
+
+
 module FeatureInstances;
 create OUT : CV 	from 		IN : AADLI;
+
+
+
 
 abstract rule check_FeatureInstance
 {
@@ -55,3 +61,70 @@ rule check_FeatureInstanceHasConcreteDataType
 		+'(Source_Text property)'
 	  )
 }
+
+
+
+
+rule check_dataAccess_are_connected
+{
+	from 
+	obj : AADLI!DataAccess,
+	sub : AADLI!Subcomponent(		
+		not sub.subcomponentType.oclIsKindOf(AADLI!ComponentType) and
+		not sub.subcomponentType.oclIsKindOf(AADLI!ComponentPrototype) and 
+		sub.subcomponentType.getType().ownedFeature->includes(obj) and
+		not AADLBA!ConnectedElement.allInstances()->exists(ce| ce.context = sub and ce.connectionEnd = obj) 
+--		and 
+--		(thisModule.standardPackagesNames->excludes(obj.getPackage().name)  or 
+--		thisModule.standardPackagesNames->excludes(sub.getPackage().name))
+	)
+	to
+	  err: CV!Error
+	  (
+	  	object <:= obj,
+		message <- 'Data access '+obj.name+' of subcomponent '+sub.name+' in '+ sub.getOwner().name+' component implementation is not connected'
+	  )
+}
+
+rule check_Parameter_are_connected
+{
+	from 
+	obj : AADLI!Parameter,
+	sub : AADLI!SubprogramCall(		
+		sub.getSubprogramType().ownedParameter->includes(obj) and
+		not AADLBA!ConnectedElement.allInstances()->exists(ce| ce.context = sub and ce.connectionEnd = obj) and 
+		(thisModule.standardPackagesNames->excludes(obj.getPackage().name) or 
+		thisModule.standardPackagesNames->excludes(sub.getPackage().name))	
+	)
+	to
+	  err: CV!Error
+	  (
+	  	object <:= obj,
+		message <- 'Parameter '+obj.name+' of subprogram call '+sub.name+' is not connected'
+	  )	
+}
+
+helper context AADLI!SubprogramCall def : getSubprogramType () : AADLI!SubprogramType = 
+	if (self.calledSubprogram.oclIsTypeOf(AADLI!SubprogramType)) then 
+		self.calledSubprogram
+	else if (self.calledSubprogram.oclIsKindOf(AADLI!SubprogramAccess)) then 
+		self.calledSubprogram.subprogramFeatureClassifier.getSubprogramType()
+	else 
+		self.calledSubprogram
+	endif
+	endif
+	;
+
+helper context OclAny def : getPackage() : AADLI!AadlPackage = 
+	if (self.getNamespace().oclIsUndefined()) then 
+		self.getOwner()
+	else
+		self.getNamespace().getPackage()
+	endif;
+
+helper def : standardPackagesNames : Sequence(String) = Sequence{
+'arinc653_runtime', 'RAMSES_processors', 'rtl8029_driver', 'Base_Types', 'PeriodicDelayedMutex_runtime', 'PeriodicDelayed_runtime',
+'ravenscar_runtime', 'ojr_runtime', 'OSEK_runtime'
+};
+
+	
