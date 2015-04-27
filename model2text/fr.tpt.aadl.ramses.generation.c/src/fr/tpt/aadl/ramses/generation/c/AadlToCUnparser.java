@@ -820,8 +820,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
                   }
                   if(type == null || headerReferenced==false)
                     type = GenerationUtilsC.getGenerationCIdentifier(cv.getClassifier().getQualifiedName()) ;
-                  structDefinition.append("\t"+type +
-                        " " +
+                  
+                  structDefinition.append("\t"+type + " " +
                         stringifiedElementNames.get(lv.getOwnedListElements()
                               .indexOf(v)) + ";\n") ;
                 }
@@ -1511,10 +1511,14 @@ public class AadlToCUnparser extends AadlProcessingSwitch
             String paramUsage = Aadl2Utils.getParameterUsage(p) ;
             if(p == returnParameter)
               continue ;
-            if(first == false)
+            if(first){
+            	_subprogramImplCode.addOutput("\n\t");
+                _subprogramHeaderCode.addOutput("\n\t");
+            }
+            else	
             {
-              _subprogramImplCode.addOutput(", ") ;
-              _subprogramHeaderCode.addOutput(", ") ;
+              _subprogramImplCode.addOutput(",\n\t") ;
+              _subprogramHeaderCode.addOutput(",\n\t") ;
             }
             processDataSubcomponentType(object, p.getDataFeatureClassifier(),
                                         _subprogramImplCode,
@@ -1537,10 +1541,14 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           else if(f instanceof DataAccess)
           {
             DataAccess da = (DataAccess) f ;
-            if(first == false)
+            if(first){
+            	_subprogramImplCode.addOutput("\n\t");
+                _subprogramHeaderCode.addOutput("\n\t");
+            }
+            else	
             {
-              _subprogramImplCode.addOutput(", ") ;
-              _subprogramHeaderCode.addOutput(", ") ;
+              _subprogramImplCode.addOutput(",\n\t") ;
+              _subprogramHeaderCode.addOutput(",\n\t") ;
             }
             processDataSubcomponentType(object, da.getDataFeatureClassifier(),
                                         _subprogramImplCode,
