@@ -1350,7 +1350,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                 first=false;
               }
 
-            }
+            }//end parameter for
 
             _cFileContent.addOutputNewline(");") ;
           }
