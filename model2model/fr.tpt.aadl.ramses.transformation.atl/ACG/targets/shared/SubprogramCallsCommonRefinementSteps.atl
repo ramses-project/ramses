@@ -2020,8 +2020,7 @@ rule m_Parameter_to_DataAccess_SourceConnection
 			name <- accessCnx.uniqueName()+'_entrypoint'
 		),
 		ceSource: AADLBA!ConnectedElement
-		(connectionEnd <- dataAccess
-		),
+		(connectionEnd <- dataAccess),
 		ceDestination: AADLBA!ConnectedElement
 		(connectionEnd <- accessCnx.destination.connectionEnd)
 	do
@@ -2059,8 +2058,7 @@ rule m_Parameter_to_DataAccess_DestinationConnection
 		ceSource: AADLBA!ConnectedElement
 		(connectionEnd <- accessCnx.source.connectionEnd),
 		ceDestination: AADLBA!ConnectedElement
-		(connectionEnd <- dataAccess
-		)
+		(connectionEnd <- dataAccess)
 	do
 	{
 		ceDestination.setContext(thisModule.resolveMatchedSingleIfExists(c,'callEntryPoint'));
