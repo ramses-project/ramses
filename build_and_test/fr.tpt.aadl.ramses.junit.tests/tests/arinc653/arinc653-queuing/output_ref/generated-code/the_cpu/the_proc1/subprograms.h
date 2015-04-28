@@ -6,7 +6,8 @@
 #include "user_code.h"
 #include "gtypes.h"
 #include "main.h"
-void test_queuing_refined_model__the_proc1_the_sender_entrypoint_impl(APEX_INTEGER *  cnx_p_out);
+void test_queuing_refined_model__the_proc1_the_sender_entrypoint_impl(
+	APEX_INTEGER *  cnx_p_out);
 
 typedef enum {
   test_queuing_refined_model__the_proc1_the_sender_entrypoint_impl_BA_entrypoint_init_state,

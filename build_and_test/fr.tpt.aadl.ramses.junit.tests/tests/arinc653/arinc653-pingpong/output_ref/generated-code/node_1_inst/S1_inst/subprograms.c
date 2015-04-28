@@ -2,7 +2,15 @@
 #include "pingpong.h"
 #include "subprograms.h"
 PingPong_refined_model__S1_inst_a1_inst_entrypoint_impl_BA_State_t S1_inst_a1_inst_entrypoint_impl_current_state = PingPong_refined_model__S1_inst_a1_inst_entrypoint_impl_BA_entrypoint_init_state;
-void PingPong_refined_model__S1_inst_a1_inst_entrypoint_impl(SAMPLING_PORT_ID_TYPE *  C1_PingIn, SAMPLING_PORT_ID_TYPE *  C1_PongIn, SAMPLING_PORT_ID_TYPE *  Mon_error_C2, SAMPLING_PORT_ID_TYPE *  mode_implicit_cnx_Mon_mode_C2, SAMPLING_PORT_ID_TYPE *  C1_ping_implicit_cnx_C1_PingOut, SAMPLING_PORT_ID_TYPE *  C1_pong_implicit_cnx_C1_PongOut, TYPE *  PingPong_a1_impl_call_seq_PingPong_Monitor_activate_state_baKeywords_entrypoint, SEQ *  PingPong_a1_impl_call_seq_PingPong_IPingOrPong_mode_seqNb_entrypoint)
+void PingPong_refined_model__S1_inst_a1_inst_entrypoint_impl(
+	SAMPLING_PORT_ID_TYPE *  C1_PingIn,
+	SAMPLING_PORT_ID_TYPE *  C1_PongIn,
+	SAMPLING_PORT_ID_TYPE *  Mon_error_C2,
+	SAMPLING_PORT_ID_TYPE *  mode_implicit_cnx_Mon_mode_C2,
+	SAMPLING_PORT_ID_TYPE *  C1_ping_implicit_cnx_C1_PingOut,
+	SAMPLING_PORT_ID_TYPE *  C1_pong_implicit_cnx_C1_PongOut,
+	TYPE *  PingPong_a1_impl_call_seq_PingPong_Monitor_activate_state_baKeywords_entrypoint,
+	SEQ *  PingPong_a1_impl_call_seq_PingPong_IPingOrPong_mode_seqNb_entrypoint)
 {
   RETURN_CODE_TYPE PingPong_refined_model__S1_inst_a1_inst_entrypoint_impl_S1_inst_a1_inst_runtime_call_ret;
   ROLE PingPong_refined_model__S1_inst_a1_inst_entrypoint_impl_Mon_mode_C2_localVariable;

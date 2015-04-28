@@ -1,7 +1,8 @@
 #include "ecrobot/c/ecrobot_interface.h"
 #include "subprograms.h"
 sonarTest_refined_model__proces_th_entrypoint_impl_BA_State_t proces_th_entrypoint_impl_current_state = sonarTest_refined_model__proces_th_entrypoint_impl_BA_entrypoint_init_state;
-void sonarTest_refined_model__proces_th_entrypoint_impl(int *  cc5_portNb)
+void sonarTest_refined_model__proces_th_entrypoint_impl(
+	int *  cc5_portNb)
 {
   StatusType sonarTest_refined_model__proces_th_entrypoint_impl_proces_th_runtime_call_ret;
   S32 sonarTest_refined_model__proces_th_entrypoint_impl_sonar_ecrobotGetSonarSensor_distance_localVariable;
