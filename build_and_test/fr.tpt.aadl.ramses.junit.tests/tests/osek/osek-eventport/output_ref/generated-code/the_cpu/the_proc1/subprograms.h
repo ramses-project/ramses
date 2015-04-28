@@ -6,7 +6,8 @@
 #include "osek_runtime.h"
 #include "gtypes.h"
 #include "main.h"
-void test_osek_eventports_refined_model__the_proc1_the_sender_entrypoint_impl(thread_queue_t *  cnx_p);
+void test_osek_eventports_refined_model__the_proc1_the_sender_entrypoint_impl(
+	thread_queue_t *  cnx_p);
 
 typedef enum {
   test_osek_eventports_refined_model__the_proc1_the_sender_entrypoint_impl_BA_entrypoint_init_state,
@@ -15,7 +16,8 @@ typedef enum {
   test_osek_eventports_refined_model__the_proc1_the_sender_entrypoint_impl_BA_entrypoint_final_state
 } test_osek_eventports_refined_model__the_proc1_the_sender_entrypoint_impl_BA_State_t;
 
-void test_osek_eventports_refined_model__the_proc1_the_receiver_entrypoint_impl(thread_queue_t *  p);
+void test_osek_eventports_refined_model__the_proc1_the_receiver_entrypoint_impl(
+	thread_queue_t *  p);
 
 typedef enum {
   test_osek_eventports_refined_model__the_proc1_the_receiver_entrypoint_impl_BA_entrypoint_init_state,
