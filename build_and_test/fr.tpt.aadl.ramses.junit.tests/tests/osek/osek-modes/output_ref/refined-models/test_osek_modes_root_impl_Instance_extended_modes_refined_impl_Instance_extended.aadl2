@@ -156,6 +156,9 @@ with Base_Types,OSEK,Data_Model,test_osek_modes,OSEK_runtime,test_osek_modes_mod
       m2: mode ;
   end the_proc_modes.impl;
   
+  system root
+  end root;
+  
   subprogram sender_spg
     features
       context: requires data access sender_spg_context;
@@ -172,9 +175,6 @@ with Base_Types,OSEK,Data_Model,test_osek_modes,OSEK_runtime,test_osek_modes_mod
       Data_Model::Base_Type => (classifier(Base_Types::Unsigned_8));
       Source_Name => "__sender_spg_context";
   end sender_spg_context;
-  
-  system root
-  end root;
   
   data the_proc_modes_mode_m1_p_bufferType
     properties
