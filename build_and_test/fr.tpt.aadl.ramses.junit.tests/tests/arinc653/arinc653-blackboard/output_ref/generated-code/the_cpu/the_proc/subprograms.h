@@ -6,7 +6,8 @@
 #include "user_code.h"
 #include "gtypes.h"
 #include "main.h"
-void test_blackboard_refined_model__the_proc_the_sender_entrypoint_impl(BLACKBOARD_ID_TYPE *  cnx_p_out);
+void test_blackboard_refined_model__the_proc_the_sender_entrypoint_impl(
+	BLACKBOARD_ID_TYPE *  cnx_p_out);
 
 typedef enum {
   test_blackboard_refined_model__the_proc_the_sender_entrypoint_impl_BA_entrypoint_init_state,
@@ -15,7 +16,8 @@ typedef enum {
   test_blackboard_refined_model__the_proc_the_sender_entrypoint_impl_BA_entrypoint_final_state
 } test_blackboard_refined_model__the_proc_the_sender_entrypoint_impl_BA_State_t;
 
-void test_blackboard_refined_model__the_proc_the_receiver_entrypoint_impl(BLACKBOARD_ID_TYPE *  p_in);
+void test_blackboard_refined_model__the_proc_the_receiver_entrypoint_impl(
+	BLACKBOARD_ID_TYPE *  p_in);
 
 typedef enum {
   test_blackboard_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_init_state,
