@@ -6,7 +6,9 @@
 #include "user_code.h"
 #include "gtypes.h"
 #include "main.h"
-void test_buffer_delayed_refined_model__the_proc_the_sender_entrypoint_impl(test_buffer_delayed_refined_model__SharedStructType_the_receiver_p_in_impl *  cnx_p_out, SEMAPHORE_ID_TYPE *  p_out_entrypointSemAccess);
+void test_buffer_delayed_refined_model__the_proc_the_sender_entrypoint_impl(
+	test_buffer_delayed_refined_model__SharedStructType_the_receiver_p_in_impl *  cnx_p_out,
+	SEMAPHORE_ID_TYPE *  p_out_entrypointSemAccess);
 
 typedef enum {
   test_buffer_delayed_refined_model__the_proc_the_sender_entrypoint_impl_BA_entrypoint_init_state,
@@ -15,13 +17,17 @@ typedef enum {
   test_buffer_delayed_refined_model__the_proc_the_sender_entrypoint_impl_BA_entrypoint_final_state
 } test_buffer_delayed_refined_model__the_proc_the_sender_entrypoint_impl_BA_State_t;
 
-void test_buffer_delayed_refined_model__root_impl_Instance_the_proc_the_receiver_p_in_Init_Spg(test_buffer_delayed_refined_model__SharedStructType_the_receiver_p_in_impl *  BufferAccess, Base_Types__Integer_16 Size);
+void test_buffer_delayed_refined_model__root_impl_Instance_the_proc_the_receiver_p_in_Init_Spg(
+	test_buffer_delayed_refined_model__SharedStructType_the_receiver_p_in_impl *  BufferAccess,
+	Base_Types__Integer_16 Size);
 
 typedef enum {
   test_buffer_delayed_refined_model__root_impl_Instance_the_proc_the_receiver_p_in_Init_Spg_s
 } test_buffer_delayed_refined_model__root_impl_Instance_the_proc_the_receiver_p_in_Init_Spg_BA_State_t;
 
-void test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl(test_buffer_delayed_refined_model__SharedStructType_the_receiver_p_in_impl *  p_in, SEMAPHORE_ID_TYPE *  p_in_entrypointSemAccess);
+void test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl(
+	test_buffer_delayed_refined_model__SharedStructType_the_receiver_p_in_impl *  p_in,
+	SEMAPHORE_ID_TYPE *  p_in_entrypointSemAccess);
 
 typedef enum {
   test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_init_state,
@@ -30,25 +36,41 @@ typedef enum {
   test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_final_state
 } test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_BA_State_t;
 
-void test_buffer_delayed_refined_model__Put_Value_the_sender_p_out_impl(test_buffer_delayed_refined_model__SharedStructType_the_receiver_p_in_impl *  BufferAccess, common_pkg__Integer *  DataValue, Base_Types__Integer_16 CurrentDeadline, Base_Types__Integer_16 PriorityValue, Base_Types__Integer_16 Size);
+void test_buffer_delayed_refined_model__Put_Value_the_sender_p_out_impl(
+	test_buffer_delayed_refined_model__SharedStructType_the_receiver_p_in_impl *  BufferAccess,
+	common_pkg__Integer *  DataValue,
+	Base_Types__Integer_16 CurrentDeadline,
+	Base_Types__Integer_16 PriorityValue,
+	Base_Types__Integer_16 Size);
 
 typedef enum {
   test_buffer_delayed_refined_model__Put_Value_the_sender_p_out_impl_s
 } test_buffer_delayed_refined_model__Put_Value_the_sender_p_out_impl_BA_State_t;
 
-void PeriodicDelayedMutex_runtime__Send_Output(Base_Types__Integer_16 PeriodValue, Base_Types__Integer_16 DeadlineValue, Base_Types__Integer_16 *  CurrentPeriod, Base_Types__Integer_16 *  CurrentDeadline);
+void PeriodicDelayedMutex_runtime__Send_Output(
+	Base_Types__Integer_16 PeriodValue,
+	Base_Types__Integer_16 DeadlineValue,
+	Base_Types__Integer_16 *  CurrentPeriod,
+	Base_Types__Integer_16 *  CurrentDeadline);
 
 typedef enum {
   PeriodicDelayedMutex_runtime__Send_Output_s
 } PeriodicDelayedMutex_runtime__Send_Output_BA_State_t;
 
-void test_buffer_delayed_refined_model__Receive_Input_mutex_the_receiver_p_in_impl(test_buffer_delayed_refined_model__SharedStructType_the_receiver_p_in_impl *  BufferAccess, Base_Types__Integer_16 PeriodValue, Base_Types__Integer_16 CurrentPeriod);
+void test_buffer_delayed_refined_model__Receive_Input_mutex_the_receiver_p_in_impl(
+	test_buffer_delayed_refined_model__SharedStructType_the_receiver_p_in_impl *  BufferAccess,
+	Base_Types__Integer_16 PeriodValue,
+	Base_Types__Integer_16 CurrentPeriod);
 
 typedef enum {
   test_buffer_delayed_refined_model__Receive_Input_mutex_the_receiver_p_in_impl_s
 } test_buffer_delayed_refined_model__Receive_Input_mutex_the_receiver_p_in_impl_BA_State_t;
 
-void test_buffer_delayed_refined_model__Next_Value_the_receiver_p_in_impl(test_buffer_delayed_refined_model__SharedStructType_the_receiver_p_in_impl *  BufferAccess, common_pkg__Integer *  DataValue, Base_Types__Integer_16 CurrentPeriod, PeriodicDelayedMutex_runtime__ReturnCodeType *  BufferState);
+void test_buffer_delayed_refined_model__Next_Value_the_receiver_p_in_impl(
+	test_buffer_delayed_refined_model__SharedStructType_the_receiver_p_in_impl *  BufferAccess,
+	common_pkg__Integer *  DataValue,
+	Base_Types__Integer_16 CurrentPeriod,
+	PeriodicDelayedMutex_runtime__ReturnCodeType *  BufferState);
 
 typedef enum {
   test_buffer_delayed_refined_model__Next_Value_the_receiver_p_in_impl_s
