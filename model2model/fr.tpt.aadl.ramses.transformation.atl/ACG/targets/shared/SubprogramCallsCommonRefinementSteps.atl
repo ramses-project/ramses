@@ -765,7 +765,7 @@ helper context AADLI!DataAccess def : getFeatureInitValue (subCall : AADLI!Subpr
 helper context AADLI!Parameter def : getFeatureInitValue (subCall : AADLI!SubprogramCall, c: AADLI!ComponentInstance) : String =
 	let var : AADLBA!DataSubcomponent = thisModule.resolveMatchedTupleIfExists(Sequence{c,subCall.eContainer(),self}, 'paramCnxVariable') in
 	let subI : AADLBA!SubprogramImplementation = thisModule.resolveMatchedSingleIfExists(c,'entryPointImplImg')in 
-	subI.getProgrammationLanguageIdentifier()+'_'+var.name
+	'& '+subI.getProgrammationLanguageIdentifier()+'_'+var.name
 	;
 helper context AADLI!DataSubcomponent def : getFeatureInitValue (subCall : AADLI!SubprogramCall,  c: AADLI!ComponentInstance) : String = 
 	let cnx : AADLI!Connection = c.subcomponent.classifier.ownedConnection->select( c | 
@@ -2680,14 +2680,6 @@ rule m_Output_DataPort_ComputeEntrypointCallSequence
 -----------------------------------------------------------------
 --- End of refactoring
 -----------------------------------------------------------------
-
-
-
-
-
-
-
-
 
 unique lazy rule createSubprogramCallSequence {
  from
