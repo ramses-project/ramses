@@ -17,11 +17,6 @@
 	<packaging>eclipse-plugin</packaging>
 
 	<dependencies>
-	  <dependency>
-  		<groupId>org.jgrapht</groupId>
-  		<artifactId>jgrapht-jdk1.6</artifactId>
- 		<version>0.8.2</version>
-	  </dependency>
 	
 	  <dependency>
 	    <groupId>ramses</groupId>
