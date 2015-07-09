@@ -2,7 +2,7 @@ Package Minimal_Example
 
 public
 
-with Timing_Properties, Data_Model, Base_types, POK ;
+with Data_Model, Base_types ;
 
 
 processor Processor1
