@@ -1,12 +1,11 @@
 package ojr_runtime
 public
 
-with Data_Model,Base_Types;
+with Data_Model;
 
 data Status
 properties
   Source_Name => "Status";
-  Programming_Properties::Source_Name => "Status";
   Data_Model::Initial_Value => ("new Status()");
 end Status;
 
@@ -14,7 +13,6 @@ end Status;
 data Message_Size_Type
 properties
   Source_Name => "Time";
-  Programming_Properties::Source_Name => "Time";
   Data_Model::Initial_Value => ("new Time()");
 end Message_Size_Type;
 
@@ -22,14 +20,12 @@ end Message_Size_Type;
 data Sampling_Port_Id_Type
 properties
   Source_Name => "Time";
-  Programming_Properties::Source_Name => "Time";
   Data_Model::Initial_Value => ("new Time()");
 end Sampling_Port_Id_Type;
 
 data GenericObject
 properties
   Source_Name => "Object";
-  Programming_Properties::Source_Name => "Object";
 end GenericObject;
 
 subprogram Receive_Data
@@ -38,7 +34,7 @@ features
   OBJ: out parameter GenericObject;
   RETURN_CODE: out parameter Status ;
 properties
-  Programming_Properties::Source_Name => "Services.ReceiveData";
+  Source_Name => "Services.ReceiveData";
 end Receive_Data;
 
 subprogram Send_Data
@@ -47,13 +43,12 @@ features
    OBJ: in parameter GenericObject;
    RETURN_CODE: out parameter Status ;
 properties
-  Programming_Properties::Source_Name => "Services.SendData";
+  Source_Name => "Services.SendData";
 end Send_Data;
 
 data InternalPort
 properties
   Source_Name => "InternalPort";
-  Programming_Properties::Source_Name => "InternalPort";
   Data_Model::Initial_Value => ("new InternalPort()");
 end InternalPort;
 
@@ -61,28 +56,24 @@ end InternalPort;
 data InternalPortQueued
 properties
   Source_Name => "InternalPortQueued";
-  Programming_Properties::Source_Name => "InternalPortQueued";
   Data_Model::Initial_Value => ("new InternalPortQueued()");
 end InternalPortQueued;
 
 data InternalPortSampled
 properties
   Source_Name => "InternalPortSampled";
-  Programming_Properties::Source_Name => "InternalPortSampled";
   Data_Model::Initial_Value => ("new InternalPortSampled()");
 end InternalPortSampled;
 
 data ExternalPort
 properties
   Source_Name => "InternalPort";
-  Programming_Properties::Source_Name => "InternalPort";
   Data_Model::Initial_Value => ("new InternalPort()");
 end ExternalPort;
 
 data Buffer_Id_Type
 properties
   Source_Name => "Time";
-  Programming_Properties::Source_Name => "Time";
   Data_Model::Initial_Value => ("new Time()");
 end Buffer_Id_Type;
 
@@ -91,7 +82,6 @@ end Buffer_Id_Type;
 data Validity_Type
 properties
   Source_Name => "Time";
-  Programming_Properties::Source_Name => "Time";
   Data_Model::Initial_Value => ("new Time()");
 end Validity_Type;
 
@@ -99,7 +89,6 @@ end Validity_Type;
 data Time
 properties
   Source_Name => "Time";
-  Programming_Properties::Source_Name => "Time";
   Data_Model::Initial_Value => ("new Time()");
 end Time;
 
