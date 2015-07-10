@@ -43,6 +43,7 @@ import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode ;
 import org.eclipse.xtext.util.concurrent.IUnitOfWork ;
 import org.osate.aadl2.ComponentImplementation ;
 import org.osate.aadl2.Element ;
+import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.instantiation.InstantiateModel ;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
@@ -54,6 +55,7 @@ import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils ;
 import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider;
 import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
 public abstract class RamsesActionHandler extends AbstractHandler {
@@ -146,10 +148,14 @@ public abstract class RamsesActionHandler extends AbstractHandler {
                 try {
                   URI uri = OsateResourceUtil.getInstanceModelURI(cc);
                   Resource res = OsateResourceUtil.getResource(uri);
-                  if(res!=null && !res.getContents().isEmpty())
-                	_sysInst = (SystemInstance) res.getContents().get(0);
+                  if(res!=null && cc instanceof SystemImplementation)
+                  {
+                    SystemImplementation si = (SystemImplementation) cc;
+                    _sysInst = ServiceProvider.getServiceRegistry().
+                        getModelInstantiatior().instantiate(si);
+                  }
                   else
-                	_sysInst = InstantiateModel.buildInstanceModelFile(cc);
+                    _sysInst = InstantiateModel.buildInstanceModelFile(cc);
                 } catch (UnsupportedOperationException uoe) {
                   Dialog.showError("Model Instantiate",
                                    "Operation is not supported: " + uoe.getMessage());

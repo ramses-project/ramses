@@ -1,7 +1,9 @@
 #include "PeriodicDelayed_runtime.h"
 #include "subprograms.h"
 test_buffer_delayed_refined_model__the_proc_the_sender_entrypoint_impl_BA_State_t the_proc_the_sender_entrypoint_impl_current_state = test_buffer_delayed_refined_model__the_proc_the_sender_entrypoint_impl_BA_entrypoint_init_state;
-void test_buffer_delayed_refined_model__the_proc_the_sender_entrypoint_impl(test_buffer_delayed_refined_model__bufferArrayImpl_the_receiver_p_in_impl *  cnx_p_out, periodic_delayed_context_t *  eventdata_receiver_p_in_Out_Periodic_Delayed_ContextAccess_the_sender_p_out)
+void test_buffer_delayed_refined_model__the_proc_the_sender_entrypoint_impl(
+	test_buffer_delayed_refined_model__bufferArrayImpl_the_receiver_p_in_impl *  cnx_p_out,
+	periodic_delayed_context_t *  eventdata_receiver_p_in_Out_Periodic_Delayed_ContextAccess_the_sender_p_out)
 {
   RETURN_CODE_TYPE test_buffer_delayed_refined_model__the_proc_the_sender_entrypoint_impl_the_proc_the_sender_runtime_call_ret;
   common_pkg__Integer test_buffer_delayed_refined_model__the_proc_the_sender_entrypoint_impl_p_out_localVariable;
@@ -43,7 +45,9 @@ while(1)
 }
 }
 test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_BA_State_t the_proc_the_receiver_entrypoint_impl_current_state = test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_init_state;
-void test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl(test_buffer_delayed_refined_model__bufferArrayImpl_the_receiver_p_in_impl *  p_in, periodic_delayed_context_t *  the_receiver_p_in_Periodic_Delayed_ContextAccess)
+void test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl(
+	test_buffer_delayed_refined_model__bufferArrayImpl_the_receiver_p_in_impl *  p_in,
+	periodic_delayed_context_t *  the_receiver_p_in_Periodic_Delayed_ContextAccess)
 {
   RETURN_CODE_TYPE test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_the_proc_the_receiver_runtime_call_ret;
   RETURN_CODE_TYPE test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_p_in_ErrorCode = 0;
@@ -90,7 +94,13 @@ while(1)
 }
 }
 test_buffer_delayed_refined_model__Put_Value_LowFP_the_proc_the_sender_p_out_BA_State_t Put_Value_LowFP_the_proc_the_sender_p_out_current_state = test_buffer_delayed_refined_model__Put_Value_LowFP_the_proc_the_sender_p_out_s;
-void test_buffer_delayed_refined_model__Put_Value_LowFP_the_proc_the_sender_p_out(Base_Types__Integer_16 taskID, Base_Types__Integer_16 *  iteration_counter, Base_Types__Integer_16 CDWSize, common_pkg__Integer pvalue, periodic_delayed_context_t *  periodic_delayed_context, test_buffer_delayed_refined_model__bufferArrayImpl_the_receiver_p_in_impl *  buffer)
+void test_buffer_delayed_refined_model__Put_Value_LowFP_the_proc_the_sender_p_out(
+	Base_Types__Integer_16 taskID,
+	Base_Types__Integer_16 *  iteration_counter,
+	Base_Types__Integer_16 CDWSize,
+	common_pkg__Integer pvalue,
+	periodic_delayed_context_t *  periodic_delayed_context,
+	test_buffer_delayed_refined_model__bufferArrayImpl_the_receiver_p_in_impl *  buffer)
 {
   Base_Types__Integer_16 CDWIndex;
 while(1)
@@ -110,7 +120,9 @@ while(1)
 }
 }
 PeriodicDelayed_runtime__Send_Output_BA_State_t Send_Output_current_state = PeriodicDelayed_runtime__Send_Output_s;
-void PeriodicDelayed_runtime__Send_Output(Base_Types__Integer_16 *  iteration_counter, Base_Types__Integer_16 CDWSize)
+void PeriodicDelayed_runtime__Send_Output(
+	Base_Types__Integer_16 *  iteration_counter,
+	Base_Types__Integer_16 CDWSize)
 {
   while(1)
 {
@@ -128,7 +140,13 @@ void PeriodicDelayed_runtime__Send_Output(Base_Types__Integer_16 *  iteration_co
 }
 }
 test_buffer_delayed_refined_model__Receive_Input_LowFP_lowmpf_the_proc_the_receiver_p_in_BA_State_t Receive_Input_LowFP_lowmpf_the_proc_the_receiver_p_in_current_state = test_buffer_delayed_refined_model__Receive_Input_LowFP_lowmpf_the_proc_the_receiver_p_in_s;
-void test_buffer_delayed_refined_model__Receive_Input_LowFP_lowmpf_the_proc_the_receiver_p_in(Base_Types__Integer_16 *  iteration_counter, Base_Types__Integer_16 CPRSize, periodic_delayed_context_t *  periodic_delayed_context, Base_Types__Integer_16 *  first, Base_Types__Integer_16 *  last, PeriodicDelayed_runtime__ReturnCodeType *  ReturnCode)
+void test_buffer_delayed_refined_model__Receive_Input_LowFP_lowmpf_the_proc_the_receiver_p_in(
+	Base_Types__Integer_16 *  iteration_counter,
+	Base_Types__Integer_16 CPRSize,
+	periodic_delayed_context_t *  periodic_delayed_context,
+	Base_Types__Integer_16 *  first,
+	Base_Types__Integer_16 *  last,
+	PeriodicDelayed_runtime__ReturnCodeType *  ReturnCode)
 {
   while(1)
 {
@@ -148,7 +166,13 @@ void test_buffer_delayed_refined_model__Receive_Input_LowFP_lowmpf_the_proc_the_
 }
 }
 test_buffer_delayed_refined_model__Next_Value_the_proc_the_receiver_p_in_BA_State_t Next_Value_the_proc_the_receiver_p_in_current_state = test_buffer_delayed_refined_model__Next_Value_the_proc_the_receiver_p_in_s;
-void test_buffer_delayed_refined_model__Next_Value_the_proc_the_receiver_p_in(Base_Types__Integer_16 *  first, Base_Types__Integer_16 last, PeriodicDelayed_runtime__ArrayDataType buffer, common_pkg__Integer *  output, Base_Types__Integer_16 bufferSize, PeriodicDelayed_runtime__ReturnCodeType *  ReturnCode)
+void test_buffer_delayed_refined_model__Next_Value_the_proc_the_receiver_p_in(
+	Base_Types__Integer_16 *  first,
+	Base_Types__Integer_16 last,
+	PeriodicDelayed_runtime__ArrayDataType buffer,
+	common_pkg__Integer *  output,
+	Base_Types__Integer_16 bufferSize,
+	PeriodicDelayed_runtime__ReturnCodeType *  ReturnCode)
 {
   while(1)
 {

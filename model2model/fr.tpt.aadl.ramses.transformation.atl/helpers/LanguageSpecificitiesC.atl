@@ -29,6 +29,26 @@ create OUT : AADLBA from IN : AADLI;
 helper def: structInitInitiator: String = '{';
 helper def: structInitTerminator: String = '}';
 
+
+rule concatStrings(list: Sequence(String))
+{
+	
+  using
+  {
+  	result: String = '';
+  	sep: String = ', ';
+  	subSeq: Sequence(Integer) = list->subSequence(1, list->size()-1);
+  }
+  do
+  {
+	result <- subSeq->iterate(i; result:String = thisModule.structInitInitiator | 
+		result + i + ','
+	);
+	result <- result + list->last() + thisModule.structInitTerminator;
+	result;
+  }
+}
+
 rule concatToString(list: Sequence(Integer))
 {
 	

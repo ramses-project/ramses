@@ -3,7 +3,14 @@
 #include "business-code/PingPong_module.h"
 #include "subprograms.h"
 PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_entrypoint_impl_BA_State_t S2_inst_IPingOrPong_Cping_ping_entrypoint_impl_current_state = PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_entrypoint_impl_BA_entrypoint_init_state;
-void PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_entrypoint_impl(SEQ *  seqNb, BLACKBOARD_ID_TYPE *  delayed_PongIn, SAMPLING_PORT_ID_TYPE *  mode_aadlKeywords, SAMPLING_PORT_ID_TYPE *  PortCnx6_PingOut, SAMPLING_PORT_ID_TYPE *  PortCnx8_badSequenceNumber, PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_currentState *  Parent_BA_currentState_Access, Base_Types__Integer_16 *  PingOut_freshnessIndicator_access)
+void PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_entrypoint_impl(
+	SEQ *  seqNb,
+	BLACKBOARD_ID_TYPE *  delayed_PongIn,
+	SAMPLING_PORT_ID_TYPE *  mode_aadlKeywords,
+	SAMPLING_PORT_ID_TYPE *  PortCnx6_PingOut,
+	SAMPLING_PORT_ID_TYPE *  PortCnx8_badSequenceNumber,
+	PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_currentState *  Parent_BA_currentState_Access,
+	Base_Types__Integer_16 *  PingOut_freshnessIndicator_access)
 {
   PingPongMessage PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_entrypoint_impl_delayed_PongIn_localVariable;
   MESSAGE_SIZE_TYPE PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_entrypoint_impl_delayed_PongIn_Length = sizeof(PingPongMessage);
@@ -61,11 +68,18 @@ while(1)
   }
 }
 }
-void PingPong__IPingOrPong_Cping_delayed_PongIn(PingPongMessage *  PongIn, PingPongMessage *  delayed_PongIn)
+void PingPong__IPingOrPong_Cping_delayed_PongIn(
+	PingPongMessage *  PongIn,
+	PingPongMessage *  delayed_PongIn)
 {
 }
 PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_BA_State_t S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_current_state = PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_BA_entrypoint_init_state;
-void PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl(SEQ *  seqNb, SAMPLING_PORT_ID_TYPE *  PongIn, SAMPLING_PORT_ID_TYPE *  mode_aadlKeywords, BLACKBOARD_ID_TYPE *  PortCnx9_delayed_PongIn, PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_currentState *  Parent_BA_currentState_Access)
+void PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl(
+	SEQ *  seqNb,
+	SAMPLING_PORT_ID_TYPE *  PongIn,
+	SAMPLING_PORT_ID_TYPE *  mode_aadlKeywords,
+	BLACKBOARD_ID_TYPE *  PortCnx9_delayed_PongIn,
+	PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_currentState *  Parent_BA_currentState_Access)
 {
   PingPongMessage PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_PongIn_localVariable;
   MESSAGE_SIZE_TYPE PingPong_refined_model__S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_PongIn_Length = sizeof(PingPongMessage);
@@ -119,7 +133,13 @@ while(1)
 }
 }
 PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_entrypoint_impl_BA_State_t S2_inst_IPingOrPong_Cpong_pong_entrypoint_impl_current_state = PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_entrypoint_impl_BA_entrypoint_init_state;
-void PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_entrypoint_impl(SEQ *  seqNb, SAMPLING_PORT_ID_TYPE *  PingIn, SAMPLING_PORT_ID_TYPE *  mode_aadlKeywords, SAMPLING_PORT_ID_TYPE *  PortCnx7_PongOut, PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_currentState *  Parent_BA_currentState_Access, Base_Types__Integer_16 *  PingIn_freshnessIndicator_access)
+void PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_entrypoint_impl(
+	SEQ *  seqNb,
+	SAMPLING_PORT_ID_TYPE *  PingIn,
+	SAMPLING_PORT_ID_TYPE *  mode_aadlKeywords,
+	SAMPLING_PORT_ID_TYPE *  PortCnx7_PongOut,
+	PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_currentState *  Parent_BA_currentState_Access,
+	Base_Types__Integer_16 *  PingIn_freshnessIndicator_access)
 {
   PingPong_refined_model__PingPongMessage_freshness_t_impl PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PingIn_localVariable;
   MESSAGE_SIZE_TYPE PingPong_refined_model__S2_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PingIn_Length = sizeof(PingPong_refined_model__PingPongMessage_freshness_t_impl);

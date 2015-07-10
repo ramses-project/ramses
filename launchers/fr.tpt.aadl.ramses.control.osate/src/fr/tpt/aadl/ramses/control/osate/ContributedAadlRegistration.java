@@ -28,6 +28,7 @@ import java.util.List ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
+import org.osate.aadl2.modelsupport.resources.PredeclaredProperties ;
 
 import fr.tpt.aadl.ramses.control.support.instantiation.AbstractPredefinedAadlModelManager ;
 
@@ -57,14 +58,14 @@ public class ContributedAadlRegistration extends AbstractPredefinedAadlModelMana
 	for(int p = 0 ; p < predefinedPackagesNames.length ; p++)
 	{
 	  String name = predefinedPackagesNames[p] ;
-	  URI uri = URI.createPlatformResourceURI(OsateResourceUtil.PLUGIN_RESOURCES_DIRECTORY_NAME
+	  URI uri = URI.createPlatformResourceURI(PredeclaredProperties.PLUGIN_RESOURCES_PROJECT_NAME
 			  +"/"+name, true);
 	  result.add(OsateResourceUtil.getResource(uri));
 	}
     for(int p = 0 ; p < predefinedPropertiesNames.length ; p++)
 	{
       String name = predefinedPropertiesNames[p] ;
-  	  URI uri = URI.createPlatformResourceURI(OsateResourceUtil.PLUGIN_RESOURCES_DIRECTORY_NAME
+  	  URI uri = URI.createPlatformResourceURI(PredeclaredProperties.PLUGIN_RESOURCES_PROJECT_NAME
   			  +"/"+name, true);
   	  result.add(OsateResourceUtil.getResource(uri));
 	}

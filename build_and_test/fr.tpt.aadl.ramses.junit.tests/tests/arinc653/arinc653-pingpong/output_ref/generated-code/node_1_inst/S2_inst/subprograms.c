@@ -2,7 +2,14 @@
 #include "pingpong.h"
 #include "subprograms.h"
 PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_BA_State_t S2_inst_a2_inst_entrypoint_impl_current_state = PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_BA_entrypoint_init_state;
-void PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl(SAMPLING_PORT_ID_TYPE *  C2_mode, SAMPLING_PORT_ID_TYPE *  C2_PingIn, SAMPLING_PORT_ID_TYPE *  C2_PongIn, SAMPLING_PORT_ID_TYPE *  C2_ping_implicit_cnx_C2_PingOut, SAMPLING_PORT_ID_TYPE *  C2_pong_implicit_cnx_C2_PongOut, SAMPLING_PORT_ID_TYPE *  C2_error_implicit_cnx_C2_badSequenceNumber, SEQ *  PingPong_a2_impl_call_seq_PingPong_IPingOrPong_mode_seqNb_entrypoint)
+void PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl(
+	SAMPLING_PORT_ID_TYPE *  C2_mode,
+	SAMPLING_PORT_ID_TYPE *  C2_PingIn,
+	SAMPLING_PORT_ID_TYPE *  C2_PongIn,
+	SAMPLING_PORT_ID_TYPE *  C2_ping_implicit_cnx_C2_PingOut,
+	SAMPLING_PORT_ID_TYPE *  C2_pong_implicit_cnx_C2_PongOut,
+	SAMPLING_PORT_ID_TYPE *  C2_error_implicit_cnx_C2_badSequenceNumber,
+	SEQ *  PingPong_a2_impl_call_seq_PingPong_IPingOrPong_mode_seqNb_entrypoint)
 {
   RETURN_CODE_TYPE PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_S2_inst_a2_inst_runtime_call_ret;
   ROLE PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_mode_localVariable;

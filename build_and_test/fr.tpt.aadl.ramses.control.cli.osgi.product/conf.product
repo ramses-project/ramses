@@ -9,7 +9,7 @@
    <launcherArgs>
       <programArgs>-consoleLog
       </programArgs>
-      <vmArgs>-Dosgi.requiredJavaVersion=1.6 -XX:MaxPermSize=256m -Xms40m -Xmx512m
+      <vmArgs>-Dosgi.requiredJavaVersion=1.6 -Xms40m -Xmx512m
       </vmArgs>
    </launcherArgs>
 

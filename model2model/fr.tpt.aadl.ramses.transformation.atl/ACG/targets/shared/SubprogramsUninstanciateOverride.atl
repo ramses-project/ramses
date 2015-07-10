@@ -30,16 +30,24 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									HOOKS: ATLHOOKS;
 
 -- @extends m_Component_Type
-rule m_Subprogram_Type {
+abstract rule m_Subprogram_Type {
  from 
  	type : AADLI!SubprogramType
  to
  	typeImg : AADLBA!SubprogramType (
-		ownedParameter <- type.ownedParameter->collect(p|thisModule.Parameter(p)),
-		ownedDataAccess <- Sequence{contextAccess}->union(
-								type.ownedDataAccess->collect(p|thisModule.DataAccess(p))
-							),
 		ownedPropertyAssociation <- type.mapSpgPropertyAssociationList()
+	)	
+}
+
+-- @extends m_Subprogram_Type
+rule m_Subprogram_Type_with_context {
+ from 
+ 	type : AADLI!SubprogramType (
+ 		type.needsContext()
+ 	)
+ to
+ 	typeImg : AADLBA!SubprogramType (
+		ownedDataAccess <- Sequence{contextAccess}		
 	),
 	contextAccess : AADLBA!DataAccess
 	(
@@ -64,6 +72,8 @@ rule m_Subprogram_Type {
 				thisModule.CreateListValueFromListOfString(
 					type.ownedEventPort->collect(e|e.name)
 					->union(type.ownedEventDataPort->collect(e|e.name))
+					->union(type.ownedParameter->collect(p|'* '+p.name))
+					->union(type.ownedDataAccess->collect(p|'* '+p.name))
 					->excluding(OclUndefined)
 				)
 			),
@@ -73,6 +83,8 @@ rule m_Subprogram_Type {
 					->union(type.ownedEventDataPort->collect(e|e.name))
 					->excluding(OclUndefined)
 					->collect(e|'Unsigned_8'.asClassifier('BASE_TYPES'))
+					->union(type.ownedParameter->collect(p|p.dataFeatureClassifier))
+					->union(type.ownedDataAccess->collect(p|p.dataFeatureClassifier))
 				)
 			),
 			thisModule.CreatePropertyAssociation('Source_Name', 'PROGRAMMING_PROPERTIES',
@@ -86,6 +98,19 @@ rule m_Subprogram_Type {
 		thisModule.addImportedUnit(thisModule.public(), 'BASE_TYPES', 'Base_Types');
 	}
 	
+}
+
+-- @extends m_Subprogram_Type
+rule m_Subprogram_Type_without_context {
+ from 
+ 	type : AADLI!SubprogramType (
+ 		not type.needsContext()
+ 	)
+ to
+ 	typeImg : AADLBA!SubprogramType (
+		ownedParameter <- type.ownedParameter->collect(p|thisModule.Parameter(p)),
+		ownedDataAccess <- type.ownedDataAccess->collect(p|thisModule.DataAccess(p))
+	)
 }
 
 
