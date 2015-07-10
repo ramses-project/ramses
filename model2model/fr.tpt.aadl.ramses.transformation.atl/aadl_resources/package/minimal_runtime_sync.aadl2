@@ -2,7 +2,7 @@ package Minimal_Runtime_Sync
 
 public
 
-with Timing_Properties, Data_Model, Base_Types, Minimal_Runtime_Types ;
+with Minimal_Runtime_Types ;
 
 
 -- Return the current date in nano second. Platform dependent.

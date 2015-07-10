@@ -2,7 +2,7 @@ package Minimal_Common_Example
 
 public
 
-with Timing_Properties, Data_Model, Base_Types, Minimal_Runtime_Dispatch, Minimal_Runtime_Port,  Minimal_Runtime_Types ;
+with Data_Model, Base_Types, Minimal_Runtime_Dispatch, Minimal_Runtime_Port,  Minimal_Runtime_Types ;
 
 
 ------------------------------- Shared Data ------------------------------------
