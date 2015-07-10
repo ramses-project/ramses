@@ -30,7 +30,6 @@ create OUT : CV 	from 		IN : AADLI;
 
 
 
-
 abstract rule check_FeatureInstance
 {
 	from
@@ -62,45 +61,51 @@ rule check_FeatureInstanceHasConcreteDataType
 	  )
 }
 
+helper context AADLI!FeatureInstance def : isConnectedToDataComponentInstance() : Boolean =
+	self.srcConnectionInstance
+			->select(e| not e.source.oclIsTypeOf(AADLI!ComponentInstance))
+	->union(
+		self.srcConnectionInstance
+			->select(e| e.source.oclIsTypeOf(AADLI!ComponentInstance))
+			->select(e| not e.source.category=#data)
+	)->isEmpty()
+;
 
-
-
+-- @extends check_FeatureInstance
 rule check_dataAccess_are_connected
 {
-	from 
-	obj : AADLI!DataAccess,
-	sub : AADLI!Subcomponent(		
-		not sub.subcomponentType.oclIsKindOf(AADLI!ComponentType) and
-		not sub.subcomponentType.oclIsKindOf(AADLI!ComponentPrototype) and 
-		sub.subcomponentType.getType().ownedFeature->includes(obj) and
-		not AADLBA!ConnectedElement.allInstances()->exists(ce| ce.context = sub and ce.connectionEnd = obj) 
---		and 
---		(thisModule.standardPackagesNames->excludes(obj.getPackage().name)  or 
---		thisModule.standardPackagesNames->excludes(sub.getPackage().name))
+	from
+	obj : AADLI!FeatureInstance
+	(
+		obj.category=#dataAccess
+		and
+		not obj.isConnectedToDataComponentInstance()
 	)
 	to
 	  err: CV!Error
 	  (
-	  	object <:= obj,
-		message <- 'Data access '+obj.name+' of subcomponent '+sub.name+' in '+ sub.getOwner().name+' component implementation is not connected'
+	  	 message <- 'Connections of '+obj.name+' should reach a data subcomponent.'
 	  )
+		
 }
+
 
 rule check_Parameter_are_connected
 {
 	from 
-	obj : AADLI!Parameter,
+	obj : AADLI!Feature,
 	sub : AADLI!SubprogramCall(		
-		sub.getSubprogramType().ownedParameter->includes(obj) and
-		not AADLBA!ConnectedElement.allInstances()->exists(ce| ce.context = sub and ce.connectionEnd = obj) and 
-		(thisModule.standardPackagesNames->excludes(obj.getPackage().name) or 
-		thisModule.standardPackagesNames->excludes(sub.getPackage().name))	
+		sub.getSubprogramType().ownedFeature->includes(obj) and
+		sub.getContainingComponent().ownedConnection->exists(
+			c | (c.source.context = sub and c.source.connectionEnd = obj) or 
+			    (c.destination.context = sub and c.destination.connectionEnd = obj)
+		)
 	)
 	to
 	  err: CV!Error
 	  (
 	  	object <:= obj,
-		message <- 'Parameter '+obj.name+' of subprogram call '+sub.name+' is not connected'
+		message <- 'Feature '+obj.name+' of subprogram call '+sub.name+' is not connected'
 	  )	
 }
 
@@ -114,17 +119,3 @@ helper context AADLI!SubprogramCall def : getSubprogramType () : AADLI!Subprogra
 	endif
 	endif
 	;
-
-helper context OclAny def : getPackage() : AADLI!AadlPackage = 
-	if (self.getNamespace().oclIsUndefined()) then 
-		self.getOwner()
-	else
-		self.getNamespace().getPackage()
-	endif;
-
-helper def : standardPackagesNames : Sequence(String) = Sequence{
-'arinc653_runtime', 'RAMSES_processors', 'rtl8029_driver', 'Base_Types', 'PeriodicDelayedMutex_runtime', 'PeriodicDelayed_runtime',
-'ravenscar_runtime', 'ojr_runtime', 'OSEK_runtime'
-};
-
-	
