@@ -6,7 +6,7 @@ package Minimal_Runtime_Dispatch
 public
 
 with Base_Types, Minimal_Runtime_Types,
-      Minimal_Runtime_Sync ;
+     Minimal_Runtime_Port, Minimal_Runtime_Sync ;
 
 
 subprogram Compute_Dispatched_Port
