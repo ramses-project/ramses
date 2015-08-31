@@ -1,11 +1,19 @@
 #ifndef __GENERATED_SUBPROGRAMS_H__
 #define __GENERATED_SUBPROGRAMS_H__
+#include "arinc653/blackboard.h"
 #include "arinc653/time.h"
 #include "arinc653/types.h"
-#include "arinc653/blackboard.h"
 #include "user_code.h"
 #include "gtypes.h"
 #include "main.h"
+typedef enum {
+  test_blackboard_refined_model__the_proc_the_sender_impl_main_state
+} test_blackboard_refined_model__the_proc_the_sender_impl_BA_State_t;
+
+typedef enum {
+  test_blackboard_refined_model__the_proc_the_receiver_impl_main_state
+} test_blackboard_refined_model__the_proc_the_receiver_impl_BA_State_t;
+
 void test_blackboard_refined_model__the_proc_the_sender_entrypoint_impl(
 	BLACKBOARD_ID_TYPE *  cnx_p_out);
 
