@@ -216,7 +216,13 @@ public class AadlToOSEKNxtCUnparser extends AadlToXUnparser implements AadlTarge
 	    result.add(MAIN_APP_MODE);
 	  for(Mode m: modeList)
 	  {
-	    result.add(m.getName());
+		if(m.isInitial())
+		  result.add(m.getName());
+	  }
+	  for(Mode m: modeList)
+	  {
+		if(!m.isInitial())
+	      result.add(m.getName());
 	  }
 	  return result;
 	}
