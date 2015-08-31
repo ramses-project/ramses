@@ -273,7 +273,11 @@ abstract rule m_create_Thread_BA
 									c.featureInstance->select(e|e.feature.oclIsKindOf(AADLBA!DataAccess))
 								)
 								->append(
-									thisModule.resolveMatchedSingleIfExists(c, 'modeCurrentValueAccess')
+									if(not c.inMode->isEmpty()) then
+										thisModule.resolveMatchedSingleIfExists(c, 'modeCurrentValueAccess')
+									else
+										OclUndefined
+									endif
 								)
 								->flatten()->asSet()->excluding(OclUndefined)
  		)
