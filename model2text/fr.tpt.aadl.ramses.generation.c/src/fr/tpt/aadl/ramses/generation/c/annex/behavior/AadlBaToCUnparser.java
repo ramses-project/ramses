@@ -679,29 +679,33 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       public String caseDispatchCondition(DispatchCondition object)
       {
         String msg = "caseDispatchCondition unparsing not supported" ;
-        _LOGGER.fatal(msg);
-        throw new UnsupportedOperationException(msg) ;
+        _LOGGER.warn(msg);
+        _cFileContent.addOutput("1");
+        return DONE;
       }
 
       public String caseDispatchTriggerConditionStop(DispatchTriggerConditionStop object)
       {
         String msg = "caseDispatchTriggerConditionStop unparsing not supported" ;
-        _LOGGER.fatal(msg);
-        throw new UnsupportedOperationException(msg) ;
+        _LOGGER.warn(msg);
+        _cFileContent.addOutput("1");
+        return DONE;
       }
 
       public String caseDispatchTriggerLogicalExpression(DispatchTriggerLogicalExpression object)
       {
         String msg = "caseDispatchTriggerLogicalExpression unparsing not supported" ;
-        _LOGGER.fatal(msg);
-        throw new UnsupportedOperationException(msg) ;
+        _LOGGER.warn(msg);
+        _cFileContent.addOutput("1");
+        return DONE;
       }
 
       public String caseDispatchConjunction(DispatchConjunction object)
       {
         String msg = "caseDispatchConjunction unparsing not supported" ;
-        _LOGGER.fatal(msg);
-        throw new UnsupportedOperationException(msg) ;
+        _LOGGER.warn(msg);
+        _cFileContent.addOutput("1");
+        return DONE;
       }
 
       public String caseBehaviorActionBlock(BehaviorActionBlock object)
@@ -1088,6 +1092,17 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       public boolean manageAccessDirection(DataAccess formal, ParameterLabel actual)
       {
     	  boolean remainingParenthesis=false;
+    	  if(actual instanceof DataAccessHolder)
+        {
+          DataAccessHolder dah = (DataAccessHolder) actual;
+          if(_dataAccessMapping.containsKey(dah.getDataAccess()))
+          {
+            if(Aadl2Utils.isReadWriteDataAccess(formal)
+                || Aadl2Utils.isWriteOnlyDataAccess(formal))
+              _cFileContent.addOutput("&") ;
+            return false;
+          }
+        }
     	  if(Aadl2Utils.isReadWriteDataAccess(formal)
         		  || Aadl2Utils.isWriteOnlyDataAccess(formal))
           {
@@ -1417,7 +1432,8 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         {
           DataAccess da = (DataAccess) elt ;
 
-          if(false == (object.eContainer() instanceof SubprogramCallAction))
+          if(false == _dataAccessMapping.containsKey(da)
+              && false == (object.eContainer() instanceof SubprogramCallAction))
           {
             if(Aadl2Utils.isReadWriteDataAccess(da) ||
                Aadl2Utils.isWriteOnlyDataAccess(da))
@@ -1426,7 +1442,10 @@ public class AadlBaToCUnparser extends AadlBaUnparser
               pointer = true ;
             }
           }
-          id = elt.getName() ;
+          if(_dataAccessMapping.containsKey(da))
+            id = _dataAccessMapping.get(da);
+          else
+            id = elt.getName() ;
         }
         else
           id = elt.getQualifiedName() ;
