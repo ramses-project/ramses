@@ -72,8 +72,9 @@ rule check_ArincUniqueProcessorBinding
 rule check_HasMajorFrame
 {
 	from
-	 	obj:AADLI!ComponentInstance
-		(not obj.hasProperty('Module_Major_Frame'))
+	 	obj:AADLI!ComponentInstance,
+		p: AADLI!Property in ARINC653
+		(p.name= 'Module_Major_Frame' and not obj.hasProperty('Module_Major_Frame'))
 	to
 		err: CV!Error
 		(message <- 'In ARINC653, each processor must '+ 
