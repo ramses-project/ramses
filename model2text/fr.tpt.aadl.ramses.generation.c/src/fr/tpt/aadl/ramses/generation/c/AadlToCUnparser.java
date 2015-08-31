@@ -45,6 +45,7 @@ import org.osate.aadl2.AnnexSubclause ;
 import org.osate.aadl2.BehavioredImplementation ;
 import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.ClassifierValue ;
+import org.osate.aadl2.ComponentClassifier ;
 import org.osate.aadl2.ComponentImplementation ;
 import org.osate.aadl2.ComponentPrototypeActual ;
 import org.osate.aadl2.ComponentPrototypeBinding ;
@@ -1301,6 +1302,23 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         GeneratorUtils.buildDataAccessMapping(object, _dataAccessMapping) ;
         process(object.getType()) ;
 
+        
+        BehaviorAnnex ba = getAnnexSubclause(object);
+        if(ba!=null)
+        {
+        String aadlComponentCId =
+              GenerationUtilsC.getGenerationCIdentifier(object
+                      .getQualifiedName()) ;
+            
+            
+        _currentImplUnparser.addOutputNewline(aadlComponentCId +
+                  "_BA_State_t " +
+                  object.getName().replace('.', '_')+
+                  "_current_state = " + aadlComponentCId + "_" +
+                  AadlBaToCUnparser.getInitialStateIdentifier(ba) + ";") ;
+        }
+        
+        
         _currentImplUnparser.addOutput("void* ") ;
         _currentImplUnparser.addOutput(GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName())) ;
         _currentImplUnparser.addOutputNewline(GenerationUtilsC.THREAD_SUFFIX +
@@ -1331,13 +1349,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
             process(d) ;
         }
 
-        _currentImplUnparser.addOutputNewline("while (1) {") ;
-        _currentImplUnparser.incrementIndent() ;
 
         processBehavioredImplementation(object) ;
-
-        _activityImplCode.decrementIndent() ;
-        _activityImplCode.addOutputNewline("}") ;
 
         _activityImplCode.addOutputNewline("return 0;") ;
         _activityImplCode.decrementIndent() ;
@@ -1427,7 +1440,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         return DONE ;
       }
       
-      private BehaviorAnnex getAnnexSubclause(SubprogramClassifier object)
+      private BehaviorAnnex getAnnexSubclause(ComponentClassifier object)
       {
         for(AnnexSubclause as : object.getOwnedAnnexSubclauses())
         {
