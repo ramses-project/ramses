@@ -820,6 +820,16 @@ rule createUniqueCallAction(c: AADLI!ComponentInstance)
 										thisModule.createFeatureHolder(da)
 									endif
 								)
+								->union(
+									c.featureInstance->collect(fi | 
+										let da:AADLBA!DataAccess = thisModule.resolveMatchedSingleIfExists(fi, 'PeriodicDelayedContext_Access') in
+										if(da.oclIsUndefined()) then
+											OclUndefined
+										else
+											thisModule.createFeatureHolder(da)
+										endif
+									)	
+								)
 								->flatten()->excluding(OclUndefined)
 		),
 		callEntryPointHolder: AADLBA!CalledSubprogramHolder
