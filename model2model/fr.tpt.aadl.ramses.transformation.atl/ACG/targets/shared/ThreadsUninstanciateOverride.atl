@@ -216,7 +216,12 @@ abstract rule m_create_Thread_BA
 													endif
 												)
 												->flatten()->excluding(OclUndefined),
-			ownedAnnexSubclause <- Sequence{thisModule.resolveMatchedSingleIfExists(c, 'behaviorAnnexForThread')}
+			ownedAnnexSubclause <- 
+--								   if(c.inMode->isEmpty()) then
+--									Sequence{}
+--								   else
+									Sequence{thisModule.resolveMatchedSingleIfExists(c, 'behaviorAnnexForThread')}
+-- 								   endif
 		),
 		typeImg : AADLBA!ThreadType (
  	 		name <- c.uniqueName(),

@@ -358,18 +358,19 @@ rule m_ThreadEntrypoint {
 												if(fi.isInputFeature()) then
 													fi.collectEntrypointFeature()
 												else 
-													if(fi.isOutputFeature()) then
+--													if(fi.isOutputFeature()) then
 														fi.srcConnectionInstance->collect(cnxInst| 
 															fi.collectEntrypointFeature(cnxInst.connectionReference->first().connection)
-													)
-													else
-														if(fi.isOutputFeature() and fi.isEventOrEventDataPort()) then
-															fi.srcConnectionInstance->collect(cnxInst| thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxInst.connectionReference->first().connection}, 'barrierEntryPointAccess'))
-														
-														else
-															OclUndefined
-														endif
-													endif
+														)
+														->union(fi.srcConnectionInstance->collect(cnxInst| thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxInst.connectionReference->first().connection}, 'barrierEntryPointAccess')))
+--													else
+--														if(fi.isOutputFeature() and fi.isEventOrEventDataPort()) then
+--															
+--														
+--														else
+--															OclUndefined
+--														endif
+--													endif
 												endif
 											endif
 								)->flatten()
@@ -793,6 +794,26 @@ rule createUniqueCallAction(c: AADLI!ComponentInstance)
 									endif
 								)->append(
 									let da:AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{c, c.subcomponent.classifier.getBA()}, 'currentStateAccessThread') in
+									if(da.oclIsUndefined()) then
+										OclUndefined
+									else
+										thisModule.createFeatureHolder(da)
+									endif
+								)
+								->union( c.featureInstance->select(fi|fi.isEventPort() or fi.isEventDataPort() and fi.isOutputFeature())
+										->collect(fi|
+												fi.srcConnectionInstance->collect( cnxInst |
+													let da:AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxInst.connectionReference->first().connection}, 'barrierEntryPointAccess') in
+													if(da.oclIsUndefined()) then
+														OclUndefined
+													else
+														thisModule.createFeatureHolder(da)
+													endif
+												)
+										)
+								)
+								->append(
+									let da:AADLBA!DataAccess = thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID_LOCAL_ACCESS') in
 									if(da.oclIsUndefined()) then
 										OclUndefined
 									else
