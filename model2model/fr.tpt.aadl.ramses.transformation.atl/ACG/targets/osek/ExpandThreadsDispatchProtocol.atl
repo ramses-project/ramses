@@ -88,6 +88,8 @@ rule m_BehaviorActionsFromThread_Periodic
 			c.subcomponent.subcomponentType.getBA() = src_transition.eContainer()
 			and
 			src_transition.destinationState.complete=true
+			and
+			false
 		)
 	using
 	{
@@ -282,6 +284,31 @@ helper def: getNextPeriodSubprogram: AADLBA!Subprogram =
 helper def: getWaitPeriodSubprogram: AADLBA!Subprogram =
 	'TerminateTask'.asSubprogramType('OSEK_RUNTIME')
 ;
+
+lazy rule createNotInModeCall
+{
+	from 
+		c: AADLI!ComponentInstance
+	using
+	{
+		spg : AADLBA!SubprogramType = thisModule.getWaitPeriodSubprogram;
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- waitSubprogramHolder,
+			parameterLabels <- Sequence{}
+		),
+		waitSubprogramHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- spg
+		)
+		
+	do
+	{
+		call;
+	}
+}
 
 helper def: platformName: String =
 	'osek'

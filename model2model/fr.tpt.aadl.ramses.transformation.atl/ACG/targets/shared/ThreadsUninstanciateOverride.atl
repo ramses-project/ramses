@@ -215,7 +215,8 @@ abstract rule m_create_Thread_BA
 														Sequence{}
 													endif
 												)
-												->flatten()->excluding(OclUndefined)
+												->flatten()->excluding(OclUndefined),
+			ownedAnnexSubclause <- Sequence{thisModule.resolveMatchedSingleIfExists(c, 'behaviorAnnexForThread')}
 		),
 		typeImg : AADLBA!ThreadType (
  	 		name <- c.uniqueName(),
@@ -270,6 +271,9 @@ abstract rule m_create_Thread_BA
 								->union
 								(
 									c.featureInstance->select(e|e.feature.oclIsKindOf(AADLBA!DataAccess))
+								)
+								->append(
+									thisModule.resolveMatchedSingleIfExists(c, 'modeCurrentValueAccess')
 								)
 								->flatten()->asSet()->excluding(OclUndefined)
  		)
