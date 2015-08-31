@@ -57,17 +57,55 @@ public class ContributedAadlRegistration extends AbstractPredefinedAadlModelMana
 	List<Resource> result = new ArrayList<Resource>();
 	for(int p = 0 ; p < predefinedPackagesNames.length ; p++)
 	{
+	  Resource resToAdd = null;
 	  String name = predefinedPackagesNames[p] ;
 	  URI uri = URI.createPlatformResourceURI(PredeclaredProperties.PLUGIN_RESOURCES_PROJECT_NAME
 			  +"/"+name, true);
-	  result.add(OsateResourceUtil.getResource(uri));
+	  resToAdd = OsateResourceUtil.getResource(uri);
+	  if(resToAdd!=null && !resToAdd.getContents().isEmpty())
+	  {
+      result.add(resToAdd);
+      continue;
+    }
+	  uri = URI.createPlatformResourceURI(PredeclaredProperties.PLUGIN_RESOURCES_PROJECT_NAME
+	                                      +"/aadl_resources/package/"+name, true);
+	                                  resToAdd = OsateResourceUtil.getResource(uri);
+	  if(resToAdd!=null && !resToAdd.getContents().isEmpty())
+	  {
+      result.add(resToAdd);
+      continue;
+    } 
 	}
-    for(int p = 0 ; p < predefinedPropertiesNames.length ; p++)
+  for(int p = 0 ; p < predefinedPropertiesNames.length ; p++)
 	{
-      String name = predefinedPropertiesNames[p] ;
-  	  URI uri = URI.createPlatformResourceURI(PredeclaredProperties.PLUGIN_RESOURCES_PROJECT_NAME
-  			  +"/"+name, true);
-  	  result.add(OsateResourceUtil.getResource(uri));
+    Resource resToAdd = null;
+    String name = predefinedPropertiesNames[p] ;
+    URI uri = URI.createPlatformResourceURI(PredeclaredProperties.PLUGIN_RESOURCES_PROJECT_NAME
+                                            +"/"+name, true);
+    resToAdd = OsateResourceUtil.getResource(uri);
+    if(resToAdd!=null && !resToAdd.getContents().isEmpty())
+    {
+      result.add(resToAdd);
+      continue;
+    }
+
+    uri = URI.createPlatformResourceURI(PredeclaredProperties.PLUGIN_RESOURCES_PROJECT_NAME
+                                        +"/aadl_resources/propertyset/"+name, true);
+    resToAdd = OsateResourceUtil.getResource(uri);
+    if(resToAdd!=null && !resToAdd.getContents().isEmpty())
+    {
+      result.add(resToAdd);
+      continue;
+    }
+    
+    uri = URI.createPlatformResourceURI(PredeclaredProperties.PLUGIN_RESOURCES_PROJECT_NAME
+                                        +"/Predeclared_Property_Sets/"+name, true);
+    resToAdd = OsateResourceUtil.getResource(uri);
+    if(resToAdd!=null && !resToAdd.getContents().isEmpty())
+    {
+      result.add(resToAdd);
+      continue;
+    }
 	}
     return result;
   }
