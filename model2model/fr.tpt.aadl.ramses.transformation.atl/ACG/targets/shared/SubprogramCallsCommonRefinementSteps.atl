@@ -803,7 +803,7 @@ rule createUniqueCallAction(c: AADLI!ComponentInstance)
 								->union( c.featureInstance->select(fi|fi.isEventPort() or fi.isEventDataPort() and fi.isOutputFeature())
 										->collect(fi|
 												fi.srcConnectionInstance->collect( cnxInst |
-													let da:AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxInst.connectionReference->first().connection}, 'barrierEntryPointAccess') in
+													let da:AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxInst.connectionReference->first().connection}, 'barrierThreadAccess') in
 													if(da.oclIsUndefined()) then
 														OclUndefined
 													else
