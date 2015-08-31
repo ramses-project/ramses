@@ -2,7 +2,7 @@ package Minimal_System_Example
 
 public
 
-with Data_Model, Minimal_Example, Minimal_Aperiodic_Example,
+with Data_Model, Base_Types, Minimal_Example, Minimal_Aperiodic_Example,
       Minimal_Periodic_Example, Minimal_Common_Example, Minimal_Runtime_Types ;
 
 

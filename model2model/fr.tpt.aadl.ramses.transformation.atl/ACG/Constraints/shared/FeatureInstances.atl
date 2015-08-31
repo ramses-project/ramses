@@ -43,7 +43,6 @@ helper context AADLI!SubprogramCallSequence def: getContainingComponent():AADLBA
         endif
 ;
 
-
 abstract rule check_FeatureInstance
 {
         from
@@ -88,8 +87,7 @@ rule check_dataAccess_are_connected
 	to
 	  err: CV!Error
 	  (
-	  	object <:= obj,
-		message <- 'Data access '+obj.name+' of subcomponent '+sub.name+' in '+ sub.getOwner().name+' component implementation is not connected'
+	  	 message <- 'Connections of '+obj.name+' should reach a data subcomponent.'
 	  )
 }		
 
