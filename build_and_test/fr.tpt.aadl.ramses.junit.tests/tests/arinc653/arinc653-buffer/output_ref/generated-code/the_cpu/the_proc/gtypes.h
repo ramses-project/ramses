@@ -1,7 +1,7 @@
 #ifndef __GENERATED_GTYPES_H__
 #define __GENERATED_GTYPES_H__
-#include "arinc653/types.h"
 #include "arinc653/buffer.h"
+#include "arinc653/types.h"
 typedef BUFFER_ID_TYPE arinc653_runtime__Buffer_Id_Type;
 typedef RETURN_CODE_TYPE arinc653_runtime__Return_Code_Type;
 typedef  int common_pkg__Integer;
