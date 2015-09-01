@@ -1292,7 +1292,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
               	  }
               	  else if(v instanceof DataComponentReference)
               	  {
-              		process(v);
+              	    process(v);
               	  }
               	  else
               	  {
@@ -1433,7 +1433,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           DataAccess da = (DataAccess) elt ;
 
           if(false == _dataAccessMapping.containsKey(da)
-              && false == (object.eContainer() instanceof SubprogramCallAction))
+              && AadlUtil.getContainingAnnex(object) instanceof ThreadClassifier)
           {
             if(Aadl2Utils.isReadWriteDataAccess(da) ||
                Aadl2Utils.isWriteOnlyDataAccess(da))
@@ -1443,7 +1443,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
             }
           }
           if(_dataAccessMapping.containsKey(da)
-              && false == (object.eContainer() instanceof SubprogramCallAction))
+              && AadlUtil.getContainingAnnex(object) instanceof ThreadClassifier)
             id = _dataAccessMapping.get(da);
           else
             id = elt.getName() ;
