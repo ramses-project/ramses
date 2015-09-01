@@ -1442,7 +1442,8 @@ public class AadlBaToCUnparser extends AadlBaUnparser
               pointer = true ;
             }
           }
-          if(_dataAccessMapping.containsKey(da))
+          if(_dataAccessMapping.containsKey(da)
+              && false == (object.eContainer() instanceof SubprogramCallAction))
             id = _dataAccessMapping.get(da);
           else
             id = elt.getName() ;

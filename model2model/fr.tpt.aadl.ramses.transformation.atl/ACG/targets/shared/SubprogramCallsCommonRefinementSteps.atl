@@ -383,6 +383,20 @@ rule m_ThreadEntrypoint {
 										Sequence{}
 									endif
 								)
+								->union(impl.getAllSubprogramCallSequence()
+									->collect(callSequence | c.subcomponent.classifier.ownedAccessConnection
+										-> select(accessCnx| 
+											accessCnx.isAccessToParamConnection()
+											and
+											accessCnx.isPartOfCallSequence(callSequence)
+											and
+											callSequence.isComputeEntryPointOf(c)
+										)
+										->collect(
+											accessCnx | thisModule.resolveMatchedTupleIfExists(Sequence{c, callSequence, accessCnx}, 'dataAccess')
+										)														
+									)
+								)
 								->append
 								(
 									thisModule.resolveMatchedTupleIfExists(Sequence{c,impl.getBA()},'currentStateAccess')

@@ -37,7 +37,7 @@ helper context AADLI!Element def: getInstanceObjectPathIfNE() : String =
 
 --- Returns the same as thisModule.resolveTemp(var : OclAny, rule_name : String, target_pattern_name : String),
 --- except that it returns OclUndefined if no trace exists instead of throwing an error.
-helper def : resolveLazyTupleSingleIfExists(var : Sequence(OclAny), rule_name : String, target_pattern_name : String) : OclAny =
+helper def : resolveLazyTupleIfExists(var : Sequence(OclAny), rule_name : String, target_pattern_name : String) : OclAny =
     let tr : OclAny = thisModule.traces.getLinksByRule(rule_name, false) in
     if tr.oclIsUndefined() then
     	OclUndefined
