@@ -1433,7 +1433,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           DataAccess da = (DataAccess) elt ;
 
           if(false == _dataAccessMapping.containsKey(da)
-              && AadlUtil.getContainingAnnex(object) instanceof ThreadClassifier)
+              && false == (object.eContainer() instanceof SubprogramCallAction))
           {
             if(Aadl2Utils.isReadWriteDataAccess(da) ||
                Aadl2Utils.isWriteOnlyDataAccess(da))
