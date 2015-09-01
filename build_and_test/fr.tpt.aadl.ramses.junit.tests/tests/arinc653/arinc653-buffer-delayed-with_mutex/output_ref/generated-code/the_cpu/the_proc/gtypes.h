@@ -1,7 +1,7 @@
 #ifndef __GENERATED_GTYPES_H__
 #define __GENERATED_GTYPES_H__
-#include "arinc653/types.h"
 #include "arinc653/semaphore.h"
+#include "arinc653/types.h"
 typedef  int common_pkg__Integer;
 typedef signed int Base_Types__Integer_16;
 typedef char Base_Types__Boolean;

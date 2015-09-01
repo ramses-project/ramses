@@ -42,49 +42,6 @@ while(1)
   }
 }
 }
-test_buffer_delayed_refined_model__Put_Value_the_proc_the_sender_p_out_BA_State_t Put_Value_the_proc_the_sender_p_out_current_state = test_buffer_delayed_refined_model__Put_Value_the_proc_the_sender_p_out_s;
-void test_buffer_delayed_refined_model__Put_Value_the_proc_the_sender_p_out(
-	Base_Types__Integer_16 *  iteration_counter,
-	PeriodicDelayed_runtime__ArrayDataType CDW,
-	Base_Types__Integer_16 CDWSize,
-	common_pkg__Integer pvalue,
-	test_buffer_delayed_refined_model__bufferArrayImpl_the_receiver_p_in_impl *  buffer)
-{
-  while(1)
-{
-  switch(Put_Value_the_proc_the_sender_p_out_current_state)
-  {
-    case test_buffer_delayed_refined_model__Put_Value_the_proc_the_sender_p_out_s:
-    // Transition id: t
-    if(1) // no execution condition
-    {
-      Put_Value_the_proc_the_sender_p_out_current_state = test_buffer_delayed_refined_model__Put_Value_the_proc_the_sender_p_out_s;
-      (*buffer)[CDW[(*iteration_counter)]] = pvalue;
-      return;
-    }
-  }
-}
-}
-PeriodicDelayed_runtime__Send_Output_BA_State_t Send_Output_current_state = PeriodicDelayed_runtime__Send_Output_s;
-void PeriodicDelayed_runtime__Send_Output(
-	Base_Types__Integer_16 *  iteration_counter,
-	Base_Types__Integer_16 CDWSize)
-{
-  while(1)
-{
-  switch(Send_Output_current_state)
-  {
-    case PeriodicDelayed_runtime__Send_Output_s:
-    // Transition id: t
-    if(1) // no execution condition
-    {
-      Send_Output_current_state = PeriodicDelayed_runtime__Send_Output_s;
-      (*iteration_counter) = ((*iteration_counter) + 1) % CDWSize;
-      return;
-    }
-  }
-}
-}
 test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_BA_State_t the_proc_the_receiver_entrypoint_impl_current_state = test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_init_state;
 void test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl(
 	test_buffer_delayed_refined_model__bufferArrayImpl_the_receiver_p_in_impl *  p_in)
@@ -130,6 +87,49 @@ while(1)
       receive (test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_p_in_localVariable);
       }
       break;
+    }
+  }
+}
+}
+test_buffer_delayed_refined_model__Put_Value_the_proc_the_sender_p_out_BA_State_t Put_Value_the_proc_the_sender_p_out_current_state = test_buffer_delayed_refined_model__Put_Value_the_proc_the_sender_p_out_s;
+void test_buffer_delayed_refined_model__Put_Value_the_proc_the_sender_p_out(
+	Base_Types__Integer_16 *  iteration_counter,
+	PeriodicDelayed_runtime__ArrayDataType CDW,
+	Base_Types__Integer_16 CDWSize,
+	common_pkg__Integer pvalue,
+	test_buffer_delayed_refined_model__bufferArrayImpl_the_receiver_p_in_impl *  buffer)
+{
+  while(1)
+{
+  switch(Put_Value_the_proc_the_sender_p_out_current_state)
+  {
+    case test_buffer_delayed_refined_model__Put_Value_the_proc_the_sender_p_out_s:
+    // Transition id: t
+    if(1) // no execution condition
+    {
+      Put_Value_the_proc_the_sender_p_out_current_state = test_buffer_delayed_refined_model__Put_Value_the_proc_the_sender_p_out_s;
+      (*buffer)[CDW[(*iteration_counter)]] = pvalue;
+      return;
+    }
+  }
+}
+}
+PeriodicDelayed_runtime__Send_Output_BA_State_t Send_Output_current_state = PeriodicDelayed_runtime__Send_Output_s;
+void PeriodicDelayed_runtime__Send_Output(
+	Base_Types__Integer_16 *  iteration_counter,
+	Base_Types__Integer_16 CDWSize)
+{
+  while(1)
+{
+  switch(Send_Output_current_state)
+  {
+    case PeriodicDelayed_runtime__Send_Output_s:
+    // Transition id: t
+    if(1) // no execution condition
+    {
+      Send_Output_current_state = PeriodicDelayed_runtime__Send_Output_s;
+      (*iteration_counter) = ((*iteration_counter) + 1) % CDWSize;
+      return;
     }
   }
 }

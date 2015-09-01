@@ -1,8 +1,8 @@
 #ifndef __GENERATED_SUBPROGRAMS_H__
 #define __GENERATED_SUBPROGRAMS_H__
+#include "arinc653/queueing.h"
 #include "arinc653/time.h"
 #include "arinc653/types.h"
-#include "arinc653/queueing.h"
 #include "user_code.h"
 #include "gtypes.h"
 #include "main.h"

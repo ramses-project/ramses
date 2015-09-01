@@ -1,11 +1,11 @@
 #ifndef __GENERATED_SUBPROGRAMS_H__
 #define __GENERATED_SUBPROGRAMS_H__
-#include "event_code.h"
-#include "arinc653/time.h"
-#include "/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/event_code.h"
-#include "arinc653/types.h"
-#include "arinc653/event.h"
 #include "arinc653/buffer.h"
+#include "/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/event_code.h"
+#include "event_code.h"
+#include "arinc653/event.h"
+#include "arinc653/time.h"
+#include "arinc653/types.h"
 #include "gtypes.h"
 #include "main.h"
 void test_events_refined_model__the_proc_the_sender_entrypoint_impl(

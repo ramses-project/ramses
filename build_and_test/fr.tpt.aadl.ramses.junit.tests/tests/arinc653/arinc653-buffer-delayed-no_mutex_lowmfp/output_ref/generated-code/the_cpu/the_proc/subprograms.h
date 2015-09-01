@@ -1,9 +1,9 @@
 #ifndef __GENERATED_SUBPROGRAMS_H__
 #define __GENERATED_SUBPROGRAMS_H__
-#include "arinc653/types.h"
-#include "arinc653/time.h"
 #include "PeriodicDelayed_runtime.h"
+#include "arinc653/time.h"
 #include "user_code.h"
+#include "arinc653/types.h"
 #include "gtypes.h"
 #include "main.h"
 void test_buffer_delayed_refined_model__the_proc_the_sender_entrypoint_impl(

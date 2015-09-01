@@ -326,13 +326,13 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
   
   subprogram S1_inst_Monitor_changeState_entrypoint
     features
-      State_baKeywords: requires data access PingPong::TYPE_aadlKeywords;
       error_C1: requires data access arinc653_runtime::Blackboard_Id_Type;
       delayed_error_C2: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx1_mode_C1: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx2_mode_C1: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx3_mode_C1: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx8_mode_C2: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      State_baKeywords: requires data access PingPong::TYPE_aadlKeywords;
       Parent_BA_currentState_Access: requires data access S1_inst_Monitor_changeState_currentState;
   end S1_inst_Monitor_changeState_entrypoint;
   
@@ -437,9 +437,9 @@ Write_Sampling_Message_ROLE ! (PortCnx8_mode_C2, mode_C2_localVariable, mode_C2_
   
   subprogram S1_inst_Monitor_delayed_error_C2_entrypoint
     features
-      State_baKeywords: requires data access PingPong::TYPE_aadlKeywords;
       error_C2: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       PortCnx11_delayed_error_C2: requires data access arinc653_runtime::Blackboard_Id_Type;
+      State_baKeywords: requires data access PingPong::TYPE_aadlKeywords;
       Parent_BA_currentState_Access: requires data access S1_inst_Monitor_delayed_error_C2_currentState;
   end S1_inst_Monitor_delayed_error_C2_entrypoint;
   
@@ -509,11 +509,11 @@ Display_Blackboard_Exception ! (PortCnx11_delayed_error_C2, delayed_error_C2_loc
   
   subprogram S1_inst_IPingOrPong_Cping_ping_entrypoint
     features
-      seqNb: requires data access PingPong::SEQ;
       delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type;
-      mode_aadlKeywords: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx9_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       PortCnx4_badSequenceNumber: requires data access arinc653_runtime::Blackboard_Id_Type;
+      mode_aadlKeywords: requires data access arinc653_runtime::Blackboard_Id_Type;
+      seqNb: requires data access PingPong::SEQ;
       Parent_BA_currentState_Access: requires data access S1_inst_IPingOrPong_Cping_ping_currentState;
       PingOut_freshnessIndicator_access: requires data access Base_Types::Integer_16;
   end S1_inst_IPingOrPong_Cping_ping_entrypoint;
@@ -617,10 +617,10 @@ Display_Blackboard_Exception ! (PortCnx4_badSequenceNumber, badSequenceNumber_lo
   
   subprogram S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint
     features
-      seqNb: requires data access PingPong::SEQ;
       PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      mode_aadlKeywords: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx12_delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type;
+      mode_aadlKeywords: requires data access arinc653_runtime::Blackboard_Id_Type;
+      seqNb: requires data access PingPong::SEQ;
       Parent_BA_currentState_Access: requires data access S1_inst_IPingOrPong_Cping_delayed_PongIn_currentState;
   end S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint;
   
@@ -704,10 +704,10 @@ Display_Blackboard_PingPongMessage ! (PortCnx12_delayed_PongIn, delayed_PongIn_l
   
   subprogram S1_inst_IPingOrPong_Cpong_pong_entrypoint
     features
-      seqNb: requires data access PingPong::SEQ;
       PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      mode_aadlKeywords: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx10_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      mode_aadlKeywords: requires data access arinc653_runtime::Blackboard_Id_Type;
+      seqNb: requires data access PingPong::SEQ;
       Parent_BA_currentState_Access: requires data access S1_inst_IPingOrPong_Cpong_pong_currentState;
       PingIn_freshnessIndicator_access: requires data access Base_Types::Integer_16;
   end S1_inst_IPingOrPong_Cpong_pong_entrypoint;
@@ -802,11 +802,11 @@ Write_Sampling_Message_PingPongMessage ! (PortCnx10_PongOut, PongOut_localVariab
   
   subprogram S2_inst_IPingOrPong_Cping_ping_entrypoint
     features
-      seqNb: requires data access PingPong::SEQ;
       delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type;
-      mode_aadlKeywords: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       PortCnx6_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       PortCnx8_badSequenceNumber: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      mode_aadlKeywords: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      seqNb: requires data access PingPong::SEQ;
       Parent_BA_currentState_Access: requires data access S2_inst_IPingOrPong_Cping_ping_currentState;
       PingOut_freshnessIndicator_access: requires data access Base_Types::Integer_16;
   end S2_inst_IPingOrPong_Cping_ping_entrypoint;
@@ -908,10 +908,10 @@ Write_Sampling_Message_Exception ! (PortCnx8_badSequenceNumber, badSequenceNumbe
   
   subprogram S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint
     features
-      seqNb: requires data access PingPong::SEQ;
       PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      mode_aadlKeywords: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       PortCnx9_delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type;
+      mode_aadlKeywords: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      seqNb: requires data access PingPong::SEQ;
       Parent_BA_currentState_Access: requires data access S2_inst_IPingOrPong_Cping_delayed_PongIn_currentState;
   end S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint;
   
@@ -993,10 +993,10 @@ Display_Blackboard_PingPongMessage ! (PortCnx9_delayed_PongIn, delayed_PongIn_lo
   
   subprogram S2_inst_IPingOrPong_Cpong_pong_entrypoint
     features
-      seqNb: requires data access PingPong::SEQ;
       PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      mode_aadlKeywords: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       PortCnx7_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      mode_aadlKeywords: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      seqNb: requires data access PingPong::SEQ;
       Parent_BA_currentState_Access: requires data access S2_inst_IPingOrPong_Cpong_pong_currentState;
       PingIn_freshnessIndicator_access: requires data access Base_Types::Integer_16;
   end S2_inst_IPingOrPong_Cpong_pong_entrypoint;

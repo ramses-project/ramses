@@ -1,9 +1,9 @@
 #ifndef __GENERATED_GTYPES_H__
 #define __GENERATED_GTYPES_H__
 #include "arinc653/sampling.h"
-#include "arinc653/types.h"
-#include "arinc653/blackboard.h"
 #include "business-code/cbtc_module.h"
+#include "arinc653/blackboard.h"
+#include "arinc653/types.h"
 typedef struct cbtc__TrainPosition {
 } cbtc__TrainPosition;
 typedef enum e_cbtc_refined_model__train_inst_TrainPpu_odometerAcquisition_behaviorIdentifier_enum {

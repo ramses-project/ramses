@@ -1,18 +1,10 @@
 #ifndef __GENERATED_SUBPROGRAMS_H__
 #define __GENERATED_SUBPROGRAMS_H__
 #include "arinc653/time.h"
-#include "arinc653/types.h"
 #include "user_code.h"
+#include "arinc653/types.h"
 #include "gtypes.h"
 #include "main.h"
-typedef enum {
-  test_buffer_delayed_refined_model__the_proc_the_sender_impl_main_state
-} test_buffer_delayed_refined_model__the_proc_the_sender_impl_BA_State_t;
-
-typedef enum {
-  test_buffer_delayed_refined_model__the_proc_the_receiver_impl_main_state
-} test_buffer_delayed_refined_model__the_proc_the_receiver_impl_BA_State_t;
-
 void test_buffer_delayed_refined_model__the_proc_the_sender_entrypoint_impl(
 	test_buffer_delayed_refined_model__bufferArrayImpl_the_receiver_p_in_impl *  cnx_p_out);
 
@@ -22,6 +14,16 @@ typedef enum {
   test_buffer_delayed_refined_model__the_proc_the_sender_entrypoint_impl_BA_entrypoint_exec_state,
   test_buffer_delayed_refined_model__the_proc_the_sender_entrypoint_impl_BA_entrypoint_final_state
 } test_buffer_delayed_refined_model__the_proc_the_sender_entrypoint_impl_BA_State_t;
+
+void test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl(
+	test_buffer_delayed_refined_model__bufferArrayImpl_the_receiver_p_in_impl *  p_in);
+
+typedef enum {
+  test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_init_state,
+  test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_wait_dispatch_state,
+  test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_exec_state,
+  test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_final_state
+} test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_BA_State_t;
 
 void test_buffer_delayed_refined_model__Put_Value_the_proc_the_sender_p_out(
 	Base_Types__Integer_16 *  iteration_counter,
@@ -41,16 +43,6 @@ void PeriodicDelayed_runtime__Send_Output(
 typedef enum {
   PeriodicDelayed_runtime__Send_Output_s
 } PeriodicDelayed_runtime__Send_Output_BA_State_t;
-
-void test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl(
-	test_buffer_delayed_refined_model__bufferArrayImpl_the_receiver_p_in_impl *  p_in);
-
-typedef enum {
-  test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_init_state,
-  test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_wait_dispatch_state,
-  test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_exec_state,
-  test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_final_state
-} test_buffer_delayed_refined_model__the_proc_the_receiver_entrypoint_impl_BA_State_t;
 
 void test_buffer_delayed_refined_model__Receive_Input_lowet_the_proc_the_receiver_p_in(
 	Base_Types__Integer_16 *  iteration_counter,

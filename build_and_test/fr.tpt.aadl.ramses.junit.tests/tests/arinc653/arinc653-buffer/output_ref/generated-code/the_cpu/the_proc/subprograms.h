@@ -6,14 +6,6 @@
 #include "user_code.h"
 #include "gtypes.h"
 #include "main.h"
-typedef enum {
-  test_buffer_refined_model__the_proc_the_sender_impl_main_state
-} test_buffer_refined_model__the_proc_the_sender_impl_BA_State_t;
-
-typedef enum {
-  test_buffer_refined_model__the_proc_the_receiver_impl_main_state
-} test_buffer_refined_model__the_proc_the_receiver_impl_BA_State_t;
-
 void test_buffer_refined_model__the_proc_the_sender_entrypoint_impl(
 	BUFFER_ID_TYPE *  cnx_p_out);
 

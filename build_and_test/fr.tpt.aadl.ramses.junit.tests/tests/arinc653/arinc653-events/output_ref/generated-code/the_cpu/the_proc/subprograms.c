@@ -1,5 +1,5 @@
-#include "arinc653/event.h"
 #include "arinc653/buffer.h"
+#include "arinc653/event.h"
 #include "subprograms.h"
 test_events_refined_model__the_proc_the_sender_entrypoint_impl_BA_State_t the_proc_the_sender_entrypoint_impl_current_state = test_events_refined_model__the_proc_the_sender_entrypoint_impl_BA_entrypoint_init_state;
 void test_events_refined_model__the_proc_the_sender_entrypoint_impl(

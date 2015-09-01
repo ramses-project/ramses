@@ -1,10 +1,10 @@
 #ifndef __GENERATED_SUBPROGRAMS_H__
 #define __GENERATED_SUBPROGRAMS_H__
+#include "arinc653/buffer.h"
+#include "arinc653/event.h"
 #include "arinc653/time.h"
 #include "arinc653/types.h"
-#include "arinc653/event.h"
 #include "user_code.h"
-#include "arinc653/buffer.h"
 #include "gtypes.h"
 #include "main.h"
 void test_sporadic_refined_model__the_proc_the_sender_entrypoint_impl(

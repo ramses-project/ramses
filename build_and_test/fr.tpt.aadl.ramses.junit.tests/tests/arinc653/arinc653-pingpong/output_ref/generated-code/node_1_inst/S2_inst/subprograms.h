@@ -1,9 +1,9 @@
 #ifndef __GENERATED_SUBPROGRAMS_H__
 #define __GENERATED_SUBPROGRAMS_H__
+#include "pingpong.h"
 #include "arinc653/sampling.h"
 #include "arinc653/time.h"
 #include "arinc653/types.h"
-#include "pingpong.h"
 #include "gtypes.h"
 #include "main.h"
 void PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl(

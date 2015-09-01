@@ -127,12 +127,12 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,arinc653_runtime;
   
   subprogram S1_inst_a1_inst_entrypoint
     features
-      C1_PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      C1_PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      Mon_error_C2: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       mode_implicit_cnx_Mon_mode_C2: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       C1_ping_implicit_cnx_C1_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       C1_pong_implicit_cnx_C1_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      C1_PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      C1_PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      Mon_error_C2: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       PingPong_a1_impl_call_seq_PingPong_Monitor_activate_state_baKeywords_entrypoint: requires data access PingPong::TYPE_aadlKeywords;
       PingPong_a1_impl_call_seq_PingPong_IPingOrPong_mode_seqNb_entrypoint: requires data access PingPong::SEQ;
   end S1_inst_a1_inst_entrypoint;

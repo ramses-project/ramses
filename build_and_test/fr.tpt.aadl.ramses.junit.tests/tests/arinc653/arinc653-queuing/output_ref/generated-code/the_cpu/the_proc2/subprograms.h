@@ -6,10 +6,6 @@
 #include "user_code.h"
 #include "gtypes.h"
 #include "main.h"
-typedef enum {
-  test_queuing_refined_model__the_proc2_the_receiver_impl_main_state
-} test_queuing_refined_model__the_proc2_the_receiver_impl_BA_State_t;
-
 void test_queuing_refined_model__the_proc2_the_receiver_entrypoint_impl(
 	APEX_INTEGER *  p_in);
 

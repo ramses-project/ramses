@@ -124,9 +124,6 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,test_netw
   bus rtl8029
   end rtl8029;
   
-  processor cpu_x86
-  end cpu_x86;
-  
   processor cpu
   end cpu;
   
@@ -134,6 +131,9 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,test_netw
     features
       bus_access: requires bus access rtl8029;
   end connected_cpu;
+  
+  processor cpu_x86
+  end cpu_x86;
   
   virtual processor part
   end part;

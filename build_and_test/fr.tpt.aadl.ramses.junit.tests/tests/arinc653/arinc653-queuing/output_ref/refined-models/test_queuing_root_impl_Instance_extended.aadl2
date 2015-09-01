@@ -251,13 +251,6 @@ Send_Queuing_Message_Integer ! (cnx_p_out, p_out_localVariable, p_out_Length, p_
       ;
     connections
       p_out_accessCnx_call_cnx: data access cnx_p_out -> call_entrypoint.cnx_p_out;
-    annex behavior_specification {**
-      states
-  main_state : initial complete final state ;
-transitions
-  dispatch_transition : main_state -[on dispatch]-> main_state {if (true) the_proc1_the_sender_entrypoint.impl ! (cnx_p_out) end if
-  } ;
-**};
   end the_proc1_the_sender.impl;
   
   thread the_proc1_the_sender
@@ -315,13 +308,6 @@ if (p_in_ErrorCode = 0) common_pkg::receiver_spg ! (p_in_localVariable) end if
       ;
     connections
       p_in_accessCnx_call: data access p_in -> call_entrypoint.p_in;
-    annex behavior_specification {**
-      states
-  main_state : initial complete final state ;
-transitions
-  dispatch_transition : main_state -[on dispatch]-> main_state {if (true) the_proc2_the_receiver_entrypoint.impl ! (p_in) end if
-  } ;
-**};
   end the_proc2_the_receiver.impl;
   
   thread the_proc2_the_receiver

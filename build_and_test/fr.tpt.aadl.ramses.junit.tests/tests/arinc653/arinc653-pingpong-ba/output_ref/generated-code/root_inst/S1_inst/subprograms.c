@@ -1,6 +1,6 @@
+#include "business-code/PingPong_module.h"
 #include "arinc653/sampling.h"
 #include "arinc653/blackboard.h"
-#include "business-code/PingPong_module.h"
 #include "subprograms.h"
 void PingPong__Monitor_delayed_error_C1(
 	Exception *  error_C1,
@@ -9,13 +9,13 @@ void PingPong__Monitor_delayed_error_C1(
 }
 PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_BA_State_t S1_inst_Monitor_changeState_entrypoint_impl_current_state = PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_BA_entrypoint_init_state;
 void PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl(
-	TYPE *  State_baKeywords,
 	BLACKBOARD_ID_TYPE *  error_C1,
 	BLACKBOARD_ID_TYPE *  delayed_error_C2,
 	BLACKBOARD_ID_TYPE *  PortCnx1_mode_C1,
 	BLACKBOARD_ID_TYPE *  PortCnx2_mode_C1,
 	BLACKBOARD_ID_TYPE *  PortCnx3_mode_C1,
 	SAMPLING_PORT_ID_TYPE *  PortCnx8_mode_C2,
+	TYPE *  State_baKeywords,
 	PingPong_refined_model__S1_inst_Monitor_changeState_currentState *  Parent_BA_currentState_Access)
 {
   Exception PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl_error_C1_localVariable;
@@ -81,9 +81,9 @@ void PingPong__Monitor_delayed_error_C2(
 }
 PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl_BA_State_t S1_inst_Monitor_delayed_error_C2_entrypoint_impl_current_state = PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl_BA_entrypoint_init_state;
 void PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl(
-	TYPE *  State_baKeywords,
 	SAMPLING_PORT_ID_TYPE *  error_C2,
 	BLACKBOARD_ID_TYPE *  PortCnx11_delayed_error_C2,
+	TYPE *  State_baKeywords,
 	PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_currentState *  Parent_BA_currentState_Access)
 {
   Exception PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl_error_C2_localVariable;
@@ -132,11 +132,11 @@ while(1)
 }
 PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_BA_State_t S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_current_state = PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_BA_entrypoint_init_state;
 void PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl(
-	SEQ *  seqNb,
 	BLACKBOARD_ID_TYPE *  delayed_PongIn,
-	BLACKBOARD_ID_TYPE *  mode_aadlKeywords,
 	SAMPLING_PORT_ID_TYPE *  PortCnx9_PingOut,
 	BLACKBOARD_ID_TYPE *  PortCnx4_badSequenceNumber,
+	BLACKBOARD_ID_TYPE *  mode_aadlKeywords,
+	SEQ *  seqNb,
 	PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_currentState *  Parent_BA_currentState_Access,
 	Base_Types__Integer_16 *  PingOut_freshnessIndicator_access)
 {
@@ -185,8 +185,8 @@ while(1)
       if (PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_mode_aadlKeywords_localVariable == E_ROLE_CPING) {
       IPingOrPong_Cping_ping (&PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_delayed_PongIn_localVariable, &(PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_PingOut_localVariable.pvalue), &PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_badSequenceNumber_localVariable, seqNb, seqNb);
       }
-      (*PingOut_freshnessIndicator_access) = (*PingOut_freshnessIndicator_access) + 1;
-      PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_PingOut_localVariable.fresh_ba = (*PingOut_freshnessIndicator_access);
+      PingOut_freshnessIndicator_access = PingOut_freshnessIndicator_access + 1;
+      PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_PingOut_localVariable.fresh_ba = PingOut_freshnessIndicator_access;
       (*Parent_BA_currentState_Access) = PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_currentState_switch;
       WRITE_SAMPLING_MESSAGE ((*PortCnx9_PingOut), &PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_PingOut_localVariable, PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_PingOut_Length, &PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_S1_inst_IPingOrPong_Cping_ping_runtime_call_ret);
       DISPLAY_BLACKBOARD ((*PortCnx4_badSequenceNumber), &PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_badSequenceNumber_localVariable, PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_badSequenceNumber_Length, &PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl_S1_inst_IPingOrPong_Cping_ping_runtime_call_ret);
@@ -203,10 +203,10 @@ void PingPong__IPingOrPong_Cping_delayed_PongIn(
 }
 PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_BA_State_t S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_current_state = PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_BA_entrypoint_init_state;
 void PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl(
-	SEQ *  seqNb,
 	SAMPLING_PORT_ID_TYPE *  PongIn,
-	BLACKBOARD_ID_TYPE *  mode_aadlKeywords,
 	BLACKBOARD_ID_TYPE *  PortCnx12_delayed_PongIn,
+	BLACKBOARD_ID_TYPE *  mode_aadlKeywords,
+	SEQ *  seqNb,
 	PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_currentState *  Parent_BA_currentState_Access)
 {
   PingPongMessage PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl_PongIn_localVariable;
@@ -262,10 +262,10 @@ while(1)
 }
 PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_BA_State_t S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_current_state = PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_BA_entrypoint_init_state;
 void PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl(
-	SEQ *  seqNb,
 	SAMPLING_PORT_ID_TYPE *  PingIn,
-	BLACKBOARD_ID_TYPE *  mode_aadlKeywords,
 	SAMPLING_PORT_ID_TYPE *  PortCnx10_PongOut,
+	BLACKBOARD_ID_TYPE *  mode_aadlKeywords,
+	SEQ *  seqNb,
 	PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_currentState *  Parent_BA_currentState_Access,
 	Base_Types__Integer_16 *  PingIn_freshnessIndicator_access)
 {
@@ -310,11 +310,11 @@ while(1)
       READ_SAMPLING_MESSAGE ((*PingIn), &PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PingIn_localVariable, PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PingIn_Length, &PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PingIn_Validity, &PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_S1_inst_IPingOrPong_Cpong_pong_runtime_call_ret);
       READ_BLACKBOARD ((*mode_aadlKeywords), PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_mode_aadlKeywords_TimeOut, &PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_mode_aadlKeywords_localVariable, &PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_mode_aadlKeywords_Length, &PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_S1_inst_IPingOrPong_Cpong_pong_runtime_call_ret);
       if (PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_mode_aadlKeywords_localVariable == E_ROLE_CPONG) {
-      if ((PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PingIn_localVariable.fresh_ba != (*PingIn_freshnessIndicator_access))) {
+      if ((PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PingIn_localVariable.fresh_ba != PingIn_freshnessIndicator_access)) {
       IPingOrPong_Cpong_pong (&PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PingIn_localVariable.pvalue, &PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PongOut_localVariable);
       }
       }
-      (*PingIn_freshnessIndicator_access) = PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PingIn_localVariable.fresh_ba;
+      PingIn_freshnessIndicator_access = PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PingIn_localVariable.fresh_ba;
       (*Parent_BA_currentState_Access) = PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_currentState_switch;
       WRITE_SAMPLING_MESSAGE ((*PortCnx10_PongOut), &PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PongOut_localVariable, PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_PongOut_Length, &PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl_S1_inst_IPingOrPong_Cpong_pong_runtime_call_ret);
       }

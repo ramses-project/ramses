@@ -1,19 +1,19 @@
 #ifndef __GENERATED_GTYPES_H__
 #define __GENERATED_GTYPES_H__
-#include "arinc653/sampling.h"
-#include "arinc653/types.h"
-#include "arinc653/blackboard.h"
 #include "business-code/PingPong_module.h"
+#include "arinc653/sampling.h"
+#include "arinc653/blackboard.h"
+#include "arinc653/types.h"
 typedef enum e_PingPong__Exception {
 	PingPong__Exception_E_EXCEPTION_NO_ERROR,
 	PingPong__Exception_E_EXCEPTION_BAD_SEQUENCE_NUMBER
 } PingPong__Exception;
+typedef BLACKBOARD_ID_TYPE arinc653_runtime__Blackboard_Id_Type;
+typedef SAMPLING_PORT_ID_TYPE arinc653_runtime__Sampling_Port_Id_Type;
 typedef enum e_PingPong__TYPE_aadlKeywords {
 	PingPong__TYPE_aadlKeywords_E_TYPE_PING,
 	PingPong__TYPE_aadlKeywords_E_TYPE_PONG
 } PingPong__TYPE_aadlKeywords;
-typedef BLACKBOARD_ID_TYPE arinc653_runtime__Blackboard_Id_Type;
-typedef SAMPLING_PORT_ID_TYPE arinc653_runtime__Sampling_Port_Id_Type;
 typedef enum e_PingPong_refined_model__S1_inst_Monitor_changeState_currentState {
 	PingPong_refined_model__S1_inst_Monitor_changeState_currentState_switch
 } PingPong_refined_model__S1_inst_Monitor_changeState_currentState;

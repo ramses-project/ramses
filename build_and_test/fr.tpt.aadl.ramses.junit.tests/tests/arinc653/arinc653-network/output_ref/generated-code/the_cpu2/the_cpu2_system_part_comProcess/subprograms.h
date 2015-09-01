@@ -1,11 +1,11 @@
 #ifndef __GENERATED_SUBPROGRAMS_H__
 #define __GENERATED_SUBPROGRAMS_H__
 #include "libpok/drivers/rtl8029.h"
+#include "types.h"
+#include "arinc653/queueing.h"
 #include "middleware/port.h"
 #include "arinc653/time.h"
 #include "arinc653/types.h"
-#include "arinc653/queueing.h"
-#include "types.h"
 #include "gtypes.h"
 #include "main.h"
 void test_network_rtl8029_remote_communications_refined_model__the_cpu2_system_part_comProcess_system_part_comm_entrypoint_impl(
