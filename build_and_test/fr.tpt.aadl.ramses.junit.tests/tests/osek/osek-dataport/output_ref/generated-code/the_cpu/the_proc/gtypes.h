@@ -1,7 +1,7 @@
 #ifndef __GENERATED_GTYPES_H__
 #define __GENERATED_GTYPES_H__
-#include "toppers_osek/include/kernel.h"
 #include "osek_runtime.h"
+#include "toppers_osek/include/kernel.h"
 typedef data_port_t OSEK_runtime__DataPortType;
 typedef StatusType OSEK_runtime__StatusType;
 typedef  int test_osek_dataports__Integer;
