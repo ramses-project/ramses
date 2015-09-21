@@ -4,8 +4,6 @@
 void* sonarTest_refined_model__proces_th_impl_Job()
 {
   int sonarTest_refined_model__proces_th_impl_batPort = NXT_PORT_S4;
-  while (1) {
-    sonarTest_refined_model__proces_th_entrypoint_impl (&sonarTest_refined_model__proces_th_impl_batPort);
-  }
+  sonarTest_refined_model__proces_th_entrypoint_impl (&sonarTest_refined_model__proces_th_impl_batPort);
   return 0;
 }
