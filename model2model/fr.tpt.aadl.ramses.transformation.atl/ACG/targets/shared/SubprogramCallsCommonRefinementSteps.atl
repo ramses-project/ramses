@@ -950,7 +950,7 @@ lazy rule createModeAction
 
 helper def: createFeatureInHolder(fi: AADLI!FeatureInstance, mi: AADLI!ModeInstance) : AADLBA!DataAccessHolder =
 	if(fi.connectedInMode(mi.mode)) then
-		thisModule.createFeatureHolder(fi.getFeatureImg(mi))
+		thisModule.createFeatureHolder(fi.getFeatureImg(mi.mode))
 	else
 		thisModule.createFeatureHolder(fi.getFeatureImg())
 	endif
