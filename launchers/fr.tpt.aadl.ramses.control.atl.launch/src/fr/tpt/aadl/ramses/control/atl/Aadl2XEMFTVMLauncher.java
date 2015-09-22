@@ -50,6 +50,7 @@ import org.eclipse.m2m.atl.emftvm.Model ;
 import org.eclipse.m2m.atl.emftvm.Module ;
 import org.eclipse.m2m.atl.emftvm.impl.resource.EMFTVMResourceImpl ;
 import org.eclipse.m2m.atl.emftvm.profiler.Profiler ;
+import org.eclipse.m2m.atl.emftvm.util.ExecEnvPool ;
 import org.eclipse.m2m.atl.emftvm.util.ModuleNotFoundException ;
 import org.eclipse.m2m.atl.emftvm.util.ModuleResolver ;
 import org.eclipse.m2m.atl.emftvm.util.StackFrame ;
@@ -75,8 +76,6 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	protected AadlModelInstantiatior _modelInstantiator ;
   
 	protected PredefinedAadlModelManager _predefinedResourcesManager ;
-
-	protected ExecEnv env;
 
 	protected ResourceSet rs = new ResourceSetImpl();
 	private HookAccessImpl atlHook;
@@ -139,19 +138,25 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	                                 String resourceSuffix,
 	                                 IProgressMonitor monitor)
 	{
-		env = AtlTransfoLauncher.getRamsesExecEnv(transformationId).getExecEnv();
+		ExecEnvPool pool = getRamsesExecEnv(transformationId);
+		ExecEnv env = null;
+		if(pool!=null)
+		  env = pool.getExecEnv();
+		else
+		  env = EmftvmFactory.eINSTANCE.createExecEnv();
+		  
 		
-		initTransformationInputs(inputResource);
+		initTransformationInputs(env, inputResource);
 		
-		Resource res = doTransformation(inputResource, outputDirPathName, resourceSuffix, monitor);
-		
-		AtlTransfoLauncher.getRamsesExecEnv(transformationId).returnExecEnv(env);
+		Resource res = doTransformation(env, inputResource, outputDirPathName, resourceSuffix, monitor);
+		if(pool!=null)
+		  pool.returnExecEnv(env);
 		
 		return res;
 
 	}
 	
-	protected Resource doTransformation(Resource inputResource,
+	protected Resource doTransformation(ExecEnv env, Resource inputResource,
 			String outputDirPathName, String resourceSuffix, final IProgressMonitor monitor) {
 		
 	  Profiler profiler = new Profiler();
@@ -168,59 +173,59 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		TimingData td = new TimingData();
 		td.finishLoading();
 		
-		if(null == env.getMonitor())
-		{
-		  VMMonitor vmMonitor = new VMMonitor()
-	    {
-	      @Override
-	      public boolean isTerminated()
-	      {
-	        // TODO Auto-generated method stub
-	        return false ;
-	      }
-
-	      @Override
-	      public void enter(StackFrame frame)
-	      {
-	        // TODO Auto-generated method stub
-	        
-	      }
-
-	      @Override
-	      public void leave(StackFrame frame)
-	      {
-	        // TODO Auto-generated method stub
-	        
-	      }
-
-	      @Override
-	      public void step(StackFrame frame)
-	      {
-	        if(monitor.isCanceled())
-	        {
-	          String msg = "user has canceled during the analysis" ;
-	          _LOGGER.trace(msg) ;
-	          throw new OperationCanceledException(msg) ;
-	        }
-	      }
-
-	      @Override
-	      public void terminated()
-	      {
-	        // TODO Auto-generated method stub
-	        
-	      }
-
-	      @Override
-	      public void error(StackFrame frame, String msg, Exception e)
-	      {
-	        // TODO Auto-generated method stub
-	        
-	      }
-	    };
-	    
-	    env.setMonitor(vmMonitor);
-		}
+//		if(null == env.getMonitor())
+//		{
+//		  VMMonitor vmMonitor = new VMMonitor()
+//	    {
+//	      @Override
+//	      public boolean isTerminated()
+//	      {
+//	        // TODO Auto-generated method stub
+//	        return false ;
+//	      }
+//
+//	      @Override
+//	      public void enter(StackFrame frame)
+//	      {
+//	        // TODO Auto-generated method stub
+//	        
+//	      }
+//
+//	      @Override
+//	      public void leave(StackFrame frame)
+//	      {
+//	        // TODO Auto-generated method stub
+//	        
+//	      }
+//
+//	      @Override
+//	      public void step(StackFrame frame)
+//	      {
+//	        if(monitor.isCanceled())
+//	        {
+//	          String msg = "user has canceled during the analysis" ;
+//	          _LOGGER.trace(msg) ;
+//	          throw new OperationCanceledException(msg) ;
+//	        }
+//	      }
+//
+//	      @Override
+//	      public void terminated()
+//	      {
+//	        // TODO Auto-generated method stub
+//	        
+//	      }
+//
+//	      @Override
+//	      public void error(StackFrame frame, String msg, Exception e)
+//	      {
+//	        // TODO Auto-generated method stub
+//	        
+//	      }
+//	    };
+//	    
+//	    env.setMonitor(vmMonitor);
+//		}
 		try
 		{
 		  env.run(td);
@@ -250,8 +255,7 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	                                  IProgressMonitor monitor)
 	{
 		
-		if(env == null)
-		  env = EmftvmFactory.eINSTANCE.createExecEnv();
+		ExecEnv env = EmftvmFactory.eINSTANCE.createExecEnv();
 		
 		// Load metamodels
 		// Load aadl instance metamodel 
@@ -270,11 +274,11 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		env.registerMetaModel("ATLHOOKS", atlHoolsMetaModel);
 
 		
-		initTransformationInputs(inputResource);
+		initTransformationInputs(env, inputResource);
 		
-		registerAdditionalTransformationsEMFTVM(transformationFileList, _moduleResolver);
+		registerAdditionalTransformationsEMFTVM(env, transformationFileList, _moduleResolver);
 		
-		Resource result = doTransformation(inputResource, outputDirPathName, resourceSuffix, monitor);
+		Resource result = doTransformation(env, inputResource, outputDirPathName, resourceSuffix, monitor);
 		
 		return result;
 	}
@@ -300,7 +304,7 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		}
 	}
 
-	protected void initTransformationInputs(Resource inputResource)
+	protected void initTransformationInputs(ExecEnv env, Resource inputResource)
 	{
 
     // Load models
@@ -358,7 +362,8 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
     env.registerInputModel("HOOKS", atlHookModel);
 	}
 
-	public void registerAdditionalTransformationsEMFTVM(List<File> transformationFileList,
+	public void registerAdditionalTransformationsEMFTVM(ExecEnv env,
+	                                                    List<File> transformationFileList,
 			                                                ModuleResolver mr)
 	{
 		

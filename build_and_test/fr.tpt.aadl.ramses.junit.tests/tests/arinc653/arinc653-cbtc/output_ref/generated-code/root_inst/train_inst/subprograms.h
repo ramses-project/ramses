@@ -1,19 +1,24 @@
 #ifndef __GENERATED_SUBPROGRAMS_H__
 #define __GENERATED_SUBPROGRAMS_H__
-#include "arinc653/sampling.h"
-#include "arinc653/types.h"
-#include "arinc653/time.h"
-#include "arinc653/blackboard.h"
-#include "business-code/cbtc_vobc_subsystem_Implementations_WheelAngleAcquisition_impl.h"
-#include "business-code/cbtc_vobc_subsystem_Implementations_TrainSpeedAccelCompute_impl.h"
 #include "business-code/cbtc_vobc_subsystem_Implementations_AccelerationSending_impl.h"
+#include "arinc653/sampling.h"
 #include "business-code/cbtc_trainPpu_subsystem_Implementations_TrainPpu_impl.h"
-#include "business-code/cbtc_vobc_subsystem_Implementations_VobcTrainPositionEstimation_impl.h"
 #include "business-code/cbtc_module.h"
+#include "business-code/cbtc_vobc_subsystem_Implementations_VobcTrainPositionEstimation_impl.h"
+#include "business-code/cbtc_vobc_subsystem_Implementations_WheelAngleAcquisition_impl.h"
+#include "arinc653/blackboard.h"
+#include "arinc653/time.h"
 #include "business-code/cbtc_vobc_subsystem_Implementations_VobcTrainPositionSending_impl.h"
+#include "arinc653/types.h"
+#include "business-code/cbtc_vobc_subsystem_Implementations_TrainSpeedAccelCompute_impl.h"
 #include "gtypes.h"
 #include "main.h"
-void cbtc_refined_model__train_inst_TrainPpu_odometerAcquisition_entrypoint_impl(SAMPLING_PORT_ID_TYPE *  trainDataIn, BLACKBOARD_ID_TYPE *  PortCnx1_wheelAngleOut, cbtc_refined_model__train_inst_TrainPpu_odometerAcquisition_currentState *  Parent_BA_currentState_Access, Base_Types__Integer_16 *  trainDataIn_freshnessIndicator_access, Base_Types__Integer_16 *  wheelAngleOut_freshnessIndicator_access);
+void cbtc_refined_model__train_inst_TrainPpu_odometerAcquisition_entrypoint_impl(
+	SAMPLING_PORT_ID_TYPE *  trainDataIn,
+	BLACKBOARD_ID_TYPE *  PortCnx1_wheelAngleOut,
+	cbtc_refined_model__train_inst_TrainPpu_odometerAcquisition_currentState *  Parent_BA_currentState_Access,
+	Base_Types__Integer_16 *  trainDataIn_freshnessIndicator_access,
+	Base_Types__Integer_16 *  wheelAngleOut_freshnessIndicator_access);
 
 typedef enum {
   cbtc_refined_model__train_inst_TrainPpu_odometerAcquisition_entrypoint_impl_BA_entrypoint_init_state,
@@ -22,7 +27,14 @@ typedef enum {
   cbtc_refined_model__train_inst_TrainPpu_odometerAcquisition_entrypoint_impl_BA_entrypoint_final_state
 } cbtc_refined_model__train_inst_TrainPpu_odometerAcquisition_entrypoint_impl_BA_State_t;
 
-void cbtc_refined_model__train_inst_TrainPpu_trainTraction_entrypoint_impl(BLACKBOARD_ID_TYPE *  tractionIn, SAMPLING_PORT_ID_TYPE *  trainDataIn, BLACKBOARD_ID_TYPE *  PortCnx2_additionalTrainPositionOffset, SAMPLING_PORT_ID_TYPE *  PortCnx9_trainDataOut, cbtc_refined_model__train_inst_TrainPpu_trainTraction_currentState *  Parent_BA_currentState_Access, Base_Types__Integer_16 *  tractionIn_freshnessIndicator_access, Base_Types__Integer_16 *  trainDataIn_freshnessIndicator_access);
+void cbtc_refined_model__train_inst_TrainPpu_trainTraction_entrypoint_impl(
+	BLACKBOARD_ID_TYPE *  tractionIn,
+	SAMPLING_PORT_ID_TYPE *  trainDataIn,
+	BLACKBOARD_ID_TYPE *  PortCnx2_additionalTrainPositionOffset,
+	SAMPLING_PORT_ID_TYPE *  PortCnx9_trainDataOut,
+	cbtc_refined_model__train_inst_TrainPpu_trainTraction_currentState *  Parent_BA_currentState_Access,
+	Base_Types__Integer_16 *  tractionIn_freshnessIndicator_access,
+	Base_Types__Integer_16 *  trainDataIn_freshnessIndicator_access);
 
 typedef enum {
   cbtc_refined_model__train_inst_TrainPpu_trainTraction_entrypoint_impl_BA_entrypoint_init_state,
@@ -31,13 +43,21 @@ typedef enum {
   cbtc_refined_model__train_inst_TrainPpu_trainTraction_entrypoint_impl_BA_entrypoint_final_state
 } cbtc_refined_model__train_inst_TrainPpu_trainTraction_entrypoint_impl_BA_State_t;
 
-void cbtc__VobcTrainPositionEstimation_delayed_additionalTrainPositionOffset(TrainPositionOffset *  additionalTrainPositionOffset, TrainPositionOffset *  delayed_additionalTrainPositionOffset);
+void cbtc__VobcTrainPositionEstimation_delayed_additionalTrainPositionOffset(
+	TrainPositionOffset *  additionalTrainPositionOffset,
+	TrainPositionOffset *  delayed_additionalTrainPositionOffset);
 
 typedef enum {
   cbtc__VobcTrainPositionEstimation_delayed_additionalTrainPositionOffset_s
 } cbtc__VobcTrainPositionEstimation_delayed_additionalTrainPositionOffset_BA_State_t;
 
-void cbtc_refined_model__train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_entrypoint_impl(BLACKBOARD_ID_TYPE *  additionalTrainPositionOffset, BLACKBOARD_ID_TYPE *  wheelAngleIn, BLACKBOARD_ID_TYPE *  PortCnx3_trainPositionOut_F, cbtc_refined_model__train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState *  Parent_BA_currentState_Access, Base_Types__Integer_16 *  wheelAngleIn_freshnessIndicator_access, Base_Types__Integer_16 *  trainPositionOut_F_freshnessIndicator_access);
+void cbtc_refined_model__train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_entrypoint_impl(
+	BLACKBOARD_ID_TYPE *  additionalTrainPositionOffset,
+	BLACKBOARD_ID_TYPE *  wheelAngleIn,
+	BLACKBOARD_ID_TYPE *  PortCnx3_trainPositionOut_F,
+	cbtc_refined_model__train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState *  Parent_BA_currentState_Access,
+	Base_Types__Integer_16 *  wheelAngleIn_freshnessIndicator_access,
+	Base_Types__Integer_16 *  trainPositionOut_F_freshnessIndicator_access);
 
 typedef enum {
   cbtc_refined_model__train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_entrypoint_impl_BA_entrypoint_init_state,
@@ -46,7 +66,16 @@ typedef enum {
   cbtc_refined_model__train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_entrypoint_impl_BA_entrypoint_final_state
 } cbtc_refined_model__train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_entrypoint_impl_BA_State_t;
 
-void cbtc_refined_model__train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_entrypoint_impl(SAMPLING_PORT_ID_TYPE *  eoaIn, BLACKBOARD_ID_TYPE *  trainPositionIn, SAMPLING_PORT_ID_TYPE *  PortCnx8_trainPositionForMauOut, BLACKBOARD_ID_TYPE *  PortCnx4_tractionOut, cbtc_refined_model__train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState *  Parent_BA_currentState_Access, Base_Types__Integer_16 *  eoaIn_freshnessIndicator_access, Base_Types__Integer_16 *  trainPositionIn_freshnessIndicator_access, Base_Types__Integer_16 *  trainPositionForMauOut_freshnessIndicator_access, Base_Types__Integer_16 *  tractionOut_freshnessIndicator_access);
+void cbtc_refined_model__train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_entrypoint_impl(
+	SAMPLING_PORT_ID_TYPE *  eoaIn,
+	BLACKBOARD_ID_TYPE *  trainPositionIn,
+	SAMPLING_PORT_ID_TYPE *  PortCnx8_trainPositionForMauOut,
+	BLACKBOARD_ID_TYPE *  PortCnx4_tractionOut,
+	cbtc_refined_model__train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState *  Parent_BA_currentState_Access,
+	Base_Types__Integer_16 *  eoaIn_freshnessIndicator_access,
+	Base_Types__Integer_16 *  trainPositionIn_freshnessIndicator_access,
+	Base_Types__Integer_16 *  trainPositionForMauOut_freshnessIndicator_access,
+	Base_Types__Integer_16 *  tractionOut_freshnessIndicator_access);
 
 typedef enum {
   cbtc_refined_model__train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_entrypoint_impl_BA_entrypoint_init_state,

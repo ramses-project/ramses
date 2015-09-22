@@ -46,6 +46,7 @@ import fr.tpt.aadl.ramses.control.support.utils.WaitMonitor ;
 import fr.tpt.aadl.ramses.control.workflow.EcoreWorkflowPilot ;
 import fr.tpt.aadl.ramses.control.workflow.ModelIdentifier ;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowFactory ;
+import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage ;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowPilot ;
 import fr.tpt.aadl.ramses.control.workflow.util.WorkflowUtils ;
 import fr.tpt.aadl.ramses.transformation.selection.ITransformationSelection ;
@@ -86,7 +87,7 @@ public class ArchitectureRefinementProcessLauncher {
   TrcSpecification trcSpec;
 
   
-  private static ResourceSet intermediateRs = new ResourceSetImpl();
+  private ResourceSet intermediateRs = new ResourceSetImpl();
   
   private final File outputPathSave ;
 
@@ -231,7 +232,7 @@ public class ArchitectureRefinementProcessLauncher {
 
     // remove tmpTip, not useful anymore.
     TipUtils.getTipSpecification().getIterations().add(iter);
-    //tmpTipResource.delete(null);
+    tmpTipResource.delete(null);
   }
 
   /**
@@ -341,7 +342,8 @@ public class ArchitectureRefinementProcessLauncher {
           new PatternMatchingTransformationThread(app,
                                                   transfo,
                                                   sinst,
-                                                  outputResourceID+"_"+threadsIter);
+                                                  outputResourceID+"_"+threadsIter,
+                                                  intermediateRs);
       threadsIter++;
     }
 
@@ -419,7 +421,7 @@ public class ArchitectureRefinementProcessLauncher {
       for(Resource r: intermediateRs.getResources())
         if(false==resourceSet.getResources().contains(r))
           resList.add(r);
-      
+      intermediateRs.getResources().clear();
       resourceSet.getResources().addAll(resList);
     }
 
@@ -592,14 +594,6 @@ public class ArchitectureRefinementProcessLauncher {
       if(mPath.endsWith(".emftvm"))
         mPath=mPath.substring(0, mPath.length()-7);
       
-//      if(false == mPath.startsWith(File.separator))
-//      {
-//        String prefix = RamsesConfiguration.getRamsesResourceDir().getAbsolutePath();
-//        if(false==prefix.endsWith("/"))
-//          prefix+="/";
-//        mPath=prefix+mPath;
-//
-//      }
       String prefix = mPath.substring(mPath.lastIndexOf("/")+1,mPath.length());
       fr.tpt.aadl.ramses.control.workflow.File f = WorkflowFactory.eINSTANCE.createFile();
       f.setPath(mPath);
@@ -637,8 +631,25 @@ public class ArchitectureRefinementProcessLauncher {
 
     Generator generator = registry.getGenerator(config.getTargetId()) ;
     try {
-
       Map<String, Resource> res = generator.generateWorkflow(sinst, config, workflowPilot, null, ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER, monitor);
+      File[] additionalTransfoFilesToDelete = dirFileForWorkflow.listFiles(new FilenameFilter() {
+        public boolean accept(File dir, String name) {
+          int iter = TipParser.getLastIterationId();
+          return name.toLowerCase().contains( "_applied_"+iter);
+        }
+      });
+      
+      for(int i = 0; i< additionalTransfoFilesToDelete.length;i++)
+        additionalTransfoFilesToDelete[i].delete();
+      
+      URI wf_uri = URI.createFileURI(workflowPath);
+      resourceSet.getPackageRegistry().put(WorkflowPackage.eNS_URI,
+                                           WorkflowPackage.eINSTANCE);
+
+      Resource workflowResource = resourceSet.getResource(wf_uri, false);
+      if(workflowResource!=null)
+        workflowResource.delete(null);
+      
       return res.get(outputResourceID);
     } catch (GenerationException e) {
       StringWriter sw = new StringWriter();
@@ -692,13 +703,13 @@ public class ArchitectureRefinementProcessLauncher {
     return options;
   }
 
-  private void killThreads(Thread[] aadlInspectorThreads)
+  private void killThreads(Thread[] threads)
   {
-    for(Thread t : aadlInspectorThreads)
+    for(Thread t : threads)
       t.interrupt();
   }
   
-  static class PatternMatchingTransformationThread extends Thread
+  class PatternMatchingTransformationThread extends Thread
   {
     private Transformation transfo;
     private String patternMatchingOutputDir;
@@ -707,17 +718,20 @@ public class ArchitectureRefinementProcessLauncher {
     private String outputResourceID;
     
     private Resource result;
+    private ResourceSet resourceSet ;
     
     public PatternMatchingTransformationThread(ArchitectureRefinementProcessLauncher initiator, 
                                                Transformation transfo,
                                                SystemInstance sinst,
-                                               String outputResourceID)
+                                               String outputResourceID,
+                                               ResourceSet rs)
     {
       this.initiator = initiator;
       this.transfo = transfo;
       this.sinst = sinst;
       patternMatchingOutputDir = initiator.getPatternMatchingOutputDir();
       this.outputResourceID = outputResourceID;
+      this.resourceSet = rs;
     }
 
     @Override
@@ -736,16 +750,14 @@ public class ArchitectureRefinementProcessLauncher {
         File f = new File(patternMatchingOutputDir+modulePath);
         emftvmFiles.add(f);
       }
-
-      AtlTransfoLauncher.initTransformation();
       
       
       ResourceSet existingRs = sinst.eResource().getResourceSet();
       
       synchronized(sinst)
       {
-        intermediateRs.getResources().addAll(existingRs.getResources());
-        pmtl.setResourceSet(intermediateRs);
+        resourceSet.getResources().addAll(existingRs.getResources());
+        pmtl.setResourceSet(resourceSet);
       }
       
       result = pmtl.doTransformation(emftvmFiles, 

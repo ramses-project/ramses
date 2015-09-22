@@ -1,12 +1,13 @@
 #ifndef __GENERATED_SUBPROGRAMS_H__
 #define __GENERATED_SUBPROGRAMS_H__
-#include "/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/osek/osek-eventdataport/input/user_send.h"
-#include "toppers_osek/include/kernel.h"
 #include "user_receive.h"
+#include "/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/osek/osek-eventdataport/input/user_send.h"
 #include "osek_runtime.h"
+#include "toppers_osek/include/kernel.h"
 #include "gtypes.h"
 #include "main.h"
-void test_osek_eventdataports_refined_model__the_proc1_the_sender_entrypoint_impl(thread_queue_t *  cnx_p);
+void test_osek_eventdataports_refined_model__the_proc1_the_sender_entrypoint_impl(
+	thread_queue_t *  cnx_p);
 
 typedef enum {
   test_osek_eventdataports_refined_model__the_proc1_the_sender_entrypoint_impl_BA_entrypoint_init_state,
@@ -15,7 +16,8 @@ typedef enum {
   test_osek_eventdataports_refined_model__the_proc1_the_sender_entrypoint_impl_BA_entrypoint_final_state
 } test_osek_eventdataports_refined_model__the_proc1_the_sender_entrypoint_impl_BA_State_t;
 
-void test_osek_eventdataports_refined_model__the_proc1_the_receiver_entrypoint_impl(thread_queue_t *  p);
+void test_osek_eventdataports_refined_model__the_proc1_the_receiver_entrypoint_impl(
+	thread_queue_t *  p);
 
 typedef enum {
   test_osek_eventdataports_refined_model__the_proc1_the_receiver_entrypoint_impl_BA_entrypoint_init_state,

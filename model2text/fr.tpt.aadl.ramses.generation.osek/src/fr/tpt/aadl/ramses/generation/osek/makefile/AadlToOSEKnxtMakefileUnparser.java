@@ -144,7 +144,12 @@ public class AadlToOSEKnxtMakefileUnparser  extends AbstractAadlToCMakefileUnpar
       public String caseProcessImplementation(ProcessImplementation object)
       {
         unparserContent
-        .addOutput("TARGET_SOURCES = main.c activity.c subprograms.c gtypes.c deployment.c ") ;
+        .addOutput("TARGET_SOURCES = \\\n\t" +
+            "main.c\\\n\t" +
+            "activity.c\\\n\t" +
+            "subprograms.c\\\n\t" +
+            "gtypes.c\\\n\t" +
+            "deployment.c") ;
 
         Set<File> sourceFileList;
 
@@ -163,7 +168,8 @@ public class AadlToOSEKnxtMakefileUnparser  extends AbstractAadlToCMakefileUnpar
           {
             value = getCygwinPath(value);
           }
-          unparserContent.addOutput( value + " ") ;
+          unparserContent.addOutput("\\\n\t");
+          unparserContent.addOutput( value) ;
         }
 
         unparserContent.addOutput("\n") ;
@@ -173,11 +179,13 @@ public class AadlToOSEKnxtMakefileUnparser  extends AbstractAadlToCMakefileUnpar
 
         if(it.hasNext())
         {
-          unparserContent.addOutput("export USER_INCLUDES=");
+          unparserContent.addOutput("export USER_INCLUDES=\\n\t");
           while(it.hasNext())
           {
             include = it.next() ;
-            unparserContent.addOutput(include.getAbsolutePath()+" ");
+            unparserContent.addOutput(include.getAbsolutePath());
+            if(it.hasNext())
+              unparserContent.addOutput("\\\n\t");
           }
           unparserContent.addOutput("\n") ;
         }
@@ -189,7 +197,7 @@ public class AadlToOSEKnxtMakefileUnparser  extends AbstractAadlToCMakefileUnpar
         if(path.charAt(1)==':')
           path = Character.toLowerCase(path.charAt(0))+path.substring(2);
         path = path.replace("\\", "/");
-        return "/cygwin/"+path;
+        return "/cygdrive/"+path;
       }
 
 

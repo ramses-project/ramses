@@ -93,8 +93,6 @@ public class Activator extends AbstractUIPlugin {
 //	    sr.init(instantiator, modelManager);
 	    ServiceProvider.setDefault(sr) ;
 	    
-		  AtlTransfoLauncher.initTransformation();
-	    
 	    /**************************************************************************/
 		}
 		catch(Exception e) // Top level exception handler. Stop all process.

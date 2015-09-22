@@ -45,6 +45,7 @@ import org.osate.aadl2.AnnexSubclause ;
 import org.osate.aadl2.BehavioredImplementation ;
 import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.ClassifierValue ;
+import org.osate.aadl2.ComponentClassifier ;
 import org.osate.aadl2.ComponentImplementation ;
 import org.osate.aadl2.ComponentPrototypeActual ;
 import org.osate.aadl2.ComponentPrototypeBinding ;
@@ -820,8 +821,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
                   }
                   if(type == null || headerReferenced==false)
                     type = GenerationUtilsC.getGenerationCIdentifier(cv.getClassifier().getQualifiedName()) ;
-                  structDefinition.append("\t"+type +
-                        " " +
+                  
+                  structDefinition.append("\t"+type + " " +
                         stringifiedElementNames.get(lv.getOwnedListElements()
                               .indexOf(v)) + ";\n") ;
                 }
@@ -1301,6 +1302,23 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         GeneratorUtils.buildDataAccessMapping(object, _dataAccessMapping) ;
         process(object.getType()) ;
 
+        
+        BehaviorAnnex ba = getAnnexSubclause(object);
+        if(ba!=null)
+        {
+        String aadlComponentCId =
+              GenerationUtilsC.getGenerationCIdentifier(object
+                      .getQualifiedName()) ;
+            
+            
+        _currentImplUnparser.addOutputNewline(aadlComponentCId +
+                  "_BA_State_t " +
+                  object.getName().replace('.', '_')+
+                  "_current_state = " + aadlComponentCId + "_" +
+                  AadlBaToCUnparser.getInitialStateIdentifier(ba) + ";") ;
+        }
+        
+        
         _currentImplUnparser.addOutput("void* ") ;
         _currentImplUnparser.addOutput(GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName())) ;
         _currentImplUnparser.addOutputNewline(GenerationUtilsC.THREAD_SUFFIX +
@@ -1331,13 +1349,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
             process(d) ;
         }
 
-        _currentImplUnparser.addOutputNewline("while (1) {") ;
-        _currentImplUnparser.incrementIndent() ;
 
         processBehavioredImplementation(object) ;
-
-        _activityImplCode.decrementIndent() ;
-        _activityImplCode.addOutputNewline("}") ;
 
         _activityImplCode.addOutputNewline("return 0;") ;
         _activityImplCode.decrementIndent() ;
@@ -1427,7 +1440,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         return DONE ;
       }
       
-      private BehaviorAnnex getAnnexSubclause(SubprogramClassifier object)
+      private BehaviorAnnex getAnnexSubclause(ComponentClassifier object)
       {
         for(AnnexSubclause as : object.getOwnedAnnexSubclauses())
         {
@@ -1511,10 +1524,14 @@ public class AadlToCUnparser extends AadlProcessingSwitch
             String paramUsage = Aadl2Utils.getParameterUsage(p) ;
             if(p == returnParameter)
               continue ;
-            if(first == false)
+            if(first){
+            	_subprogramImplCode.addOutput("\n\t");
+                _subprogramHeaderCode.addOutput("\n\t");
+            }
+            else	
             {
-              _subprogramImplCode.addOutput(", ") ;
-              _subprogramHeaderCode.addOutput(", ") ;
+              _subprogramImplCode.addOutput(",\n\t") ;
+              _subprogramHeaderCode.addOutput(",\n\t") ;
             }
             processDataSubcomponentType(object, p.getDataFeatureClassifier(),
                                         _subprogramImplCode,
@@ -1537,10 +1554,14 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           else if(f instanceof DataAccess)
           {
             DataAccess da = (DataAccess) f ;
-            if(first == false)
+            if(first){
+            	_subprogramImplCode.addOutput("\n\t");
+                _subprogramHeaderCode.addOutput("\n\t");
+            }
+            else	
             {
-              _subprogramImplCode.addOutput(", ") ;
-              _subprogramHeaderCode.addOutput(", ") ;
+              _subprogramImplCode.addOutput(",\n\t") ;
+              _subprogramHeaderCode.addOutput(",\n\t") ;
             }
             processDataSubcomponentType(object, da.getDataFeatureClassifier(),
                                         _subprogramImplCode,

@@ -4,8 +4,8 @@ package Minimal_Aperiodic_Example
 
 public
 
-with Timing_Properties, Data_Model, Base_Types, Minimal_Runtime_Dispatch,
-     Minimal_Common_Example, Minimal_Example, Minimal_Runtime_Types ;
+with Data_Model, Base_Types, Minimal_Runtime_Dispatch,
+     Minimal_Common_Example, Minimal_Runtime_Types, Minimal_Example ;
 
 
 -- on dispatch P1 OR P2

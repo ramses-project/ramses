@@ -289,6 +289,9 @@ rule m_Process_Instance {
 															endif
 														)
 													)
+													->append(
+														thisModule.resolveMatchedSingleIfExists(c, 'targetModeValue')
+													)
 													->flatten()->excluding(OclUndefined),
 		ownedAccessConnection			<- c.connectionInstance->select(e| e.kind.getName()='accessConnection')
 												->collect(e | e.connectionReference.getConnectionsReferencesImg())->flatten()
@@ -360,6 +363,16 @@ rule m_Process_Instance {
 														thisModule.resolveMatchedTupleIfExists(Sequence{e,e.subcomponent.subcomponentType.getBA()},'accessConnection_CURRENT_STATE_THREAD')
 													)
 												)
+												->union(
+														c.modeInstance->collect(e|
+															thisModule.resolveMatchedTupleIfExists(Sequence{e,c}, 'targetModeAccessConnection'))
+													)
+												->union(
+														c.modeInstance->collect(e|
+															c.componentInstance->select(f|f.category=#thread)->collect(f|
+																thisModule.resolveMatchedTupleIfExists(Sequence{f,e}, 'targetModeAccessConnection'))
+															)
+													)
                                                ->flatten()->excluding(OclUndefined),
 		ownedMode <- c.modeInstance
 	)
@@ -368,7 +381,6 @@ rule m_Process_Instance {
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(implImg, impl);
 	}
 }
-
 
 -- @extends m_Connection_Reference
 rule m_AccessConnection_Reference

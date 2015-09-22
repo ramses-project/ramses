@@ -37,7 +37,7 @@ public interface PredefinedAadlModelManager {
   {"AADL_Project.aadl", "Communication_Properties.aadl", "Data_Model.aadl",
    "Deployment_Properties.aadl", "Memory_Properties.aadl",
    "Modeling_Properties.aadl", "Programming_Properties.aadl",
-   "Thread_Properties.aadl", "Timing_Properties.aadl",
+   "Thread_Properties.aadl", "Timing_Properties.aadl", "ARINC653.aadl",
    "Generation_Properties.aadl2", "pok_properties.aadl2",
    "osek_properties.aadl2", "RAMSES.aadl2", "AI.aadl",
    "MCDA.aadl2"} ;

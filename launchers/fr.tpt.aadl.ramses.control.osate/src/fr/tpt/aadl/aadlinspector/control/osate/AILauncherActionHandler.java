@@ -143,6 +143,13 @@ public class AILauncherActionHandler extends RamsesActionHandler {
 		
 		AnalysisResult ar = aiLauncher.launchAnalysis(sysInst, config.getAadlInspectorOutputDir(), config.getMode(), monitor);
 		
+		if(ar==null)
+		{
+		  String msg = "AADL Inspector Analysis failed; check input model and launch AADL" +
+		      "Inspector with graphical interface to analyse the reasons of this error.";
+		  ServiceProvider.SYS_ERR_REP.error(msg, false);
+		}
+		
 		AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE ;
     AnalysisArtifact result = f.createAnalysisArtifact() ;
     ar.normalize(result);

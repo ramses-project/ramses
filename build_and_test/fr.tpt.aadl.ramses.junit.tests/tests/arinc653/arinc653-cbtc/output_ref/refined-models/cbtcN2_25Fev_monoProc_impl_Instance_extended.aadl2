@@ -104,7 +104,7 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
   processor implementation root_inst.impl
     subcomponents
       VP_train_inst: virtual processor cbtc::VP_train.impl {
-        Scheduling_Protocol => (Round_Robin_Protocol);
+        Scheduling_Protocol => (RMS);
         Period => 600 ms;
         ARINC653::Partition_Identifier => 2;
         ARINC653::Partition_Name => "train";
@@ -112,7 +112,7 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
         POK::Additional_Features => (libc_stdio, console);
         };
       VP_railway_inst: virtual processor cbtc::VP_railway.impl {
-        Scheduling_Protocol => (Round_Robin_Protocol);
+        Scheduling_Protocol => (RMS);
         Period => 600 ms;
         ARINC653::Partition_Identifier => 3;
         ARINC653::Partition_Name => "railway";

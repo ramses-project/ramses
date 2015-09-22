@@ -64,7 +64,8 @@ abstract rule m_Component_Type {
   to
     typeImg : AADLBA!ComponentType
 	(
- 		name <- type.name
+ 		name <- type.name,
+		ownedFlowSpecification <- type.ownedFlowSpecification
  	)
   do
   {

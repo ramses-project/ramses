@@ -1,0 +1,204 @@
+package model
+public
+
+-- model not made for execution, just for test case generation
+    
+with Data_Model;
+with OSEK;
+with Generation_Properties;
+with nxtTypes;
+    
+system implementation root.impl
+    subcomponents 
+        cpu   :  processor arm.impl;
+        mem   :  memory nxt_mem.impl;
+        line_follower : process proc.impl;
+        color_sensor : device ColorSensor;
+    properties
+        Actual_Processor_Binding => (reference (cpu)) applies to line_follower;
+        Actual_Memory_Binding => (reference (mem)) applies to line_follower;
+        Actual_Processor_Binding => (reference (cpu)) applies to color_sensor;
+end root.impl;
+
+process implementation proc.impl
+    subcomponents
+        color_sensor_port: data nxtTypes::nxt_sensor_port {Data_Model::Initial_Value => ("NXT_PORT_S2");};
+
+        follow_line_inst : thread follow_line.impl;
+        backgroung_inst : thread backgroung.impl ;
+    connections
+        cnx_color_sensor_port1 : port color_sensor_port -> follow_line_inst.color_sensor_port;
+end proc.impl;
+
+
+
+thread implementation follow_line.impl
+    calls 
+        follow : {
+            get_color   : subprogram ecrobotGetColorId;
+            check_color : subprogram check_color_sub;
+            compute_angle : subprogram compute_angle_sub;
+            
+            get_color2   : subprogram ecrobotGetColorId;
+            check_color2 : subprogram check_color_sub;
+            compute_angle2 : subprogram compute_angle_sub;
+            
+            get_color3   : subprogram ecrobotGetColorId3;
+            check_color3 : subprogram check_color_sub3;
+            compute_angle3 : subprogram compute_angle_sub3;
+        };
+    connections        
+        cnx_color_sensor_port : parameter get_color.portId -> color_sensor_port;
+        cnx_current_color : parameter get_color.color -> compute_angle.current_color1;
+        cnx2_current_color : parameter get_color.color -> check_color.current_color2;
+        
+        cnx_color_sensor_port2 : parameter get_color2.portId -> color_sensor_port;
+        cnx_current_color2 : parameter get_color2.color -> compute_angle2.current_color1;
+        cnx2_current_color2 : parameter get_color2.color -> check_color2.current_color2;
+        
+        cnx_color_sensor_port3 : parameter get_color3.portId -> color_sensor_port;
+        cnx_current_color3 : parameter get_color3.color -> compute_angle3.current_color1;
+        cnx2_current_color3 : parameter get_color3.color -> check_color3.current_color2;
+    properties
+        Dispatch_Protocol                  => periodic;
+        Period                             => 100 ms;
+        Compute_Execution_time             => 0 ms .. 30 ms;
+        Deadline                           => 50 ms;
+        Priority                           => 2;
+        Compute_Entrypoint_Call_Sequence => reference (follow); 
+end follow_line.impl;
+
+thread implementation backgroung.impl
+    calls
+        poll : {
+          bgColorSensor : subprogram bgColorSensor; 
+        };
+    properties
+        Dispatch_Protocol                  => periodic;
+        Period                             => 10 ms;
+        Compute_Execution_time             => 0 ms .. 25 ms;
+        Deadline                           => 50 ms;
+        Priority                           => 1;
+        Compute_Entrypoint_Call_Sequence => reference (poll);       
+end    backgroung.impl; 
+--------------------------------------------------------------------------------
+--component types
+process proc
+end proc;
+
+system root
+end root;
+
+thread follow_line
+    features
+      ecrobotGetColorId : requires subprogram access ecrobotGetColorId;   
+      compute_angle_sub : requires subprogram access compute_angle_sub;
+      check_color_sub : requires subprogram access check_color_sub;
+      
+      ecrobotGetColorId3 : requires subprogram access ecrobotGetColorId3;   
+      compute_angle_sub3 : requires subprogram access compute_angle_sub3;
+      check_color_sub3 : requires subprogram access check_color_sub3;
+      
+      color_sensor_port : in data port nxtTypes::nxt_sensor_port; 
+               
+end follow_line;
+
+
+thread backgroung
+    features 
+        update_color : requires subprogram access bgColorSensor;         
+end    backgroung; 
+--------------------------------------------------------------------------------
+
+subprogram ecrobotGetColorId
+    features
+        portId: in parameter nxtTypes::nxt_sensor_port;
+        color : out parameter nxtTypes::color_id {Generation_Properties::Return_Parameter => true;};
+    properties
+        Source_language => (C);
+        Source_text => ("ecrobot/c/ecrobot_interface.h");
+        Source_name => "ecrobot_get_nxtcolorsensor_id";
+end ecrobotGetColorId;
+
+
+subprogram compute_angle_sub
+    features 
+        current_color1   : in parameter nxtTypes::color_id;        
+    properties
+        Source_language => (C);
+        Source_text => ("source.h","source.c");
+        Source_name => "compute_angle_fnc";
+end compute_angle_sub;
+
+subprogram check_color_sub
+    features
+        current_color2 : in parameter nxtTypes::color_id;
+    properties
+        Source_language => (C);
+        Source_text => ("source.h","source.c");
+        Source_name => "check_color_fnc";
+end  check_color_sub;
+
+subprogram ecrobotGetColorId3
+    features
+        portId: in parameter nxtTypes::nxt_sensor_port;
+        color : out parameter nxtTypes::color_id {Generation_Properties::Return_Parameter => true;};
+    properties
+        Source_language => (C);
+        Source_text => ("ecrobot/c/ecrobot_interface.h");
+        Source_name => "ecrobot_get_nxtcolorsensor_id";
+end ecrobotGetColorId3;
+
+
+subprogram compute_angle_sub3
+    features 
+        current_color1   : in parameter nxtTypes::color_id;        
+    properties
+        Source_language => (C);
+        Source_text => ("source.h","source.c");
+        Source_name => "compute_angle_fnc";
+end compute_angle_sub3;
+
+subprogram check_color_sub3
+    features
+        current_color2 : in parameter nxtTypes::color_id;
+    properties
+        Source_language => (C);
+        Source_text => ("source.h","source.c");
+        Source_name => "check_color_fnc";
+end  check_color_sub3;   
+
+subprogram bgColorSensor
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot/c/ecrobot_interface.h");
+  Source_name => "ecrobot_process_bg_nxtcolorsensor";
+end bgColorSensor;
+--------------------------------------------------------------------------------
+--types
+
+--------------------------------------------------------------------------------
+--plateform
+processor arm        
+end arm;
+
+processor implementation arm.impl 
+properties
+  Scheduling_Protocol => (RMS) ;
+  OSEK::SystemCounter_MaxAllowedValue => 2000;
+  OSEK::SystemCounter_TicksPerBase => 1;
+  OSEK::SystemCounter_MinCycle => 1;
+end arm.impl;
+
+memory nxt_mem
+end nxt_mem;  
+
+memory implementation nxt_mem.impl
+end nxt_mem.impl; 
+
+device ColorSensor
+features
+  getColor: provides subprogram access ecrobotGetColorId;    
+end ColorSensor;
+
+end model;

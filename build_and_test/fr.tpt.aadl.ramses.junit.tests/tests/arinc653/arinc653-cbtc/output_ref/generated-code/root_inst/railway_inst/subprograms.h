@@ -1,27 +1,36 @@
 #ifndef __GENERATED_SUBPROGRAMS_H__
 #define __GENERATED_SUBPROGRAMS_H__
-#include "business-code/cbtc_trainPpu_subsystem_Implementations_TrackPpu_impl.h"
 #include "arinc653/sampling.h"
-#include "business-code/cbtc_mau_subsystem_Implementations_EoaSending_impl.h"
-#include "arinc653/blackboard.h"
-#include "arinc653/time.h"
 #include "business-code/cbtc_viu_subsystem_Implementations_ViuTrainPositionSending_impl.h"
-#include "business-code/cbtc_viu_subsystem_Implementations_ViuTrainPositionEstimation_impl.h"
-#include "business-code/cbtc_viu_subsystem_Implementations_TrackAcquisition_impl.h"
-#include "business-code/cbtc_mau_subsystem_Implementations_EndOfAuthorityComputation_impl.h"
-#include "arinc653/types.h"
 #include "business-code/cbtc_module.h"
+#include "business-code/cbtc_mau_subsystem_Implementations_EoaSending_impl.h"
 #include "business-code/cbtc_cbtc_subsystem_Implementations_TrainSimu_impl.h"
 #include "business-code/cbtc_mau_subsystem_Implementations_TrainPositionsCorrelation_impl.h"
+#include "arinc653/time.h"
+#include "arinc653/types.h"
+#include "business-code/cbtc_trainPpu_subsystem_Implementations_TrackPpu_impl.h"
+#include "business-code/cbtc_viu_subsystem_Implementations_TrackAcquisition_impl.h"
+#include "business-code/cbtc_mau_subsystem_Implementations_EndOfAuthorityComputation_impl.h"
+#include "arinc653/blackboard.h"
+#include "business-code/cbtc_viu_subsystem_Implementations_ViuTrainPositionEstimation_impl.h"
 #include "gtypes.h"
 #include "main.h"
-void cbtc__TrainPositionsCorrelation_store_trainPositionMauOut(TrainPosition *  delayed_trainPositionMauOut, TrainPosition *  trainPositionMauOut);
+void cbtc__TrainPositionsCorrelation_store_trainPositionMauOut(
+	TrainPosition *  delayed_trainPositionMauOut,
+	TrainPosition *  trainPositionMauOut);
 
 typedef enum {
   cbtc__TrainPositionsCorrelation_store_trainPositionMauOut_s
 } cbtc__TrainPositionsCorrelation_store_trainPositionMauOut_BA_State_t;
 
-void cbtc_refined_model__railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_entrypoint_impl(SAMPLING_PORT_ID_TYPE *  trainPositionVobcForMauIn, BLACKBOARD_ID_TYPE *  trainPositionViuForMauIn, SAMPLING_PORT_ID_TYPE *  PortCnx7_eoaForVobcOut, cbtc_refined_model__railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState *  Parent_BA_currentState_Access, Base_Types__Integer_16 *  trainPositionVobcForMauIn_freshnessIndicator_access, Base_Types__Integer_16 *  trainPositionViuForMauIn_freshnessIndicator_access, Base_Types__Integer_16 *  eoaForVobcOut_freshnessIndicator_access);
+void cbtc_refined_model__railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_entrypoint_impl(
+	SAMPLING_PORT_ID_TYPE *  trainPositionVobcForMauIn,
+	BLACKBOARD_ID_TYPE *  trainPositionViuForMauIn,
+	SAMPLING_PORT_ID_TYPE *  PortCnx7_eoaForVobcOut,
+	cbtc_refined_model__railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState *  Parent_BA_currentState_Access,
+	Base_Types__Integer_16 *  trainPositionVobcForMauIn_freshnessIndicator_access,
+	Base_Types__Integer_16 *  trainPositionViuForMauIn_freshnessIndicator_access,
+	Base_Types__Integer_16 *  eoaForVobcOut_freshnessIndicator_access);
 
 typedef enum {
   cbtc_refined_model__railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_entrypoint_impl_BA_entrypoint_init_state,
@@ -30,7 +39,12 @@ typedef enum {
   cbtc_refined_model__railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_entrypoint_impl_BA_entrypoint_final_state
 } cbtc_refined_model__railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_entrypoint_impl_BA_State_t;
 
-void cbtc_refined_model__railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_entrypoint_impl(BLACKBOARD_ID_TYPE *  trackIn, BLACKBOARD_ID_TYPE *  PortCnx1_trainPositionForMauOut, cbtc_refined_model__railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState *  Parent_BA_currentState_Access, Base_Types__Integer_16 *  trackIn_freshnessIndicator_access, Base_Types__Integer_16 *  trainPositionForMauOut_freshnessIndicator_access);
+void cbtc_refined_model__railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_entrypoint_impl(
+	BLACKBOARD_ID_TYPE *  trackIn,
+	BLACKBOARD_ID_TYPE *  PortCnx1_trainPositionForMauOut,
+	cbtc_refined_model__railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState *  Parent_BA_currentState_Access,
+	Base_Types__Integer_16 *  trackIn_freshnessIndicator_access,
+	Base_Types__Integer_16 *  trainPositionForMauOut_freshnessIndicator_access);
 
 typedef enum {
   cbtc_refined_model__railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_entrypoint_impl_BA_entrypoint_init_state,
@@ -39,7 +53,13 @@ typedef enum {
   cbtc_refined_model__railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_entrypoint_impl_BA_entrypoint_final_state
 } cbtc_refined_model__railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_entrypoint_impl_BA_State_t;
 
-void cbtc_refined_model__railway_inst_TrainSimu_trainSimulation_entrypoint_impl(BLACKBOARD_ID_TYPE *  delayed_trainDataIn, SAMPLING_PORT_ID_TYPE *  PortCnx6_trainDataOut, BLACKBOARD_ID_TYPE *  PortCnx3_trackOut, cbtc_refined_model__railway_inst_TrainSimu_trainSimulation_currentState *  Parent_BA_currentState_Access, Base_Types__Integer_16 *  trainDataOut_freshnessIndicator_access, Base_Types__Integer_16 *  trackOut_freshnessIndicator_access);
+void cbtc_refined_model__railway_inst_TrainSimu_trainSimulation_entrypoint_impl(
+	BLACKBOARD_ID_TYPE *  delayed_trainDataIn,
+	SAMPLING_PORT_ID_TYPE *  PortCnx6_trainDataOut,
+	BLACKBOARD_ID_TYPE *  PortCnx3_trackOut,
+	cbtc_refined_model__railway_inst_TrainSimu_trainSimulation_currentState *  Parent_BA_currentState_Access,
+	Base_Types__Integer_16 *  trainDataOut_freshnessIndicator_access,
+	Base_Types__Integer_16 *  trackOut_freshnessIndicator_access);
 
 typedef enum {
   cbtc_refined_model__railway_inst_TrainSimu_trainSimulation_entrypoint_impl_BA_entrypoint_init_state,
@@ -48,13 +68,18 @@ typedef enum {
   cbtc_refined_model__railway_inst_TrainSimu_trainSimulation_entrypoint_impl_BA_entrypoint_final_state
 } cbtc_refined_model__railway_inst_TrainSimu_trainSimulation_entrypoint_impl_BA_State_t;
 
-void cbtc__TrainSimu_delayed_trainDataIn(TrainData *  trainDataIn, TrainData *  delayed_trainDataIn);
+void cbtc__TrainSimu_delayed_trainDataIn(
+	TrainData *  trainDataIn,
+	TrainData *  delayed_trainDataIn);
 
 typedef enum {
   cbtc__TrainSimu_delayed_trainDataIn_s
 } cbtc__TrainSimu_delayed_trainDataIn_BA_State_t;
 
-void cbtc_refined_model__railway_inst_TrainSimu_delayed_trainDataIn_entrypoint_impl(SAMPLING_PORT_ID_TYPE *  trainDataIn, BLACKBOARD_ID_TYPE *  PortCnx2_delayed_trainDataIn, cbtc_refined_model__railway_inst_TrainSimu_delayed_trainDataIn_currentState *  Parent_BA_currentState_Access);
+void cbtc_refined_model__railway_inst_TrainSimu_delayed_trainDataIn_entrypoint_impl(
+	SAMPLING_PORT_ID_TYPE *  trainDataIn,
+	BLACKBOARD_ID_TYPE *  PortCnx2_delayed_trainDataIn,
+	cbtc_refined_model__railway_inst_TrainSimu_delayed_trainDataIn_currentState *  Parent_BA_currentState_Access);
 
 typedef enum {
   cbtc_refined_model__railway_inst_TrainSimu_delayed_trainDataIn_entrypoint_impl_BA_entrypoint_init_state,

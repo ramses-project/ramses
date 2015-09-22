@@ -4,9 +4,8 @@ package Minimal_Periodic_Example
 
 public
 
-with Timing_Properties, Data_Model, Base_Types, Minimal_Runtime_Sync,
-      Minimal_Runtime_Dispatch, Minimal_Common_Example, Minimal_Example,
-      Minimal_Runtime_Types ;
+with Data_Model, Base_Types, Minimal_Runtime_Sync, Minimal_Example, 
+     Minimal_Common_Example, Minimal_Runtime_Types ;
 
 
 ---------------------------- Transmitter 1 ----------------------------

@@ -629,7 +629,6 @@ rule m_BehaviorActionsFromThread
 								cnxInst | thisModule.resolveMatchedTupleIfExists(Sequence{port, src_transition.eContainer(), cnxInst.connectionReference->first().connection}, 'call')
 							)
 						)
-						->append(thisModule.resolveMatchedTupleIfExists(Sequence{c,src_transition},'waitDispatchCall'))
 						else
 						Sequence{}
 						endif

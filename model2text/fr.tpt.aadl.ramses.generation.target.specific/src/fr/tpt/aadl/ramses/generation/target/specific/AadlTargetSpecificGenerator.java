@@ -27,6 +27,7 @@ import java.io.PrintWriter ;
 import java.io.StringWriter ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
+import java.util.Iterator ;
 import java.util.List ;
 import java.util.Map ;
 import java.util.concurrent.TimeUnit ;
@@ -711,7 +712,9 @@ public class AadlTargetSpecificGenerator implements Generator
                 {
                   foundLoopManagementPlugin = true;
                   monitor.subTask("Transformation alternatives loop: "+resolutionMethodName);
-                  modelsMap.putAll(gen.processLoop());
+                  @SuppressWarnings("unchecked")
+                  Map<String, Resource> newResourceMap = (Map<String, Resource>) gen.processLoop();
+                  modelsMap.putAll(newResourceMap);
                   workflowPilot.setLoopModelIdSuffix(gen.getModelIdSuffix());
                   boolean loopAnalysis = isValidLoopIteration(l.getAnalysis(), 
                                                               errManager, 
@@ -721,6 +724,14 @@ public class AadlTargetSpecificGenerator implements Generator
                                                               gen.getModelIdSuffix(), 
                                                               monitor,
                                                               gen.getCurrentIterationNb());
+                  // unload generated aadl models to save memory
+                  Iterator it = newResourceMap.entrySet().iterator();
+                  while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry)it.next();
+                    Resource toUnload = (Resource) pair.getValue();
+                    toUnload.getContents().clear();
+                    toUnload.unload();
+                  }
                   if(loopAnalysis==false)
                     _LOGGER.error("Analysis results show that some constraints are not satisfied");
                 }

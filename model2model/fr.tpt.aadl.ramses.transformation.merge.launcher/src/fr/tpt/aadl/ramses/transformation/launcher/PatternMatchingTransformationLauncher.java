@@ -15,6 +15,7 @@ import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.emf.ecore.util.EcoreUtil ;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
 import org.eclipse.m2m.atl.emftvm.EmftvmFactory ;
+import org.eclipse.m2m.atl.emftvm.ExecEnv ;
 import org.eclipse.m2m.atl.emftvm.Metamodel ;
 import org.eclipse.m2m.atl.emftvm.Module ;
 import org.eclipse.m2m.atl.emftvm.Rule ;
@@ -51,9 +52,10 @@ public class PatternMatchingTransformationLauncher extends Aadl2XEMFTVMLauncher 
 	ResourceSet resourceSet;
 
 	@Override
-	protected synchronized void initTransformationInputs(Resource inputResource)
+	protected synchronized void initTransformationInputs(ExecEnv env,
+	                                                     Resource inputResource)
   {
-	  super.initTransformationInputs(inputResource);
+	  super.initTransformationInputs(env, inputResource);
 	  
 	  // Load pattern matching metamodel
 	  Metamodel patternMatchinMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
@@ -82,13 +84,14 @@ public class PatternMatchingTransformationLauncher extends Aadl2XEMFTVMLauncher 
 	}
 
 	@Override
-	public Resource doTransformation(Resource inputResource,
+	public Resource doTransformation(final ExecEnv env,
+	                                 Resource inputResource,
 	                                 String outputDirPathName, 
 	                                 String resourceSuffix, 
 	                                 final IProgressMonitor monitor)
 	{
 	  
-	  Resource outputResource = super.doTransformation(inputResource, outputDirPathName, resourceSuffix, monitor);
+	  Resource outputResource = super.doTransformation(env,inputResource, outputDirPathName, resourceSuffix, monitor);
 	  if(outputResource==null)
 	    return null;
 	  for(Module m : getModuleList())

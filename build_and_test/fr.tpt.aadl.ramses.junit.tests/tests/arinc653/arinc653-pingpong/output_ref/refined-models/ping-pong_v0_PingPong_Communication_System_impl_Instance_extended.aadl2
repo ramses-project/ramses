@@ -54,12 +54,12 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,arinc653_runtime;
     subcomponents
       VP_S1_inst: virtual processor PingPong::VP_S1.impl {
         Period => 1000 ms;
-        Scheduling_Protocol => (Round_Robin_Protocol);
+        Scheduling_Protocol => (RMS);
         POK::Additional_Features => (console);
         };
       VP_S2_inst: virtual processor PingPong::VP_S2.impl {
         Period => 1000 ms;
-        Scheduling_Protocol => (Round_Robin_Protocol);
+        Scheduling_Protocol => (RMS);
         POK::Additional_Features => (console);
         };
   end node_1_inst.impl;
@@ -127,14 +127,14 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,arinc653_runtime;
   
   subprogram S1_inst_a1_inst_entrypoint
     features
-      C1_PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      C1_PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      Mon_error_C2: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       mode_implicit_cnx_Mon_mode_C2: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       C1_ping_implicit_cnx_C1_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       C1_pong_implicit_cnx_C1_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      call_seq_state_baKeywords_entrypoint: requires data access PingPong::TYPE_aadlKeywords;
-      call_seq_seqNb_entrypoint: requires data access PingPong::SEQ;
+      C1_PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      C1_PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      Mon_error_C2: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      PingPong_a1_impl_call_seq_PingPong_Monitor_activate_state_baKeywords_entrypoint: requires data access PingPong::TYPE_aadlKeywords;
+      PingPong_a1_impl_call_seq_PingPong_IPingOrPong_mode_seqNb_entrypoint: requires data access PingPong::SEQ;
   end S1_inst_a1_inst_entrypoint;
   
   subprogram implementation S1_inst_a1_inst_entrypoint.impl
@@ -176,8 +176,8 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,arinc653_runtime;
       C1_PingIn_Validity: data arinc653_runtime::Validity_Type;
       C1_PongIn_Validity: data arinc653_runtime::Validity_Type;
       Mon_error_C2_Validity: data arinc653_runtime::Validity_Type;
-      cnx7_localVariable: data PingPong::Exception;
-      cnx9_localVariable: data PingPong::ROLE;
+      PingPong_IPingOrPong_mode_badSequenceNumber_localVariable: data PingPong::Exception;
+      PingPong_Monitor_activate_mode_C1_localVariable: data PingPong::ROLE;
     annex behavior_specification {**
       variables
   whichPortActivated : PingPong_refined_model::S1_inst_a1_inst_behaviorIdentifier_enum ;
@@ -190,9 +190,9 @@ transitions
   call_seq [0] : BA_entrypoint_exec_state -[whichPortActivated = S1_inst_a1_inst_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {Read_Sampling_Message_PingPongMessage ! (C1_PingIn, C1_PingIn_localVariable, C1_PingIn_Length, C1_PingIn_Validity, C1_PingIn_ErrorCode) ;
 Read_Sampling_Message_PingPongMessage ! (C1_PongIn, C1_PongIn_localVariable, C1_PongIn_Length, C1_PongIn_Validity, C1_PongIn_ErrorCode) ;
 Read_Sampling_Message_Exception ! (Mon_error_C2, Mon_error_C2_localVariable, Mon_error_C2_Length, Mon_error_C2_Validity, Mon_error_C2_ErrorCode) ;
-if (Mon_error_C2_ErrorCode = 0) PingPong::Monitor_activate ! (call_seq_state_baKeywords_entrypoint, cnx7_localVariable, Mon_error_C2_localVariable, cnx9_localVariable, Mon_mode_C2_localVariable) end if
+if (Mon_error_C2_ErrorCode = 0) PingPong::Monitor_activate ! (PingPong_a1_impl_call_seq_PingPong_Monitor_activate_state_baKeywords_entrypoint, PingPong_IPingOrPong_mode_badSequenceNumber_localVariable, Mon_error_C2_localVariable, PingPong_Monitor_activate_mode_C1_localVariable, Mon_mode_C2_localVariable) end if
    ;
-if (C1_PingIn_ErrorCode = 0 and C1_PongIn_ErrorCode = 0) PingPong::IPingOrPong_mode ! (call_seq_seqNb_entrypoint, C1_PingIn_localVariable, C1_PingOut_localVariable, C1_PongIn_localVariable, C1_PongOut_localVariable, cnx7_localVariable, cnx9_localVariable) end if
+if (C1_PingIn_ErrorCode = 0 and C1_PongIn_ErrorCode = 0) PingPong::IPingOrPong_mode ! (PingPong_a1_impl_call_seq_PingPong_IPingOrPong_mode_seqNb_entrypoint, C1_PingIn_localVariable, C1_PingOut_localVariable, C1_PongIn_localVariable, C1_PongOut_localVariable, PingPong_IPingOrPong_mode_badSequenceNumber_localVariable, PingPong_Monitor_activate_mode_C1_localVariable) end if
    ;
 Write_Sampling_Message_ROLE ! (mode_implicit_cnx_Mon_mode_C2, Mon_mode_C2_localVariable, Mon_mode_C2_Length, S1_inst_a1_inst_runtime_call_ret) ;
 Write_Sampling_Message_PingPongMessage ! (C1_ping_implicit_cnx_C1_PingOut, C1_PingOut_localVariable, C1_PingOut_Length, S1_inst_a1_inst_runtime_call_ret) ;
@@ -237,8 +237,8 @@ Write_Sampling_Message_PingPongMessage ! (C1_pong_implicit_cnx_C1_PongOut, C1_Po
       C1_PingIn_accessCnx_call_seq: data access C1_PingIn -> call_entrypoint.C1_PingIn;
       C1_PongIn_accessCnx_call_seq: data access C1_PongIn -> call_entrypoint.C1_PongIn;
       Mon_error_C2_accessCnx_call_seq: data access Mon_error_C2 -> call_entrypoint.Mon_error_C2;
-      cnx8_entrypoint: data access call_entrypoint.call_seq_state_baKeywords_entrypoint -> state_baKeywords;
-      cnxx11_entrypoint: data access call_entrypoint.call_seq_seqNb_entrypoint -> seqNb;
+      cnx8_entrypoint: data access call_entrypoint.PingPong_a1_impl_call_seq_PingPong_Monitor_activate_state_baKeywords_entrypoint -> state_baKeywords;
+      cnxx11_entrypoint: data access call_entrypoint.PingPong_a1_impl_call_seq_PingPong_IPingOrPong_mode_seqNb_entrypoint -> seqNb;
   end S1_inst_a1_inst.impl;
   
   thread S1_inst_a1_inst
@@ -259,7 +259,7 @@ Write_Sampling_Message_PingPongMessage ! (C1_pong_implicit_cnx_C1_PongOut, C1_Po
       C2_ping_implicit_cnx_C2_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       C2_pong_implicit_cnx_C2_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       C2_error_implicit_cnx_C2_badSequenceNumber: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      call_seq_seqNb_entrypoint: requires data access PingPong::SEQ;
+      PingPong_a2_impl_call_seq_PingPong_IPingOrPong_mode_seqNb_entrypoint: requires data access PingPong::SEQ;
   end S2_inst_a2_inst_entrypoint;
   
   subprogram implementation S2_inst_a2_inst_entrypoint.impl
@@ -313,7 +313,7 @@ transitions
   call_seq [0] : BA_entrypoint_exec_state -[whichPortActivated = S2_inst_a2_inst_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {Read_Sampling_Message_ROLE ! (C2_mode, C2_mode_localVariable, C2_mode_Length, C2_mode_Validity, C2_mode_ErrorCode) ;
 Read_Sampling_Message_PingPongMessage ! (C2_PingIn, C2_PingIn_localVariable, C2_PingIn_Length, C2_PingIn_Validity, C2_PingIn_ErrorCode) ;
 Read_Sampling_Message_PingPongMessage ! (C2_PongIn, C2_PongIn_localVariable, C2_PongIn_Length, C2_PongIn_Validity, C2_PongIn_ErrorCode) ;
-if (C2_mode_ErrorCode = 0 and C2_PingIn_ErrorCode = 0 and C2_PongIn_ErrorCode = 0) PingPong::IPingOrPong_mode ! (call_seq_seqNb_entrypoint, C2_PingIn_localVariable, C2_PingOut_localVariable, C2_PongIn_localVariable, C2_PongOut_localVariable, C2_badSequenceNumber_localVariable, C2_mode_localVariable) end if
+if (C2_mode_ErrorCode = 0 and C2_PingIn_ErrorCode = 0 and C2_PongIn_ErrorCode = 0) PingPong::IPingOrPong_mode ! (PingPong_a2_impl_call_seq_PingPong_IPingOrPong_mode_seqNb_entrypoint, C2_PingIn_localVariable, C2_PingOut_localVariable, C2_PongIn_localVariable, C2_PongOut_localVariable, C2_badSequenceNumber_localVariable, C2_mode_localVariable) end if
    ;
 Write_Sampling_Message_PingPongMessage ! (C2_ping_implicit_cnx_C2_PingOut, C2_PingOut_localVariable, C2_PingOut_Length, S2_inst_a2_inst_runtime_call_ret) ;
 Write_Sampling_Message_PingPongMessage ! (C2_pong_implicit_cnx_C2_PongOut, C2_PongOut_localVariable, C2_PongOut_Length, S2_inst_a2_inst_runtime_call_ret) ;
@@ -351,7 +351,7 @@ Write_Sampling_Message_Exception ! (C2_error_implicit_cnx_C2_badSequenceNumber, 
       C2_PingOut_accessCnx_call_seq_C2_ping_implicit_cnx: data access C2_ping_implicit_cnx_C2_PingOut -> call_entrypoint.C2_ping_implicit_cnx_C2_PingOut;
       C2_PongOut_accessCnx_call_seq_C2_pong_implicit_cnx: data access C2_pong_implicit_cnx_C2_PongOut -> call_entrypoint.C2_pong_implicit_cnx_C2_PongOut;
       C2_badSequenceNumber_accessCnx_call_seq_C2_error_implicit_cnx: data access C2_error_implicit_cnx_C2_badSequenceNumber -> call_entrypoint.C2_error_implicit_cnx_C2_badSequenceNumber;
-      cnx7_entrypoint: data access call_entrypoint.call_seq_seqNb_entrypoint -> seqNb;
+      cnx7_entrypoint: data access call_entrypoint.PingPong_a2_impl_call_seq_PingPong_IPingOrPong_mode_seqNb_entrypoint -> seqNb;
   end S2_inst_a2_inst.impl;
   
   thread S2_inst_a2_inst

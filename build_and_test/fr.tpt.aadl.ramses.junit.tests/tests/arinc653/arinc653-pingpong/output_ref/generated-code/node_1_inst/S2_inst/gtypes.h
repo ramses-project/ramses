@@ -1,8 +1,8 @@
 #ifndef __GENERATED_GTYPES_H__
 #define __GENERATED_GTYPES_H__
+#include "pingpong.h"
 #include "arinc653/sampling.h"
 #include "arinc653/types.h"
-#include "pingpong.h"
 typedef  int PingPong__SEQ;
 typedef SAMPLING_PORT_ID_TYPE arinc653_runtime__Sampling_Port_Id_Type;
 typedef RETURN_CODE_TYPE arinc653_runtime__Return_Code_Type;

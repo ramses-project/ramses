@@ -22,6 +22,7 @@
 package fr.tpt.aadl.ramses.generation.target.specific;
 
 import java.io.File ;
+import java.io.IOException ;
 import java.util.ArrayList ;
 import java.util.List ;
 
@@ -87,9 +88,22 @@ public class AadlTargetSpecificCodeGenerator
 
     if ((inputResource == null ) || (inputResource.getContents() == null) || (inputResource.getContents().size() <= 0))
     {
-      String errMsg = "Cannot find AADL model sources" ;
-      _LOGGER.fatal(errMsg) ;
-      throw new GenerationException(errMsg);
+      try
+      {
+        inputResource.load(null);
+      }
+      catch(IOException e)
+      {
+        String errMsg = "Cannot load AADL model" ;
+        _LOGGER.fatal(errMsg) ;
+        throw new GenerationException(errMsg);
+      }
+      if ((inputResource == null ) || (inputResource.getContents() == null) || (inputResource.getContents().size() <= 0))
+      {
+        String errMsg = "Cannot find AADL model sources" ;
+        _LOGGER.fatal(errMsg) ;
+        throw new GenerationException(errMsg);
+      }
     }
 
     EObject root = inputResource.getContents().get(0);

@@ -1,7 +1,7 @@
 #ifndef __GENERATED_GTYPES_H__
 #define __GENERATED_GTYPES_H__
-#include "toppers_osek/include/kernel.h"
 #include "osek_runtime.h"
+#include "toppers_osek/include/kernel.h"
 typedef thread_queue_t OSEK_runtime__ThreadQueueType;
 typedef StatusType OSEK_runtime__StatusType;
 typedef signed int Base_Types__Integer_16;

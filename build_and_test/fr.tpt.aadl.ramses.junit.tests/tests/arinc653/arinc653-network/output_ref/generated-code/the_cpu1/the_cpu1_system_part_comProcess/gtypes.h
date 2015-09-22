@@ -1,8 +1,8 @@
 #ifndef __GENERATED_GTYPES_H__
 #define __GENERATED_GTYPES_H__
-#include "arinc653/types.h"
-#include "arinc653/queueing.h"
 #include "types.h"
+#include "arinc653/queueing.h"
+#include "arinc653/types.h"
 typedef pok_port_id_t rtl8029_driver__Pok_Port_Id_T;
 typedef char * Base_Types__String;
 typedef unsigned int Base_Types__Unsigned_32;

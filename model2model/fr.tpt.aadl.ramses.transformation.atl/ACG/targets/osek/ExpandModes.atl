@@ -63,18 +63,18 @@ unique lazy rule createModeSwitchAction
 		(
 			element <- spg
 		),
-		MODE_HOLDER: AADLBA!DataSubcomponentHolder
+		MODE_HOLDER: AADLBA!DataAccessHolder
 		(
-			element<-thisModule.resolveTemp(Sequence{mti.source, mti.getProcess()}, 'targetModeValue')
+			element<-thisModule.resolveTemp(Sequence{mti.source, mti.getProcess()}, 'targetModeValueAccess')
 		),
 		initTargetModeValue: AADLBA!AssignmentAction
 		(
 			target <- targetModeValueHolder,
 			valueExpression <- targetModeValueExpression
 		),
-		targetModeValueHolder: AADLBA!DataSubcomponentHolder
+		targetModeValueHolder: AADLBA!DataAccessHolder
 		(
-			element <- thisModule.resolveTemp(Sequence{mti.source, mti.eContainer()}, 'targetModeValue')
+			element <- thisModule.resolveTemp(Sequence{mti.source, mti.eContainer()}, 'targetModeValueAccess')
 		),
 		targetModeValueExpression: AADLBA!ValueExpression
 		(

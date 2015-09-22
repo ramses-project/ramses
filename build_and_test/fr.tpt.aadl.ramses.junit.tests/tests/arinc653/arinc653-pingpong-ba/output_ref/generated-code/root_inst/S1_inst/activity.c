@@ -11,9 +11,7 @@ extern SAMPLING_PORT_ID_TYPE S1_inst_Mon_mode_C2_globalVariable;
 extern PingPong_refined_model__S1_inst_Monitor_changeState_currentState Monitor_changeStateParent_BA_currentState;
 void* PingPong_refined_model__S1_inst_Monitor_changeState_impl_Job()
 {
-  while (1) {
-    PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl (&State_baKeywords, &Monitor_changeState_error_C1_globalVariable, &Monitor_changeState_delayed_error_C2_globalVariable, &IPingOrPong_Cping_ping_mode_aadlKeywords_globalVariable, &IPingOrPong_Cping_delayed_PongIn_mode_aadlKeywords_globalVariable, &IPingOrPong_Cpong_pong_mode_aadlKeywords_globalVariable, &S1_inst_Mon_mode_C2_globalVariable, &Monitor_changeStateParent_BA_currentState);
-  }
+  PingPong_refined_model__S1_inst_Monitor_changeState_entrypoint_impl (&Monitor_changeState_error_C1_globalVariable, &Monitor_changeState_delayed_error_C2_globalVariable, &IPingOrPong_Cping_ping_mode_aadlKeywords_globalVariable, &IPingOrPong_Cping_delayed_PongIn_mode_aadlKeywords_globalVariable, &IPingOrPong_Cpong_pong_mode_aadlKeywords_globalVariable, &S1_inst_Mon_mode_C2_globalVariable, &State_baKeywords, &Monitor_changeStateParent_BA_currentState);
   return 0;
 }
 extern TYPE State_baKeywords;
@@ -22,9 +20,7 @@ extern BLACKBOARD_ID_TYPE Monitor_changeState_delayed_error_C2_globalVariable;
 extern PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_currentState Monitor_delayed_error_C2Parent_BA_currentState;
 void* PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_impl_Job()
 {
-  while (1) {
-    PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl (&State_baKeywords, &S1_inst_Mon_error_C2globalVariable, &Monitor_changeState_delayed_error_C2_globalVariable, &Monitor_delayed_error_C2Parent_BA_currentState);
-  }
+  PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_entrypoint_impl (&S1_inst_Mon_error_C2globalVariable, &Monitor_changeState_delayed_error_C2_globalVariable, &State_baKeywords, &Monitor_delayed_error_C2Parent_BA_currentState);
   return 0;
 }
 extern SEQ seqNb;
@@ -36,9 +32,7 @@ extern PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_currentState IPing
 void* PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_impl_Job()
 {
   Base_Types__Integer_16 PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_impl_PingOut_persistentFreshnessIndicator = 0;
-  while (1) {
-    PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl (&seqNb, &IPingOrPong_Cping_ping_delayed_PongIn_globalVariable, &IPingOrPong_Cping_ping_mode_aadlKeywords_globalVariable, &S1_inst_C1_PingOut_globalVariable, &Monitor_changeState_error_C1_globalVariable, &IPingOrPong_Cping_pingParent_BA_currentState, &PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_impl_PingOut_persistentFreshnessIndicator);
-  }
+  PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_entrypoint_impl (&IPingOrPong_Cping_ping_delayed_PongIn_globalVariable, &S1_inst_C1_PingOut_globalVariable, &Monitor_changeState_error_C1_globalVariable, &IPingOrPong_Cping_ping_mode_aadlKeywords_globalVariable, &seqNb, &IPingOrPong_Cping_pingParent_BA_currentState, &PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_impl_PingOut_persistentFreshnessIndicator);
   return 0;
 }
 extern SEQ seqNb;
@@ -48,9 +42,7 @@ extern BLACKBOARD_ID_TYPE IPingOrPong_Cping_ping_delayed_PongIn_globalVariable;
 extern PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_currentState IPingOrPong_Cping_delayed_PongInParent_BA_currentState;
 void* PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_impl_Job()
 {
-  while (1) {
-    PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl (&seqNb, &S1_inst_C1_PongInglobalVariable, &IPingOrPong_Cping_delayed_PongIn_mode_aadlKeywords_globalVariable, &IPingOrPong_Cping_ping_delayed_PongIn_globalVariable, &IPingOrPong_Cping_delayed_PongInParent_BA_currentState);
-  }
+  PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint_impl (&S1_inst_C1_PongInglobalVariable, &IPingOrPong_Cping_ping_delayed_PongIn_globalVariable, &IPingOrPong_Cping_delayed_PongIn_mode_aadlKeywords_globalVariable, &seqNb, &IPingOrPong_Cping_delayed_PongInParent_BA_currentState);
   return 0;
 }
 extern SEQ seqNb;
@@ -61,8 +53,6 @@ extern PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_currentState IPing
 void* PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_impl_Job()
 {
   Base_Types__Integer_16 PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_impl_PingIn_persistentFreshnessIndicator = 0;
-  while (1) {
-    PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl (&seqNb, &S1_inst_C1_PingInglobalVariable, &IPingOrPong_Cpong_pong_mode_aadlKeywords_globalVariable, &S1_inst_C1_PongOut_globalVariable, &IPingOrPong_Cpong_pongParent_BA_currentState, &PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_impl_PingIn_persistentFreshnessIndicator);
-  }
+  PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_entrypoint_impl (&S1_inst_C1_PingInglobalVariable, &S1_inst_C1_PongOut_globalVariable, &IPingOrPong_Cpong_pong_mode_aadlKeywords_globalVariable, &seqNb, &IPingOrPong_Cpong_pongParent_BA_currentState, &PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_impl_PingIn_persistentFreshnessIndicator);
   return 0;
 }

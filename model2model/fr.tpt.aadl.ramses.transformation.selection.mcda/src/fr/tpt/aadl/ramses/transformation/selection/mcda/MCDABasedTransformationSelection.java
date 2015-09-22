@@ -38,6 +38,7 @@ import fr.tpt.aadl.ramses.control.support.generator.TransformationException ;
 import fr.tpt.aadl.ramses.control.support.instantiation.ParseException ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.utils.Command ;
+import fr.tpt.aadl.ramses.control.support.utils.DependencyGraphUtils ;
 import fr.tpt.aadl.ramses.control.support.utils.Names ;
 import fr.tpt.aadl.ramses.control.support.utils.WaitMonitor ;
 import fr.tpt.aadl.ramses.control.workflow.AbstractLoop ;
@@ -51,7 +52,6 @@ import fr.tpt.aadl.ramses.transformation.selection.RuleApplicationUtils ;
 import fr.tpt.aadl.ramses.transformation.selection.TransformationRuleAlternative ;
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyGraph ;
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyNode ;
-import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.util.DependencyGraphUtils ;
 import fr.tpt.aadl.ramses.transformation.tip.ElementTransformation ;
 import fr.tpt.aadl.ramses.transformation.tip.util.TipParser ;
 import fr.tpt.aadl.ramses.transformation.tip.util.TipUtils ;
@@ -473,7 +473,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
   }
 
   
-  static class TransformationRuleSelectionThread extends Thread
+  class TransformationRuleSelectionThread extends Thread
   {
     
     private TrcSpecification trc;

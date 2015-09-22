@@ -1,9 +1,9 @@
 #ifndef __GENERATED_GTYPES_H__
 #define __GENERATED_GTYPES_H__
 #include "arinc653/sampling.h"
-#include "arinc653/types.h"
-#include "arinc653/blackboard.h"
 #include "business-code/cbtc_module.h"
+#include "arinc653/blackboard.h"
+#include "arinc653/types.h"
 typedef signed int Base_Types__Integer_16;
 typedef SAMPLING_PORT_ID_TYPE arinc653_runtime__Sampling_Port_Id_Type;
 typedef BLACKBOARD_ID_TYPE arinc653_runtime__Blackboard_Id_Type;

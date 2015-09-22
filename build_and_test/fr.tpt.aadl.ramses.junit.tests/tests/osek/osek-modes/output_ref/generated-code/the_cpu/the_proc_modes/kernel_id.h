@@ -1,6 +1,6 @@
 /*
  *  kernel_id.h
- *  Mon Feb 23 11:13:58 2015
+ *  Tue Apr 28 01:23:46 2015
  *  SG Version 2.00
  *  sg.exe ./the_proc_modes.oil -os=ECC2 -I/data/packages/nxtOSEK/ecrobot/../toppers_osek/sg/impl_oil -template=/data/packages/nxtOSEK/ecrobot/../toppers_osek/sg/lego_nxt.sgt
  */

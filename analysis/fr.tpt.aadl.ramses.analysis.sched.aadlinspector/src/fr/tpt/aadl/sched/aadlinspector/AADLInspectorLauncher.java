@@ -58,6 +58,7 @@ public class AADLInspectorLauncher
 	private String BIN_PATH;
 	private String OUTPUT_FILE_PATH;
 	private String extension = "";
+	private Process AIProcess ;
 	
 	private Logger _LOGGER = Logger.getLogger(AADLInspectorLauncher.class) ;
 	
@@ -118,7 +119,6 @@ public class AADLInspectorLauncher
 		}
 		
 		final String command = BIN_PATH + "AADLInspector" + extension;
-		Process p ;
 		
 		if(monitor.isCanceled())
 		{
@@ -129,7 +129,7 @@ public class AADLInspectorLauncher
 		
     try
     {
-      p = Runtime.getRuntime().exec(new String[] {
+      AIProcess = Runtime.getRuntime().exec(new String[] {
       		command, 
       		"-a", modelList, 
       		"--plugin", "schedulability.cheddarSimTest", 
@@ -154,13 +154,13 @@ public class AADLInspectorLauncher
     
 		try 
 		{
-		  exitValue = p.waitFor() ;
+		  exitValue = AIProcess.waitFor() ;
 		}
 		catch(InterruptedException e)
 		{
 		  _LOGGER.trace("AADLInspector thread " + Thread.currentThread().getId() +
                     " has been interrupted. The current process is destroyed");
-		  p.destroy();
+		  AIProcess.destroy();
 		  throw e ;
 		}
     
@@ -281,4 +281,10 @@ public class AADLInspectorLauncher
 			}
 		}
 	}
+
+  public void stopProcess()
+  {
+    if(AIProcess!=null)
+      AIProcess.destroy();
+  }
 }

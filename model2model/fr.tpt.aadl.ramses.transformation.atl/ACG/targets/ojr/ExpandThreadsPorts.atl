@@ -49,7 +49,7 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 				and
 				callSequence.isComputeEntryPointOf(c)
 			)->collect(
-				paramCnx | thisModule.resolveMatchedTupleIfExists(Sequence{c, callSequence, paramCnx}, 'paramCnxVariable')
+				paramCnx | thisModule.resolveMatchedTupleIfExists(Sequence{c, callSequence, paramCnx.source.connectionEnd}, 'paramCnxVariable')
 			)
 		)
 	)

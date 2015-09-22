@@ -87,7 +87,7 @@ public class AadlModelsManagerImpl implements AadlModelInstantiatior {
 	    }
 	    catch(Exception e)
 	    {
-	      String errMsg =  "cannot delete the previous AADL resource set" ;
+	      String errMsg = "cannot delete the previous AADL resource set" ;
 	      _LOGGER.fatal(errMsg, e);
 	      throw new RuntimeException(errMsg, e) ;
 	    }

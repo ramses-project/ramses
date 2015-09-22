@@ -35,7 +35,7 @@ package Minimal_Runtime_Port
 
 public
 
-with Timing_Properties, Data_Model, Base_Types, Minimal_Runtime_Types, Minimal_Runtime_Sync ;
+with Base_Types, Minimal_Runtime_Types, Minimal_Runtime_Sync ;
 
 
 subprogram Remove_Pending_Event

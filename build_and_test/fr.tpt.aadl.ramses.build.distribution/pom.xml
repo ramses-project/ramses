@@ -14,14 +14,6 @@
   <version>${project.parent.version}</version>
 
   <dependencies>
-    <dependency>
-      <groupId>ramses</groupId>
-      <artifactId>fr.tpt.aadl.ramses.control.cli.static</artifactId>
-      <version>${project.parent.version}</version>
-      <type>jar</type>
-      <classifier>exe</classifier>
-      <scope>compile</scope>
-    </dependency>
 
     <dependency>
       <groupId>org.osate</groupId>

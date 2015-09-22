@@ -95,7 +95,7 @@ with Data_Model,ARINC653,POK,RAMSES_processors,RAMSES_buses;
   properties
     ARINC653::Partition_Identifier => 1;
     POK::Additional_Features => (libc_stdio, console);
-    Scheduling_Protocol => (Round_Robin_Protocol);
+    Scheduling_Protocol => (RMS);
     Period => 1000 Ms;
     ARINC653::HM_Error_ID_Actions => (
     	[ErrorIdentifier => 3; Description => "Restart process"; Action => "Cold_Restart";],

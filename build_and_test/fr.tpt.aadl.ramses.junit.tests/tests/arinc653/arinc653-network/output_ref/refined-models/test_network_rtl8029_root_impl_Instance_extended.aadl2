@@ -41,7 +41,7 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,test_netw
     subcomponents
       the_part: virtual processor part {
         Period => 1000 ms;
-        Scheduling_Protocol => (Round_Robin_Protocol);
+        Scheduling_Protocol => (RMS);
         ARINC653::HM_Error_ID_Actions => ([
           ErrorIdentifier=> 3;
           Description=> "Restart process";
@@ -57,7 +57,7 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,test_netw
       system_part: virtual processor part {
         Period => 1000 ms;
         ARINC653::System_Partition => true;
-        Scheduling_Protocol => (Round_Robin_Protocol);
+        Scheduling_Protocol => (RMS);
         ARINC653::HM_Error_ID_Actions => ([
           ErrorIdentifier=> 3;
           Description=> "Restart process";
@@ -124,9 +124,6 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,test_netw
   bus rtl8029
   end rtl8029;
   
-  processor cpu_x86
-  end cpu_x86;
-  
   processor cpu
   end cpu;
   
@@ -134,6 +131,9 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,test_netw
     features
       bus_access: requires bus access rtl8029;
   end connected_cpu;
+  
+  processor cpu_x86
+  end cpu_x86;
   
   virtual processor part
   end part;

@@ -65,7 +65,7 @@ helper def: collectCommunicationsLocalVariables(c : AADLI!ComponentInstance, cal
   )->select(paramCnx |
    paramCnx.isParamToParamConnection() and paramCnx.isPartOfCallSequence(callSequence) and callSequence.isComputeEntryPointOf(c)
   )->collect(paramCnx |
-   thisModule.resolveMatchedTupleIfExists(Sequence {c, callSequence, paramCnx}, 'paramCnxVariable')
+   thisModule.resolveMatchedTupleIfExists(Sequence {c, callSequence, paramCnx.source.connectionEnd}, 'paramCnxVariable')
   )
  ))->flatten(); --	- m_Process_Output_DataPort_Instance extends m_Process_Output_Port_Instance: for each port instance
 --		such that

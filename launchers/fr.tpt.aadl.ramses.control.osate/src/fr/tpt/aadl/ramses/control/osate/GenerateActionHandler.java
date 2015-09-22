@@ -55,6 +55,7 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import fr.tpt.aadl.ramses.control.osate.properties.AadlInspectorPropertyPage;
 import fr.tpt.aadl.ramses.control.osate.properties.LoggingConfigPage;
 import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage;
+import fr.tpt.aadl.ramses.control.support.RamsesException;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException;
 import fr.tpt.aadl.ramses.control.support.config.ConfigurationException;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
@@ -260,10 +261,17 @@ public class GenerateActionHandler extends RamsesActionHandler {
     SystemImplementation sysImpl = (SystemImplementation) sinst.
                                                   getComponentImplementation() ;
     
+    if(sysImpl==null)
+    {
+    	String errMsg =  "Please re-instantiate system \'"+ sinst + '\''+": "
+    			+ "cannot retreive system implementation from instance ";
+    	_LOGGER.error(errMsg);
+    	ServiceProvider.SYS_ERR_REP.error(errMsg, false);
+    }
     String workflow = getConfigFile(sysImpl.eResource(), "workflow");
     
     AnalysisErrorReporterManager errReporter = 
-                                 ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER ;
+    		ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER ;
     
     // Reinitialize the registry as include directors (eg projects directories),
     // may be added or deleted.
