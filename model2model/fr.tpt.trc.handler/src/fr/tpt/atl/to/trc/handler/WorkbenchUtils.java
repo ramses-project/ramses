@@ -47,6 +47,7 @@ import org.eclipse.ui.PlatformUI ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 import org.osate.aadl2.modelsupport.errorreporting.MarkerAnalysisErrorReporter ;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
+import org.osate.aadl2.modelsupport.resources.PredeclaredProperties;
 import org.osate.utils.Aadl2Utils ;
 import org.osate.utils.FileUtils ;
 
@@ -116,7 +117,7 @@ public class WorkbenchUtils
     IProject projects[] = root.getProjects();
     for(IProject p : projects)
     {
-      if(!p.getName().equals(OsateResourceUtil.PLUGIN_RESOURCES_DIRECTORY_NAME))
+      if(!p.getName().equals(PredeclaredProperties.PLUGIN_RESOURCES_PROJECT_NAME))
       {
         if(p.isOpen())
         {
