@@ -417,9 +417,9 @@ public class RamsesPropertyPage extends PropertyPage {
     }
     catch (CoreException e)
     {
-      String msg = "cannot save RAMSES configuration" ;
-      _LOGGER.fatal(msg, e) ;
-      throw new RuntimeException(msg, e) ;
+      String msg = "cannot save RAMSES configuration; report this message as a bug" ;
+	  _LOGGER.fatal(msg, e) ;
+	  throw new RuntimeException(msg, e) ;
     }
   }
 
@@ -474,11 +474,11 @@ public class RamsesPropertyPage extends PropertyPage {
   private void popupConfigurationErrorMessage(short errno)
   {
     StringBuilder msg =
-             new StringBuilder("Cannot save RAMSES configuration:\n\n");
+             new StringBuilder("Cannot save RAMSES configuration.\n");
 
     if(errno == 1)
     {
-      msg.append("\n\tCan't fetch the project.") ;
+      msg.append("\nCan't fetch the project.") ;
     }
     else
     {
@@ -488,27 +488,29 @@ public class RamsesPropertyPage extends PropertyPage {
       {
         case 1 :
         {
-          msg.append("\n\tTarget is missing.") ;
+          msg.append("\nTarget is missing.") ;
           break ;
         }
         
         case 2 :
         {
-          msg.append("\n\tThe target " + target.getData().toString() + " is not supported.") ;
+          msg.append("\nThe target " + target.getData().toString() + " is not supported.") ;
           break ;
         }
         
         case 3 :
         {
-          msg.append("\n\tThe runtime is missing.") ;
+          msg.append("\nThe runtime is missing.") ;
           break ;
         }
         
         case 4 :
         {
-          msg.append("\n\tThe given runtime is not a valid " + target.getData().toString() + " runtime.") ;
-          break ;
+          msg.append("\nThe path you entered is not valid; make sure (i) the targetted runtime or analysis tool is correctly installed"
+              		+ "and (ii) that the path you selected is correct.");
+          break;
         }
+        
       }
       
       if(errno%100 != 0)

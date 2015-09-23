@@ -318,7 +318,7 @@ public class AadlInspectorPropertyPage extends RamsesPropertyPage {
 		}
 		catch (CoreException e)
 		{
-			String msg = "cannot save RAMSES configuration" ;
+			String msg = "cannot save RAMSES configuration; report this message as a bug" ;
 			_LOGGER.fatal(msg, e) ;
 			throw new RuntimeException(msg, e) ;
 		}

@@ -80,7 +80,7 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
   
   protected String formatFatalMsg(String initialMsg)
   {
-    StringBuilder sb = new StringBuilder("<Fatal Error> Abort on fatal error ") ;
+    StringBuilder sb = new StringBuilder("Fatal Error: ") ;
     String dir = System.getProperty("user.dir");
     if(RamsesConfiguration.IS_LOGGER_ON)
     {
@@ -102,12 +102,12 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
   
   protected String formatErrorMsg(String initialMsg)
   {
-    return "<Internal Error> " + initialMsg ;
+    return "Error: " + initialMsg ;
   }
   
   protected String formatWarningMsg(String initialMsg)
   {
-    return "<Internal Warning> " + initialMsg ;
+    return "Warning: " + initialMsg ;
   }
   
   @Override
