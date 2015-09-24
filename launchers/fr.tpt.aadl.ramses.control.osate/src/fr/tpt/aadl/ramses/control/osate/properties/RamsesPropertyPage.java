@@ -316,7 +316,9 @@ public class RamsesPropertyPage extends PropertyPage {
       public void handleEvent(Event event)
       {
         Button button = (Button)(event.widget);
-        selectedPathLabel.setText("Select path for " + button.getText());
+        String txt = "Select path for " + button.getText();
+        selectedPathLabel.setText(txt);
+        selectedPathLabel.setSize(txt.length()*6, 50);
         selectedPathLabel.redraw();
         if (button.getSelection())
         {
@@ -335,8 +337,8 @@ public class RamsesPropertyPage extends PropertyPage {
     pathButton.setAlignment(SWT.RIGHT);
 
     selectedPathLabel = new Label(composite, SWT.BOLD); 
+        
     selectedPathLabel.setText("Path for target not selected ...");
-    selectedPathLabel.setSize(90, 50);
     GridData grdPath = new GridData();
     grdPath.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
     selectedPathLabel.setLayoutData(grdPath) ;
